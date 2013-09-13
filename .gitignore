@@ -1,5 +1,5 @@
 #ignored folders
-.idea/
+.idea
 .archive/
 .coverage/
 node_modules/
