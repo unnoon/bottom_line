@@ -1,0 +1,9 @@
+#ignored folders
+.idea/
+.archive/
+.coverage/
+
+#ignored file types
+*.map
+
+
