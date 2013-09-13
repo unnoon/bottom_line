@@ -1,0 +1,18 @@
+{
+	"name"           : "bottom_line.js",
+	"version"        : "0.1.0",
+	"description"    : "JS Toolbelt",
+	"repository"     : {
+		"type": "git",
+		"url" : "https://unnoon@bitbucket.org/unnoon/bottom_line._.-s.git"
+	},
+	"devDependencies": {
+		"grunt": "latest",
+
+		"karma-mocha"       : "latest",
+		"karma-chai-plugins": "latest",
+		"karma-coverage"    : "latest",
+
+		"benchmark": "latest"
+	}
+}
