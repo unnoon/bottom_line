@@ -3,6 +3,7 @@
 .archive/
 .coverage/
 node_modules/
+.idea
 
 #ignored file types
 *.map
