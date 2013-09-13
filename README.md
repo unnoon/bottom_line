@@ -1,6 +1,7 @@
-_____________Bottom_Line._.⌡S___
-BottomLine JavaScript Library
+#_____________Bottom_Line._.⌡S___
 
-Copyright 2013, Rogier Geertzema
-Released under the MIT license
+JS Toolbelt.
+
+Copyright 2013, Rogier Geertzema.
+Released under the MIT license.
 ________________________________
