@@ -9,7 +9,7 @@ describe("Extensions", function() {
 
 		describe("logical evaluations", function() {
 
-			it("strings", function() {
+			it("js types", function() {
 				expect('0').to.be.ok;
 				expect(-6).to.be.ok;
 				expect(6).to.be.ok;
@@ -83,6 +83,18 @@ describe("Extensions", function() {
 				expect(typeof undefined).to.eql('undefined');
 			});
 
+			it("javascript types", function() {
+				expect(new Number(6) instanceof Number).to.be.true;
+				expect(6 instanceof Number).to.be.false;
+				expect(new String('str') instanceof String).to.be.true;
+				expect('str' instanceof String).to.be.false; // works only on objects
+				expect([] instanceof Array).to.be.true; // counter intuitive
+				expect({} instanceof Object).to.be.true;
+				expect(function(){} instanceof Function).to.be.true;
+				expect(null instanceof Object).to.be.false; // counter intuitive. Although only objects can have the value null...
+				expect(undefined instanceof Object).to.be.false;
+			});
+
 			it("custom types: named constructor", function() {
 				function Animal() {} // make sure the constructor is a named function
 				var animal = new Animal();
@@ -95,6 +107,35 @@ describe("Extensions", function() {
 				var cat = new Cat();
 
 				expect(typeof cat).to.eql('object');
+			});
+		});
+
+		describe("instanceof", function() {
+
+			it("javascript types", function() {
+				expect(new Number(6) instanceof Number).to.be.true;
+				expect(6 instanceof Number).to.be.false;
+				expect(new String('str') instanceof String).to.be.true;
+				expect('str' instanceof String).to.be.false; // works only on objects
+				expect([] instanceof Array).to.be.true; // counter intuitive
+				expect({} instanceof Object).to.be.true;
+				expect(function(){} instanceof Function).to.be.true;
+				expect(null instanceof Object).to.be.false; // counter intuitive. Although only objects can have the value null...
+				expect(undefined instanceof Object).to.be.false;
+			});
+
+			it("custom types: named constructor", function() {
+				function Animal() {} // make sure the constructor is a named function
+				var animal = new Animal();
+
+				expect(animal instanceof Animal).to.be.true;
+			});
+
+			it("custom types: UNnamed constructor", function() {
+				var Cat = function () {};  // unnamed constructor
+				var cat = new Cat();
+
+				expect(cat instanceof Cat).to.be.true;
 			});
 		});
 
@@ -122,6 +163,24 @@ describe("Extensions", function() {
 				setNummie(666);
 
 				expect(clo()).to.eql(666);
+			});
+		});
+
+		describe("getters/setters", function() {
+
+			it("setters cannot return values", function() {
+				var obj = {
+					get x() {
+						return this._x;
+					},
+					set x(val) {
+						this._x = val;
+
+						return this;
+					}
+				};
+
+				expect((obj.x = 666)).to.equal(666);
 			});
 		});
 	});

@@ -71,6 +71,12 @@ describe("Bottom_Line._.⌡S", function() {
 	    });
 
 	    describe("prototype methods", function() {
+			describe("converter", function() {
+
+				it("convert to array", function() {
+					expect(_.arr(4)).to.deep.equal([4]);
+				});
+			});
 
 		    describe("append", function() {
 
@@ -82,6 +88,32 @@ describe("Bottom_Line._.⌡S", function() {
 				    expect(arr).to.eql(['a', 'b', 'c', 'd', 'e']);
 			    });
 		    });
+
+			describe("first: testting getters setters", function() {
+
+				it("append an array", function() {
+					var arr = ['a', 'b', 'c'];
+
+					expect(arr._.first).to.eql('a');
+				});
+
+				it("append an array", function() {
+					var arr = ['a', 'b', 'c'];
+
+					arr._.first = 'z';
+
+					expect(arr._.first).to.eql('z');
+					expect(arr).to.eql(['z', 'b', 'c']);
+				});
+
+				it("append an array", function() {
+					var arr = [['a', 'b'], 'b', 'c'];
+
+					arr.$.append(['d']).first.del('b').value;
+
+					expect(arr).to.eql([['a'], 'b', 'c', 'd']);
+				});
+			});
 
 			describe("insert", function() {
 
@@ -122,7 +154,7 @@ describe("Bottom_Line._.⌡S", function() {
 
 					arr._.insert(5, 4);
 
-					expect(arr).to.eql([1, 2, 3, 5 ]);
+					expect(arr).to.eql([1, 2, 3, 5]);
 				});
 			});
 
@@ -214,6 +246,25 @@ describe("Bottom_Line._.⌡S", function() {
 			    });
 		    });
 	    });
+	});
+
+	describe("Function", function() {
+
+		describe("static methods", function() {
+
+			describe("strap", function() {
+
+				it("positive after test", function() {
+					function multiply(num1, num2) {
+						return num1*num2;
+					}
+
+					var multiply6 = _.strap(6, multiply);
+
+					expect(multiply6(6)).to.equal(36);
+				});
+			});
+		});
 	});
 /*
 	describe("Underscore", function() {

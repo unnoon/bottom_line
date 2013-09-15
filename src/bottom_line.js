@@ -13,15 +13,10 @@
 
 	var _ = function() {};
 
-	// set browser and server globals
-	if (typeof exports !== 'undefined')
+	// set browser and nodejs globals
+	if(typeof(module) !== 'undefined' && module.exports)
 	{
-		if (typeof module !== 'undefined' && module.exports)
-		{
-			exports = module.exports = _;
-		}
-
-		exports._ = _;
+		module.exports = _;
 	}
 	else
 	{
@@ -36,13 +31,6 @@
 	var __fnc  = Function;
 	var __math = Math;
 
-	var physics = {
-		METER   : 1,
-		SECOND  : 1000 // 1 second is a thousand milliseconds
-		// FIXME object referencing parameters
-	//	GRAVITY : 9.80665/METER*SECOND
-	};
-
 	// wrap functions for chaining
 	function constructWrapper(nativeObj, shorthand, module)
 	{
@@ -51,10 +39,10 @@
 			this.value = value;
 		};
 
-		// stores single use methods
+		// stores non-chainable use methods
 		wrapperObj.__instance__ = {};
 
-		if(nativeObj.prototype)
+		if(nativeObj && nativeObj.prototype)
 		{
 			// extend native object with the 2 special properties
 			__obj.defineProperties(nativeObj.prototype, {
@@ -75,200 +63,202 @@
 			});
 		}
 
-		var statics = module.static || {};
 		// statics
-		__obj.getOwnPropertyNames(statics).forEach(function(prop) {
-			__obj.defineProperty(wrapperObj, prop, {value: statics[prop], enumarable: false});
+		var statics = module.static || {};
+		__obj.getOwnPropertyNames(statics).forEach(function(name) {
+			var descriptor = __obj.getOwnPropertyDescriptor(statics, name);
+
+			descriptor.enumarable = false;
+
+			__obj.defineProperty(wrapperObj, name, descriptor);
+
+			// copy static properties to the bottom line _ object
+			if(shorthand !== 'int') // except for the int class
+			{
+				if(_[name]) console.log('overwriting property: '+name); // TODO properly wrap identical function names based on type
+
+				__obj.defineProperty(_, name, descriptor);
+			}
 		});
 
-		var prototype = module.prototype || {};
 		// prototype
-		__obj.getOwnPropertyNames(prototype).forEach(function(prop) {
-			var fn = prototype[prop];
+		var prototype = module.prototype || {};
+		__obj.getOwnPropertyNames(prototype).forEach(function(name) {
+			var descriptor  = __obj.getOwnPropertyDescriptor(prototype, name);
+			var descriptor_ = clone(descriptor);
+			var descriptor$ = clone(descriptor);
 
-			if(fn instanceof Function)
-			{
-				(function(fn, prop) {
-					// normal
-					__obj.defineProperty(wrapperObj.__instance__, prop, {value: function () {
-							return fn.apply(wrapperObj.value, arguments);
-						},
-						enumarable: false
-					});
+			// make properties non enumerable
+			descriptor_.enumarable = false;
+			descriptor$.enumarable = false;
 
-					// chaining
-					__obj.defineProperty(wrapperObj.prototype, prop, {value: function () {
-							this.value = fn.apply(this.value, arguments);
+			// wrap function & getters & setters
+			if(typeof(descriptor.value) === 'function') wrap('value');
+			if(descriptor.get) 							wrap('get');
+			if(descriptor.set) 							wrap('set');
 
-							return this;
-						},
-						enumarable: false
-					});
-				})(fn, prop)
+			function wrap(type) {
+				var fn = descriptor[type];
+
+				descriptor_[type] = function () {
+					return fn.apply(wrapperObj.value, arguments);
+				};
+				descriptor$[type] = function () {
+					this.value = fn.apply(this.value, arguments);
+
+					return this;
+				};
+			}
+
+			__obj.defineProperty(wrapperObj.__instance__, name, descriptor_);
+			__obj.defineProperty(wrapperObj.prototype,    name, descriptor$);
+
+			// simple cloning function
+			function clone(obj) {
+				var clone = __obj.create(__obj.getPrototypeOf(obj));
+
+				__obj.getOwnPropertyNames(obj).forEach(function(name) {
+					__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
+				});
+
+				return clone;
 			}
 		})
 	}
 
 	/**
-	 * Extends an object with function/properties from a module object
-	 * @public
-	 * @param   {Object}  obj          - object to be extended
-	 * @param   {Object=} opt_settings - optional settings/default descriptor
-	 * @param   {Object}  module       - object containing functions/properties to extend the object with
-	 * @returns {Object}  obj          - the extended object
-	 */
-	_.extend = function(obj, opt_settings, module) {
-		var settings;
-		var descriptor;
-
-		module   = module? module       : opt_settings;
-		settings = module? opt_settings : {};
-
-		settings.enumerable   = settings.enumerable   !== false;
-		settings.configurable = settings.configurable !== false;
-		settings.writable     = settings.writable     !== false;
-
-	    for (var prop in module)
-	    {
-		    if(obj.hasOwnProperty(prop))
-			{
-			    console.warn('overwriting existing property: '+prop);
-			}
-		    else if(prop in obj)
-			{
-			    console.warn('overriding existing property: '+prop);
-			}
-
-		    descriptor = __obj.getOwnPropertyDescriptor(module, prop);
-
-		    descriptor.enumerable   = settings.enumerable;
-		    descriptor.configurable = settings.configurable;
-		    if(descriptor.hasOwnProperty('writable')) descriptor.writable = settings.writable; // getters/setters don't have a writable property in their descriptor
-
-		    __obj.defineProperty(obj, prop, descriptor);
-	    }
-
-		return obj;
-	};
-
-	/**
 	 * Object
 	 */
-	_.extend(_, {
-		// TODO: deep clone
-		/**
-		 * Clones an object
-		 * @public
-		 * @static
-		 * @param   {Object}  obj   - object to be cloned
-		 * @returns {Object}  clone - the cloned object
-		 */
-		clone: function (obj) {
-			var clone = __obj.create(__obj.getPrototypeOf(obj));
+	constructWrapper(Object, 'obj', {
+		static: {
+			// TODO: deep clone
+			/**
+			 * Clones an object
+			 * @public
+			 * @static
+			 * @param   {Object}  obj   - object to be cloned
+			 * @returns {Object}  clone - the cloned object
+			 */
+			clone: function (obj) {
+				var clone = __obj.create(__obj.getPrototypeOf(obj));
 
-			__obj.getOwnPropertyNames(obj).forEach(function(prop) {
-				__obj.defineProperty(clone, prop, __obj.getOwnPropertyDescriptor(obj, prop));
-			});
+				__obj.getOwnPropertyNames(obj).forEach(function(name) {
+					__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
+				});
 
-			return clone;
-		},
-		/**
-		 * Sets the prototype of an object
-		 * @public
-		 * @static
-		 * @param   {Object} obj   - object to set the prototype on
-		 * @param   {Array}  proto - the prototype to be set
-		 * @returns {Object} obj   - object with new prototype
-		 */
-		setPrototypeOf: function(obj, proto) {
-			obj.__proto__ = proto;
-			return obj;
-		},
-//			/**
-//			 * Converts an object to an array (for example arguments)
-//			 * @public
-//			 * @static
-//			 * @param   {any} obj - object to be converted to an array
-//			 * @returns {Array}   - converted object
-//			 */
-//			 toArray: function(obj) {
-//				 var type = _.typeOf(obj);
-//
-//				 switch (type)
-//				 {
-//					 case 'arguments' : return Array.prototype.slice.call(obj, 0);
-//					 case 'object'    :
-//					case 'function'  : return __obj.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
-//					 case 'array'     : return obj;
-//					case 'undefined' :
-//					case 'null'      : return [];
-//					 default          : return [obj];
-//				 }
-//			 },
-		/**
-		 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-		 * @public
-		 * @param {Object} obj  - object to iterate
-		 * @param {Object} opts - optional arguments
-		 * {
-		 *     ctx  : ..., // context for the callback, defaults to undefined
-		 * }
-		 * @param {function} callback - callback function to be called for each element
-		 */
-		iterate: function(obj, opts, callback) {
-			if(obj.length)
-			{   // handles array-like objects
-				__arr.prototype.iterate.apply(obj, arguments);
-			}
-			else
-			{
-				if(typeof opts === 'function')
-				{
-					callback = opts;
-					opts     = {};
-				}
+				return clone;
+			},
+			/**
+			 * Extends an object with function/properties from a module object
+			 * @public
+			 * @param   {Object}  obj          - object to be extended
+			 * @param   {Object=} opt_settings - optional settings/default descriptor
+			 * @param   {Object}  module       - object containing functions/properties to extend the object with
+			 * @returns {Object}  obj          - the extended object
+			 */
+			extend: function(obj, opt_settings, module) {
+				var settings;
+				var descriptor;
 
-				var ctx  = opts.ctx;
+				module   = module? module       : opt_settings;
+				settings = module? opt_settings : {};
 
-				for(var prop in obj)
+				settings.enumerable   = settings.enumerable   !== false;
+				settings.configurable = settings.configurable !== false;
+				settings.writable     = settings.writable     !== false;
+
+				for (var prop in module)
 				{
 					if(obj.hasOwnProperty(prop))
 					{
-						if(callback.call(ctx, obj[prop], prop, obj) === false) break;
+						console.warn('overwriting existing property: '+prop);
+					}
+					else if(prop in obj)
+					{
+						console.warn('overriding existing property: '+prop);
+					}
+
+					descriptor = __obj.getOwnPropertyDescriptor(module, prop);
+
+					descriptor.enumerable   = settings.enumerable;
+					descriptor.configurable = settings.configurable;
+					if(descriptor.hasOwnProperty('writable')) descriptor.writable = settings.writable; // getters/setters don't have a writable property in their descriptor
+
+					__obj.defineProperty(obj, prop, descriptor);
+				}
+
+				return obj;
+			},
+			/**
+			 * Sets the prototype of an object
+			 * @public
+			 * @static
+			 * @param   {Object} obj   - object to set the prototype on
+			 * @param   {Array}  proto - the prototype to be set
+			 * @returns {Object} obj   - object with new prototype
+			 */
+			setPrototypeOf: function(obj, proto) {
+				obj.__proto__ = proto;
+				return obj;
+			},
+			/**
+			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * @public
+			 * @param {Object} obj  - object to iterate
+			 * @param {Object} opts - optional arguments
+			 * {
+			 *     ctx  : ..., // context for the callback, defaults to undefined
+			 * }
+			 * @param {function} callback - callback function to be called for each element
+			 */
+			iterate: function(obj, opts, callback) {
+				if(obj.length)
+				{   // handles array-like objects
+					__arr.prototype.iterate.apply(obj, arguments);
+				}
+				else
+				{
+					if(typeof opts === 'function')
+					{
+						callback = opts;
+						opts     = {};
+					}
+
+					var ctx  = opts.ctx;
+
+					for(var prop in obj)
+					{
+						if(obj.hasOwnProperty(prop))
+						{
+							if(callback.call(ctx, obj[prop], prop, obj) === false) break;
+						}
 					}
 				}
-			}
-		},
-		/**
-		 * Proxies all function of an object (including those from the prototype in a certain context.
-		 * @public
-		 * @param   {Object} obj - object containing the functions to be proxied
-		 * @param   {Object} ctx - context to proxy the functions in
-		 * @returns {Object} obj - the object containing the proxied versions of the functions
-		 */
-		proxy: function(obj, ctx) {
-			for(var prop in obj) {
-				if(typeof obj[prop] === 'function')
-					obj[prop] = obj[prop].bind(ctx);
-			}
+			},
+			/**
+			 * Proxies all function of an object (including those from the prototype in a certain context.
+			 * @public
+			 * @param   {Object} obj - object containing the functions to be proxied
+			 * @param   {Object} ctx - context to proxy the functions in
+			 * @returns {Object} obj - the object containing the proxied versions of the functions
+			 */
+			proxy: function(obj, ctx) {
+				for(var prop in obj) {
+					if(typeof obj[prop] === 'function')
+						obj[prop] = obj[prop].bind(ctx);
+				}
 
-			return obj;
-		},
-		/**
-		 * Returns the type of an object. Better suited then the one from js itself
-		 * @public
-		 * @param   {Object} obj - object tot check the type from
-		 * @returns {string} - type of the object
-		 */
-		typeOf: function(obj) {
-			var type =  __obj.prototype.toString.call(obj).$.between('[object ', ']').decapitalize().value;
-
-			// replace with something like this: ???
-			//if(type === 'object' && obj.constructor !== Object)
-			if(type === 'object' && obj.constructor.name && obj.constructor !== 'Object')
-				return obj.constructor.name;
-			else
-				return type;
+				return obj;
+			},
+			/**
+			 * Returns the type of an object. Better suited then the one from js itself
+			 * @public
+			 * @param   {Object} obj - object tot check the type from
+			 * @returns {string} - type of the object
+			 */
+			typeOf: function(obj) {
+				return __obj.prototype.toString.call(obj).$.between('[object ', ']').decapitalize().value;
+			}
 		}
 	});
 
@@ -379,20 +369,17 @@
 				this[0] = val;
 			},
 			/**
-			 * Getter: Returns the last element of an array
+			 * Mutator: gets/sets the last element of an array
 			 * @public
-			 * @returns {Array} - last element of the array
+			 * @param   {Array} val - Value to be set as the last element
+			 * @returns {any|this}  - last element of the array
 			 */
-			get last() {
-				return this[this.length-1];
-			},
-			/**
-			 * Setter: Sets the last element of an array
-			 * @public
-			 * @param {Array} val - Value to be set as the last element
-			 */
-			set last(val) {
+			last: function(val) {
+				if(!arguments.length) return this[this.length-1];
+
 				this[this.length-1] = val;
+
+				return this;
 			},
 			/**
 			 * Mutator: Append 1 or more arrays to the current array
@@ -697,7 +684,7 @@
 			 * @returns {string}         - new string with the substring inserted
 			 */
 			insert: function(substr, i) {
-				return _.str(this).splice(i, 0, substr);
+				return this._.splice(i, 0, substr);
 			},
 			/**
 			 * Checks if a string is all lowercase
@@ -786,8 +773,8 @@
 			 */
 			get sign() {
 				return this > 0?  1 :
-					this < 0? -1 :
-						0 ;
+					   this < 0? -1 :
+					   			  0 ;
 			},
 			/**
 			 * Getter: indicator if the the number is even
@@ -851,7 +838,7 @@
 			callAfter: function (delay, fnc) {
 				setTimeout(fnc, delay);
 			},
-			 memoize: function(ctx) {}, // TODO
+			memoize: function(ctx) {}, // TODO
 			/**
 			 * Creates a partial version of the function that can be partially prefilled/bootstrapped with arguments use undefined to leave blank
 			 * @public
@@ -875,11 +862,32 @@
 			/**
 			 * Similar to bind but only prefills the arguments not the context
 			 * @public
-			 * @param   {any}      var_args - optional arguments
+			 * @param   {...any}   var_args - arguments to prefill
+			 * @param   {Function} fnc      - function to strap
 			 * @returns {Function}          - bootstrapped version of the function
 			 */
+			// TODO add partial support
 			strap: function(var_args, fnc) {
-				return fnc.bind.apply(this, [null].append(var_args));
+				var args = _.arr(arguments); // convert to array
+
+				fnc = args.pop();
+
+				return fnc.bind.apply(fnc, [null]._.append(args));
+			},
+			/**
+			 * Similar to bind but only prefills the arguments not the context
+			 * @public
+			 * @param   {...any}   var_args - arguments to prefill
+			 * @param   {Function} fnc      - function to strap
+			 * @returns {Function}          - bootstrapped version of the function
+			 */
+			// TODO add partial support
+			bind: function(ctx, var_args, fnc) {
+				var args = _.arr(arguments); // convert to array
+
+				fnc = args.pop();
+
+				return fnc.bind.apply(fnc, args);
 			}
 		}
 	});
@@ -909,76 +917,60 @@
 			 */
 			distance: function(x1, y1, x2, y2) {
 				return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-			},
-			distanceGrav: function(t, speed) {
-				return speed*t - 1/2*GRAVITY*t*t;
 			}
 		}
 	});
 
-	// /**
-	//  * Integer
-	//  * // TODO check if we can do something with signed arrays
-	//  */
-	// _.extend(__int, {enumerable: false}, {
-	// 	/**
-	// 	 * Returns a random integer between the min and max value
-	// 	 * @public
-	// 	 * @param   {number} min - integer lower bound
-	// 	 * @param   {number} max - integer upper bound
-	// 	 * @returns {number} - random integer in between
-	// 	 */
-	// 	random: function(min, max) {
-	// 		return Math.floor(Math.random() * (max + 1 - min)) + min;
-	// 	},
-	// 	/**
-	// 	 * Rebounds a number between 2 values. Handy for arrays that are continuous
-	// 	 * Curried version: for example - __int.rebound(4)(-5, 7)
-	// 	 * @public
-	// 	 * @param   {number}  int - integer value
-	// 	 * @returns {function} - function to add the range
-	// 	 */
-	// 	rebound: function(int) {
-	// 		/**
-	// 		 * Rebounds a number between 2 values. Handy for arrays that are continuous
-	// 		 * @private
-	// 		 * @param   {number}  min - minimum value
-	// 		 * @param   {number}  max - maximum value
-	// 		 * @returns {boolean} - rebounded version of the number that falls between the 2 values
-	// 		 */
-	// 		return function range(min, max) {
-	// 			var overflow = int % (__math.abs(max - min) + 1);
+	/**
+	  * Integer
+	  * // TODO check if we can do something with signed arrays
+	  */
+	constructWrapper(null, 'int', {
+		init: function(num) {
+			if (this.constructor === _.int) // called with new
+			{
+				this.value = num;
+			}
+			else // called as converter function
+			{
+				if(typeof(num) === 'number')
+				{
+					return Math[num < 0? 'ceil' : 'floor'](num);
+				}
+			}
+		},
+		static: {
+			/**
+			 * Returns a random integer between the min and max value
+			 * @public
+			 * @param   {number} min - integer lower bound
+			 * @param   {number} max - integer upper bound
+			 * @returns {number} - random integer in between
+			 */
+			random: function(min, max) {
+				return Math.floor(Math.random() * (max + 1 - min)) + min;
+			},
+			/**
+			 * Rebounds a number between 2 values. Handy for arrays that are continuous
+			 * Curried version: for example - __int.rebound(4)(-5, 7)
+			 * @public
+			 * @param   {number}  int - integer value
+			 * @returns {function} - function to add the range
+			 */
+			rebound: function(int) {
+				/**
+				 * Rebounds a number between 2 values. Handy for arrays that are continuous
+				 * @private
+				 * @param   {number}  min - minimum value
+				 * @param   {number}  max - maximum value
+				 * @returns {boolean} - rebounded version of the number that falls between the 2 values
+				 */
+				return function range(min, max) {
+					var overflow = int % (__math.abs(max - min) + 1);
 
-	// 			return (overflow < 0? max+1 : min) + overflow;
-	// 		}
-	// 	}
-	// });
-
-	// /**
-	//  * Integer
-	//  * // TODO check if we can do something with signed arrays
-	//  */
-	// _.extend(__int.prototype, {enumerable: false}, {
-	// 	/**
-	// 	 * Rebounds a number between 2 values. Handy for arrays that are continuous
-	// 	 * Curried version: for example - __int.rebound(4)(-5, 7)
-	// 	 * @public
-	// 	 * @param   {number}  int - integer value
-	// 	 * @returns {function} - function to add the range
-	// 	 */
-	// 	rebound: function range(min, max) {
-	// 		var overflow = this % (__math.abs(max - min) + 1);
-
-	// 		return (overflow < 0? max+1 : min) + overflow;
-	// 	}
-	// });
-
-	// // what about this syntaxxx???
-	// _.fnc(function() {}).strap(5, 7);
-
-	// _.int(5).rebound(6, 8);
-	// _.int.random(6, 8);
-	// _.num.random(6, 8);
-
-	// _.arr([5,6,7]).slice(0);
+					return (overflow < 0? max+1 : min) + overflow;
+				}
+			}
+		}
+	});
 }).call(this); // need to call it specifically in this context, otherwise 'this' is undefined
