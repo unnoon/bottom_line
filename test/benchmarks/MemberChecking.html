@@ -31,6 +31,12 @@
             .add('not undefined: depth 3', function() {
                 member = obj['a3'] !== undefined;
             })
+            .add('boolean checking!! depth 3', function() {
+                member = !!obj['a3'];
+            })
+            .add('boolean checking depth 3', function() {
+                member = Boolean(obj['a3']);
+            })
             // add listeners
             .on('cycle', function(event) {
                 console.log(String(event.target));

@@ -46,7 +46,7 @@
 		{
 			// extend native object with the 2 special properties
 			__obj.defineProperties(nativeObj.prototype, {
-				_: {
+				$: {
 					get: function() {
 						wrapperObj.value = this;
 
@@ -54,7 +54,7 @@
 					},
 					enumerable: false
 				},
-				$: {
+				_: {
 					get: function() {
 						return new wrapperObj(this); // return new wrapper object for chaining
 					},
@@ -131,6 +131,17 @@
 	 */
 	constructWrapper(Object, 'obj', {
 		static: {
+			/**
+			 * Returns the type of an object. Better suited then the one from js itself
+			 * @public
+			 * @param   {Object} obj - object tot check the type from
+			 * @returns {string} - type of the object
+			 */
+			typeOf: function(obj) {
+				return __obj.prototype.toString.call(obj)._.between('[object ', ']').decapitalize().value;
+			}
+		},
+		prototype: {
 			// TODO: deep clone
 			/**
 			 * Clones an object
@@ -190,49 +201,34 @@
 				return obj;
 			},
 			/**
-			 * Sets the prototype of an object
+			 * Sets/gets the prototype of an object
+			 * NOTE setting a prototype using __proto__ is non standard use at your own risk!
 			 * @public
-			 * @static
-			 * @param   {Object} obj   - object to set the prototype on
-			 * @param   {Array}  proto - the prototype to be set
-			 * @returns {Object} obj   - object with new prototype
+			 * @param   {Array}  proto      - the prototype to be set
+			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
 			 */
-			setPrototypeOf: function(obj, proto) {
-				obj.__proto__ = proto;
-				return obj;
+			proto: function(proto) {
+				if(!arguments.length) return __obj.getPrototypeOf(this);
+
+				this.__proto__ = proto;
+
+				return this;
 			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
-			 * @param {Object} obj  - object to iterate
-			 * @param {Object} opts - optional arguments
-			 * {
-			 *     ctx  : ..., // context for the callback, defaults to undefined
-			 * }
-			 * @param {function} callback - callback function to be called for each element
+			 * @param {Function} cb      - callback function to be called for each element
+			 * @param {Object=}  opt_ctx - optional context
 			 */
-			iterate: function(obj, opts, callback) {
-				if(obj.length)
-				{   // handles array-like objects
-					__arr.prototype.iterate.apply(obj, arguments);
-				}
-				else
+			iterate: function(cb, opt_ctx) {
+				var keys = __obj.keys(this);
+				var key;
+
+				for(var i = 0, max = keys.length; i < max; i++)
 				{
-					if(typeof opts === 'function')
-					{
-						callback = opts;
-						opts     = {};
-					}
+					key = keys[i];
 
-					var ctx  = opts.ctx;
-
-					for(var prop in obj)
-					{
-						if(obj.hasOwnProperty(prop))
-						{
-							if(callback.call(ctx, obj[prop], prop, obj) === false) break;
-						}
-					}
+					if(cb.call(opt_ctx, this[key], key, this) === false) break;
 				}
 			},
 			/**
@@ -243,21 +239,12 @@
 			 * @returns {Object} obj - the object containing the proxied versions of the functions
 			 */
 			proxy: function(obj, ctx) {
-				for(var prop in obj) {
-					if(typeof obj[prop] === 'function')
-						obj[prop] = obj[prop].bind(ctx);
+				for(var prop in obj)
+				{
+					if(typeof(obj[prop]) === 'function') obj[prop] = obj[prop].bind(ctx);
 				}
 
 				return obj;
-			},
-			/**
-			 * Returns the type of an object. Better suited then the one from js itself
-			 * @public
-			 * @param   {Object} obj - object tot check the type from
-			 * @returns {string} - type of the object
-			 */
-			typeOf: function(obj) {
-				return __obj.prototype.toString.call(obj).$.between('[object ', ']').decapitalize().value;
 			}
 		}
 	});
@@ -312,7 +299,7 @@
 
 				for(var i = 1, max = args.length; i < max; i++)
 				{
-					diff = diff.filter(function(elm) {return !args[i]._.has(elm)});
+					diff = diff.filter(function(elm) {return !args[i].$.has(elm)});
 				}
 
 				return diff;
@@ -332,7 +319,7 @@
 				{
 					for(j = 0; j < intersection.length; j++) // no max, length is variable
 					{
-						if(!arguments[i]._.has(intersection[j])) intersection.splice(j--, 1)
+						if(!arguments[i].$.has(intersection[j])) intersection.splice(j--, 1)
 					}
 					// if intersection is empty we can stop the iterating
 					if(!intersection.length) break;
@@ -348,7 +335,7 @@
 			 * @returns  {Array} intersection - array containing the union of elements
 			 */
 			union: function(var_args) {
-				return __arr.prototype.concat.apply([], arguments)._.unique();
+				return __arr.prototype.concat.apply([], arguments).$.unique();
 			}
 		},
 		prototype: {
@@ -579,7 +566,7 @@
 				for(var i = 0, max = this.length; i < max; i++)
 				{
 					elm = this[i];
-					if(!unique._.has(elm)) unique.push(elm);
+					if(!unique.$.has(elm)) unique.push(elm);
 				}
 
 				return unique;
@@ -640,7 +627,7 @@
 			 * @returns {string}             - new string containing the string before the given substring
 			 */
 			between: function(pre_substr, post_substr) {
-				return this.$.after(pre_substr).before(post_substr).value;
+				return this._.after(pre_substr).before(post_substr).value;
 			},
 			/**
 			 * Capitalize the first character of a string
@@ -684,7 +671,7 @@
 			 * @returns {string}         - new string with the substring inserted
 			 */
 			insert: function(substr, i) {
-				return this._.splice(i, 0, substr);
+				return this.$.splice(i, 0, substr);
 			},
 			/**
 			 * Checks if a string is all lowercase
@@ -872,7 +859,7 @@
 
 				fnc = args.pop();
 
-				return fnc.bind.apply(fnc, [null]._.append(args));
+				return fnc.bind.apply(fnc, [null].$.append(args));
 			},
 			/**
 			 * Similar to bind but only prefills the arguments not the context

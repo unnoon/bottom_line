@@ -1,23 +1,128 @@
 describe("Bottom_Line._.⌡S", function() {
 
-	describe("new arr", function() {
+	describe("bottom line js", function() {
 
-		it("simple", function() {
+		it("singular", function() {
 			var names = ['bobby', 'jean'];
 
-			var namesExt = names._.append(['xavier']);
+			var namesExt = names.$.append(['xavier']);
 
 			expect(namesExt).to.eql(['bobby', 'jean', 'xavier']);
 
-			expect(names._.has('jean')).to.equal(true);
+			expect(names.$.has('jean')).to.equal(true);
 		});
 
-		it("chain", function() {
+		it("chaining", function() {
 			var names = ['bobby', 'jean'];
 
-			var arr = names.$.append(['xavier']).del('bobby').value;
+			names._.append(['xavier']).del('bobby').value;
 
-			expect(arr).to.eql(['jean', 'xavier']);
+			expect(names).to.eql(['jean', 'xavier']);
+		});
+	});
+
+	describe("Object", function() {
+
+		describe("static methods", function() {
+
+			describe("typeOf", function() {
+
+				it("javascript types", function() {
+					expect(_.typeOf(6)).to.eql('number');
+					expect(_.typeOf(NaN)).to.eql('number');
+					expect(_.typeOf(Infinity)).to.eql('number');
+					expect(_.typeOf('s')).to.eql('string');
+					expect(_.typeOf([])).to.eql('array');
+					expect(_.typeOf({})).to.eql('object');
+					expect(_.typeOf(function(){})).to.eql('function');
+					expect(_.typeOf(null)).to.eql('null');
+					expect(_.typeOf(undefined)).to.eql('undefined');
+				});
+
+				it("custom types: named constructor", function() {
+					function Animal() {} // make sure the constructor is a named function
+					var animal = new Animal();
+
+					expect(_.typeOf(animal)).to.eql('object');
+				});
+
+				it("custom types: UNnamed constructor", function() {
+					var Cat = function () {};  // unnamed constructor
+					var cat = new Cat();
+
+					expect(_.typeOf(cat)).to.eql('object');
+				});
+			});
+		});
+
+		describe("prototype methods", function() {
+
+			describe("iterate", function() {
+
+				it("simple iteration", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3
+					};
+
+					var sum = 0;
+
+					obj.$.iterate(function(elm) {
+						sum += elm;
+					});
+
+					expect(sum).to.equal(6);
+				});
+
+				it("iteration can be stoppped by returning false", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3
+					};
+
+					var sum = 0;
+
+					obj.$.iterate(function(elm) {
+						if(elm === 2) return false;
+
+						sum += elm;
+					});
+
+					expect(sum).to.be.below(6);
+				});
+
+				it("will throw a TypeError if no callback function is provided", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3
+					};
+
+					expect(obj.$.iterate).to.throw(TypeError);
+				});
+
+				it("it is possible to pass a different context for the callback function", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3
+					};
+
+					var obj2 = {
+						c: 1
+					};
+
+					var sum = 0;
+
+					obj.$.iterate(function(elm) {
+						sum += elm + this.c;
+					}, obj2);
+
+					expect(sum).to.equal(9);
+				});
+			});
 		});
 	});
 
@@ -83,7 +188,7 @@ describe("Bottom_Line._.⌡S", function() {
 			    it("append an array", function() {
 				    var arr = ['a', 'b', 'c'];
 
-				    arr._.append(['d', 'e']);
+				    arr.$.append(['d', 'e']);
 
 				    expect(arr).to.eql(['a', 'b', 'c', 'd', 'e']);
 			    });
@@ -94,22 +199,22 @@ describe("Bottom_Line._.⌡S", function() {
 				it("append an array", function() {
 					var arr = ['a', 'b', 'c'];
 
-					expect(arr._.first).to.eql('a');
+					expect(arr.$.first).to.eql('a');
 				});
 
 				it("append an array", function() {
 					var arr = ['a', 'b', 'c'];
 
-					arr._.first = 'z';
+					arr.$.first = 'z';
 
-					expect(arr._.first).to.eql('z');
+					expect(arr.$.first).to.eql('z');
 					expect(arr).to.eql(['z', 'b', 'c']);
 				});
 
 				it("append an array", function() {
 					var arr = [['a', 'b'], 'b', 'c'];
 
-					arr.$.append(['d']).first.del('b').value;
+					arr._.append(['d']).first.del('b').value;
 
 					expect(arr).to.eql([['a'], 'b', 'c', 'd']);
 				});
@@ -120,7 +225,7 @@ describe("Bottom_Line._.⌡S", function() {
 				it("insert beginning", function() {
 					var arr = [1, 2, 3];
 
-					arr._.insert(0, 0);
+					arr.$.insert(0, 0);
 
 					expect(arr).to.eql([0, 1, 2, 3]);
 				});
@@ -128,7 +233,7 @@ describe("Bottom_Line._.⌡S", function() {
 				it("insert end", function() {
 					var arr = [1, 2, 3];
 
-					arr._.insert(4, 3);
+					arr.$.insert(4, 3);
 
 					expect(arr).to.eql([1, 2, 3, 4]);
 				});
@@ -136,7 +241,7 @@ describe("Bottom_Line._.⌡S", function() {
 				it("insert middle", function() {
 					var arr = [1, 2, 3];
 
-					arr._.insert(1.5, 1);
+					arr.$.insert(1.5, 1);
 
 					expect(arr).to.eql([1, 1.5, 2, 3]);
 				});
@@ -144,7 +249,7 @@ describe("Bottom_Line._.⌡S", function() {
 				it("insert out of bounds -", function() {
 					var arr = [1, 2, 3];
 
-					arr._.insert(-1, -2);
+					arr.$.insert(-1, -2);
 
 					expect(arr).to.eql([1, -1, 2, 3]);
 				});
@@ -152,7 +257,7 @@ describe("Bottom_Line._.⌡S", function() {
 				it("insert out of bounds", function() {
 					var arr = [1, 2, 3];
 
-					arr._.insert(5, 4);
+					arr.$.insert(5, 4);
 
 					expect(arr).to.eql([1, 2, 3, 5]);
 				});
@@ -163,7 +268,7 @@ describe("Bottom_Line._.⌡S", function() {
 			    it("delete one element", function() {
 				    var arr = ['a', 'b', 'c'];
 
-				    arr._.del('a');
+				    arr.$.del('a');
 
 				    expect(arr).to.eql(['b', 'c']);
 			    });
@@ -171,7 +276,7 @@ describe("Bottom_Line._.⌡S", function() {
 			    it("delete one element that does not exists in the array", function() {
 				    var arr = ['a', 'b', 'c'];
 
-				    arr._.del('d');
+				    arr.$.del('d');
 
 				    expect(arr).to.eql(['a', 'b', 'c']);
 			    });
@@ -216,25 +321,25 @@ describe("Bottom_Line._.⌡S", function() {
 			describe("after", function() {
 
 		        it("positive after test", function() {
-					expect('one.two'._.after('.t')).to.eql('wo');
+					expect('one.two'.$.after('.t')).to.eql('wo');
 				});
 
 				it("negative after test", function() {
-					expect('one'._.after('.t')).to.eql('');
+					expect('one'.$.after('.t')).to.eql('');
 				});
 			});
 
 			describe("capitalize", function() {
 
 				it("positive testcases", function() {
-					expect('hello'._.capitalize()).to.eql('Hello');
-					expect('Hello'._.capitalize()).to.eql('Hello');
+					expect('hello'.$.capitalize()).to.eql('Hello');
+					expect('Hello'.$.capitalize()).to.eql('Hello');
 				});
 
 				it("empty string", function() {
 					var empty_str = '';
 
-					empty_str._.capitalize();
+					empty_str.$.capitalize();
 					expect(empty_str).to.eql('');
 				});
 			});
@@ -242,7 +347,7 @@ describe("Bottom_Line._.⌡S", function() {
 		    describe("isUpperCase", function() {
 
 			    it("positive uppercase case", function() {
-				    expect('HF_GD123'._.isUpperCase()).to.be.true;
+				    expect('HF_GD123'.$.isUpperCase()).to.be.true;
 			    });
 		    });
 	    });
@@ -270,35 +375,6 @@ describe("Bottom_Line._.⌡S", function() {
 	describe("Underscore", function() {
 
 		describe("static methods", function() {
-
-			describe("typeOf", function() {
-
-				it("javascript types", function() {
-					expect(_.typeOf(6)).to.eql('number');
-					expect(_.typeOf(NaN)).to.eql('number');
-					expect(_.typeOf(Infinity)).to.eql('number');
-					expect(_.typeOf('s')).to.eql('string');
-					expect(_.typeOf([])).to.eql('array');
-					expect(_.typeOf({})).to.eql('object');
-					expect(_.typeOf(function(){})).to.eql('function');
-					expect(_.typeOf(null)).to.eql('null');
-					expect(_.typeOf(undefined)).to.eql('undefined');
-				});
-
-				it("custom types: named constructor", function() {
-					function Animal() {} // make sure the constructor is a named function
-					var animal = new Animal();
-
-					expect(_.typeOf(animal)).to.eql('Animal');
-				});
-
-				it("custom types: UNnamed constructor", function() {
-					var Cat = function () {};  // unnamed constructor
-					var cat = new Cat();
-
-					expect(_.typeOf(cat)).to.eql('object');
-				});
-			});
 
 			describe("Object properties available from underscore", function() {
 
