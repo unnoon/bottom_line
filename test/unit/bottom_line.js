@@ -15,9 +15,21 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining", function() {
 			var names = ['bobby', 'jean'];
 
-			names._.append(['xavier']).del('bobby').value;
+			names._.append(['xavier']).del('bobby');
 
 			expect(names).to.eql(['jean', 'xavier']);
+		});
+
+		it("chaining different types", function() {
+			var arr = [4,5,6,2];
+
+			expect(arr._.del(2).min()._.bound(1, 3).between(2,4).value).to.be.true;
+		});
+
+		it("singular type chaining", function() {
+			var arr = [4,5,6,2];
+
+			expect(arr.$.min().$.bound(-1, 1)).to.equal(1);
 		});
 	});
 
@@ -121,6 +133,24 @@ describe("Bottom_Line._.⌡S", function() {
 					}, obj2);
 
 					expect(sum).to.equal(9);
+				});
+			});
+
+			describe("filter", function() {
+
+				it("simple filter", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					};
+
+					var result = obj.$.filter(function(elm) {
+						return elm < 3;
+					});
+
+					expect(result).to.deep.equal([1,2]);
 				});
 			});
 		});

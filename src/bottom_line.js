@@ -10,8 +10,7 @@
 
 (function() {
 	var __root = this;
-
-	var _ = function() {};
+	var _      = function() {};
 
 	// set browser and nodejs globals
 	if(typeof(module) !== 'undefined' && module.exports)
@@ -38,6 +37,16 @@
 			// convertor & constructor function
 			this.value = value;
 		};
+
+		// extend it with an extra property to support chaining of multiple types
+		__obj.defineProperties(wrapperObj.prototype, {
+			_: {
+				get: function() {
+					return this.value._;
+				},
+				enumerable: false
+			}
+		});
 
 		// stores non-chainable use methods
 		wrapperObj.__instance__ = {};
@@ -100,9 +109,11 @@
 			function wrap(type) {
 				var fn = descriptor[type];
 
+				// singular
 				descriptor_[type] = function () {
 					return fn.apply(wrapperObj.value, arguments);
 				};
+				// chaining
 				descriptor$[type] = function () {
 					this.value = fn.apply(this.value, arguments);
 
@@ -201,18 +212,20 @@
 				return obj;
 			},
 			/**
-			 * Sets/gets the prototype of an object
-			 * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+			 * Filters
 			 * @public
-			 * @param   {Array}  proto      - the prototype to be set
-			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
+			 * @param  {Function} cb      - callback function to be called for each element
+			 * @param  {Object=}  opt_ctx - optional context
+			 * @return {Array} array containing the filtered values
 			 */
-			proto: function(proto) {
-				if(!arguments.length) return __obj.getPrototypeOf(this);
+			filter: function(cb, opt_ctx) {
+				var output = [];
 
-				this.__proto__ = proto;
+				this.$.iterate(function(elm) {
+					if(cb.call(opt_ctx, elm)) output.push(elm);
+				});
 
-				return this;
+				return output;
 			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -230,6 +243,36 @@
 
 					if(cb.call(opt_ctx, this[key], key, this) === false) break;
 				}
+			},
+			/**
+			 * Returns an array containing the keys of an object (enumerable properties))
+			 * @public
+			 * @return {Array} keys of the object
+			 */
+			keys: function() {
+				return __obj.keys(this);
+			},
+			/**
+			 * Returns an array containing the names of an object (includes non-enumerable properties)
+			 * @public
+			 * @return {Array} keys of the object
+			 */
+			names: function() {
+				return __obj.getOwnPropertyNames(this);
+			},
+			/**
+			 * Sets/gets the prototype of an object
+			 * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+			 * @public
+			 * @param   {Array}  proto      - the prototype to be set
+			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
+			 */
+			proto: function(proto) {
+				if(!arguments.length) return __obj.getPrototypeOf(this);
+
+				this.__proto__ = proto;
+
+				return this;
 			},
 			/**
 			 * Proxies all function of an object (including those from the prototype in a certain context.
@@ -787,7 +830,7 @@
 			 * @returns {boolean}     - boolean indicating if the value lies between the two values
 			 */
 			between: function(min, max) {
-				return min <= this && this <= max;
+				return min <= this && this <= max; // this is correct when saying between the endpoints should be included when saying from to the end point "to" is excluded well for mathematicians that is
 			},
 			/**
 			 * Bounds a number between 2 values

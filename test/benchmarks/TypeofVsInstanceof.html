@@ -20,15 +20,26 @@
                 typeof null==='object'; // counter intuitive. Although only objects can have the value null...
                 typeof undefined==='undefined';
             })
+            .add('_.typeof', function() {
+                _.typeOf(6) === 'number';
+                _.typeOf(NaN)==='number';
+                _.typeOf(Infinity)==='number';
+                _.typeOf('s')==='string';
+                _.typeOf([])==='array';
+                _.typeOf({})==='object';
+                _.typeOf(function(){})==='function';
+                _.typeOf(null)==='null';
+                _.typeOf(undefined)==='undefined';
+            })
             .add('instanceof', function() {
                 6 instanceof Number;
                 NaN instanceof Number;
                 Infinity instanceof Number;
                 's' instanceof String;
                 [] instanceof Array; // counter intuitive
-                    ({}) instanceof Object;
-                    (function(){}) instanceof Function;
-                null instanceof Object; // counter intuitive. Although only objects can have the value null...
+                ({}) instanceof Object;
+                (function(){}) instanceof Function;
+                null instanceof Object;
                 undefined instanceof Object;
             })
             // add listeners
