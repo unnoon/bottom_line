@@ -1,4 +1,4 @@
-describe("Bottom_Line._.⌡S", function() {
+describe("Bottom_Line.$$.⌡S", function() {
 
 	describe("bottom line js", function() {
 
@@ -15,7 +15,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining", function() {
 			var names = ['bobby', 'jean'];
 
-			names._.append(['xavier']).del('bobby');
+			names.$$.append(['xavier']).del('bobby');
 
 			expect(names).to.eql(['jean', 'xavier']);
 		});
@@ -23,7 +23,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining different types", function() {
 			var arr = [4,5,6,2];
 
-			expect(arr._.del(2).min()._.bound(1, 3).between(2,4).value).to.be.true;
+			expect(arr.$$.del(2).min().$$.bound(1, 3).between(2,4).value).to.be.true;
 		});
 
 		it("singular type chaining", function() {
@@ -37,37 +37,133 @@ describe("Bottom_Line._.⌡S", function() {
 
 		describe("static methods", function() {
 
-			describe("typeOf", function() {
+			describe("clone", function() {
+
+				it("simple clone", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					};
+
+					expect(_.clone(obj)).to.deep.equal({
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					});
+					expect(_.clone(obj)).to.not.equal({
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					});
+					expect(_.clone(obj)).to.not.equal(obj);
+				});
+			});
+
+			describe("extend", function() {
+
+				it("simple extend", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					};
+					var module = {
+						fnc: function() {
+							return 'tralala';
+						},
+						prop: 666,
+						_x: 'jeweetzelluf',
+						get x() {
+							return this._x;
+						}
+					};
+
+					_.extend(obj,module);
+
+					expect(obj.fnc()).to.equal('tralala');
+					expect(obj.prop).to.equal(666);
+					expect(obj.x).to.equal('jeweetzelluf');
+
+					var descriptor = Object.getOwnPropertyDescriptor(obj, 'prop');
+
+					expect(descriptor.writable).to.be.true;
+					expect(descriptor.enumerable).to.be.true;
+					expect(descriptor.configurable).to.be.true;
+				});
+
+				it("adding custom descriptors", function() {
+					var obj = {
+						x: 1,
+						y: 2
+					};
+					var module = {
+						prop: 666
+					};
+
+					_.extend(obj,{writable:false, enumerable:false, configurable:false}, module);
+
+					expect(obj.prop).to.equal(666);
+
+					var descriptor = Object.getOwnPropertyDescriptor(obj, 'prop');
+
+					expect(descriptor.writable).to.be.false;
+					expect(descriptor.enumerable).to.be.false;
+					expect(descriptor.configurable).to.be.false;
+				});
+			});
+
+			describe("typeof", function() {
 
 				it("javascript types", function() {
-					expect(_.typeOf(6)).to.eql('number');
-					expect(_.typeOf(NaN)).to.eql('number');
-					expect(_.typeOf(Infinity)).to.eql('number');
-					expect(_.typeOf('s')).to.eql('string');
-					expect(_.typeOf([])).to.eql('array');
-					expect(_.typeOf({})).to.eql('object');
-					expect(_.typeOf(function(){})).to.eql('function');
-					expect(_.typeOf(null)).to.eql('null');
-					expect(_.typeOf(undefined)).to.eql('undefined');
+					expect(_.typeof(6)).to.eql('number');
+					expect(_.typeof(NaN)).to.eql('number');
+					expect(_.typeof(Infinity)).to.eql('number');
+					expect(_.typeof('s')).to.eql('string');
+					expect(_.typeof([])).to.eql('array');
+					expect(_.typeof({})).to.eql('object');
+					expect(_.typeof(function(){})).to.eql('function');
+					expect(_.typeof(null)).to.eql('null');
+					expect(_.typeof(undefined)).to.eql('undefined');
 				});
 
 				it("custom types: named constructor", function() {
 					function Animal() {} // make sure the constructor is a named function
 					var animal = new Animal();
 
-					expect(_.typeOf(animal)).to.eql('object');
+					expect(_.typeof(animal)).to.eql('object');
 				});
 
 				it("custom types: UNnamed constructor", function() {
 					var Cat = function () {};  // unnamed constructor
 					var cat = new Cat();
 
-					expect(_.typeOf(cat)).to.eql('object');
+					expect(_.typeof(cat)).to.eql('object');
 				});
 			});
 		});
 
 		describe("prototype methods", function() {
+
+			describe("del", function() {
+
+				it("delete an element", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3
+					};
+
+					expect(obj.$.del(2)).to.deep.equal({
+						x: 1,
+						z: 3
+					});
+				});
+			});
 
 			describe("iterate", function() {
 
@@ -153,6 +249,34 @@ describe("Bottom_Line._.⌡S", function() {
 					expect(result).to.deep.equal([1,2]);
 				});
 			});
+
+			describe("find", function() {
+
+				it("simple find", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					};
+
+					expect(obj.$.find(function(elm) {return elm > 2})).to.deep.equal(3);
+				});
+			});
+
+			describe("values", function() {
+
+				it("simple values", function() {
+					var obj = {
+						x: 1,
+						y: 2,
+						z: 3,
+						t: 666
+					};
+
+					expect(obj.$.values()).to.deep.equal([1,2,3,666]);
+				});
+			});
 		});
 	});
 
@@ -224,27 +348,46 @@ describe("Bottom_Line._.⌡S", function() {
 			    });
 		    });
 
-			describe("first: testting getters setters", function() {
+			describe("del", function() {
 
-				it("append an array", function() {
+				it("delete one element", function() {
 					var arr = ['a', 'b', 'c'];
 
-					expect(arr.$.first).to.eql('a');
+					arr.$.del('a');
+
+					expect(arr).to.eql(['b', 'c']);
 				});
 
-				it("append an array", function() {
+				it("delete one element that does not exists in the array", function() {
 					var arr = ['a', 'b', 'c'];
 
-					arr.$.first = 'z';
+					arr.$.del('d');
 
-					expect(arr.$.first).to.eql('z');
+					expect(arr).to.eql(['a', 'b', 'c']);
+				});
+			});
+
+			describe("first: testting", function() {
+
+				it("return first", function() {
+					var arr = ['a', 'b', 'c'];
+
+					expect(arr.$.first()).to.eql('a');
+				});
+
+				it("set first", function() {
+					var arr = ['a', 'b', 'c'];
+
+					arr.$.first('z');
+
+					expect(arr.$.first()).to.eql('z');
 					expect(arr).to.eql(['z', 'b', 'c']);
 				});
 
-				it("append an array", function() {
+				it("complex first chain", function() {
 					var arr = [['a', 'b'], 'b', 'c'];
 
-					arr._.append(['d']).first.del('b').value;
+					arr.$$.append(['d']).first().del('b');
 
 					expect(arr).to.eql([['a'], 'b', 'c', 'd']);
 				});
@@ -292,27 +435,23 @@ describe("Bottom_Line._.⌡S", function() {
 					expect(arr).to.eql([1, 2, 3, 5]);
 				});
 			});
-
-		    describe("del", function() {
-
-			    it("delete one element", function() {
-				    var arr = ['a', 'b', 'c'];
-
-				    arr.$.del('a');
-
-				    expect(arr).to.eql(['b', 'c']);
-			    });
-
-			    it("delete one element that does not exists in the array", function() {
-				    var arr = ['a', 'b', 'c'];
-
-				    arr.$.del('d');
-
-				    expect(arr).to.eql(['a', 'b', 'c']);
-			    });
-		    });
 	    });
-    });
+
+		describe("iterate", function() {
+
+			it("simple iterate", function() {
+				var arr = [1, 2, 3];
+
+				var sum = 0;
+
+				arr.$.iterate(function(elm) {
+					sum += elm;
+				});
+
+				expect(sum).to.eql(6);
+			});
+		});
+	});
 /*
 	describe("Number", function() {
 

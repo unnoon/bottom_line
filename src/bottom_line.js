@@ -1,5 +1,5 @@
 /*!
- * _____________Bottom_Line._.⌡S___
+ * _____________Bottom_Line.$$.⌡S___
  * BottomLine JavaScript Library
  *
  * Copyright 2013, Rogier Geertzema
@@ -40,9 +40,9 @@
 
 		// extend it with an extra property to support chaining of multiple types
 		__obj.defineProperties(wrapperObj.prototype, {
-			_: {
+			$$: {
 				get: function() {
-					return this.value._;
+					return this.value.$$;
 				},
 				enumerable: false
 			}
@@ -63,7 +63,7 @@
 					},
 					enumerable: false
 				},
-				_: {
+				$$: {
 					get: function() {
 						return new wrapperObj(this); // return new wrapper object for chaining
 					},
@@ -142,17 +142,6 @@
 	 */
 	constructWrapper(Object, 'obj', {
 		static: {
-			/**
-			 * Returns the type of an object. Better suited then the one from js itself
-			 * @public
-			 * @param   {Object} obj - object tot check the type from
-			 * @returns {string} - type of the object
-			 */
-			typeOf: function(obj) {
-				return __obj.prototype.toString.call(obj)._.between('[object ', ']').decapitalize().value;
-			}
-		},
-		prototype: {
 			// TODO: deep clone
 			/**
 			 * Clones an object
@@ -176,7 +165,7 @@
 			 * @param   {Object}  obj          - object to be extended
 			 * @param   {Object=} opt_settings - optional settings/default descriptor
 			 * @param   {Object}  module       - object containing functions/properties to extend the object with
-			 * @returns {Object}  obj          - the extended object
+			 * @return  {Object}  obj          - the extended object
 			 */
 			extend: function(obj, opt_settings, module) {
 				var settings;
@@ -212,6 +201,17 @@
 				return obj;
 			},
 			/**
+			 * Returns the type of an object. Better suited then the one from js itself
+			 * @public
+			 * @param   {Object} obj - object tot check the type from
+			 * @returns {string} - type of the object
+			 */
+			typeof: function(obj) {
+				return __obj.prototype.toString.call(obj).$$.between('[object ', ']').decapitalize().value;
+			}
+		},
+		prototype: {
+			/**
 			 * Filters
 			 * @public
 			 * @param  {Function} cb      - callback function to be called for each element
@@ -219,13 +219,32 @@
 			 * @return {Array} array containing the filtered values
 			 */
 			filter: function(cb, opt_ctx) {
-				var output = [];
+				var filtered = [];
 
 				this.$.iterate(function(elm) {
-					if(cb.call(opt_ctx, elm)) output.push(elm);
+					if(cb.call(opt_ctx, elm)) filtered.push(elm);
 				});
 
-				return output;
+				return filtered;
+			},
+			/**
+			 * Filters
+			 * @public
+			 * @param  {Function} cb      - callback function to be called for each element
+			 * @param  {Object=}  opt_ctx - optional context
+			 * @return {any} first value that is found
+			 */
+			find: function(cb, opt_ctx) {
+				var found;
+
+				this.$.iterate(function(elm) {
+					if(cb.call(opt_ctx, elm))
+					{
+						return found = elm, false; // break iteration
+					}
+				});
+
+				return found;
 			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -274,20 +293,48 @@
 
 				return this;
 			},
+			// TODO proper implementation
+//			/**
+//			 * Proxies all functions of an object (including those from the prototype in a certain context.
+//			 * @public
+//			 * @param   {Object} obj - object containing the functions to be proxied
+//			 * @param   {Object} ctx - context to proxy the functions in
+//			 * @returns {Object} obj - the object containing the proxied versions of the functions
+//			 */
+//			proxy: function(obj, ctx) {
+//				for(var prop in obj)
+//				{
+//					if(typeof(obj[prop]) === 'function') obj[prop] = obj[prop].bind(ctx);
+//				}
+//
+//				return obj;
+//			},
 			/**
-			 * Proxies all function of an object (including those from the prototype in a certain context.
+			 * Remove one elm from an array
 			 * @public
-			 * @param   {Object} obj - object containing the functions to be proxied
-			 * @param   {Object} ctx - context to proxy the functions in
-			 * @returns {Object} obj - the object containing the proxied versions of the functions
+			 * @param  {any} element - elm to be deleted
+			 * @return {Object}      - object without the element
 			 */
-			proxy: function(obj, ctx) {
-				for(var prop in obj)
-				{
-					if(typeof(obj[prop]) === 'function') obj[prop] = obj[prop].bind(ctx);
-				}
+			del: function(element) {
+				this.$.iterate(function(elm, key) {
+					if(element === elm) delete this[key];
+				}, this);
 
-				return obj;
+				return this;
+			},
+			/**
+			 * Returns an array containing the values of an object (enumerable properties)
+			 * @public
+			 * @return {Array} values of the object
+			 */
+			values: function() {
+				var values = [];
+
+				this.$.iterate(function(elm) {
+					values.push(elm);
+				});
+
+				return values;
 			}
 		}
 	});
@@ -305,7 +352,7 @@
 			}
 			else // called as converter function
 			{
-				 var type = _.typeOf(obj);
+				 var type = _.typeof(obj);
 
 				 switch (type)
 				 {
@@ -383,26 +430,23 @@
 		},
 		prototype: {
 			/**
-			 * Getter: Returns the first element of an array
+			 * Get/sets: the first element of an array
 			 * @public
-			 * @returns {Array} - first element of the array
+			 * @param  {any=}      val - value to set on the first element
+			 * @return {any|Array}     - first element of the array or the array itself
 			 */
-			get first() {
-				return this[0];
+			first: function(val) {
+				if(!arguments.length) return this[0];
+
+		        this[0] = val;
+
+				return this;
 			},
 			/**
-			 * Setter: Sets the first element of an array
+			 * gets/sets the last element of an array
 			 * @public
-			 * @param {Array} val - Value to be set as the first element
-			 */
-			set first(val) {
-				this[0] = val;
-			},
-			/**
-			 * Mutator: gets/sets the last element of an array
-			 * @public
-			 * @param   {Array} val - Value to be set as the last element
-			 * @returns {any|this}  - last element of the array
+			 * @param   {any}      val - Value to be set as the last element
+			 * @returns {any|Array}    - last element of the array
 			 */
 			last: function(val) {
 				if(!arguments.length) return this[this.length-1];
@@ -518,31 +562,32 @@
 			insert: function(elm, i) {
 				return this.splice(i, 0, elm);
 			},
+			// TODO negative steo values
 			/**
 			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
 			 * @param {Object} opts - optional arguments
 			 * {
 			 *     from : ..., // start index. defaults to 0
-			 *     to   : ..., // to index, default to length-1
+			 *     to   : ..., // to index, default to length and is exclusive
 			 *     step : ..., // step for the index, defaults to 1
 			 *     ctx  : ..., // context for the callback, defaults to null
 			 * }
 			 * @param {function} callback - callback function to be called for each element
 			 */
 			iterate: function(opts, callback) {
-				if(typeof opts === 'function')
+				if(typeof(opts) === 'function')
 				{
 					callback = opts;
 					opts     = {};
 				}
 
 				var from = opts.from || 0;
-				var to   = opts.to   || this.length-1;
+				var to   = opts.to   || this.length;
 				var step = opts.step || 1;
 				var ctx  = opts.ctx;
 
-				for(var i = from; i <= to; i += step)
+				for(var i = from; i < to; i += step)
 				{
 					if(callback.call(ctx, this[i], i, this) === false) break;
 				}
@@ -670,7 +715,7 @@
 			 * @returns {string}             - new string containing the string before the given substring
 			 */
 			between: function(pre_substr, post_substr) {
-				return this._.after(pre_substr).before(post_substr).value;
+				return this.$$.after(pre_substr).before(post_substr).value;
 			},
 			/**
 			 * Capitalize the first character of a string
@@ -868,7 +913,10 @@
 			callAfter: function (delay, fnc) {
 				setTimeout(fnc, delay);
 			},
-			memoize: function(ctx) {}, // TODO
+			memoize: function(ctx)
+			{
+				// TODO
+			},
 			/**
 			 * Creates a partial version of the function that can be partially prefilled/bootstrapped with arguments use undefined to leave blank
 			 * @public

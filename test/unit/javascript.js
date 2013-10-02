@@ -99,14 +99,14 @@ describe("Extensions", function() {
 				function Animal() {} // make sure the constructor is a named function
 				var animal = new Animal();
 
-				expect(typeof animal).to.eql('object');
+				expect(typeof(animal)).to.eql('object');
 			});
 
 			it("custom types: UNnamed constructor", function() {
 				var Cat = function () {};  // unnamed constructor
 				var cat = new Cat();
 
-				expect(typeof cat).to.eql('object');
+				expect(typeof(cat)).to.eql('object');
 			});
 		});
 

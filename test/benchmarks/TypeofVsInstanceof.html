@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Typeof vs Instanceof</title>
+    <title>typeof vs Instanceof</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
     <script src="../../src/bottom_line.js"></script>
     <script>
@@ -21,15 +21,15 @@
                 typeof undefined==='undefined';
             })
             .add('_.typeof', function() {
-                _.typeOf(6) === 'number';
-                _.typeOf(NaN)==='number';
-                _.typeOf(Infinity)==='number';
-                _.typeOf('s')==='string';
-                _.typeOf([])==='array';
-                _.typeOf({})==='object';
-                _.typeOf(function(){})==='function';
-                _.typeOf(null)==='null';
-                _.typeOf(undefined)==='undefined';
+                _.typeof(6) === 'number';
+                _.typeof(NaN)==='number';
+                _.typeof(Infinity)==='number';
+                _.typeof('s')==='string';
+                _.typeof([])==='array';
+                _.typeof({})==='object';
+                _.typeof(function(){})==='function';
+                _.typeof(null)==='null';
+                _.typeof(undefined)==='undefined';
             })
             .add('instanceof', function() {
                 6 instanceof Number;
