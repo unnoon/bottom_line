@@ -652,20 +652,10 @@
 			 * @param opt_ctx
 			 */
 			// TODO negative step values
-			_each: function(elastic, opt_step, cb, opt_ctx) {
+			_each: function(elastic, step, cb, opt_ctx) {
 				var from = 0;
 				var to   = this.length;
-				var step = opt_step;
-				var ctx  = opt_ctx;
 				var i;
-
-				// TODO automatic argument shifting function or create an eachBy
-				if(typeof(opt_step) === 'function')
-				{
-					ctx  = cb;
-					cb   = opt_step;
-					step = 1;
-				}
 
 				if(elastic) // allows for dynamic adaption of the array. Assumes insertion or deletes on the current index
 				{
@@ -674,7 +664,7 @@
 
 					for(i = from; i < to; i += step)
 					{
-						if(cb.call(ctx, this[i], i, this) === false) break;
+						if(cb.call(opt_ctx, this[i], i, this) === false) break;
 
 						delta = this.length - size;
 
@@ -687,7 +677,7 @@
 				{
 					for(i = from; i < to; i += step)
 					{
-						if(cb.call(ctx, this[i], i, this) === false) break;
+						if(cb.call(opt_ctx, this[i], i, this) === false) break;
 					}
 				}
 			},
@@ -698,15 +688,23 @@
 			 * @param {function} callback - callback function to be called for each element
 			 */
 			each: function(opt_step, cb, opt_ctx) {
-				this.$._each(false, opt_step, cb, opt_ctx);
+				if(typeof(opt_step) === 'function')
+					this.$._each(false, 1, opt_step, cb);
+				else
+					this.$._each(false, opt_step, cb, opt_ctx);
 			},
 			/**
-			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * Flexible Array iterator, allows for insertion or deletion on the index.
+			 * If the value false is returned, iteration is canceled.
 			 * @public
+			 * @param {function} callback - callback function to be called for each element
 			 * @param {function} callback - callback function to be called for each element
 			 */
 			eachlastic: function(opt_step, cb, opt_ctx) {
-				this.$._each(true, opt_step, cb, ctx);
+				if(typeof(opt_step) === 'function')
+					this.$._each(true, 1, opt_step, cb);
+				else
+					this.$._each(true, opt_step, cb, opt_ctx);
 			},
 			/**
 			 * Accessor: Returns the maximum value of an array with numbers
