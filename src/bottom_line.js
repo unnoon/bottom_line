@@ -1,5 +1,5 @@
 /*!
- * _____________Bottom_Line.$$.⌡S___
+ * _____________Bottom_Line._.⌡S___
  * BottomLine JavaScript Library
  *
  * Copyright 2013, Rogier Geertzema
@@ -221,7 +221,7 @@
 			filter: function(cb, opt_ctx) {
 				var filtered = [];
 
-				this.$.iterate(function(elm) {
+				this.$.each(function(elm) {
 					if(cb.call(opt_ctx, elm)) filtered.push(elm);
 				});
 
@@ -237,11 +237,8 @@
 			find: function(cb, opt_ctx) {
 				var found;
 
-				this.$.iterate(function(elm) {
-					if(cb.call(opt_ctx, elm))
-					{
-						return found = elm, false; // break iteration
-					}
+				this.$.each(function(elm) {
+					if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
 				});
 
 				return found;
@@ -252,7 +249,7 @@
 			 * @param {Function} cb      - callback function to be called for each element
 			 * @param {Object=}  opt_ctx - optional context
 			 */
-			iterate: function(cb, opt_ctx) {
+			each: function(cb, opt_ctx) {
 				var keys = __obj.keys(this);
 				var key;
 
@@ -287,7 +284,7 @@
 			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
 			 */
 			proto: function(proto) {
-				if(!arguments.length) return __obj.getPrototypeOf(this);
+				if(proto === undefined) return __obj.getPrototypeOf(this);
 
 				this.__proto__ = proto;
 
@@ -310,13 +307,27 @@
 //				return obj;
 //			},
 			/**
-			 * Remove one elm from an array
+			 * Remove elements based on key
+			 * @public
+			 * @param  {...any|Array|Function} ...key - elm to be deleted
+			 * @return {Object}      - object without the element
+			 */
+			delete: function(key)
+			{
+				this.$.each(function(val, _key) {
+					if(key === _key) delete this[key];
+				}, this);
+
+				return this;
+			},
+			/**
+			 * Remove elements based on value
 			 * @public
 			 * @param  {any} element - elm to be deleted
 			 * @return {Object}      - object without the element
 			 */
-			del: function(element) {
-				this.$.iterate(function(elm, key) {
+			remove: function(element) {
+				this.$.each(function(elm, key) {
 					if(element === elm) delete this[key];
 				}, this);
 
@@ -330,7 +341,7 @@
 			values: function() {
 				var values = [];
 
-				this.$.iterate(function(elm) {
+				this.$.each(function(elm) {
 					values.push(elm);
 				});
 
@@ -436,7 +447,7 @@
 			 * @return {any|Array}     - first element of the array or the array itself
 			 */
 			first: function(val) {
-				if(!arguments.length) return this[0];
+				if(val === undefined) return this[0];
 
 		        this[0] = val;
 
@@ -449,7 +460,7 @@
 			 * @returns {any|Array}    - last element of the array
 			 */
 			last: function(val) {
-				if(!arguments.length) return this[this.length-1];
+				if(val === undefined) return this[this.length-1];
 
 				this[this.length-1] = val;
 
@@ -478,17 +489,86 @@
 			avg: function() {
 				return this.sum()/this.length;
 			},
-			// TODO delete multiple elements
 			/**
-			 * Mutator: Deletes an element from the current array
+			 * Removes the first occurrence in an array
 			 * @public
-			 * @param   {Object} elm - Element to be deleted
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
 			 * @returns {Object}     - The array without the element
 			 */
-			 del: function(elm) {
-				 var i = this.indexOf(elm);
+			remove: function($value) {
+				this.$._remove(true, $value);
+			},
+			/**
+			 * Removes the all occurrence in an array
+			 * @public
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
+			 * @returns {Object}     - The array without the element
+			 */
+			removeAll: function($value) {
+				this.$._remove(false, $value);
+			},
+			/**
+			 * Removes the first occurrence in an array
+			 * @public
+			 * @param   {boolean} first - Boolean indicating if we should remove the first occurrence only
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
+			 * @returns {Object}     - The array without the element
+			 */
+			_remove: function(first, $value) {
+				var type = _.typeof($value);
 
-				 if(i > -1) this.splice(i, 1);
+				if(type === 'array') // TODO  what is the fastest way to check for an array
+				{
+					var values = $value;
+
+					this.$['each'+(!first? 'lastic' : '')](function(val, i) {
+						if(values.$.has(val))
+						{
+							this.splice(i, 1);
+
+							if(first) return values.$.remove(val), !!values.length;
+						}
+					}, this);
+				}
+				else // function or a singular value given
+				{
+					var cb = (type === 'function')? $value : function(val) {return val === $value};
+
+					this.$['each'+(!first? 'lastic' : '')](function(val, i) {
+						if(cb(val, i, this)) return this.splice(i, 1), first;
+					}, this);
+				}
+
+				return this;
+			},
+			/**
+			 * Remove elements based on index
+			 * @public
+			 * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+			 * @param  {number=} opt_to - to index to delete to
+			 * @return {Array}   this   - mutated array for chaining
+			 */
+			delete: function($index, opt_to)
+			{
+				var type = typeof($index);
+
+				if(type === 'number')
+				{
+					var from = $index;
+					var to   = opt_to || from;
+
+					this.splice(from, to-from+1);
+				}
+				else // function or array
+				{
+					var cb = (type === 'function')? $index : function(i) {return $index.$.has(i)}; // assumes function otherwise array
+					var offset  = 0;
+
+					for(var i = 0, max = this.length; i < max; i++)
+					{
+						if(cb(i+offset, this)) this.splice(i--, 1), max--, offset++;
+					}
+				}
 
 				return this;
 			},
@@ -510,7 +590,7 @@
 					{   // if last dimension set initial value
 						if(dim === dimensions.length-1)
 						{
-							arr[i] = (typeof init === 'function')? init() : init;
+							arr[i] = (typeof(init) === 'function')? init() : init;
 						}
 						else
 						{
@@ -566,33 +646,68 @@
 			/**
 			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
-			 * @param {Object} opts - optional arguments
-			 * {
-			 *     from : ..., // start index. defaults to 0
-			 *     to   : ..., // to index, default to length and is exclusive
-			 *     step : ..., // step for the index, defaults to 1
-			 *     ctx  : ..., // context for the callback, defaults to null
-			 * }
-			 * @param {function} callback - callback function to be called for each element
+			 * @param elastic
+			 * @param opt_step
+			 * @param {function} cb - callback function to be called for each element
+			 * @param opt_ctx
 			 */
-			iterate: function(opts, callback) {
-				if(typeof(opts) === 'function')
+			// TODO negative step values
+			_each: function(elastic, opt_step, cb, opt_ctx) {
+				var from = 0;
+				var to   = this.length;
+				var step = opt_step;
+				var ctx  = opt_ctx;
+				var i;
+
+				// TODO automatic argument shifting function or create an eachBy
+				if(typeof(opt_step) === 'function')
 				{
-					callback = opts;
-					opts     = {};
+					ctx  = cb;
+					cb   = opt_step;
+					step = 1;
 				}
 
-				var from = opts.from || 0;
-				var to   = opts.to   || this.length;
-				var step = opts.step || 1;
-				var ctx  = opts.ctx;
-
-				for(var i = from; i < to; i += step)
+				if(elastic) // allows for dynamic adaption of the array. Assumes insertion or deletes on the current index
 				{
-					if(callback.call(ctx, this[i], i, this) === false) break;
+					var size  = to;
+					var delta = 0;
+
+					for(i = from; i < to; i += step)
+					{
+						if(cb.call(ctx, this[i], i, this) === false) break;
+
+						delta = this.length - size;
+
+						i    += delta;
+						to   += delta;
+						size += delta;
+					}
+				}
+				else // iteration without changing the size of the array
+				{
+					for(i = from; i < to; i += step)
+					{
+						if(cb.call(ctx, this[i], i, this) === false) break;
+					}
 				}
 			},
-			// TODO: max based on filter function
+			/**
+			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * @public
+			 * @param {Object} opts - optional arguments
+			 * @param {function} callback - callback function to be called for each element
+			 */
+			each: function(opt_step, cb, opt_ctx) {
+				this.$._each(false, opt_step, cb, opt_ctx);
+			},
+			/**
+			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * @public
+			 * @param {function} callback - callback function to be called for each element
+			 */
+			eachlastic: function(opt_step, cb, opt_ctx) {
+				this.$._each(true, opt_step, cb, ctx);
+			},
 			/**
 			 * Accessor: Returns the maximum value of an array with numbers
 			 * @public
@@ -601,7 +716,7 @@
 			 * @returns {number|any} - maximum number or element in the array
 			 */
 			max: function(opt_compareFunction) {
-				if (!arguments.length)
+				if (opt_compareFunction === undefined)
 					return __math.max.apply(null, this);
 				else
 				{
