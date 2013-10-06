@@ -213,5 +213,29 @@ describe("Array", function() {
 
 			expect(sum).to.eql(6);
 		});
+
+		it("simple step each", function() {
+			var arr = [1, 2, 3, 4, 5, 6];
+
+			var sum = 0;
+
+			arr.$.each(2,function(elm) {
+				sum += elm;
+			});
+
+			expect(sum).to.eql(9);
+		});
+
+		it("simple negative step each", function() {
+			var arr = [1, 2, 6];
+
+			var div = 36;
+
+			arr.$.each(-1, function(elm) {
+				div /= elm;
+			});
+
+			expect(div).to.eql(3);
+		});
 	});
 });

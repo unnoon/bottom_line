@@ -653,16 +653,18 @@
 			 */
 			// TODO negative step values
 			_each: function(elastic, step, cb, opt_ctx) {
-				var from = 0;
-				var to   = this.length;
+				var sign = step.$.sign;
+				var from = 0, to = this.length;
 				var i;
+
+				if(sign < 0) from = this.length-1, to = 1;
 
 				if(elastic) // allows for dynamic adaption of the array. Assumes insertion or deletes on the current index
 				{
 					var size  = to;
 					var delta = 0;
 
-					for(i = from; i < to; i += step)
+					for(i = from; sign*i < to; i += step)
 					{
 						if(cb.call(opt_ctx, this[i], i, this) === false) break;
 
@@ -675,7 +677,7 @@
 				}
 				else // iteration without changing the size of the array
 				{
-					for(i = from; i < to; i += step)
+					for(i = from; sign*i < to; i += step)
 					{
 						if(cb.call(opt_ctx, this[i], i, this) === false) break;
 					}
@@ -684,8 +686,9 @@
 			/**
 			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
-			 * @param {Object} opts - optional arguments
-			 * @param {function} callback - callback function to be called for each element
+			 * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+			 * @param {function} cb       - callback function to be called for each element
+			 * @param {Object=}  opt_ctx  - optional context for the callback function
 			 */
 			each: function(opt_step, cb, opt_ctx) {
 				if(typeof(opt_step) === 'function')
@@ -697,8 +700,9 @@
 			 * Flexible Array iterator, allows for insertion or deletion on the index.
 			 * If the value false is returned, iteration is canceled.
 			 * @public
-			 * @param {function} callback - callback function to be called for each element
-			 * @param {function} callback - callback function to be called for each element
+			 * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+			 * @param {function} cb       - callback function to be called for each element
+			 * @param {Object=}  opt_ctx  - optional context for the callback function
 			 */
 			eachlastic: function(opt_step, cb, opt_ctx) {
 				if(typeof(opt_step) === 'function')
@@ -710,21 +714,21 @@
 			 * Accessor: Returns the maximum value of an array with numbers
 			 * @public
 			 * @this    {Array<number>|Array<any>}
-			 * @param   {Function} opt_compareFunction - optional function to determine the the max in case of non-numeric array
+			 * @param   {Function} opt_compare - optional function to determine the the max in case of non-numeric array
 			 * @returns {number|any} - maximum number or element in the array
 			 */
-			max: function(opt_compareFunction) {
-				if (opt_compareFunction === undefined)
+			max: function(opt_compare) {
+				if (opt_compare === undefined)
+				{
 					return __math.max.apply(null, this);
+				}
 				else
 				{
 					var max = this[0];
-					var elm;
-					for(var i = 1, m = this.length; i < m; i++)
-					{
-						elm = this[i];
-						max = opt_compareFunction(elm, max) > 0? elm : max;
-					}
+
+					this.$.each(function(elm) {
+						max = opt_compare(elm, max) > 0? elm : max;
+					});
 
 					return max;
 				}
@@ -962,7 +966,7 @@
 			get sign() {
 				return this > 0?  1 :
 					   this < 0? -1 :
-					   			  0 ;
+								  0 ;
 			},
 			/**
 			 * Getter: indicator if the the number is even
