@@ -521,7 +521,7 @@
 				{
 					var values = $value;
 
-					this.$['each'+(!first? 'lastic' : '')](function(val, i) {
+					this.$.each(function(val, i) {
 						if(values.$.has(val))
 						{
 							this.splice(i, 1);
@@ -534,7 +534,7 @@
 				{
 					var cb = (type === 'function')? $value : function(val) {return val === $value};
 
-					this.$['each'+(!first? 'lastic' : '')](function(val, i) {
+					this.$.each(function(val, i) {
 						if(cb(val, i, this)) return this.splice(i, 1), first;
 					}, this);
 				}
@@ -646,41 +646,24 @@
 			/**
 			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
-			 * @param elastic
 			 * @param opt_step
 			 * @param {function} cb - callback function to be called for each element
 			 * @param opt_ctx
 			 */
 			// TODO negative step values
-			_each: function(elastic, step, cb, opt_ctx) {
+			_each: function(step, cb, opt_ctx) {
 				var sign = step.$.sign;
 				var from = 0, to = this.length;
 				var i;
+				var size  = to;
+				var delta = 0;
 
 				if(sign < 0) from = this.length-1, to = 1;
 
-				if(elastic) // allows for dynamic adaption of the array. Assumes insertion or deletes on the current index
+				for(i = from; sign*i < to; i += step)
 				{
-					var size  = to;
-					var delta = 0;
-
-					for(i = from; sign*i < to; i += step)
-					{
-						if(cb.call(opt_ctx, this[i], i, this) === false) break;
-
-						delta = this.length - size;
-
-						i    += delta;
-						to   += delta;
-						size += delta;
-					}
-				}
-				else // iteration without changing the size of the array
-				{
-					for(i = from; sign*i < to; i += step)
-					{
-						if(cb.call(opt_ctx, this[i], i, this) === false) break;
-					}
+					if(cb.call(opt_ctx, this[i], i, this) === false) break;
+					if(delta = this.length - size) i += delta, to += delta, size += delta;
 				}
 			},
 			/**
@@ -692,23 +675,9 @@
 			 */
 			each: function(opt_step, cb, opt_ctx) {
 				if(typeof(opt_step) === 'function')
-					this.$._each(false, 1, opt_step, cb);
+					this.$._each(1, opt_step, cb);
 				else
-					this.$._each(false, opt_step, cb, opt_ctx);
-			},
-			/**
-			 * Flexible Array iterator, allows for insertion or deletion on the index.
-			 * If the value false is returned, iteration is canceled.
-			 * @public
-			 * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
-			 * @param {function} cb       - callback function to be called for each element
-			 * @param {Object=}  opt_ctx  - optional context for the callback function
-			 */
-			eachlastic: function(opt_step, cb, opt_ctx) {
-				if(typeof(opt_step) === 'function')
-					this.$._each(true, 1, opt_step, cb);
-				else
-					this.$._each(true, opt_step, cb, opt_ctx);
+					this.$._each(opt_step, cb, opt_ctx);
 			},
 			/**
 			 * Accessor: Returns the maximum value of an array with numbers
