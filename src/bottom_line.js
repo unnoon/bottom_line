@@ -346,6 +346,20 @@
 				});
 
 				return values;
+			},
+			/**
+			 * Returns an array containing the keys & values of an object (enumerable properties)
+			 * @public
+			 * @return {Array} keys & values of the object
+			 */
+			pairs: function() {
+				var pairs = [];
+
+				this.$.each(function(val, key) {
+					pairs.push(key, val);
+				});
+
+				return pairs;
 			}
 		}
 	});
@@ -642,32 +656,9 @@
 			insert: function(elm, i) {
 				return this.splice(i, 0, elm);
 			},
-			// TODO negative steo values
 			/**
-			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-			 * @public
-			 * @param opt_step
-			 * @param {function} cb - callback function to be called for each element
-			 * @param opt_ctx
-			 */
-			// TODO negative step values
-			_each: function(step, cb, opt_ctx) {
-				var sign = step.$.sign;
-				var from = 0, to = this.length;
-				var i;
-				var size  = to;
-				var delta = 0;
-
-				if(sign < 0) from = this.length-1, to = 1;
-
-				for(i = from; sign*i < to; i += step)
-				{
-					if(cb.call(opt_ctx, this[i], i, this) === false) break;
-					if(delta = this.length - size) i += delta, to += delta, size += delta;
-				}
-			},
-			/**
-			 * Accessor: Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * each is eachlastic in the sense that one can add and delete elements at the current index
 			 * @public
 			 * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
 			 * @param {function} cb       - callback function to be called for each element
@@ -678,6 +669,40 @@
 					this.$._each(1, opt_step, cb);
 				else
 					this.$._each(opt_step, cb, opt_ctx);
+			},
+			/**
+			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * each is eachlastic in the sense that one can add and delete elements at the current index
+			 * @public
+			 * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
+			 * @param {function} cb       - callback function to be called for each element
+			 * @param {Object=}  opt_ctx  - optional context for the callback function
+			 */
+			// TODO negative step values
+			_each: function(step, cb, opt_ctx) {
+				var i, from, to;
+
+				if(step > 0) // normal traversing
+				{
+					from = 0, to = this.length;
+
+					var delta, size = to;
+
+					for(i = from; i < to; i += step)
+					{
+						if(cb.call(opt_ctx, this[i], i, this) === false) break;
+						if(delta = this.length - size) i += delta, to += delta, size += delta;
+					}
+				}
+				else // reverse traversing
+				{
+					from = this.length-1, to = -1;
+
+					for(i = from; i > to; i += step)
+					{
+						if(cb.call(opt_ctx, this[i], i, this) === false) break;
+					}
+				}
 			},
 			/**
 			 * Accessor: Returns the maximum value of an array with numbers
@@ -717,7 +742,7 @@
 			 * @returns {any} - random element from the array
 			 */
 			 random: function() {
-				 return this[__int.random(0, this.length - 1)];
+				 return this[_.int.random(0, this.length - 1)];
 			 },
 			/**
 			 * Accessor: Returns the sum of all numbers in a number array

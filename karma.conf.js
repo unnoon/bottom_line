@@ -36,7 +36,8 @@ module.exports = function (config) {
 
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-		reporters     : ['dots', 'coverage'],
+//		reporters     : ['dots', 'coverage'],
+		reporters     : ['dots'],
 
 		// enable / disable colors in the output (reporters and logs)
 		colors        : true,

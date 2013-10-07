@@ -226,6 +226,26 @@ describe("Array", function() {
 			expect(sum).to.eql(9);
 		});
 
+		it("elastic step each", function() {
+			var arr = [1, 2, 3, 4, 5, 6];
+
+			arr.$.each(function(elm, i, arr) {
+				if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
+			});
+
+			expect(arr).to.eql([1, 5, 6]);
+		});
+
+		it("elastic step 2 each", function() {
+			var arr = [1, 2, 3, 4, 5, 6];
+
+			arr.$.each(2, function(elm, i, arr) {
+				if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
+			});
+
+			expect(arr).to.eql([1, 2, 4, 5, 6]);
+		});
+
 		it("simple negative step each", function() {
 			var arr = [1, 2, 6];
 
@@ -236,6 +256,26 @@ describe("Array", function() {
 			});
 
 			expect(div).to.eql(3);
+		});
+
+		it("elastic negative step each", function() {
+			var arr = [1, 2, 3, 4, 5, 6];
+
+			arr.$.each(-1, function(elm, i, arr) {
+				if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
+			});
+
+			expect(arr).to.eql([1, 5, 6]);
+		});
+
+		it("elastic negative step 2 each", function() {
+			var arr = [1, 2, 3, 4, 5, 6];
+
+			arr.$.each(-2, function(elm, i, arr) {
+				if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
+			});
+
+			expect(arr).to.eql([1, 3, 5, 6]);
 		});
 	});
 });
