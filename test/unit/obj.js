@@ -114,7 +114,7 @@ describe("Object", function() {
 
 	describe("Object prototype methods", function() {
 
-		xdescribe("delete", function() {
+		describe("delete", function() {
 
 			it("delete an element", function() {
 				var obj = {
@@ -123,8 +123,34 @@ describe("Object", function() {
 					z: 3
 				};
 
-				expect(obj.$.delete(2)).to.deep.equal({
+				expect(obj.$.delete('y')).to.deep.equal({
 					x: 1,
+					z: 3
+				});
+			});
+
+			it("delete an array of elements", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3
+				};
+
+				expect(obj.$.delete(['x', 'z'])).to.deep.equal({
+					y: 2
+				});
+			});
+
+			it("delete based on function", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					xy: 4,
+					z: 3
+				};
+
+				expect(obj.$.delete(function(key) {return key.$.startsWith('x')})).to.deep.equal({
+					y: 2,
 					z: 3
 				});
 			});
@@ -240,6 +266,20 @@ describe("Object", function() {
 				};
 
 				expect(obj.$.values()).to.deep.equal([1,2,3,666]);
+			});
+		});
+
+		describe("pairs", function() {
+
+			it("simple values", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3,
+					t: 666
+				};
+
+				expect(obj.$.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
 			});
 		});
 	});

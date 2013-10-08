@@ -307,29 +307,82 @@
 //				return obj;
 //			},
 			/**
-			 * Remove elements based on key
+			 * Remove elements based on index
 			 * @public
-			 * @param  {...any|Array|Function} ...key - elm to be deleted
-			 * @return {Object}      - object without the element
+			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
+			 * @return {Array}   this   - mutated array for chaining
 			 */
-			delete: function(key)
+			delete: function($key)
 			{
-				this.$.each(function(val, _key) {
-					if(key === _key) delete this[key];
-				}, this);
+				var type = typeof($key);
+
+				if(type === 'string')
+				{
+					delete this[$key];
+				}
+				else // function or array
+				{
+					var cb = (type === 'function')? $key : function(key) {return $key.$.has(key)}; // assumes function otherwise array
+
+					this.$.each(function(val, key) {
+						if(cb(key)) delete this[key];
+					}, this);
+				}
 
 				return this;
 			},
 			/**
-			 * Remove elements based on value
+			 * Removes the first occurrence in an object
 			 * @public
-			 * @param  {any} element - elm to be deleted
-			 * @return {Object}      - object without the element
+			 * @this    {Object}
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
+			 * @returns {Object}     - The array without the element
 			 */
-			remove: function(element) {
-				this.$.each(function(elm, key) {
-					if(element === elm) delete this[key];
-				}, this);
+			remove: function($value) {
+				this.$._remove(true, $value);
+			},
+			/**
+			 * Removes the all occurrence in an object
+			 * @public
+			 * @this    {Object}
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
+			 * @returns {Object}     - The array without the element
+			 */
+			removeAll: function($value) {
+				this.$._remove(false, $value);
+			},
+			/**
+			 * Removes the first occurrence in an object
+			 * @public
+			 * @this    {Object}
+			 * @param   {boolean} first - Boolean indicating if we should remove the first occurrence only
+			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
+			 * @returns {Object}     - The array without the element
+			 */
+			_remove: function(first, $value) {
+				var type = _.typeof($value);
+
+				if(type === 'array') // TODO  what is the fastest way to check for an array
+				{
+					var values = $value;
+
+					this.$.each(function(val, key) {
+						if(values.$.has(val))
+						{
+							delete this[key];
+
+							if(first) return values.$.remove(val), !!values.length;
+						}
+					}, this);
+				}
+				else // function or a singular value given
+				{
+					var cb = (type === 'function')? $value : function(val) {return val === $value};
+
+					this.$.each(function(val, key) {
+						if(cb(val, key, this)) return delete this[key], first;
+					}, this);
+				}
 
 				return this;
 			},
@@ -549,7 +602,7 @@
 					var cb = (type === 'function')? $value : function(val) {return val === $value};
 
 					this.$.each(function(val, i) {
-						if(cb(val, i, this)) return this.splice(i, 1), first;
+						if(cb(val, i, this)) return this.splice(i, 1), !first;
 					}, this);
 				}
 

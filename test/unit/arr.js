@@ -121,12 +121,51 @@ describe("Array", function() {
 				expect(arr).to.eql(['b', 'c']);
 			});
 
-			it("remove one element that does not exists in the array", function() {
+			it("remove multiple values", function() {
 				var arr = ['a', 'b', 'c', 'd'];
 
 				arr.$.remove(['b','d']);
 
 				expect(arr).to.eql(['a', 'c']);
+			});
+
+			it("remove multiple values", function() {
+				var arr = ['a', 'b', 'c', 'd', 'bb'];
+
+				arr.$.remove(function(val) {
+					return val.$.startsWith('b');
+				});
+
+				expect(arr).to.eql(['a', 'c', 'd', 'bb']);
+			});
+		});
+
+		describe("remove all by value", function() {
+
+			it("remove one element", function() {
+				var arr = ['a', 'b', 'a', 'c'];
+
+				arr.$.removeAll('a');
+
+				expect(arr).to.eql(['b', 'c']);
+			});
+
+			it("remove multiple values", function() {
+				var arr = ['a', 'b', 'c', 'b', 'd', 'd'];
+
+				arr.$.removeAll(['b','d']);
+
+				expect(arr).to.eql(['a', 'c']);
+			});
+
+			it("remove multiple values", function() {
+				var arr = ['a', 'b', 'c', 'd', 'bb', 'bb'];
+
+				arr.$.removeAll(function(val) {
+					return val.$.startsWith('b');
+				});
+
+				expect(arr).to.eql(['a', 'c', 'd']);
 			});
 		});
 
