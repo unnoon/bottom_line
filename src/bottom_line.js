@@ -92,14 +92,15 @@
 
 		// prototype
 		var prototype = module.prototype || {};
+
 		__obj.getOwnPropertyNames(prototype).forEach(function(name) {
-			var descriptor  = __obj.getOwnPropertyDescriptor(prototype, name);
-			var descriptor_ = clone(descriptor);
-			var descriptor$ = clone(descriptor);
+			var descriptor   = __obj.getOwnPropertyDescriptor(prototype, name);
+			var descriptor$  = clone(descriptor);
+			var descriptor$$ = clone(descriptor);
 
 			// make properties non enumerable
-			descriptor_.enumarable = false;
-			descriptor$.enumarable = false;
+			descriptor$.enumerable  = false;
+			descriptor$$.enumerable = false;
 
 			// wrap function & getters & setters
 			if(typeof(descriptor.value) === 'function') wrap('value');
@@ -110,19 +111,19 @@
 				var fn = descriptor[type];
 
 				// singular
-				descriptor_[type] = function () {
+				descriptor$[type] = function () {
 					return fn.apply(wrapperObj.value, arguments);
 				};
 				// chaining
-				descriptor$[type] = function () {
+				descriptor$$[type] = function () {
 					this.value = fn.apply(this.value, arguments);
 
 					return this;
 				};
 			}
 
-			__obj.defineProperty(wrapperObj.__instance__, name, descriptor_);
-			__obj.defineProperty(wrapperObj.prototype,    name, descriptor$);
+			__obj.defineProperty(wrapperObj.__instance__, name, descriptor$);
+			__obj.defineProperty(wrapperObj.prototype,    name, descriptor$$);
 
 			// simple cloning function
 			function clone(obj) {
@@ -228,7 +229,7 @@
 				return filtered;
 			},
 			/**
-			 * Filters
+			 * Finds first element that is picked by the callback function
 			 * @public
 			 * @param  {Function} cb      - callback function to be called for each element
 			 * @param  {Object=}  opt_ctx - optional context
@@ -312,7 +313,7 @@
 			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			delete: function($key)
+			withoutKeys: function($key)
 			{
 				var type = typeof($key);
 
@@ -362,7 +363,7 @@
 			_remove: function(first, $value) {
 				var type = _.typeof($value);
 
-				if(type === 'array') // TODO  what is the fastest way to check for an array
+				if(type === 'array')
 				{
 					var values = $value;
 
@@ -454,99 +455,31 @@
 			 */
 			concat: function(var_args) {
 				return __arr.prototype.concat.apply(null, arguments);
-			},
-			/**
-			 * Returns the difference between 2 arrays
-			 * @public
-			 * @param {...Array} var_args - 2 or more arrays to calc the difference from
-			 * @returns  {Array}          - new array containing the difference between the first array and the others
-			 */
-			diff: function(var_args) {
-				var args = arguments;
-				var diff = args[0];
-
-				for(var i = 1, max = args.length; i < max; i++)
-				{
-					diff = diff.filter(function(elm) {return !args[i].$.has(elm)});
-				}
-
-				return diff;
-			},
-			/**
-			 * Calculates the intersection for 2 or more arrays
-			 * @public
-			 * @static
-			 * @param   {...Array} var_args     - 2 or more arrays
-			 * @returns {Array}    intersection - array containing the intersecting elements
-			 */
-			intersection: function(var_args) {
-				var intersection = arguments[0];
-				var i, j, max;
-
-				for(i = 0, max = arguments.length; i < max; i++)
-				{
-					for(j = 0; j < intersection.length; j++) // no max, length is variable
-					{
-						if(!arguments[i].$.has(intersection[j])) intersection.splice(j--, 1)
-					}
-					// if intersection is empty we can stop the iterating
-					if(!intersection.length) break;
-				}
-
-				return intersection;
-			},
-			/**
-			 * Calculates the union for 2 or more arrays
-			 * @public
-			 * @static
-			 * @param {...Array} var_args     - 2 or more arrays
-			 * @returns  {Array} intersection - array containing the union of elements
-			 */
-			union: function(var_args) {
-				return __arr.prototype.concat.apply([], arguments).$.unique();
 			}
 		},
 		prototype: {
 			/**
-			 * Get/sets: the first element of an array
-			 * @public
-			 * @param  {any=}      val - value to set on the first element
-			 * @return {any|Array}     - first element of the array or the array itself
-			 */
-			first: function(val) {
-				if(val === undefined) return this[0];
-
-		        this[0] = val;
-
-				return this;
-			},
-			/**
-			 * gets/sets the last element of an array
-			 * @public
-			 * @param   {any}      val - Value to be set as the last element
-			 * @returns {any|Array}    - last element of the array
-			 */
-			last: function(val) {
-				if(val === undefined) return this[this.length-1];
-
-				this[this.length-1] = val;
-
-				return this;
-			},
-			/**
 			 * Mutator: Append 1 or more arrays to the current array
 			 * @public
-			 * @param   {...Array} var_args - 1 or more arrays to be appended
-			 * @returns    {Array}  this     - Array appended with arr
+             * @this       {Array}
+			 * @param      {Array} arr  - array to be appended
+			 * @returns    {Array} this - Array appended with arr
 			 */
-			 append: function(var_args) {
-				for(var i = 0, max = arguments.length; i < max; i++)
-				{
-					this.push.apply(this, arguments[i]);
-				}
+			 append: function(arr) {
+				this.push.apply(this, arr);
 
 				return this;
 			 },
+            /**
+             * appends 1 or more arrays toa new array
+             * @public
+             * @this       {Array}
+             * @param   {...Array} var_args - 1 or more arrays to be appended
+             * @returns    {Array}  this     - Array appended with arr
+             */
+            $append: function(var_args) {
+                return _.clone(this).$.append(var_args);
+            },
 			/**
 			 * Accessor: Returns the average of an array with numbers
 			 * @public
@@ -556,95 +489,138 @@
 			avg: function() {
 				return this.sum()/this.length;
 			},
-			/**
-			 * Removes the first occurrence in an array
-			 * @public
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			remove: function($value) {
-				this.$._remove(true, $value);
-			},
-			/**
-			 * Removes the all occurrence in an array
-			 * @public
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			removeAll: function($value) {
-				this.$._remove(false, $value);
-			},
-			/**
-			 * Removes the first occurrence in an array
-			 * @public
-			 * @param   {boolean} first - Boolean indicating if we should remove the first occurrence only
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			_remove: function(first, $value) {
-				var type = _.typeof($value);
+            _cp: function(all, target, invert, $value, opt_ctx)
+            {
+                this.$._edit(
+                    all,
+                    target,
+                    invert,
+                    function(val) {this.push(val);},
+                    function(val, i, _this, delta) {_this.$._cp(true, this, false, function(val, index) {return index > i});},
+                    $value,
+                    opt_ctx
+                )
+            },
+            /**
+             * Copies the occurrences from an array to an new array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Array}                      - new array with the copied elements
+             */
+            _edit: function(all, target, invert, onmatch, ondone, $value, opt_ctx)
+            {
+                var first  = !all;
+                var normal = !invert;
+                var match;
+                var done;
+                var array  = false;
 
-				if(type === 'array') // TODO  what is the fastest way to check for an array
-				{
-					var values = $value;
+                var cb = (typeof($value) === 'function')? $value                                   :
+                         (array = __arr.isArray($value))? function(val) {return $value.$.has(val)} :
+                                                          function(val) {return val === $value};
 
-					this.$.each(function(val, i) {
-						if(values.$.has(val))
-						{
-							this.splice(i, 1);
+                this.$.each(function(val, i, _this, delta) {
+                    match = cb.call(opt_ctx, val, i, _this, delta);
+                    // remove normal or inverted match
+                    if(match === normal) onmatch.call(target, val, i, _this, delta);
 
-							if(first) return values.$.remove(val), !!values.length;
-						}
-					}, this);
-				}
-				else // function or a singular value given
-				{
-					var cb = (type === 'function')? $value : function(val) {return val === $value};
+                    // if first and the first  match is made check if we are done
+                    if(first && match)
+                    {
+                        done = array? !$value.$.without(val).length : true;
 
-					this.$.each(function(val, i) {
-						if(cb(val, i, this)) return this.splice(i, 1), !first;
-					}, this);
-				}
+                        // remove remainder if done & invert mode
+                        if(done && invert) ondone.call(target, val, i, _this, delta);
 
-				return this;
-			},
-			/**
-			 * Remove elements based on index
-			 * @public
-			 * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-			 * @param  {number=} opt_to - to index to delete to
-			 * @return {Array}   this   - mutated array for chaining
-			 */
-			delete: function($index, opt_to)
-			{
-				var type = typeof($index);
+                        return !done;
+                    }
+                }, this);
 
-				if(type === 'number')
-				{
-					var from = $index;
-					var to   = opt_to || from;
+                return target;
+            },
+            /**
+             * Remove elements based on index
+             * @public
+             * @this   {Array}
+             * @param  {boolean} invert - boolean indicating if the deletion shopuld be inverted
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}   this   - mutated array for chaining
+             */
+            _del: function(invert, $index, opt_to_ctx)
+            {
+                var normal = !invert;
 
-					this.splice(from, to-from+1);
-				}
-				else // function or array
-				{
-					var cb = (type === 'function')? $index : function(i) {return $index.$.has(i)}; // assumes function otherwise array
-					var offset  = 0;
+                switch(_.typeof($index))
+                {
+                    case 'number' :
+                    {
+                        var from = $index;
+                        var to   = opt_to_ctx || from;
 
-					for(var i = 0, max = this.length; i < max; i++)
-					{
-						if(cb(i+offset, this)) this.splice(i--, 1), max--, offset++;
-					}
-				}
+                        if(normal)
+                        {
+                            this.splice(from, to-from+1);
+                        }
+                        else
+                        {
+                            this.splice(to+1, this.length-to);
+                            this.splice(0,    from);
+                        }
 
-				return this;
-			},
+                        break;
+                    }
+                    case 'function' :
+                    {
+                        var cb = $index;
+
+                        this.$.each(function(val, i, _this, delta) {
+                            if(cb.call(opt_to_ctx, i-delta, this) === normal) this.splice(i, 1);
+                        }, this);
+
+                        break;
+                    }
+                    case 'array' :
+                    {
+                        this.$.each(function(val, i, _this, delta) {
+                            if($index.$.has(i-delta) === normal) return $index.$.without(i-delta), this.splice(i, 1), !!$index.length;
+                        }, this);
+
+                        break;
+                    }
+                }
+
+                return this;
+            },
+            /**
+             * Returns the difference between 2 arrays
+             * @this     {Array}
+             * @param {...Array} var_args - 2 or more arrays to calc the difference from
+             * @returns  {Array}          - this for chaining             */
+            // TODO this should be an alias
+            diff: function(arr) {
+                return this.$.without(arr);
+            },
+            /**
+             * Returns the difference between 2 arrays in a new arrar
+             * @this     {Array}
+             * @param    {Array} arr - array to subtract from this
+             * @returns  {Array}     - new array containing the difference between the first array and the others
+             */
+            $diff: function(arr) {
+                return this.$.$selectAll(function(val) {return !arr.$.has(val)});
+            },
 			/**
 			 * Mutator: Creates a multidimensional array
 			 * @public
-			 * @param   {Array<number>} dimensions - array specifying the dimensions. A multidimensional array specification can be used for clarity
-			 * @param   {any|Function}  init       - initial value for the array. Can be either a value or a function specifying the value
-			 * @returns {Array}                    - this initialized multi-dimensional array
+             * @this   {Array}
+			 * @param  {Array<number>} dimensions - array specifying the dimensions. A multidimensional array specification can be used for clarity
+			 * @param  {any|Function}  init       - initial value for the array. Can be either a value or a function specifying the value
+			 * @return {Array}                    - this initialized multi-dimensional array
 			 */
 			dim: function(dimensions, init) {
 				dimensions = dimensions.flatten();
@@ -669,30 +645,151 @@
 
 				return this;
 			},
-			/**
-			 * Accessor: Returns the first element found by the selector function
-			 * @public
-			 * @param   {Function} callback - selector function callback to be called on each element
-			 * @param   {Object=}  opt_ctx  - optional context for the callback function
-			 * @returns {any}               - the found element or undefined otherwise
-			 */
-			find: function(callback, opt_ctx) {
-				for(var i = 0, max = this.length; i < max; i++)
-				{
-					if(callback.call(opt_ctx, this[i], i, this)) return this[i];
-				}
-			},
+            /**
+             * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             * each is eachlastic in the sense that one can add and delete elements at the current index
+             * @public
+             * @this   {Array}
+             * @param  {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param  {function} cb       - callback function to be called for each element
+             * @param  {Object=}  opt_ctx  - optional context for the callback function
+             * @return {Array}             - this array for chaining
+             */
+            each: function(opt_step, cb, opt_ctx) {
+                if(typeof(opt_step) === 'function')
+                    return this.$._each(1, opt_step, cb);
+                else
+                    return this.$._each(opt_step, cb, opt_ctx);
+            },
+            /**
+             * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             * each is eachlastic in the sense that one can add and delete elements at the current index
+             * @public
+             * @this   {Array}
+             * @param  {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param  {function} cb       - callback function to be called for each element
+             * @param  {Object=}  opt_ctx  - optional context for the callback function
+             * @return {Array}             - this array for chaining
+             */
+            _each: function(step, cb, opt_ctx) {
+                var from = 0, to = this.length;
+                var diff, size = to, delta = 0;
+
+                cb = opt_ctx? cb.bind(opt_ctx) : cb;
+
+                for(var i = from; i < to; i += step)
+                {
+                    if(cb(this[i], i, this, delta) === false) break;
+                    if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff;
+                }
+
+                return this;
+            },
+            /**
+             * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             * each is eachlastic in the sense that one can add and delete elements at the current index
+             * @public
+             * @this  {Array}
+             * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param {function} cb       - callback function to be called for each element
+             * @param {Object=}  opt_ctx  - optional context for the callback function
+             * @return {Array}            - this array for chaining
+             */
+            eachRight: function(opt_step, cb, opt_ctx) {
+                if(typeof(opt_step) === 'function')
+                    return this.$._eachRight(1, opt_step, cb);
+                else
+                    return this.$._eachRight(opt_step, cb, opt_ctx);
+            },
+            /**
+             * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             * each is eachlastic in the sense that one can add and delete elements at the current index
+             * @public
+             * @this  {Array}
+             * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param {function} cb       - callback function to be called for each element
+             * @param {Object=}  opt_ctx  - optional context for the callback function
+             * @return {Array}            - this array for chaining
+             */
+            _eachRight: function(step, cb, opt_ctx) {
+                var from = this.length-1, to = -1;
+
+                cb = opt_ctx? cb.bind(opt_ctx) : cb;
+
+                for(var i = from; i > to; i -= step)
+                {
+                    if(cb(this[i], i, this) === false) break;
+                }
+
+                return this;
+            },
+            /**
+             * Finds first element that is picked by the callback function
+             * @public
+             * @this   {Array}
+             * @param  {Function} cb      - callback function to be called for each element
+             * @param  {Object=}  opt_ctx - optional context
+             * @return {any} first value that is found
+             */
+            find: function(cb, opt_ctx) {
+                var found;
+
+                this.$.each(function(elm) {
+                    if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
+                });
+
+                return found;
+            },
+            /**
+             * Finds all elements according to ther callback fucntion
+             * @public
+             * @this   {Array}
+             * @param  {Function} cb      - callback function to be called for each element
+             * @param  {Object=}  opt_ctx - optional context
+             * @return {Array} first value that is found
+             */
+            // TODO this should be an alias
+            findAll: function(cb, opt_ctx) {
+                return this.$.$selectAll(cb, opt_ctx);
+            },
+            /**
+             * Get/sets: the first element of an array
+             * @public
+             * @this   {Array}
+             * @param  {any=}      val - value to set on the first element
+             * @return {any|Array}     - first element of the array or the array itself
+             */
+            first: function(val) {
+                if(val === undefined) return this[0];
+
+                this[0] = val;
+
+                return this;
+            },
+            /**
+             * Accessor: Flattens a 2 dimensional array
+             * @public
+             * @this    {Array}
+             * @returns {Array} - this for chaining
+             */
+            flatten: function() {
+                return this.$.each(function(val, i) {
+                    if(__arr.isArray(val)) this.splice.apply(this, val.$.insert(1).$.insert(i));
+                }, this)
+            },
 			/**
 			 * Accessor: Flattens a 2 dimensional array
 			 * @public
+             * @this    {Array}
 			 * @returns {Array} - new flattened version of the array
 			 */
-			flatten: function() {
+			$flatten: function() {
 				return this.concat.apply([], this);
 			},
 			/**
 			 * Accessor: Check is an array contains a certain value
 			 * @public
+             * @this    {Array}
 			 * @param   {Object}  elm - element to check membership of
 			 * @returns {boolean}     - boolean indicating if the array contains the element
 			 */
@@ -702,61 +799,71 @@
 			/**
 			 * Mutator: Inserts an element in a specific location in an array
 			 * @public
+             * @this    {Array}
 			 * @param   {Object}  elm - element to check membership of
 			 * @param   {number}  i   - position to insert the element
-			 * @returns {boolean}     - boolean indicating if the array contains the element
+			 * @return  {Array  }     - this for chaining
 			 */
 			insert: function(elm, i) {
-				return this.splice(i, 0, elm);
+				return this.splice(i, 0, elm), this;
 			},
-			/**
-			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-			 * each is eachlastic in the sense that one can add and delete elements at the current index
-			 * @public
-			 * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
-			 * @param {function} cb       - callback function to be called for each element
-			 * @param {Object=}  opt_ctx  - optional context for the callback function
-			 */
-			each: function(opt_step, cb, opt_ctx) {
-				if(typeof(opt_step) === 'function')
-					this.$._each(1, opt_step, cb);
-				else
-					this.$._each(opt_step, cb, opt_ctx);
-			},
-			/**
-			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-			 * each is eachlastic in the sense that one can add and delete elements at the current index
-			 * @public
-			 * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
-			 * @param {function} cb       - callback function to be called for each element
-			 * @param {Object=}  opt_ctx  - optional context for the callback function
-			 */
-			// TODO negative step values
-			_each: function(step, cb, opt_ctx) {
-				var i, from, to;
+            /**
+             * Calculates the intersection for 2 or more arrays
+             * NOTE assumes the arrays do not contain duplicate values
+             * @public
+             * @static
+             * @this   {Array}
+             * @param  {Array} arr - 2 or more arrays
+             * @return {Array}     - this for chaining
+             */
+            intersect: function(arr) {
+                return this.$.selectAll(function(val) {
+                    return arr.$.has(val);
+                }, this);
+            },
+            /**
+             * Calculates the intersection for 2 or more arrays
+             * @public
+             * @static
+             * @this   {Array}
+             * @param  {Array} arr - 2 or more arrays
+             * @return {Array}     - this for chaining
+             */
+            $intersect: function(arr) {
+                return this.$.$selectAll(function(val) {
+                    return arr.$.has(val);
+                }, this);
+            },
+            /**
+             * Checks if an array intersects an other
+             * @public
+             * @this    {Array}
+             * @param   {Array}  arr - array to check intersection with
+             * @returns {boolean}     - boolean indicating if the 2 arrays intersect
+             */
+            intersects: function(arr) {
+                var intersects = false;
 
-				if(step > 0) // normal traversing
-				{
-					from = 0, to = this.length;
+                this.$.each(function(val) {
+                    if(arr.$.has(val)) return !(intersects = true);
+                });
 
-					var delta, size = to;
+                return intersects;
+            },
+            /**
+             * gets/sets the last element of an array
+             * @public
+             * @this    {Array}
+             * @param   {any}      val - Value to be set as the last element
+             * @returns {any|Array}    - last element of the array
+             */
+            last: function(val) {
+                if(val === undefined) return this[this.length-1];
 
-					for(i = from; i < to; i += step)
-					{
-						if(cb.call(opt_ctx, this[i], i, this) === false) break;
-						if(delta = this.length - size) i += delta, to += delta, size += delta;
-					}
-				}
-				else // reverse traversing
-				{
-					from = this.length-1, to = -1;
+                this[this.length-1] = val;
 
-					for(i = from; i > to; i += step)
-					{
-						if(cb.call(opt_ctx, this[i], i, this) === false) break;
-					}
-				}
-			},
+                return this;
+            },
 			/**
 			 * Accessor: Returns the maximum value of an array with numbers
 			 * @public
@@ -765,7 +872,7 @@
 			 * @returns {number|any} - maximum number or element in the array
 			 */
 			max: function(opt_compare) {
-				if (opt_compare === undefined)
+				if(opt_compare === undefined)
 				{
 					return __math.max.apply(null, this);
 				}
@@ -783,20 +890,161 @@
 			/**
 			 * Accessor: Returns the minimum value of an array with numbers
 			 * @public
-			 * @this    {Array<number>}
-			 * @returns {number} - minimum number in the array
+			 * @this    {Array<number>|Array<any>}
+             * @param   {Function=} opt_compare - optional compare function
+			 * @returns {number|any} - minimum element in the array
 			 */
-			min: function(opt_) {
-				return __math.min.apply(null, this);
+			min: function(opt_compare) {
+                if(opt_compare === undefined)
+                {
+                    return __math.min.apply(null, this);
+                }
+                else
+                {
+                    var min = this[0];
+
+                    this.$.each(function(elm) {
+                        min = opt_compare(elm, min) < 0? elm : min;
+                    });
+
+                    return min;
+                }
 			},
+            /**
+             * Modifies the members of an array according to a certain function
+             * @public
+             * @this    {Array}
+             * @param   {Function} modifier - function that modifies the array members
+             * @param   {Object=}  opt_ctx  - optional context for the modifier function
+             * @returns {Array}             - the modified array
+             */
+            modify: function(modifier, opt_ctx) {
+                this.$.each(function(val, i) {
+                    this[i] = modifier.call(opt_ctx, val, i, this);
+                }, this);
+
+                return this;
+            },
+            /**
+             * Copies and modifies the members of an array according to a certain function
+             * @public
+             * @this    {Array}
+             * @param   {Function} modifier - function that modifies the array members
+             * @param   {Object=}  opt_ctx  - optional context for the modifier function
+             * @returns {Array}             - the modified array
+             */
+            $modify: function(modifier, opt_ctx)
+            {
+                return _.clone(this).$.modify(modifier, opt_ctx);
+            },
 			/**
 			 * Accessor: Returns a random element from the array
 			 * @public
-			 * @returns {any} - random element from the array
+             * @this   {Array}
+			 * @return {any} - random element from the array
 			 */
 			 random: function() {
 				 return this[_.int.random(0, this.length - 1)];
 			 },
+            /**
+             * Removes the occurrences from an array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Array}                      - The array without the element
+             */
+            _rm: function(all, invert, $value, opt_ctx)
+            {
+                var first  = !all;
+                var normal = !invert;
+                var match;
+                var done;
+                var array  = false;
+
+                var cb = (typeof($value) === 'function')? $value                                   :
+                         (array = __arr.isArray($value))? function(val) {return $value.$.has(val)} :
+                                                          function(val) {return val === $value};
+
+                this.$.each(function(val, i, _this, delta) {
+                    match = cb.call(opt_ctx, val, i, _this, delta);
+                    // remove normal or inverted match
+                    if(match === normal) this.splice(i, 1);
+                    // if first and the first  match is made check if we are done
+                    if(first && match)
+                    {
+                        done = array? !$value.$.without(val).length : true;
+
+                        // remove remainder if done & invert mode
+                        if(done && invert) this.$.withoutKeys(i+1, this.length);
+
+                        return !done;
+                    }
+                }, this);
+
+                return this;
+            },
+            /**
+             * Select the first occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array }                     - array with the selected element
+             */
+            select: function($value, opt_ctx) {
+                return this.$._rm(false, true, $value, opt_ctx);
+            },
+            /**
+             * Accessor: Returns the first element found by the selector function
+             * @public
+             * @this    {Array}
+             * @param   {Function} callback - selector function callback to be called on each element
+             * @param   {Object=}  opt_ctx  - optional context for the callback function
+             * @returns {any}               - the found element or undefined otherwise
+             */
+            $select: function($value, opt_ctx) {
+                return this.$._cp(false, [], false, $value, opt_ctx);
+
+            },
+            /**
+             * Select all occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array}                      - array with the selected elements
+             */
+            selectAll: function($value, opt_ctx) {
+                return this.$._rm(true, true, $value, opt_ctx);
+            },
+            /**
+             * Select all occurrence in an array and copies them to a new array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array}                      - array with the selected elements
+             */
+            $selectAll: function($value, opt_ctx) {
+                return this.$._cp(true, [], false, $value, opt_ctx);
+            },
+            /**
+             * Retrieves and sets the size of an array
+             * @public
+             * @this    {Array}
+             * @param   {number} size  - the new size of the array
+             * @returns {number|Array} - the length of the arrayu or the array itself
+             */
+            size: function(size) {
+                if(size === undefined) return this.length;
+
+                this.length = size;
+
+                return this;
+            },
 			/**
 			 * Accessor: Returns the sum of all numbers in a number array
 			 * @public
@@ -806,23 +1054,149 @@
 			 sum: function() {
 				 return this.reduce(function(a, b) { return a + b; });
 			 },
+            /**
+             * Calculates the union for 2 arrays
+             * @public
+             * @this   {Array}
+             * @param  {Array} arr  - array to unfiy
+             * @return {Array} this - unified with the other
+             */
+            unify: function(arr) {
+                return this.$$.append(arr).unique().value;
+            },
+            /**
+             * Calculates the union for 2 arrays into an new array
+             * @public
+             * @this   {Array}
+             * @param  {Array} arr  - array to unfiy
+             * @return {Array}      - new array containing the unification
+             */
+            $unify: function(arr) {
+                return this.$$.$append(arr).unique().value;
+            },
 			/**
-			 * Accessor: Returns a new version of the array without duplicates
+			 * Removes duplicate values in an array
 			 * @public
+             * @this    {Array}
 			 * @returns {Array} - new array without duplicates
 			 */
 			unique: function() {
-				var unique = [];
-				var elm;
+                this.$.eachRight(function(val, i) {
+                    this.$.each(function(duplicate, j) {
+                        if(val === duplicate && j < i) return this.splice(i, 1), false;
+                        return j < i;
+                    }, this)
+                }, this);
 
-				for(var i = 0, max = this.length; i < max; i++)
-				{
-					elm = this[i];
-					if(!unique.$.has(elm)) unique.push(elm);
-				}
+                return this;
+			},
+            /**
+             * Accessor: Returns a new version of the array without duplicates
+             * @public
+             * @this    {Array}
+             * @returns {Array} - new array without duplicates
+             */
+            $unique: function() {
+                var unique = [];
 
-				return unique;
-			}
+                this.$.each(function(val) {
+                    if(!unique.$.has(val)) unique.push(val);
+                }, this);
+
+                return unique;
+            },
+            /**
+             * Removes the first occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array }                     - The array without the element
+             */
+            without: function($value, opt_ctx) {
+                return this.$._rm(false, false, $value, opt_ctx);
+            },
+            /**
+             * Removes the first occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array }                     - NEW array without the element
+             */
+            $without: function($value, opt_ctx) {
+                return this.$._cp(false, [], true, $value, opt_ctx);
+            },
+            /**
+             * Removes the all occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array}                      - The array without the element
+             */
+            withoutAll: function($value, opt_ctx) {
+                return this.$._rm(true, false, $value, opt_ctx);
+            },
+            /**
+             * Removes the all occurrence in an array
+             * @public
+             * @this    {Array}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Array}                      - NEW array without the element
+             */
+            $withoutAll: function($value, opt_ctx) {
+                return this.$._cp(true, [], true, $value, opt_ctx);
+            },
+            /**
+             * Remove elements based on index
+             * @public
+             * @this   {Array}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}   this   - mutated array for chaining
+             */
+            withoutKeys: function($index, opt_to_ctx)
+            {
+                return this.$._del(false, $index, opt_to_ctx);
+            },
+            /**
+             * Remove elements based on index
+             * @public
+             * @this   {Array}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}   this   - mutated array for chaining
+             */
+            $withoutKeys: function($index, opt_to_ctx)
+            {
+                return _.clone(this).$.withoutKeys($index, opt_to_ctx);
+            },
+            /**
+             * Selects elements based on index, removes others
+             * @public
+             * @this   {Array}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}   this   - mutated array for chaining
+             */
+            selectKeys: function($index, opt_to_ctx)
+            {
+                return this.$._del(true, $index, opt_to_ctx);
+            },
+            /**
+             * Selects elements based on index into a new array
+             * @public
+             * @this   {Array}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}   this   - mutated array for chaining
+             */
+            $selectKeys: function($index, opt_to_ctx)
+            {
+                return _.clone(this).$.selectKeys($index, opt_to_ctx);
+            }
 		}
 	});
 
@@ -1210,7 +1584,7 @@
 				return function range(min, max) {
 					var overflow = int % (__math.abs(max - min) + 1);
 
-					return (overflow < 0? max+1 : min) + overflow;
+					return ((overflow < 0)? max+1 : min) + overflow;
 				}
 			}
 		}

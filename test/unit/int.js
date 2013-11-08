@@ -1,4 +1,4 @@
-describe("Integer", function() {
+xdescribe("Integer", function() {
 
 	describe("static methods", function() {
 

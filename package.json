@@ -13,6 +13,9 @@
 		"karma-chai-plugins": "latest",
 		"karma-coverage"    : "latest",
 
+        "karma-chrome-launcher": "latest",
+        "karma-phantomjs-launcher": "latest",
+
 		"benchmark": "latest"
 	}
 }

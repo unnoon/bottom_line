@@ -14,7 +14,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining", function() {
 			var names = ['bobby', 'jean'];
 
-			names.$$.append(['xavier']).remove('bobby');
+			names.$$.append(['xavier']).without('bobby');
 
 			expect(names).to.eql(['jean', 'xavier']);
 		});
@@ -22,7 +22,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining different types", function() {
 			var arr = [4,5,6,2];
 
-			expect(arr.$$.remove(2).min().$$.bound(1, 3).between(2,4).value).to.be.true;
+			expect(arr.$$.without(2).min().$$.bound(1, 3).between(2,4).value).to.be.true;
 		});
 
 		it("singular type chaining", function() {

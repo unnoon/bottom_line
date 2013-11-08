@@ -1,4 +1,4 @@
-describe("Object", function() {
+xdescribe("Object", function() {
 
 	describe("static methods", function() {
 
