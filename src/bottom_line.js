@@ -489,17 +489,44 @@
 			avg: function() {
 				return this.sum()/this.length;
 			},
-            _cp: function(all, target, invert, $value, opt_ctx)
+            /**
+             * Copies a value to an array
+             * @public
+             * @this   {Array}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}                 this       - mutated array for chaining
+             */
+            copy: function(to, $value, opt_ctx)
             {
-                this.$._edit(
-                    all,
-                    target,
-                    invert,
-                    function(val) {this.push(val);},
-                    function(val, i, _this, delta) {_this.$._cp(true, this, false, function(val, index) {return index > i});},
-                    $value,
-                    opt_ctx
-                )
+                return this.$._cp(false, false, to, $value, opt_ctx);
+            },
+            /**
+             * Copies all similar values to an array
+             * @public
+             * @this   {Array}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}                 this       - mutated array for chaining
+             */
+            copyAll: function(to, $value, opt_ctx)
+            {
+                return this.$._cp(true, false, to, $value, opt_ctx);
+            },
+            /**
+             * Copies keys to an array
+             * @public
+             * @this   {Array}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}                 this       - mutated array for chaining
+             */
+            copyKeys: function(to, $index, opt_to_ctx)
+            {
+                return this.$._cpKeys(false, to, $index, opt_to_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -511,7 +538,58 @@
              * @param   {Object}             opt_ctx - optional context for the function
              * @returns {Array}                      - new array with the copied elements
              */
-            _edit: function(all, target, invert, onmatch, ondone, $value, opt_ctx)
+            _cp: function(all, invert, target, $value, opt_ctx)
+            {
+                var onmatch = function(val) {this.push(val);};
+                var ondone  = function(val, i, _this) {_this.$.copyKeys(this, function(index) {return index > i});};
+
+                return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
+            },
+            /**
+             * Copies the occurrences from an array to an new array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Array}                      - new array with the copied elements
+             */
+            _cut: function(all, invert, target, $value, opt_ctx)
+            {
+                var onmatch = function(val, i, _this) {this.push(val); _this.splice(i, 1)};
+                var ondone  = function(val, i, _this) {_this.$.cutKeys(this, function(index) {return index > i});};
+
+                return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
+            },
+            /**
+             * Copies the occurrences from an array to an new array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Array}                      - new array with the copied elements
+             */
+            _cpKeys: function(invert, target, $value, opt_to_ctx)
+            {
+                var onmatch = function(i, _this) {this.push(_this[i]);};
+                var ondone  = function(i, _this) {_this.$.copyKeys(this, function(index) {return index > i});};
+
+                return this.$._editKeys(invert, onmatch, ondone, target, $value, opt_to_ctx);
+            },
+            /**
+             * Copies the occurrences from an array to an new array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Array}                      - new array with the copied elements
+             */
+            _edit: function(all, invert, onmatch, ondone, target, $value, opt_ctx)
             {
                 var first  = !all;
                 var normal = !invert;
@@ -543,15 +621,78 @@
                 return target;
             },
             /**
+             * Edits an array based on indices
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Array}                      - new array with the copied elements
+             */
+            _editKeys: function(invert, onmatch, ondone, target, $index, opt_to_ctx)
+            {
+                var type   = typeof($index);
+                var all    = typeof(opt_to_ctx) === 'number' || type === 'function';
+                var first  = !all;
+                var normal = !invert;
+                var match;
+                var done;
+                var array  = false;
+                var index;
+
+                var cb = (type === 'function')?           $index                                               :
+                         (array = __arr.isArray($index))? function(i) {return $index.$.has(i)}                 :
+                         (opt_to_ctx === undefined)?      function(i) {return i === $index}                    :
+                                                          function(i) {return i.$.between($index, opt_to_ctx)};
+
+                this.$.each(function(val, i, _this, delta) {
+                    index = i - delta; // the original index in the array
+
+                    match = cb.call(opt_to_ctx, index, _this);
+                    // remove normal or inverted match
+                    if(match === normal) onmatch.call(target, i, _this);
+
+                    // if match is made check if we are done
+                    if(first && match)
+                    {
+                        done = array? !$index.$.without(index).length : true;
+
+                        // remove remainder if done & invert mode
+                        if(done && invert) ondone.call(target, i, _this);
+
+                        return !done;
+                    }
+                }, this);
+
+                return target;
+            },
+            /**
+             * Removes the occurrences from an array
+             * @public
+             * @this    {Array}
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Array}                      - The array without the element
+             */
+            _del: function(invert, $index, opt_to_ctx)
+            {
+                var onmatch = function(i) {this.splice(i, 1);};
+                var ondone  = function(i) {this.$.withoutKeys(i+1, this.length);};
+
+                return this.$._editKeys(invert, onmatch, ondone, this, $index, opt_to_ctx);
+            },
+            /**
              * Remove elements based on index
              * @public
              * @this   {Array}
-             * @param  {boolean} invert - boolean indicating if the deletion shopuld be inverted
-             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
-             * @return {Array}   this   - mutated array for chaining
+             * @param  {boolean}               invert     - boolean indicating if the deletion should be inverted
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Array}                 this       - mutated array for chaining
              */
-            _del: function(invert, $index, opt_to_ctx)
+            _del2: function(invert, $index, opt_to_ctx)
             {
                 var normal = !invert;
 
@@ -958,33 +1099,10 @@
              */
             _rm: function(all, invert, $value, opt_ctx)
             {
-                var first  = !all;
-                var normal = !invert;
-                var match;
-                var done;
-                var array  = false;
+                var onmatch = function(val, i) {this.splice(i, 1);};
+                var ondone  = function(val, i) {this.$.withoutKeys(i+1, this.length);};
 
-                var cb = (typeof($value) === 'function')? $value                                   :
-                         (array = __arr.isArray($value))? function(val) {return $value.$.has(val)} :
-                                                          function(val) {return val === $value};
-
-                this.$.each(function(val, i, _this, delta) {
-                    match = cb.call(opt_ctx, val, i, _this, delta);
-                    // remove normal or inverted match
-                    if(match === normal) this.splice(i, 1);
-                    // if first and the first  match is made check if we are done
-                    if(first && match)
-                    {
-                        done = array? !$value.$.without(val).length : true;
-
-                        // remove remainder if done & invert mode
-                        if(done && invert) this.$.withoutKeys(i+1, this.length);
-
-                        return !done;
-                    }
-                }, this);
-
-                return this;
+                return this.$._edit(all, invert, onmatch, ondone, this, $value, opt_ctx);
             },
             /**
              * Select the first occurrence in an array
@@ -1001,13 +1119,12 @@
              * Accessor: Returns the first element found by the selector function
              * @public
              * @this    {Array}
-             * @param   {Function} callback - selector function callback to be called on each element
+             * @param   {Function} $value   - selector function callback to be called on each element
              * @param   {Object=}  opt_ctx  - optional context for the callback function
              * @returns {any}               - the found element or undefined otherwise
              */
             $select: function($value, opt_ctx) {
-                return this.$._cp(false, [], false, $value, opt_ctx);
-
+                return this.$._cp(false, false, [], $value, opt_ctx);
             },
             /**
              * Select all occurrence in an array
@@ -1029,7 +1146,7 @@
              * @returns {Array}                      - array with the selected elements
              */
             $selectAll: function($value, opt_ctx) {
-                return this.$._cp(true, [], false, $value, opt_ctx);
+                return this.$._cp(true, false, [], $value, opt_ctx);
             },
             /**
              * Retrieves and sets the size of an array
@@ -1125,7 +1242,7 @@
              * @returns {Array }                     - NEW array without the element
              */
             $without: function($value, opt_ctx) {
-                return this.$._cp(false, [], true, $value, opt_ctx);
+                return this.$._cp(false, true, [], $value, opt_ctx);
             },
             /**
              * Removes the all occurrence in an array
@@ -1147,7 +1264,7 @@
              * @returns {Array}                      - NEW array without the element
              */
             $withoutAll: function($value, opt_ctx) {
-                return this.$._cp(true, [], true, $value, opt_ctx);
+                return this.$._cp(true, true, [], $value, opt_ctx);
             },
             /**
              * Remove elements based on index
@@ -1171,7 +1288,7 @@
              */
             $withoutKeys: function($index, opt_to_ctx)
             {
-                return _.clone(this).$.withoutKeys($index, opt_to_ctx);
+                return this.$._cpKeys(true, [], $index, opt_to_ctx);
             },
             /**
              * Selects elements based on index, removes others
@@ -1195,7 +1312,7 @@
              */
             $selectKeys: function($index, opt_to_ctx)
             {
-                return _.clone(this).$.selectKeys($index, opt_to_ctx);
+                return this.$._cpKeys(false, [], $index, opt_to_ctx);
             }
 		}
 	});

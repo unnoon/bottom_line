@@ -312,8 +312,6 @@ describe("Array", function() {
             it("select one element", function() {
                 var arr = ['a', 'b', 'a', 'c'];
 
-                console.log('select one');
-
                 expect(arr.$.select('a')).to.eql(['a']);
                 expect(arr).to.eql(['a']);
             });
@@ -479,6 +477,46 @@ describe("Array", function() {
                 arr.$.selectKeys([0, 3, 4]);
 
                 expect(arr).to.eql(['a', 'd', 'e']);
+            });
+        });
+
+        describe("$selectKeys", function() {
+
+            it("$selectKeys one index", function() {
+                var arr = ['a', 'b', 'c'];
+
+                expect(arr.$.$selectKeys(1)).to.deep.equal(['b']);
+                expect(arr).to.deep.equal(['a', 'b', 'c']);
+            });
+
+            it("$selectKeys from to index", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$selectKeys(1, 3)).to.deep.equal(['b', 'c', 'd']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("$selectKeys from to index out of bounds", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$selectKeys(1, 6)).to.deep.equal(['b', 'c', 'd', 'e']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("$selectKeys indexes with function", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$selectKeys(function(i) {
+                    return i % 2 === 0;
+                })).to.eql(['a', 'c', 'e']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("$selectKeys indexes within array", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$selectKeys([0, 3, 4])).to.eql(['a', 'd', 'e']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
             });
         });
 
@@ -689,6 +727,46 @@ describe("Array", function() {
                 arr.$.withoutKeys([0, 3, 4]);
 
                 expect(arr).to.eql(['b', 'c']);
+            });
+        });
+
+        describe("$withoutKeys", function() {
+
+            it("withoutKeys one index", function() {
+                var arr = ['a', 'b', 'c'];
+
+                expect(arr.$.$withoutKeys(1)).to.deep.equal(['a', 'c']);
+                expect(arr).to.deep.equal(['a', 'b', 'c']);
+            });
+
+            it("$withoutKeys from to index", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$withoutKeys(1, 3)).to.deep.equal(['a', 'e']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("withoutKeys from to index out of bounds", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$withoutKeys(1, 6)).to.deep.equal(['a']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("withoutKeys indexes with function", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$withoutKeys(function(i) {
+                    return i % 2 === 0;
+                })).to.eql(['b', 'd']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
+            });
+
+            it("withoutKeys indexes within array", function() {
+                var arr = ['a', 'b', 'c', 'd', 'e'];
+
+                expect(arr.$.$withoutKeys([0, 3, 4])).to.eql(['b', 'c']);
+                expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
             });
         });
 	});
