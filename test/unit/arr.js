@@ -164,13 +164,14 @@ describe("Array", function() {
 			});
 		});
 
-		xdescribe("cutKeys", function() {
+		describe("cutKeys", function() {
 
 			it("cutKeys value", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
 				expect(arr1.$.cutKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
+				expect(arr1).to.eql(['a', 'c', 'b']);
 			});
 
 			it("cutKeys values", function() {
@@ -178,6 +179,7 @@ describe("Array", function() {
 				var arr2 = ['b', 'e'];
 
 				expect(arr1.$.cutKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1).to.eql(['a', 'b']);
 			});
 
 			it("cutKeys function", function() {
@@ -185,6 +187,7 @@ describe("Array", function() {
 				var arr2 = ['b', 'e'];
 
 				expect(arr1.$.cutKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
+				expect(arr1).to.eql(['a', 'b']);
 
 			});
 		});

@@ -589,6 +589,23 @@
 				return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
 			},
 			/**
+			 * Copies the occurrences from an array to an new array
+			 * @public
+			 * @this    {Array}
+			 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+			 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+			 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+			 * @param   {Object}             opt_ctx - optional context for the function
+			 * @returns {Array}                      - new array with the copied elements
+			 */
+			_cutKeys: function(invert, target, $value, opt_ctx)
+			{
+				var onmatch = function(i, _this) {this.push(_this[i]); _this.splice(i, 1)};
+				var ondone  = function(i, _this) {_this.$.cutKeys(this, function(index) {return index > i});};
+
+				return this.$._editKeys(invert, onmatch, ondone, target, $value, opt_ctx);
+			},
+			/**
 			 * Cut a value to an array
 			 * @public
 			 * @this   {Array}
