@@ -109,6 +109,86 @@ describe("Array", function() {
 			});
 		});
 
+		describe("cut", function() {
+
+			it("cut value", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cut(arr2, 'b')).to.eql(['b', 'e', 'b']);
+				expect(arr1).to.eql(['a', 'c', 'b']);
+			});
+
+			it("cut values", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cut(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1).to.eql(['a', 'b']);
+			});
+
+			it("cut function", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cut(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
+				expect(arr1).to.eql(['a', 'c', 'b']);
+			});
+		});
+
+		describe("cutAll", function() {
+
+			it("cutAll value", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1).to.eql(['a', 'c']);
+			});
+
+			it("cutAll values", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
+				expect(arr1).to.eql(['a']);
+			});
+
+			it("cutAll function", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1).to.eql(['a', 'c']);
+
+			});
+		});
+
+		xdescribe("cutKeys", function() {
+
+			it("cutKeys value", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
+			});
+
+			it("cutKeys values", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
+			});
+
+			it("cutKeys function", function() {
+				var arr1 = ['a', 'b', 'c', 'b'];
+				var arr2 = ['b', 'e'];
+
+				expect(arr1.$.cutKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
+
+			});
+		});
+
 		describe("diff", function() {
 
 			it("simple difference", function() {

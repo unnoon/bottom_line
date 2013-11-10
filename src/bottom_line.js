@@ -589,6 +589,45 @@
 				return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
 			},
 			/**
+			 * Cut a value to an array
+			 * @public
+			 * @this   {Array}
+			 * @param  {Array}                 to         - array to copy to
+			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+			 * @return {Array}                 this       - mutated array for chaining
+			 */
+			cut: function(to, $value, opt_ctx)
+			{
+				return this.$._cut(false, false, to, $value, opt_ctx);
+			},
+			/**
+			 * Cut all similar values to an array
+			 * @public
+			 * @this   {Array}
+			 * @param  {Array}                 to         - array to copy to
+			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+			 * @return {Array}                 this       - mutated array for chaining
+			 */
+			cutAll: function(to, $value, opt_ctx)
+			{
+				return this.$._cut(true, false, to, $value, opt_ctx);
+			},
+			/**
+			 * Copies keys to an array
+			 * @public
+			 * @this   {Array}
+			 * @param  {Array}                 to         - array to copy to
+			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+			 * @return {Array}                 this       - mutated array for chaining
+			 */
+			cutKeys: function(to, $index, opt_to_ctx)
+			{
+				return this.$._cutKeys(false, to, $index, opt_to_ctx);
+			},
+			/**
 			 * Copies the occurrences from an array to an new array
 			 * @public
 			 * @this    {Array}
@@ -908,7 +947,7 @@
 				return found;
 			},
 			/**
-			 * Finds all elements according to ther callback fucntion
+			 * Finds all elements according to the callback function
 			 * @public
 			 * @this   {Array}
 			 * @param  {Function} cb      - callback function to be called for each element
