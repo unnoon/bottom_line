@@ -10,7 +10,7 @@
 
 (function() {
 	var __root = this;
-	var _      = function() {};
+	var _      = {};
 
 	// set browser and nodejs globals
 	if(typeof(module) !== 'undefined' && module.exports)
@@ -138,6 +138,70 @@
 		})
 	}
 
+	/*
+	 * Collections general collection object to store general functions
+	 */
+	var __coll = {
+		/**
+		 * Edits the key valuer pairs of an object
+		 * @public
+		 * @this    {Array|Object}
+		 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+		 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+		 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+		 * @param   {Object}             opt_ctx - optional context for the function
+		 * @returns {Array}                      - new array with the copied elements
+		 */
+		_edit: function(all, invert, onmatch, ondone, target, $value, opt_ctx)
+		{
+			var first  = !all;
+			var normal = !invert;
+			var match;
+			var done;
+			var array  = false;
+
+			var cb = (typeof($value) === 'function')? 	$value                                   :
+					 (array = _.isArray($value))? 		function(val) {return $value.$.has(val)} :
+														function(val) {return val === $value};
+
+			this.$.each(function(val, i, _this, delta) {
+				match = cb.call(opt_ctx, val, i, _this, delta);
+				// remove normal or inverted match
+				if(match === normal) onmatch.call(target, val, i, _this, delta);
+
+				// if first and the first  match is made check if we are done
+				if(first && match)
+				{
+					done = array? !$value.$.without(val).length : true;
+
+					// remove remainder if done & invert mode
+					if(done && invert) ondone.call(target, val, i, _this, delta);
+
+					return !done;
+				}
+			}, this);
+
+			return target;
+		},
+		/**
+		 * Finds first element that is picked by the callback function
+		 * @public
+		 * @this   {Array}
+		 * @param  {Function} cb      - callback function to be called for each element
+		 * @param  {Object=}  opt_ctx - optional context
+		 * @return {any} first value that is found
+		 */
+		find: function(cb, opt_ctx) {
+			var found;
+
+			this.$.each(function(elm) {
+				if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
+			});
+
+			return found;
+		}
+	};
+
 	/**
 	 * Object
 	 */
@@ -230,9 +294,42 @@
 			}
 		},
 		prototype: {
+			__alias: {
+
+			},
+			/**
+			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * @public
+			 * @this  {Object}
+			 * @param {Function} cb      - callback function to be called for each element
+			 * @param {Object=}  opt_ctx - optional context
+			 */
+			each: function(cb, opt_ctx) {
+				var keys = __obj.keys(this);
+				var key;
+
+				for(var i = 0, max = keys.length; i < max; i++)
+				{
+					key = keys[i];
+
+					if(cb.call(opt_ctx, this[key], key, this) === false) break;
+				}
+			},
+			/**
+			 * Edits the key value pairs of an object
+			 * @public
+			 * @this    {Array}
+			 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+			 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+			 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+			 * @param   {Object}             opt_ctx - optional context for the function
+			 * @returns {Array}                      - new array with the copied elements
+			 */
+			_edit: __coll._edit,
 			/**
 			 * Filters
 			 * @public
+			 * @this   {Object}
 			 * @param  {Function} cb      - callback function to be called for each element
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {Array} array containing the filtered values
@@ -249,56 +346,45 @@
 			/**
 			 * Finds first element that is picked by the callback function
 			 * @public
+			 * @this   {Object}
 			 * @param  {Function} cb      - callback function to be called for each element
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {any} first value that is found
 			 */
-			find: function(cb, opt_ctx) {
-				var found;
-
-				this.$.each(function(elm) {
-					if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
-				});
-
-				return found;
-			},
-			/**
-			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-			 * @public
-			 * @param {Function} cb      - callback function to be called for each element
-			 * @param {Object=}  opt_ctx - optional context
-			 */
-			each: function(cb, opt_ctx) {
-				var keys = __obj.keys(this);
-				var key;
-
-				for(var i = 0, max = keys.length; i < max; i++)
-				{
-					key = keys[i];
-
-					if(cb.call(opt_ctx, this[key], key, this) === false) break;
-				}
-			},
+			find: __coll.find,
 			/**
 			 * Returns an array containing the keys of an object (enumerable properties))
 			 * @public
+			 * @this   {Object}
 			 * @return {Array} keys of the object
 			 */
-			keys: function() {
-				return __obj.keys(this);
-			},
+			keys: __obj.keys,
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public
 			 * @return {Array} keys of the object
 			 */
-			names: function() {
-				return __obj.getOwnPropertyNames(this);
+			names: __obj.getOwnPropertyNames,
+			/**
+			 * Returns an array containing the keys & values of an object (enumerable properties)
+			 * @public
+			 * @this   {Object}
+			 * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
+			 */
+			pairs: function() {
+				var pairs = [];
+
+				this.$.each(function(val, key) {
+					pairs.push(key, val);
+				});
+
+				return pairs;
 			},
 			/**
 			 * Sets/gets the prototype of an object
 			 * NOTE setting a prototype using __proto__ is non standard use at your own risk!
 			 * @public
+			 * @this   {Object}
 			 * @param   {Array}  proto      - the prototype to be set
 			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
 			 */
@@ -325,31 +411,6 @@
 //
 //				return obj;
 //			},
-			/**
-			 * Remove elements based on index
-			 * @public
-			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
-			 * @return {Array}   this   - mutated array for chaining
-			 */
-			withoutKeys: function($key)
-			{
-				var type = typeof($key);
-
-				if(type === 'string')
-				{
-					delete this[$key];
-				}
-				else // function or array
-				{
-					var cb = (type === 'function')? $key : function(key) {return $key.$.has(key)}; // assumes function otherwise array
-
-					this.$.each(function(val, key) {
-						if(cb(key)) delete this[key];
-					}, this);
-				}
-
-				return this;
-			},
 			/**
 			 * Removes the first occurrence in an object
 			 * @public
@@ -406,8 +467,26 @@
 				return this;
 			},
 			/**
+			 * Removes the occurrences from an object based on value
+			 * @public
+			 * @this    {Object}
+			 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+			 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+			 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+			 * @param   {Object}             opt_ctx - optional context for the function
+			 * @returns {Array}                      - The array without the element
+			 */
+			_rm: function(all, invert, $value, opt_ctx)
+			{
+				var onmatch = function(val, key) {delete this[key]};
+				var ondone  = function(val, key) {this.$.withoutKeys(i+1, this.length);};
+
+				return this.$._edit(all, invert, onmatch, ondone, this, $value, opt_ctx);
+			},
+			/**
 			 * Returns an array containing the values of an object (enumerable properties)
 			 * @public
+			 * @this   {Object}
 			 * @return {Array} values of the object
 			 */
 			values: function() {
@@ -420,18 +499,42 @@
 				return values;
 			},
 			/**
-			 * Returns an array containing the keys & values of an object (enumerable properties)
+			 * Removes the first occurrence in an object
 			 * @public
-			 * @return {Array} keys & values of the object
+			 * @this    {Object}
+			 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+			 * @param   {Object}             opt_ctx - optional context or the function
+			 * @returns {Array }                     - The array without the element
 			 */
-			pairs: function() {
-				var pairs = [];
+			without__alias: ['diff'],
+			without: function($value, opt_ctx) {
+				return this.$._rm(false, false, $value, opt_ctx);
+			},
+			/**
+			 * Remove elements based on index
+			 * @public
+			 * @this   {Object}
+			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
+			 * @return {Array}   this   - mutated array for chaining
+			 */
+			withoutKeys: function($key)
+			{
+				var type = typeof($key);
 
-				this.$.each(function(val, key) {
-					pairs.push(key, val);
-				});
+				if(type === 'string')
+				{
+					delete this[$key];
+				}
+				else // function or array
+				{
+					var cb = (type === 'function')? $key : function(key) {return $key.$.has(key)}; // assumes function otherwise array
 
-				return pairs;
+					this.$.each(function(val, key) {
+						if(cb(key)) delete this[key];
+					}, this);
+				}
+
+				return this;
 			}
 		}
 	});
@@ -662,7 +765,7 @@
 				return this.$._editKeys(invert, onmatch, ondone, target, $value, opt_to_ctx);
 			},
 			/**
-			 * Copies the occurrences from an array to an new array
+			 * Edits the occurrences of an array
 			 * @public
 			 * @this    {Array}
 			 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
@@ -723,10 +826,10 @@
 				var array  = false;
 				var index;
 
-				var cb = (type === 'function')?           $index                                               :
-					(array = _.isArray($index))? function(i) {return $index.$.has(i)}                 :
-						(opt_to_ctx === undefined)?      function(i) {return i === $index}                    :
-							function(i) {return i.$.between($index, opt_to_ctx)};
+				var cb = (type === 'function')?	$index                                               							 :
+												(array = _.isArray($index))?function(i) {return $index.$.has(i)}                 :
+												(opt_to_ctx === undefined)? function(i) {return i === $index}                    :
+																			function(i) {return i.$.between($index, opt_to_ctx)};
 
 				this.$.each(function(val, i, _this, delta) {
 					index = i - delta; // the original index in the array
@@ -954,15 +1057,7 @@
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {any} first value that is found
 			 */
-			find: function(cb, opt_ctx) {
-				var found;
-
-				this.$.each(function(elm) {
-					if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
-				});
-
-				return found;
-			},
+			find: __coll.find,
 			/**
 			 * Finds all elements according to the callback function
 			 * @public

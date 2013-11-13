@@ -1,4 +1,4 @@
-xdescribe("Object", function() {
+describe("Object", function() {
 
 	describe("static methods", function() {
 
@@ -114,48 +114,6 @@ xdescribe("Object", function() {
 
 	describe("Object prototype methods", function() {
 
-		describe("delete", function() {
-
-			it("delete an element", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3
-				};
-
-				expect(obj.$.delete('y')).to.deep.equal({
-					x: 1,
-					z: 3
-				});
-			});
-
-			it("delete an array of elements", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3
-				};
-
-				expect(obj.$.delete(['x', 'z'])).to.deep.equal({
-					y: 2
-				});
-			});
-
-			it("delete based on function", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					xy: 4,
-					z: 3
-				};
-
-				expect(obj.$.delete(function(key) {return key.$.startsWith('x')})).to.deep.equal({
-					y: 2,
-					z: 3
-				});
-			});
-		});
-
 		describe("each", function() {
 
 			it("simple iteration", function() {
@@ -255,6 +213,20 @@ xdescribe("Object", function() {
 			});
 		});
 
+		describe("pairs", function() {
+
+			it("simple values", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3,
+					t: 666
+				};
+
+				expect(obj.$.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
+			});
+		});
+
 		describe("values", function() {
 
 			it("simple values", function() {
@@ -269,9 +241,42 @@ xdescribe("Object", function() {
 			});
 		});
 
-		describe("pairs", function() {
+		describe("without by value", function() {
 
-			it("simple values", function() {
+			it("without one element", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3,
+					t: 2
+				};
+
+				obj.$.without(2);
+
+				expect(obj).to.eql({
+					x: 1,
+					z: 3,
+					t: 2
+				});
+			});
+
+			it("without multiple values", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3,
+					t: 2
+				};
+
+				obj.$.without([2,3]);
+
+				expect(obj).to.eql({
+					x: 1,
+					t: 2
+				});
+			});
+
+			it("without function", function() {
 				var obj = {
 					x: 1,
 					y: 2,
@@ -279,7 +284,57 @@ xdescribe("Object", function() {
 					t: 666
 				};
 
-				expect(obj.$.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
+				obj.$.without(function(val) {
+					return val > 2;
+				});
+
+				expect(obj).to.eql({
+					x: 1,
+					y: 2,
+					t: 666
+				});
+			});
+		});
+
+		describe("withoutKeys", function() {
+
+			it("withoutKeys", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3
+				};
+
+				expect(obj.$.withoutKeys('y')).to.deep.equal({
+					x: 1,
+					z: 3
+				});
+			});
+
+			it("withoutKeys an array of elements", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3
+				};
+
+				expect(obj.$.withoutKeys(['x', 'z'])).to.deep.equal({
+					y: 2
+				});
+			});
+
+			it("withoutKeys based on function", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					xy: 4,
+					z: 3
+				};
+
+				expect(obj.$.withoutKeys(function(key) {return key.$.startsWith('x')})).to.deep.equal({
+					y: 2,
+					z: 3
+				});
 			});
 		});
 	});
