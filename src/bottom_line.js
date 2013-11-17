@@ -139,7 +139,7 @@
 	}
 
 	/*
-	 * Collections general collection object to store general functions
+	 * Collections general collection object to store general collection functions
 	 */
 	var __coll = {
 		/**
@@ -165,6 +165,7 @@
 														function(val) {return val === $value};
 
 			this.$.each(function(val, i, _this, delta) {
+//			this.$['each'+(normal && all?'Right':'')](function(val, i, _this, delta) { // TODO use eachRight for withoutAll
 				match = cb.call(opt_ctx, val, i, _this, delta);
 				// remove normal or inverted match
 				if(match === normal) onmatch.call(target, val, i, _this, delta);
@@ -294,9 +295,6 @@
 			}
 		},
 		prototype: {
-			__alias: {
-
-			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
@@ -506,7 +504,6 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - The array without the element
 			 */
-			without__alias: ['diff', 'something else', 'more different stuff'],   // this looks shitty
 			without: function($value, opt_ctx) {
 				return this.$._rm(false, false, $value, opt_ctx);
 			},
@@ -626,9 +623,17 @@
 			 */
 			compact: function()
 			{
-				return this.$.without(function(val) {
-					return !val;
-				});
+				return this.$.withoutAll(function(val) {return !val});
+			},
+			/**
+			 * Removes al falsey values from an array into a new array
+			 * @public
+			 * @this   {Array}
+			 * @return {Array}                 this       - mutated array for chaining
+			 */
+			$compact: function()
+			{
+				return this.$.$withoutAll(function(val) {return !val});
 			},
 			/**
 			 * Copies a value to an array
@@ -786,37 +791,7 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			_edit: function(all, invert, onmatch, ondone, target, $value, opt_ctx)
-			{
-				var first  = !all;
-				var normal = !invert;
-				var match;
-				var done;
-				var array  = false;
-
-				var cb = (typeof($value) === 'function')? 	$value                                   :
-					     (array = _.isArray($value))? 		function(val) {return $value.$.has(val)} :
-															function(val) {return val === $value};
-
-				this.$.each(function(val, i, _this, delta) {
-					match = cb.call(opt_ctx, val, i, _this, delta);
-					// remove normal or inverted match
-					if(match === normal) onmatch.call(target, val, i, _this, delta);
-
-					// if first and the first  match is made check if we are done
-					if(first && match)
-					{
-						done = array? !$value.$.without(val).length : true;
-
-						// remove remainder if done & invert mode
-						if(done && invert) ondone.call(target, val, i, _this, delta);
-
-						return !done;
-					}
-				}, this);
-
-				return target;
-			},
+			_edit: __coll._edit,
 			/**
 			 * Edits an array based on indices
 			 * @public
@@ -1014,7 +989,7 @@
 
 				for(var i = from; i < to; i += step)
 				{
-					if(_.isUndefined(val = this[i])) continue; // handle broken arrays
+					if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays
 					if(cb.call(opt_ctx, val, i, this, delta) === false) break;
 					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index for insertion and deletion
 				}

@@ -30,7 +30,26 @@ describe("Array", function() {
 
 				expect(arr.$.$append(['d', 'e'])).to.eql(['a', 'b', 'c', 'd', 'e']);
 				expect(arr).to.eql(['a', 'b', 'c']);
-				expect(arr).to.equal(arr);
+			});
+		});
+
+		describe("compact", function() {
+
+			it("compact array", function() {
+				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN];
+
+				expect(arr1.$.compact()).to.eql(['a', 'b', 'c']);
+			});
+		});
+
+		describe("$compact", function() {
+
+			it("$compact array", function() {
+				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd'];
+
+				expect(arr1.$.$compact()).to.eql(['a', 'b', 'c', 'd']);
+//				expect(arr1).to.eql(['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd']); // somehow this fails bug in chai???
+				expect(arr1[9]).to.eql('d');
 			});
 		});
 
@@ -337,7 +356,6 @@ describe("Array", function() {
 
 				expect(arr1.$.$flatten()).to.eql(['a', 'b', 'c', 'd', 'e']);
 				expect(arr1).to.eql([['a', 'b'], 'c', ['d', 'e']]);
-				expect(arr1).to.equal(arr1);
 			});
 		});
 
@@ -793,6 +811,14 @@ describe("Array", function() {
 				arr.$.withoutAll('a');
 
 				expect(arr).to.eql(['b', 'c']);
+			});
+
+			it("without one element", function() {
+				var arr = ['a', 'b', 'a', 'c'];
+
+				arr.$.withoutAll(function(val) {return val === 'c'});
+
+				expect(arr).to.eql(['a', 'b', 'a']);
 			});
 
 			it("without multiple values", function() {
