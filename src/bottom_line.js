@@ -1,6 +1,6 @@
 /*!
  * _____________Bottom_Line._.⌡S___
- * BottomLine JavaScript Library
+ * Bottom_line JavaScript Library
  *
  * Copyright 2013, Rogier Geertzema
  * Released under the MIT license
@@ -619,6 +619,18 @@
 				return this.sum()/this.length;
 			},
 			/**
+			 * Removes al falsey values from an array
+			 * @public
+			 * @this   {Array}
+			 * @return {Array}                 this       - mutated array for chaining
+			 */
+			compact: function()
+			{
+				return this.$.without(function(val) {
+					return !val;
+				});
+			},
+			/**
 			 * Copies a value to an array
 			 * @public
 			 * @this   {Array}
@@ -949,8 +961,6 @@
 			 * @return {Array}                    - this initialized multi-dimensional array
 			 */
 			dim: function(dimensions, init) {
-				dimensions = dimensions.flatten();
-
 				addDim(this, 0);
 
 				function addDim(arr, dim)
@@ -1000,13 +1010,13 @@
 			_each: function(step, cb, opt_ctx) {
 				var from = 0, to = this.length;
 				var diff, size = to, delta = 0;
-
-				cb = opt_ctx? cb.bind(opt_ctx) : cb;
+				var val;
 
 				for(var i = from; i < to; i += step)
 				{
-					if(cb(this[i], i, this, delta) === false) break;
-					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff;
+					if(_.isUndefined(val = this[i])) continue; // handle broken arrays
+					if(cb.call(opt_ctx, val, i, this, delta) === false) break;
+					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index for insertion and deletion
 				}
 
 				return this;
