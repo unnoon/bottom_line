@@ -506,7 +506,7 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - The array without the element
 			 */
-			without__alias: ['diff', 'something else'],   // this looks shitty
+			without__alias: ['diff', 'something else', 'more different stuff'],   // this looks shitty
 			without: function($value, opt_ctx) {
 				return this.$._rm(false, false, $value, opt_ctx);
 			},
