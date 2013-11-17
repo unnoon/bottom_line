@@ -296,7 +296,7 @@
 		},
 		prototype: {
 			/**
-			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+			 * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
 			 * @this  {Object}
 			 * @param {Function} cb      - callback function to be called for each element
