@@ -6,7 +6,6 @@
  * Released under the MIT license
  * ________________________________
  */
-// pus test
 'use strict';
 
 (function() {
