@@ -915,7 +915,8 @@
 			 * @param {...Array} var_args - 2 or more arrays to calc the difference from
 			 * @returns  {Array}          - this for chaining             */
 			// TODO this should be an alias
-			diff: function(arr) {
+			diff: function(arr)
+			{
 				return this.$.without(arr);
 			},
 			/**
@@ -924,37 +925,45 @@
 			 * @param    {Array} arr - array to subtract from this
 			 * @returns  {Array}     - new array containing the difference between the first array and the others
 			 */
-			$diff: function(arr) {
+			$diff: function(arr)
+			{
 				return this.$.$selectAll(function(val) {return !arr.$.has(val)});
 			},
 			/**
-			 * Mutator: Creates a multidimensional array
+			 * Mutator: Creates a multidimensional array. The dimensions come from the array itself
+			 * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
 			 * @public
 			 * @this   {Array}
-			 * @param  {Array<number>} dimensions - array specifying the dimensions. A multidimensional array specification can be used for clarity
-			 * @param  {any|Function}  init       - initial value for the array. Can be either a value or a function specifying the value
-			 * @return {Array}                    - this initialized multi-dimensional array
+			 * @param  {any|Function=} opt_init - initial value for the array. Can be either a value or a function specifying the value
+			 * @param  {Object}        opt_ctx  - optional context for the init function
+			 * @return {Array}                  - this initialized multi-dimensional array
 			 */
-			dim: function(dimensions, init) {
-				addDim(this, 0);
+			dimit: function(opt_init, opt_ctx)
+			{
+				var dimensions = _.clone(this);
+				var init       = (typeof(opt_init) === 'function')? opt_init : function() {return opt_init};
 
-				function addDim(arr, dim)
+				this.length = dimensions[0]; // set correct length
+
+				addDim(this, 0, dimensions);
+
+				return this;
+
+				function addDim(arr, dim, dimensions)
 				{
 					for(var i = 0, max = dimensions[dim]; i < max; i++)
 					{   // if last dimension set initial value
 						if(dim === dimensions.length-1)
 						{
-							arr[i] = (typeof(init) === 'function')? init() : init;
+							arr[i] = init.call(opt_ctx)
 						}
 						else
 						{
 							arr[i] = [];
-							addDim(arr[i], dim+1);
+							addDim(arr[i], dim+1, dimensions);
 						}
 					}
 				}
-
-				return this;
 			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1799,7 +1808,7 @@
 			 * @returns {boolean}   - true or false based on the probability
 			 */
 			byProb: function(p) {
-				return Math.random() < p;
+				return __math.random() < p;
 			},
 			/**
 			 * Return the distance between 2 points in Euclidean space
@@ -1811,8 +1820,11 @@
 			 * @returns {number} - distance between the 2 points
 			 */
 			distance: function(x1, y1, x2, y2) {
-				return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-			}
+				return __math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+			},
+			max: __math.max,
+			min :  __math.min,
+			round: __math.round
 		}
 	});
 
