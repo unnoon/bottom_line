@@ -1275,6 +1275,26 @@
 
 				return this.$._edit(all, invert, onmatch, ondone, this, $value, opt_ctx);
 			},
+			reduce: __arr.prototype.reduce,
+			/**
+			 * Reduces an array in the reverse order
+			 * @public
+			 * @this    {Array}
+			 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+			 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+			 * @returns {any}                        - The reduced value
+			 */
+//			reduceRight: function(cb, initial)
+//			{
+//				var reduction = initial;
+//
+//				this.$.each(function(val) {
+//					reduction = cb(val, reduction);
+//				});
+//
+//				return reduction;
+//			},
+			reduceRight: __arr.prototype.reduceRight,
 			/**
 			 * Select the first occurrence in an array
 			 * @public
