@@ -1817,6 +1817,24 @@
 	constructWrapper(Math, 'math', {
 		static: {
 			/**
+			 * Calculates the factor of a displacement vector and a scalar
+			 * This can for example used to calculate the velocity based a direction and a speed
+			 * NOTE this function should be called in the correct context!!
+			 * @public
+			 * @param   {Object} v  - vector like object containing properties x & y
+			 * @param   {number} dx - displacement/direction x
+			 * @param   {number} dy - displacement/direction y
+			 * @returns {Object}    - the factor
+			 */
+			factorize: function(v, dx, dy, scalar) {
+				var factor = scalar/_.sqrt(dx*dx + dy*dy);
+
+				v.x = factor*dx;
+				v.y = factor*dy;
+
+				return v;
+			},
+			/**
 			 * Return true based on a certain probability based on a number between 0 & 1;
 			 * @public
 			 * @param   {number}  p - probability to return true
@@ -1839,7 +1857,9 @@
 			},
 			max: __math.max,
 			min :  __math.min,
-			round: __math.round
+			round: __math.round,
+			sqrt: __math.sqrt
+
 		}
 	});
 
