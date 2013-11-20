@@ -983,7 +983,9 @@
 			 * @param  {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
 			 * @param  {function} cb       - callback function to be called for each element
 			 * @param  {Object=}  opt_ctx  - optional context for the callback function
-			 * @return {Array}             - this array for chaining
+			 * @return {boolean}           - the result for the halting condition of the callback function.
+			 * 								 false means iteration was broken prematurely.
+			 * 								 This information can passed on in nested loops for multi-dimensional arrays
 			 */
 			_each: function(step, cb, opt_ctx) {
 				var from = 0, to = this.length;
@@ -991,12 +993,12 @@
 
 				for(var i = from; i < to; i += step)
 				{
-					if(!this.hasOwnProperty(i)) continue; // handle broken arrays
-					if(cb.call(opt_ctx, this[i], i, this, delta) === false) break;
-					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index for insertion and deletion
+					if(!this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices
+					if(cb.call(opt_ctx, this[i], i, this, delta) === false) return false; // return result of the callback function
+					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
 				}
 
-				return this;
+				return true;
 			},
 			/**
 			 * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration

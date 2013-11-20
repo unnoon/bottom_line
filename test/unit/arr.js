@@ -244,7 +244,7 @@ describe("Array", function() {
 				]);
 			});
 
-			it("2D array undefined", function() {
+			it("2D array: init undefined", function() {
 				var arr = [2, 3].$.dimit();
 
 				expect(arr).to.eql([
