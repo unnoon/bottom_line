@@ -233,6 +233,30 @@ describe("Array", function() {
 			});
 		});
 
+		describe("dimit", function() {
+
+			it("2D array", function() {
+				var arr = [2, 3].$.dimit(0);
+
+				expect(arr).to.eql([
+					[0,0,0],
+					[0,0,0]
+				]);
+			});
+
+			it("2D array undefined", function() {
+				var arr = [2, 3].$.dimit();
+
+				expect(arr).to.eql([
+					[],
+					[]
+				]);
+				expect(arr.length).to.eql(2);
+				expect(arr[0].length).to.eql(3);
+				expect(arr[1].length).to.eql(3);
+			});
+		});
+
 		describe("each", function() {
 
 			it("simple each", function() {
@@ -309,6 +333,43 @@ describe("Array", function() {
 				});
 
 				expect(arr).to.eql([1, 3, 5, 6]);
+			});
+
+			it("broken arrays", function() {
+				var arr = [];
+
+				arr[4] = 3;
+				arr[6] = 4;
+
+				var sum   = 0;
+				var count = 0;
+
+				arr.$.each(function(elm, i, arr) {
+					sum += elm;
+					count++;
+				});
+
+				expect(sum).to.eql(7);
+				expect(count).to.eql(2);
+			});
+
+			it("broken arrays: can handle undefined as values", function() {
+				var arr = [];
+
+				arr[4] = 3;
+				arr[6] = undefined;
+				arr[8] = 4;
+
+				var sum   = 0;
+				var count = 0;
+
+				arr.$.each(function(elm, i, arr) {
+					sum += elm;
+					count++;
+				});
+
+				expect(Number.isNaN(sum)).to.be.true;
+				expect(count).to.eql(3);
 			});
 		});
 

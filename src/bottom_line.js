@@ -940,28 +940,22 @@
 			 */
 			dimit: function(opt_init, opt_ctx)
 			{
-				var dimensions = _.clone(this);
+				var dimensions = this;
+				var arr        = new Array(dimensions[0]);
 				var init       = (typeof(opt_init) === 'function')? opt_init : function() {return opt_init};
 
-				this.length = dimensions[0]; // set correct length
+				// add other dimensions
+				addDim(arr, 0, dimensions);
 
-				addDim(this, 0, dimensions);
-
-				return this;
+				return arr;
 
 				function addDim(arr, dim, dimensions)
 				{
 					for(var i = 0, max = dimensions[dim]; i < max; i++)
-					{   // if last dimension set initial value
-						if(dim === dimensions.length-1)
-						{
-							arr[i] = init.call(opt_ctx)
-						}
-						else
-						{
-							arr[i] = [];
-							addDim(arr[i], dim+1, dimensions);
-						}
+					{
+						arr[i] = (dim === dimensions.length-1)? init.call(opt_ctx) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
+						if(dim === dimensions.length-2 && _.isUndefined(opt_init)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined
+						addDim(arr[i], dim+1, dimensions); // add another dimension
 					}
 				}
 			},
@@ -994,12 +988,11 @@
 			_each: function(step, cb, opt_ctx) {
 				var from = 0, to = this.length;
 				var diff, size = to, delta = 0;
-				var val;
 
 				for(var i = from; i < to; i += step)
 				{
-					if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays
-					if(cb.call(opt_ctx, val, i, this, delta) === false) break;
+					if(!this.hasOwnProperty(i)) continue; // handle broken arrays
+					if(cb.call(opt_ctx, this[i], i, this, delta) === false) break;
 					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index for insertion and deletion
 				}
 
