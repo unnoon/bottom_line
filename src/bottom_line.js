@@ -1818,7 +1818,6 @@
 		static: {
 			/**
 			 * Calculates the factor of a displacement vector and a speed scalar
-			 * This can for example used to calculate the velocity based a direction and a speed
 			 * @public
 			 * @param   {number} dx - displacement/direction x
 			 * @param   {number} dy - displacement/direction y
