@@ -1812,6 +1812,35 @@
 	});
 
 	/**
+	 * Physics
+	 */
+	constructWrapper(null, 'physics', {
+		static: {
+			/**
+			 * Calculates the factor of a displacement vector and a speed scalar
+			 * This can for example used to calculate the velocity based a direction and a speed
+			 * @public
+			 * @param   {number} dx - displacement/direction x
+			 * @param   {number} dy - displacement/direction y
+			 * @return  {number}    - the factor to multiply dx & dy to retrieve the velocity
+			 */
+			speed2velocity: function(dx, dy, speed) {
+				return speed/_.sqrt(dx*dx + dy*dy);
+			},
+			/**
+			 * Calculates the speed based on the velocity (actually this is just the Hypotenuse of a triangle)
+			 * @public
+			 * @param   {number} vx - velocity x
+			 * @param   {number} vy - velocity y
+			 * @return  {number}    - the speed of the physical body
+			 */
+			velocity2speed: function(vx, vy) {
+				return _.sqrt(vx*vx + vy*vy);
+			}
+		}
+	});
+
+	/**
 	  * Math
 	  */
 	constructWrapper(Math, 'math', {
