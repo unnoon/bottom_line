@@ -1815,16 +1815,19 @@
 	 * Physics
 	 */
 	constructWrapper(null, 'physics', {
+		// FIXEM These function should be properties of a proper physics class
 		static: {
 			/**
 			 * Calculates the factor of a displacement vector and a speed scalar
 			 * @public
 			 * @param   {number} dx - displacement/direction x
 			 * @param   {number} dy - displacement/direction y
-			 * @return  {number}    - the factor to multiply dx & dy to retrieve the velocity
+			 * @return  {Object}    - object containing velocity for x & y coordinates
 			 */
 			speed2velocity: function(dx, dy, speed) {
-				return speed/_.sqrt(dx*dx + dy*dy);
+				var speedFactor = speed/_.sqrt(dx*dx + dy*dy);
+
+				return {x: speedFactor*dx, y: speedFactor*dy}
 			},
 			/**
 			 * Calculates the speed based on the velocity (actually this is just the Hypotenuse of a triangle)
