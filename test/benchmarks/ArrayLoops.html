@@ -17,6 +17,11 @@
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
+            .add('_ each', function() {
+                arr.$.each(function(e) {
+                    elm = e;
+                })
+            })
             .add('for loop', function() {
                 for(var i = 0; i < arr.length; i++)
                 {
@@ -31,11 +36,6 @@
             })
             .add('forEach', function() {
                 arr.forEach(function(e) {
-                    elm = e;
-                })
-            })
-            .add('_ iterate', function() {
-                arr.$.each(function(e) {
                     elm = e;
                 })
             })

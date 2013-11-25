@@ -989,11 +989,11 @@
 			 */
 			_each: function(step, cb, opt_ctx) {
 				var from = 0, to = this.length;
-				var diff, size = to, delta = 0;
+				var val, diff, size = to, delta = 0;
 
 				for(var i = from; i < to; i += step)
 				{
-					if(!this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices
+					if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
 					if(cb.call(opt_ctx, this[i], i, this, delta) === false) return false; // return result of the callback function
 					if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
 				}
