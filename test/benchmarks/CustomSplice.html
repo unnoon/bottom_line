@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Backward splicing</title>
+    <title>Splice for deletion</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
     <script src="../../src/bottom_line.js"></script>
     <script>
         var arr = [];
         var elm;
+        var del_index = 500;
 
         function initArr() {
             arr = [];
@@ -20,19 +21,16 @@
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
-            .add('forward splicing', function() {
+            .add('custom splice', function() {
                 initArr();
-                for(var i = 0, max = arr.length; i < max; i++)
+                for(var i = del_index, max = arr.length-1; i < max; i++)
                 {
-                    if(arr[i] % 2) arr.splice(i, 1);
+                    arr[i] = arr[i+1]
                 }
             })
-            .add('backward splicing', function() {
+            .add('splice', function() {
                 initArr();
-                for(var i = arr.length-1; i > -1; i--)
-                {
-                    if(arr[i] % 2) arr.splice(i, 1);
-                }
+                arr.splice(del_index, 1);
             })
             // add listeners
             .on('cycle', function(event) {

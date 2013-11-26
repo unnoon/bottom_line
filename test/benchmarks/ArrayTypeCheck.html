@@ -1,38 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Backward splicing</title>
+    <title>Array type checking</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
     <script src="../../src/bottom_line.js"></script>
     <script>
         var arr = [];
         var elm;
 
-        function initArr() {
-            arr = [];
-            for(var i = 0; i < 1000; i++)
-            {
-                arr.push(i);
-            }
+        for(var i = 0; i < 1000; i++)
+        {
+            arr.push(i);
         }
 
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
-            .add('forward splicing', function() {
-                initArr();
-                for(var i = 0, max = arr.length; i < max; i++)
-                {
-                    if(arr[i] % 2) arr.splice(i, 1);
-                }
+            .add('isArray', function() {
+                var isArray = Array.isArray([]);
             })
-            .add('backward splicing', function() {
-                initArr();
-                for(var i = arr.length-1; i > -1; i--)
-                {
-                    if(arr[i] % 2) arr.splice(i, 1);
-                }
+            .add('_ typeof', function() {
+                var isArray = _.typeof([]) === 'array';
             })
             // add listeners
             .on('cycle', function(event) {

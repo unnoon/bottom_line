@@ -124,18 +124,18 @@
 
 			__obj.defineProperty(wrapperObj.__instance__, name, descriptor$);
 			__obj.defineProperty(wrapperObj.prototype,    name, descriptor$$);
-
-			// simple cloning function
-			function clone(obj) {
-				var clone = __obj.create(__obj.getPrototypeOf(obj));
-
-				__obj.getOwnPropertyNames(obj).forEach(function(name) {
-					__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
-				});
-
-				return clone;
-			}
 		})
+	}
+
+	// simple cloning function
+	function clone(obj) {
+		var clone = __obj.create(__obj.getPrototypeOf(obj));
+
+		__obj.getOwnPropertyNames(obj).forEach(function(name) {
+			__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
+		});
+
+		return clone;
 	}
 
 	/*
@@ -148,38 +148,30 @@
 		 * @this    {Array|Object}
 		 * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
 		 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+		 * @param   {Function}           onmatch - function to be executed on a match
+		 * @param   {boolean}            reverse - Boolean indicating if we should use inverse iteration
 		 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
 		 * @param   {Object}             opt_ctx - optional context for the function
 		 * @returns {Array}                      - new array with the copied elements
 		 */
-		_edit: function(all, invert, onmatch, ondone, target, $value, opt_ctx)
+		_edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
 		{
 			var first  = !all;
 			var normal = !invert;
 			var match;
-			var done;
+			var finish = false;
 			var array  = false;
 
 			var cb = (typeof($value) === 'function')? 	$value                                   :
 					 (array = _.isArray($value))? 		function(val) {return $value.$.has(val)} :
 														function(val) {return val === $value};
 
-			this.$.each(function(val, i, _this, delta) {
-//			this.$['each'+(normal && all?'Right':'')](function(val, i, _this, delta) { // TODO use eachRight for withoutAll
+			this.$['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
 				match = cb.call(opt_ctx, val, i, _this, delta);
 				// remove normal or inverted match
-				if(match === normal) onmatch.call(target, val, i, _this, delta);
-
-				// if first and the first  match is made check if we are done
-				if(first && match)
-				{
-					done = array? !$value.$.without(val).length : true;
-
-					// remove remainder if done & invert mode
-					if(done && invert) ondone.call(target, val, i, _this, delta);
-
-					return !done;
-				}
+				if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
+				// if first and the first match is made check if we are done
+				if(first && match) return finish = array? !$value.$.without(val).length : true, !(normal && finish);
 			}, this);
 
 			return target;
@@ -216,15 +208,7 @@
 			 * @param   {Object}  obj   - object to be cloned
 			 * @returns {Object}  clone - the cloned object
 			 */
-			clone: function (obj) {
-				var clone = __obj.create(__obj.getPrototypeOf(obj));
-
-				__obj.getOwnPropertyNames(obj).forEach(function(name) {
-					__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
-				});
-
-				return clone;
-			},
+			clone: clone,
 			/**
 			 * Extends an object with function/properties from a module object
 			 * @public
@@ -303,13 +287,10 @@
 			 * @param {Object=}  opt_ctx - optional context
 			 */
 			each: function(cb, opt_ctx) {
-				var keys = __obj.keys(this);
-				var key;
-
-				for(var i = 0, max = keys.length; i < max; i++)
+				// TODO maybe a faster version using keys. I now prefer using keys because it will not create a new array object with the keys
+				for(var key in this)
 				{
-					key = keys[i];
-
+					if(!this.hasOwnProperty(key)) continue;
 					if(cb.call(opt_ctx, this[key], key, this) === false) break;
 				}
 			},
@@ -476,10 +457,7 @@
 			 */
 			_rm: function(all, invert, $value, opt_ctx)
 			{
-				var onmatch = function(val, key) {delete this[key]};
-				var ondone  = function(val, key) {this.$.withoutKeys(i+1, this.length);};
-
-				return this.$._edit(all, invert, onmatch, ondone, this, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
 			},
 			/**
 			 * Returns an array containing the values of an object (enumerable properties)
@@ -686,10 +664,7 @@
 			 */
 			_cp: function(all, invert, target, $value, opt_ctx)
 			{
-				var onmatch = function(val) {this.push(val);};
-				var ondone  = function(val, i, _this) {_this.$.copyKeys(this, function(index) {return index > i});};
-
-				return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -703,10 +678,7 @@
 			 */
 			_cut: function(all, invert, target, $value, opt_ctx)
 			{
-				var onmatch = function(val, i, _this) {this.push(val); _this.splice(i, 1)};
-				var ondone  = function(val, i, _this) {_this.$.cutKeys(this, function(index) {return index > i});};
-
-				return this.$._edit(all, invert, onmatch, ondone, target, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -954,7 +926,7 @@
 					for(var i = 0, max = dimensions[dim]; i < max; i++)
 					{
 						arr[i] = (dim === dimensions.length-1)? init.call(opt_ctx) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
-						if(dim === dimensions.length-2 && _.isUndefined(opt_init)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined
+						if(dim === dimensions.length-2 && _.isUndefined(opt_init)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined don't initialize the array
 						addDim(arr[i], dim+1, dimensions); // add another dimension
 					}
 				}
@@ -1028,11 +1000,13 @@
 			 */
 			_eachRight: function(step, cb, opt_ctx) {
 				var from = this.length-1, to = -1;
+				var val;
 
 				cb = opt_ctx? cb.bind(opt_ctx) : cb;
 
 				for(var i = from; i > to; i -= step)
 				{
+					if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
 					if(cb(this[i], i, this) === false) break;
 				}
 
@@ -1265,10 +1239,7 @@
 			 */
 			_rm: function(all, invert, $value, opt_ctx)
 			{
-				var onmatch = function(val, i) {this.splice(i, 1);};
-				var ondone  = function(val, i) {this.$.withoutKeys(i+1, this.length);};
-
-				return this.$._edit(all, invert, onmatch, ondone, this, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
 			},
 			reduce: __arr.prototype.reduce,
 			/**
@@ -1698,7 +1669,7 @@
 			 * @returns {boolean} - indicating if the number is even
 			 */
 			get even() {
-				return !this.odd;
+				return !(this & 1);
 			},
 			/**
 			 * Getter: indicator if the the number is odd
@@ -1706,7 +1677,7 @@
 			 * @returns {boolean} - indicating if the number is odd
 			 */
 			get odd() {
-				return this % 2;
+				return !!(this & 1);
 			},
 			/**
 			 * Checks if a number is between to values
@@ -1726,7 +1697,7 @@
 			 * @returns {boolean}     - bounded version of the number that falls between the 2 values
 			 */
 			bound: function(min, max) {
-				return Math.min(Math.max(this, min), max);
+				return __math.min(__math.max(this, min), max);
 			},
 			/**
 			 * Rebounds a number between 2 values. Handy for number ranges that are continuous
@@ -1806,7 +1777,7 @@
 
 				fnc = args.pop();
 
-				return fnc.bind.apply(fnc, args);
+				return fnc.bind.apply(fnc, args)
 			}
 		}
 	});
@@ -1815,19 +1786,23 @@
 	 * Physics
 	 */
 	constructWrapper(null, 'physics', {
-		// FIXEM These function should be properties of a proper physics class
+		// FIXME These function should be properties of a proper physics class
 		static: {
 			/**
 			 * Calculates the factor of a displacement vector and a speed scalar
 			 * @public
-			 * @param   {number} dx - displacement/direction x
-			 * @param   {number} dy - displacement/direction y
-			 * @return  {Object}    - object containing velocity for x & y coordinates
+			 * @param   {number} dx    - displacement/direction x
+			 * @param   {number} dy    - displacement/direction y
+			 * @param   {number} speed - speed to be componized
+			 * @return  {Object}       - object containing velocity for x & y coordinates
 			 */
 			speed2velocity: function(dx, dy, speed) {
 				var speedFactor = speed/_.sqrt(dx*dx + dy*dy);
 
-				return {x: speedFactor*dx, y: speedFactor*dy}
+				return {
+					x: speedFactor*dx,
+					y: speedFactor*dy
+				}
 			},
 			/**
 			 * Calculates the speed based on the velocity (actually this is just the Hypotenuse of a triangle)
@@ -1837,7 +1812,7 @@
 			 * @return  {number}    - the speed of the physical body
 			 */
 			velocity2speed: function(vx, vy) {
-				return _.sqrt(vx*vx + vy*vy);
+				return _.sqrt(vx*vx + vy*vy)
 			}
 		}
 	});
@@ -1847,24 +1822,6 @@
 	  */
 	constructWrapper(Math, 'math', {
 		static: {
-			/**
-			 * Calculates the factor of a displacement vector and a scalar
-			 * This can for example used to calculate the velocity based a direction and a speed
-			 * NOTE this function should be called in the correct context!!
-			 * @public
-			 * @param   {Object} v  - vector like object containing properties x & y
-			 * @param   {number} dx - displacement/direction x
-			 * @param   {number} dy - displacement/direction y
-			 * @returns {Object}    - the factor
-			 */
-			factorize: function(v, dx, dy, scalar) {
-				var factor = scalar/_.sqrt(dx*dx + dy*dy);
-
-				v.x = factor*dx;
-				v.y = factor*dy;
-
-				return v;
-			},
 			/**
 			 * Return true based on a certain probability based on a number between 0 & 1;
 			 * @public
@@ -1900,16 +1857,13 @@
 	  */
 	constructWrapper(null, 'int', {
 		init: function(num) {
-			if (this.constructor === _.int) // called with new
+			if(this.constructor === _.int) // called with new
 			{
 				this.value = num;
 			}
 			else // called as converter function
 			{
-				if(typeof(num) === 'number')
-				{
-					return Math[num < 0? 'ceil' : 'floor'](num);
-				}
+				return num|0;
 			}
 		},
 		static: {
@@ -1921,7 +1875,7 @@
 			 * @returns {number} - random integer in between
 			 */
 			random: function(min, max) {
-				return Math.floor(Math.random() * (max + 1 - min)) + min;
+				return min + (__math.random() * (max + 1 - min))|0;
 			},
 			/**
 			 * Rebounds a number between 2 values. Handy for arrays that are continuous

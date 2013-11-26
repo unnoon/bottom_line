@@ -1,4 +1,4 @@
-xdescribe("String", function() {
+describe("String", function() {
 
 	describe("prototype methods", function() {
 

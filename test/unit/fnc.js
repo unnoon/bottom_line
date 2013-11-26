@@ -1,4 +1,4 @@
-xdescribe("Function", function() {
+describe("Function", function() {
 
 	describe("static methods", function() {
 

@@ -69,6 +69,24 @@ describe("Extensions", function() {
 			});
 		});
 
+		describe("bitwise operators", function() {
+			var num     =  435.5674;
+			var num_neg = -435.5674;
+
+			it("flooring & integer conversion", function() {
+				expect(Math.floor(num)).to.equal(435);
+				expect(Math.floor(num_neg)).to.equal(-436);
+				// these can be used for integer conversion
+				expect(num | 0).to.equal(435);
+				expect(num_neg | 0).to.equal(-435);
+				expect(num << 0).to.equal(435);
+				expect(num_neg << 0).to.equal(-435);
+				expect(num >> 0).to.equal(435);
+				expect(num_neg >> 0).to.equal(-435);
+			});
+		});
+
+
 		describe("typeof", function() {
 
 			it("javascript types", function() {

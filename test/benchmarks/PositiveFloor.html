@@ -1,38 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Backward splicing</title>
+    <title>Positive floor</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
     <script src="../../src/bottom_line.js"></script>
     <script>
-        var arr = [];
-        var elm;
-
-        function initArr() {
-            arr = [];
-            for(var i = 0; i < 1000; i++)
-            {
-                arr.push(i);
-            }
-        }
+        var num = 435.5674;
 
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
-            .add('forward splicing', function() {
-                initArr();
-                for(var i = 0, max = arr.length; i < max; i++)
-                {
-                    if(arr[i] % 2) arr.splice(i, 1);
-                }
+            .add('Math.floor', function() {
+                var floor = Math.floor(num);
             })
-            .add('backward splicing', function() {
-                initArr();
-                for(var i = arr.length-1; i > -1; i--)
-                {
-                    if(arr[i] % 2) arr.splice(i, 1);
-                }
+            .add('bitwise |', function() {
+                var floor = num | 0;
+            })
+            .add('bitwise >>', function() {
+                var floor = num >> 0;
+            })
+            .add('bitwise <<', function() {
+                var floor = num << 0;
             })
             // add listeners
             .on('cycle', function(event) {
