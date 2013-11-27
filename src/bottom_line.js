@@ -156,11 +156,8 @@
 		 */
 		_edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
 		{
-			var first  = !all;
-			var normal = !invert;
-			var match;
-			var finish = false;
-			var array  = false;
+			var first = !all, normal = !invert;
+			var array, match, finish = false;
 
 			var cb = (typeof($value) === 'function')? 	$value                                   :
 					 (array = _.isArray($value))? 		function(val) {return $value.$.has(val)} :
@@ -171,7 +168,7 @@
 				// remove normal or inverted match
 				if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
 				// if first and the first match is made check if we are done
-				if(first && match) return finish = array? !$value.$.without(val).length : true, !(normal && finish);
+				if(first && match && !finish) return finish = array? !$value.$.without(val).length : true, !(normal && finish);
 			}, this);
 
 			return target;
