@@ -689,10 +689,7 @@
 			 */
 			_cutKeys: function(invert, target, $value, opt_ctx)
 			{
-				var onmatch = function(i, _this) {this.push(_this[i]); _this.splice(i, 1)};
-				var ondone  = function(i, _this) {_this.$.cutKeys(this, function(index) {return index > i});};
-
-				return this.$._editKeys(invert, onmatch, ondone, target, $value, opt_ctx);
+				return this.$._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Cut a value to an array
@@ -745,10 +742,7 @@
 			 */
 			_cpKeys: function(invert, target, $value, opt_to_ctx)
 			{
-				var onmatch = function(i, _this) {this.push(_this[i]);};
-				var ondone  = function(i, _this) {_this.$.copyKeys(this, function(index) {return index > i});};
-
-				return this.$._editKeys(invert, onmatch, ondone, target, $value, opt_to_ctx);
+				return this.$._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
 			},
 			/**
 			 * Edits the occurrences of an array
@@ -771,39 +765,24 @@
 			 * @param   {Object}             opt_to_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			_editKeys: function(invert, onmatch, ondone, target, $index, opt_to_ctx)
+			_editKeys: function(invert, onmatch, reverse, target, $index, opt_to_ctx)
 			{
-				var type   = typeof($index);
-				var all    = typeof(opt_to_ctx) === 'number' || type === 'function';
-				var first  = !all;
-				var normal = !invert;
-				var match;
-				var done;
-				var array  = false;
-				var index;
+				var type = typeof($index), index;
+				var first = !(typeof(opt_to_ctx) === 'number' || type === 'function'), normal = !invert;
+				var array, match, finish = false;
 
 				var cb = (type === 'function')?	$index                                               							 :
 												(array = _.isArray($index))?function(i) {return $index.$.has(i)}                 :
 												(opt_to_ctx === undefined)? function(i) {return i === $index}                    :
 																			function(i) {return i.$.between($index, opt_to_ctx)};
 
-				this.$.each(function(val, i, _this, delta) {
+				this.$['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
 					index = i - delta; // the original index in the array
 
 					match = cb.call(opt_to_ctx, index, _this);
 					// remove normal or inverted match
-					if(match === normal) onmatch.call(target, i, _this);
-
-					// if match is made check if we are done
-					if(first && match)
-					{
-						done = array? !$index.$.without(index).length : true;
-
-						// remove remainder if done & invert mode
-						if(done && invert) ondone.call(target, i, _this);
-
-						return !done;
-					}
+					if(match === normal || finish) onmatch.call(target, i, _this);
+					if(first && match && !finish) return finish = array? !$index.$.without(index).length : true, !(normal && finish);
 				}, this);
 
 				return target;
@@ -819,10 +798,7 @@
 			 */
 			_del: function(invert, $index, opt_to_ctx)
 			{
-				var onmatch = function(i) {this.splice(i, 1);};
-				var ondone  = function(i) {this.$.withoutKeys(i+1, this.length);};
-
-				return this.$._editKeys(invert, onmatch, ondone, this, $index, opt_to_ctx);
+				return this.$._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
 			},
 			/**
 			 * Remove elements based on index
