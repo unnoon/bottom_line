@@ -284,7 +284,7 @@
 			 * @param {Object=}  opt_ctx - optional context
 			 */
 			each: function(cb, opt_ctx) {
-				// TODO maybe a faster version using keys. I now prefer using keys because it will not create a new array object with the keys
+				// TODO maybe a faster version using keys. I now prefer using for in  because it will not create a new array object with the keys
 				for(var key in this)
 				{
 					if(!this.hasOwnProperty(key)) continue;
