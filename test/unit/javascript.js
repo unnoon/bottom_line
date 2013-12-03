@@ -201,5 +201,56 @@ describe("Extensions", function() {
 				expect((obj.x = 666)).to.equal(666);
 			});
 		});
+
+		describe("extendin", function() {
+
+			it("array traps", function() {
+				var arr = new Array(3);
+
+				arr.push(666);
+
+				expect(arr.length).to.equal(4);
+				expect(arr[3]).to.equal(666);
+				expect(arr[0]).to.equal(undefined);
+			});
+
+			xit("array", function() {
+				function Collection(){
+					var collection = Object.create( Array.prototype );
+
+					collection = (Array.apply( collection, arguments ) || collection);
+
+					Collection.injectClassMethods( collection );
+
+					return( collection );
+				}
+
+				expect(arrxt instanceof Array).to.be.true;
+				expect(arrxt.length).to.equal(4);
+			});
+
+			it("array", function() {
+				var Array2 = function() {
+					return Array.apply( [], arguments );
+				};
+
+				Array2.prototype = Object.create( Array.prototype );
+//				Array2.prototype.constructor = Array2;
+
+				Array2.prototype.testmethod = function() {
+					return 'aap';
+				};
+
+				var list = new Array2(4);
+
+				list.push(123);
+				list.push(456);
+
+				expect(list.length).to.eql(6);
+				expect(list[4]).to.eql(123);
+//				expect(list.testmethod()).to.eql('aap'); // FIXME ofcourse this breaks...
+				expect(list.indexOf(123)).to.eql(4);
+			});
+		});
 	});
 });
