@@ -25,6 +25,15 @@
             .add('obj.hasOwnProperty(prop): prop is #3', function() {
                 member = obj.hasOwnProperty('c1');
             })
+            .add('prop in obj: depth = 1', function() {
+                member = 'c1' in obj;
+            })
+            .add('not undefined: depth 1', function() {
+                member = obj['c1'] !== undefined;
+            })
+            .add('boolean checking!! depth 1', function() {
+                member = !!obj['c1'];
+            })
             .add('prop in obj: depth = 3', function() {
                 member = 'a3' in obj;
             })
@@ -33,9 +42,6 @@
             })
             .add('boolean checking!! depth 3', function() {
                 member = !!obj['a3'];
-            })
-            .add('boolean checking depth 3', function() {
-                member = Boolean(obj['a3']);
             })
             // add listeners
             .on('cycle', function(event) {
