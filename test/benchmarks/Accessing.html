@@ -8,12 +8,21 @@
         var zwar = function zwar() {
             return 'zombie';
         };
-
+        // global underscore styling
         _.zwar = zwar;
-
+        // native styling
         Array.prototype.zwar = zwar;
 
+        var wrapper = _.arr;
+
+        // bottom_line js styling
+        _.arr.__instance__.zwar = function() {
+            return zwar.apply(wrapper.value, arguments);
+        };
+
         var arr = [];
+
+        arr.$.zwar();
 
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
@@ -24,6 +33,9 @@
             })
             .add('from prototype', function() {
                 arr.zwar();
+            })
+            .add('bottom_line', function() {
+                arr.$.zwar();
             })
             // add listeners
             .on('cycle', function(event) {

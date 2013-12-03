@@ -202,7 +202,7 @@ describe("Extensions", function() {
 			});
 		});
 
-		describe("extendin", function() {
+		describe("array", function() {
 
 			it("array traps", function() {
 				var arr = new Array(3);
@@ -214,42 +214,72 @@ describe("Extensions", function() {
 				expect(arr[0]).to.equal(undefined);
 			});
 
-			xit("array", function() {
-				function Collection(){
-					var collection = Object.create( Array.prototype );
-
-					collection = (Array.apply( collection, arguments ) || collection);
-
-					Collection.injectClassMethods( collection );
-
-					return( collection );
-				}
-
-				expect(arrxt instanceof Array).to.be.true;
-				expect(arrxt.length).to.equal(4);
-			});
-
-			it("array", function() {
-				var Array2 = function() {
-					return Array.apply( [], arguments );
+			it("array subclassing: naive", function() {
+				var Array2 = function($len_val, opt_values) {
+					if(opt_values === undefined)
+						this.length = $len_val;
+					else
+						this.push.apply(this, arguments);
 				};
 
-				Array2.prototype = Object.create( Array.prototype );
-//				Array2.prototype.constructor = Array2;
-
+				Array2.prototype = Object.create(Array.prototype);
+				Array2.prototype.constructor = Array2;
 				Array2.prototype.testmethod = function() {
 					return 'aap';
 				};
 
-				var list = new Array2(4);
+				var list = new Array2(4, 6); // in this case we can specify
+
+				expect(list.length).to.eql(2);
 
 				list.push(123);
 				list.push(456);
 
-				expect(list.length).to.eql(6);
-				expect(list[4]).to.eql(123);
-//				expect(list.testmethod()).to.eql('aap'); // FIXME ofcourse this breaks...
-				expect(list.indexOf(123)).to.eql(4);
+				expect(list.length).to.eql(4);
+				expect(list[3]).to.eql(456);
+				expect(list.testmethod()).to.eql('aap'); // custom method
+				expect(list.indexOf(123)).to.eql(2); // native method
+				expect(list instanceof Array).to.be.true;
+				expect(list instanceof Array2).to.be.true;
+
+
+				var list2 = new Array2(4); // in this case we can specify
+
+				expect(list2.length).to.eql(4);
+
+				list2.push(123);
+				list2.push(456);
+
+				expect(list2.length).to.eql(6);
+				expect(list2[5]).to.eql(456);
+				expect(list2.testmethod()).to.eql('aap'); // custom method
+				expect(list2.indexOf(456)).to.eql(5); // native method
+				expect(list2 instanceof Array).to.be.true;
+				expect(list2 instanceof Array2).to.be.true;
+			});
+
+			it("array subclassing: calling constructor does not work", function() {
+				var Array2 = function() {
+					Array.apply(this, arguments);
+				};
+
+				Array2.prototype = Object.create(Array.prototype);
+				Array2.prototype.constructor = Array2;
+				Array2.prototype.testmethod = function() {
+					return 'aap';
+				};
+
+				var list = new Array2(4); // this does not work!!
+
+				expect(list.length).to.eql(0); // this should be 4
+
+				list.push(123);
+				list.push(456);
+
+				expect(list.length).to.eql(2);
+				expect(list[1]).to.eql(456);
+				expect(list.testmethod()).to.eql('aap');
+				expect(list.indexOf(123)).to.eql(0);
 			});
 		});
 	});
