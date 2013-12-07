@@ -42,8 +42,8 @@
                     elm = obj[keys[i]];
                 }
             })
-            .add('_ iterate', function() {
-                obj.$.iterate(function(e) {
+            .add('_each', function() {
+                obj._each(function(e) {
                     elm = e;
                 })
             })

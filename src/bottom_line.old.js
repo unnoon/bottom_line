@@ -9,7 +9,8 @@
 'use strict';
 
 (function() {
-	var _ = {};
+	var __root = this;
+	var _      = {};
 
 	// set browser and nodejs globals
 	if(typeof(module) !== 'undefined' && module.exports)
@@ -18,7 +19,7 @@
 	}
 	else
 	{
-		this._ = _;
+		__root._ = _;
 	}
 
 	// some short cuts
@@ -32,41 +33,58 @@
 	// wrap functions for chaining
 	function constructWrapper(nativeObj, shorthand, module)
 	{
-		// set wrapper object
-		var wrapperObj = _[shorthand] = module.init || function(value) {};
+		var wrapperObj = _[shorthand] = module.init || function(value) {
+			// convertor & constructor function
+			this.value = value;
+		};
 
-		// copy native statics to wrapper object & _ for easy use
-		if(nativeObj)
+		// extend it with an extra property to support chaining of multiple types
+		__obj.defineProperties(wrapperObj.prototype, {
+			$$: {
+				get: function() {
+					return this.value.$$;
+				},
+				enumerable: false
+			}
+		});
+
+		// stores non-chainable use methods
+		wrapperObj.__instance__ = {};
+
+		if(nativeObj && nativeObj.prototype)
 		{
-			__obj.getOwnPropertyNames(nativeObj).forEach(function(name) {
-				if(!/^length|name|arguments|caller|prototype$/.test(name))
-				{
-					var descriptor = __obj.getOwnPropertyDescriptor(nativeObj, name);
+			// extend native object with the 2 special properties
+			__obj.defineProperties(nativeObj.prototype, {
+				$: {
+					get: function() {
+						wrapperObj.value = this;
 
-					if(wrapperObj.hasOwnProperty(name)) console.warn('overwriting existing property: '+name+' on _.'+shorthand+' while copying native statics');
-					if(_.hasOwnProperty(name)) console.warn('overwriting existing property: '+name+' on _ while copying native statics, for shorthand: '+shorthand);
-
-					__obj.defineProperty(wrapperObj, name, descriptor);
-					__obj.defineProperty(_,          name, descriptor);
+						return wrapperObj.__instance__; // return object containing single use methods
+					},
+					enumerable: false
+				},
+				$$: {
+					get: function() {
+						return new wrapperObj(this); // return new wrapper object for chaining
+					},
+					enumerable: false
 				}
 			});
 		}
 
-		// copy statics to wrapper & _
+		// statics
 		var statics = module.static || {};
 		__obj.getOwnPropertyNames(statics).forEach(function(name) {
 			var descriptor = __obj.getOwnPropertyDescriptor(statics, name);
 
-			descriptor.enumerable = false;
-
-			if(wrapperObj.hasOwnProperty(name)) console.warn('overwriting existing property: '+name+' on _.'+shorthand+' while copying statics');
+			descriptor.enumarable = false;
 
 			__obj.defineProperty(wrapperObj, name, descriptor);
 
 			// copy static properties to the bottom line _ object
 			if(shorthand !== 'int') // except for the int class
 			{
-				if(_.hasOwnProperty(name)) console.warn('overwriting existing property: '+name+' on _ while copying statics');
+				if(_[name]) console.log('overwriting property: '+name); // TODO properly wrap identical function names based on type
 
 				__obj.defineProperty(_, name, descriptor);
 			}
@@ -74,15 +92,50 @@
 
 		// prototype
 		var prototype = module.prototype || {};
+
 		__obj.getOwnPropertyNames(prototype).forEach(function(name) {
-			var descriptor = __obj.getOwnPropertyDescriptor(prototype, name);
+			var descriptor   = __obj.getOwnPropertyDescriptor(prototype, name);
+			var descriptor$  = clone(descriptor);
+			var descriptor$$ = clone(descriptor);
 
-			descriptor.enumerable = false;
+			// make properties non enumerable
+			descriptor$.enumerable  = false;
+			descriptor$$.enumerable = false;
 
-			if(nativeObj.prototype.hasOwnProperty(name)) console.warn('overwriting existing property: '+name+' on _.'+nativeObj+' while copying prototype methods');
+			// wrap function & getters & setters
+			if(typeof(descriptor.value) === 'function') wrap('value');
+			if(descriptor.get) 							wrap('get');
+			if(descriptor.set) 							wrap('set');
 
-			__obj.defineProperty(nativeObj.prototype, name, descriptor);
+			function wrap(type) {
+				var fn = descriptor[type];
+
+				// singular
+				descriptor$[type] = function () {
+					return fn.apply(wrapperObj.value, arguments);
+				};
+				// chaining
+				descriptor$$[type] = function () {
+					this.value = fn.apply(this.value, arguments);
+
+					return this;
+				};
+			}
+
+			__obj.defineProperty(wrapperObj.__instance__, name, descriptor$);
+			__obj.defineProperty(wrapperObj.prototype,    name, descriptor$$);
 		})
+	}
+
+	// simple cloning function
+	function clone(obj) {
+		var clone = __obj.create(__obj.getPrototypeOf(obj));
+
+		__obj.getOwnPropertyNames(obj).forEach(function(name) {
+			__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
+		});
+
+		return clone;
 	}
 
 	/*
@@ -101,21 +154,21 @@
 		 * @param   {Object}             opt_ctx - optional context for the function
 		 * @returns {Array}                      - new array with the copied elements
 		 */
-		__edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
+		_edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
 		{
 			var first = !all, normal = !invert;
 			var array, match, finish = false;
 
 			var cb = (typeof($value) === 'function')? 	$value                                   :
-					 (array = _.isArray($value))? 		function(val) {return $value._has(val)} :
+					 (array = _.isArray($value))? 		function(val) {return $value.$.has(val)} :
 														function(val) {return val === $value};
 
-			this['_each'+(reverse?'Right':'')](function(val, i, _this, delta) {
+			this.$['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
 				match = cb.call(opt_ctx, val, i, _this, delta);
 				// remove normal or inverted match
 				if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
 				// if first and the first match is made check if we are done
-				if(first && match && !finish) return finish = array? !$value._without(val).length : true, !(normal && finish);
+				if(first && match && !finish) return finish = array? !$value.$.without(val).length : true, !(normal && finish);
 			}, this);
 
 			return target;
@@ -128,10 +181,10 @@
 		 * @param  {Object=}  opt_ctx - optional context
 		 * @return {any} first value that is found
 		 */
-		_find: function(cb, opt_ctx) {
+		find: function(cb, opt_ctx) {
 			var found;
 
-			this._each(function(elm) {
+			this.$.each(function(elm) {
 				if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
 			});
 
@@ -152,15 +205,7 @@
 			 * @param   {Object}  obj   - object to be cloned
 			 * @returns {Object}  clone - the cloned object
 			 */
-			clone: function clone(obj) {
-				var clone = __obj.create(__obj.getPrototypeOf(obj));
-
-				__obj.getOwnPropertyNames(obj)._each(function(name) {
-					__obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
-				});
-
-				return clone;
-			},
+			clone: clone,
 			/**
 			 * Extends an object with function/properties from a module object
 			 * @public
@@ -180,15 +225,15 @@
 				settings.configurable = settings.configurable !== false;
 				settings.writable     = settings.writable     !== false;
 
-				module._each(function(val, prop) {
-
+				for (var prop in module)
+				{
 					if(obj.hasOwnProperty(prop))
 					{
-						console.warn('overwriting existing property: '+prop+' while extending: '+obj.toString());
+						console.warn('overwriting existing property: '+prop);
 					}
 					else if(prop in obj)
 					{
-						console.warn('overriding existing property: '+prop+' while extending: '+obj.toString());
+						console.warn('overriding existing property: '+prop);
 					}
 
 					descriptor = __obj.getOwnPropertyDescriptor(module, prop);
@@ -198,7 +243,7 @@
 					if(descriptor.hasOwnProperty('writable')) descriptor.writable = settings.writable; // getters/setters don't have a writable property in their descriptor
 
 					__obj.defineProperty(obj, prop, descriptor);
-				});
+				}
 
 				return obj;
 			},
@@ -227,7 +272,7 @@
 			 * @returns {string} - type of the object
 			 */
 			typeof: function(obj) {
-				return __obj.prototype.toString.call(obj)._between('[object ', ']')._decapitalize();
+				return __obj.prototype.toString.call(obj).$$.between('[object ', ']').decapitalize().value;
 			}
 		},
 		prototype: {
@@ -238,7 +283,7 @@
 			 * @param {Function} cb      - callback function to be called for each element
 			 * @param {Object=}  opt_ctx - optional context
 			 */
-			_each: function(cb, opt_ctx) {
+			each: function(cb, opt_ctx) {
 				// TODO maybe a faster version using keys. I now prefer using for in  because it will not create a new array object with the keys
 				for(var key in this)
 				{
@@ -256,7 +301,7 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__edit: __coll.__edit,
+			_edit: __coll._edit,
 			/**
 			 * Filters
 			 * @public
@@ -265,10 +310,10 @@
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {Array} array containing the filtered values
 			 */
-			_filter: function(cb, opt_ctx) {
+			filter: function(cb, opt_ctx) {
 				var filtered = [];
 
-				this._each(function(elm) {
+				this.$.each(function(elm) {
 					if(cb.call(opt_ctx, elm)) filtered.push(elm);
 				});
 
@@ -282,30 +327,30 @@
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {any} first value that is found
 			 */
-			_find: __coll._find,
+			find: __coll.find,
 			/**
 			 * Returns an array containing the keys of an object (enumerable properties))
 			 * @public
 			 * @this   {Object}
 			 * @return {Array} keys of the object
 			 */
-			_keys: __obj.keys,
+			keys: __obj.keys,
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public
 			 * @return {Array} keys of the object
 			 */
-			_names: __obj.getOwnPropertyNames,
+			names: __obj.getOwnPropertyNames,
 			/**
 			 * Returns an array containing the keys & values of an object (enumerable properties)
 			 * @public
 			 * @this   {Object}
 			 * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
 			 */
-			_pairs: function() {
+			pairs: function() {
 				var pairs = [];
 
-				this._each(function(val, key) {
+				this.$.each(function(val, key) {
 					pairs.push(key, val);
 				});
 
@@ -319,7 +364,7 @@
 			 * @param   {Array}  proto      - the prototype to be set
 			 * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
 			 */
-			_proto: function(proto) {
+			proto: function(proto) {
 				if(proto === undefined) return __obj.getPrototypeOf(this);
 
 				this.__proto__ = proto;
@@ -349,8 +394,8 @@
 			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
 			 * @returns {Object}     - The array without the element
 			 */
-			_remove: function($value) {
-				this.__remove(true, $value);
+			remove: function($value) {
+				this.$._remove(true, $value);
 			},
 			/**
 			 * Removes the all occurrence in an object
@@ -359,8 +404,8 @@
 			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
 			 * @returns {Object}     - The array without the element
 			 */
-			_removeAll: function($value) {
-				this.__remove(false, $value);
+			removeAll: function($value) {
+				this.$._remove(false, $value);
 			},
 			/**
 			 * Removes the first occurrence in an object
@@ -370,19 +415,19 @@
 			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
 			 * @returns {Object}     - The array without the element
 			 */
-			__remove: function(first, $value) {
+			_remove: function(first, $value) {
 				var type = _.typeof($value);
 
 				if(type === 'array')
 				{
 					var values = $value;
 
-					this._each(function(val, key) {
-						if(values._has(val))
+					this.$.each(function(val, key) {
+						if(values.$.has(val))
 						{
 							delete this[key];
 
-							if(first) return values._remove(val), !!values.length;
+							if(first) return values.$.remove(val), !!values.length;
 						}
 					}, this);
 				}
@@ -390,7 +435,7 @@
 				{
 					var cb = (type === 'function')? $value : function(val) {return val === $value};
 
-					this._each(function(val, key) {
+					this.$.each(function(val, key) {
 						if(cb(val, key, this)) return delete this[key], first;
 					}, this);
 				}
@@ -409,7 +454,7 @@
 			 */
 			_rm: function(all, invert, $value, opt_ctx)
 			{
-				return this.__edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
 			},
 			/**
 			 * Returns an array containing the values of an object (enumerable properties)
@@ -417,10 +462,10 @@
 			 * @this   {Object}
 			 * @return {Array} values of the object
 			 */
-			_values: function() {
+			values: function() {
 				var values = [];
 
-				this._each(function(elm) {
+				this.$.each(function(elm) {
 					values.push(elm);
 				});
 
@@ -434,8 +479,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - The array without the element
 			 */
-			_without: function($value, opt_ctx) {
-				return this._rm(false, false, $value, opt_ctx);
+			without: function($value, opt_ctx) {
+				return this.$._rm(false, false, $value, opt_ctx);
 			},
 			/**
 			 * Remove elements based on index
@@ -444,7 +489,7 @@
 			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			_withoutKeys: function($key)
+			withoutKeys: function($key)
 			{
 				var type = typeof($key);
 
@@ -454,9 +499,9 @@
 				}
 				else // function or array
 				{
-					var cb = (type === 'function')? $key : function(key) {return $key._has(key)}; // assumes function otherwise array
+					var cb = (type === 'function')? $key : function(key) {return $key.$.has(key)}; // assumes function otherwise array
 
-					this._each(function(val, key) {
+					this.$.each(function(val, key) {
 						if(cb(key)) delete this[key];
 					}, this);
 				}
@@ -503,7 +548,15 @@
 			 */
 			concat: function(var_args) {
 				return __arr.prototype.concat.apply(null, arguments);
-			}
+			},
+			/**
+			 * Checks if an object is an array
+			 * @public
+			 * @static
+			 * @param    {Object} obj - object to check
+			 * @returns  {boolean}    - boolean indicating if an object is an instance of an array
+			 */
+			isArray: Array.isArray
 		},
 		prototype: {
 			/**
@@ -513,7 +566,7 @@
 			 * @param      {Array} arr  - array to be appended
 			 * @returns    {Array} this - Array appended with arr
 			 */
-			_append: function(arr) {
+			append: function(arr) {
 				this.push.apply(this, arr);
 
 				return this;
@@ -525,8 +578,8 @@
 			 * @param   {...Array} var_args - 1 or more arrays to be appended
 			 * @returns    {Array}  this     - Array appended with arr
 			 */
-			_$append: function(var_args) {
-				return _.clone(this)._append(var_args);
+			$append: function(var_args) {
+				return _.clone(this).$.append(var_args);
 			},
 			/**
 			 * Accessor: Returns the average of an array with numbers
@@ -534,7 +587,7 @@
 			 * @this    {Array<number>}
 			 * @returns {Number} - Average of the numbers in the array
 			 */
-			_avg: function() {
+			avg: function() {
 				return this.sum()/this.length;
 			},
 			/**
@@ -543,9 +596,9 @@
 			 * @this   {Array}
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_compact: function()
+			compact: function()
 			{
-				return this._withoutAll(function(val) {return !val});
+				return this.$.withoutAll(function(val) {return !val});
 			},
 			/**
 			 * Removes al falsey values from an array into a new array
@@ -553,9 +606,9 @@
 			 * @this   {Array}
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_$compact: function()
+			$compact: function()
 			{
-				return this._$withoutAll(function(val) {return !val});
+				return this.$.$withoutAll(function(val) {return !val});
 			},
 			/**
 			 * Copies a value to an array
@@ -566,9 +619,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_copy: function(to, $value, opt_ctx)
+			copy: function(to, $value, opt_ctx)
 			{
-				return this.__cp(false, false, to, $value, opt_ctx);
+				return this.$._cp(false, false, to, $value, opt_ctx);
 			},
 			/**
 			 * Copies all similar values to an array
@@ -579,9 +632,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_copyAll: function(to, $value, opt_ctx)
+			copyAll: function(to, $value, opt_ctx)
 			{
-				return this.__cp(true, false, to, $value, opt_ctx);
+				return this.$._cp(true, false, to, $value, opt_ctx);
 			},
 			/**
 			 * Copies keys to an array
@@ -592,9 +645,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_copyKeys: function(to, $index, opt_to_ctx)
+			copyKeys: function(to, $index, opt_to_ctx)
 			{
-				return this.__cpKeys(false, to, $index, opt_to_ctx);
+				return this.$._cpKeys(false, to, $index, opt_to_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -606,9 +659,9 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__cp: function(all, invert, target, $value, opt_ctx)
+			_cp: function(all, invert, target, $value, opt_ctx)
 			{
-				return this.__edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -620,9 +673,9 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__cut: function(all, invert, target, $value, opt_ctx)
+			_cut: function(all, invert, target, $value, opt_ctx)
 			{
-				return this.__edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -634,9 +687,9 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__cutKeys: function(invert, target, $value, opt_ctx)
+			_cutKeys: function(invert, target, $value, opt_ctx)
 			{
-				return this.__editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+				return this.$._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
 			},
 			/**
 			 * Cut a value to an array
@@ -647,9 +700,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_cut: function(to, $value, opt_ctx)
+			cut: function(to, $value, opt_ctx)
 			{
-				return this.__cut(false, false, to, $value, opt_ctx);
+				return this.$._cut(false, false, to, $value, opt_ctx);
 			},
 			/**
 			 * Cut all similar values to an array
@@ -660,9 +713,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_cutAll: function(to, $value, opt_ctx)
+			cutAll: function(to, $value, opt_ctx)
 			{
-				return this.__cut(true, false, to, $value, opt_ctx);
+				return this.$._cut(true, false, to, $value, opt_ctx);
 			},
 			/**
 			 * Copies keys to an array
@@ -673,9 +726,9 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			_cutKeys: function(to, $index, opt_to_ctx)
+			cutKeys: function(to, $index, opt_to_ctx)
 			{
-				return this.__cutKeys(false, to, $index, opt_to_ctx);
+				return this.$._cutKeys(false, to, $index, opt_to_ctx);
 			},
 			/**
 			 * Copies the occurrences from an array to an new array
@@ -687,9 +740,9 @@
 			 * @param   {Object}             opt_to_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__cpKeys: function(invert, target, $value, opt_to_ctx)
+			_cpKeys: function(invert, target, $value, opt_to_ctx)
 			{
-				return this.__editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
+				return this.$._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
 			},
 			/**
 			 * Edits the occurrences of an array
@@ -701,7 +754,7 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__edit: __coll.__edit,
+			_edit: __coll._edit,
 			/**
 			 * Edits an array based on indices
 			 * @public
@@ -712,24 +765,24 @@
 			 * @param   {Object}             opt_to_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__editKeys: function(invert, onmatch, reverse, target, $index, opt_to_ctx)
+			_editKeys: function(invert, onmatch, reverse, target, $index, opt_to_ctx)
 			{
 				var type = typeof($index), index;
 				var first = !(typeof(opt_to_ctx) === 'number' || type === 'function'), normal = !invert;
 				var array, match, finish = false;
 
 				var cb = (type === 'function')?	$index                                               							 :
-												(array = _.isArray($index))?function(i) {return $index._has(i)}                 :
+												(array = _.isArray($index))?function(i) {return $index.$.has(i)}                 :
 												(opt_to_ctx === undefined)? function(i) {return i === $index}                    :
-																			function(i) {return i._between($index, opt_to_ctx)};
+																			function(i) {return i.$.between($index, opt_to_ctx)};
 
-				this['_each'+(reverse?'Right':'')](function(val, i, _this, delta) {
+				this.$['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
 					index = i - delta; // the original index in the array
 
 					match = cb.call(opt_to_ctx, index, _this);
 					// remove normal or inverted match
 					if(match === normal || finish) onmatch.call(target, i, _this);
-					if(first && match && !finish) return finish = array? !$index._without(index).length : true, !(normal && finish);
+					if(first && match && !finish) return finish = array? !$index.$.without(index).length : true, !(normal && finish);
 				}, this);
 
 				return target;
@@ -743,9 +796,9 @@
 			 * @param   {Object}             opt_to_ctx - optional context for the function
 			 * @returns {Array}                      - The array without the element
 			 */
-			__del: function(invert, $index, opt_to_ctx)
+			_del: function(invert, $index, opt_to_ctx)
 			{
-				return this.__editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
+				return this.$._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
 			},
 			/**
 			 * Remove elements based on index
@@ -756,7 +809,7 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			__del2: function(invert, $index, opt_to_ctx)
+			_del2: function(invert, $index, opt_to_ctx)
 			{
 				var normal = !invert;
 
@@ -783,7 +836,7 @@
 					{
 						var cb = $index;
 
-						this._each(function(val, i, _this, delta) {
+						this.$.each(function(val, i, _this, delta) {
 							if(cb.call(opt_to_ctx, i-delta, this) === normal) this.splice(i, 1);
 						}, this);
 
@@ -791,8 +844,8 @@
 					}
 					case 'array' :
 					{
-						this._each(function(val, i, _this, delta) {
-							if($index._has(i-delta) === normal) return $index._without(i-delta), this.splice(i, 1), !!$index.length;
+						this.$.each(function(val, i, _this, delta) {
+							if($index.$.has(i-delta) === normal) return $index.$.without(i-delta), this.splice(i, 1), !!$index.length;
 						}, this);
 
 						break;
@@ -807,9 +860,9 @@
 			 * @param {...Array} var_args - 2 or more arrays to calc the difference from
 			 * @returns  {Array}          - this for chaining             */
 			// TODO this should be an alias
-			_diff: function(arr)
+			diff: function(arr)
 			{
-				return this._without(arr);
+				return this.$.without(arr);
 			},
 			/**
 			 * Returns the difference between 2 arrays in a new arrar
@@ -817,20 +870,20 @@
 			 * @param    {Array} arr - array to subtract from this
 			 * @returns  {Array}     - new array containing the difference between the first array and the others
 			 */
-			_$diff: function(arr)
+			$diff: function(arr)
 			{
-				return this._$selectAll(function(val) {return !arr._has(val)});
+				return this.$.$selectAll(function(val) {return !arr.$.has(val)});
 			},
 			/**
 			 * Mutator: Creates a multidimensional array. The dimensions come from the array itself
-			 * i.e. [3, 6]._dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+			 * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
 			 * @public
 			 * @this   {Array}
 			 * @param  {any|Function=} opt_init - initial value for the array. Can be either a value or a function specifying the value
 			 * @param  {Object}        opt_ctx  - optional context for the init function
 			 * @return {Array}                  - this initialized multi-dimensional array
 			 */
-			_dimit: function(opt_init, opt_ctx)
+			dimit: function(opt_init, opt_ctx)
 			{
 				var dimensions = this;
 				var arr        = new Array(dimensions[0]);
@@ -861,11 +914,11 @@
 			 * @param  {Object=}  opt_ctx  - optional context for the callback function
 			 * @return {Array}             - this array for chaining
 			 */
-			_each: function(opt_step, cb, opt_ctx) {
+			each: function(opt_step, cb, opt_ctx) {
 				if(typeof(opt_step) === 'function')
-					return this.__each(1, opt_step, cb);
+					return this.$._each(1, opt_step, cb);
 				else
-					return this.__each(opt_step, cb, opt_ctx);
+					return this.$._each(opt_step, cb, opt_ctx);
 			},
 			/**
 			 * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -879,7 +932,7 @@
 			 * 								 false means iteration was broken prematurely.
 			 * 								 This information can passed on in nested loops for multi-dimensional arrays
 			 */
-			__each: function(step, cb, opt_ctx) {
+			_each: function(step, cb, opt_ctx) {
 				var from = 0, to = this.length;
 				var val, diff, size = to, delta = 0;
 
@@ -902,11 +955,11 @@
 			 * @param {Object=}  opt_ctx  - optional context for the callback function
 			 * @return {Array}            - this array for chaining
 			 */
-			_eachRight: function(opt_step, cb, opt_ctx) {
+			eachRight: function(opt_step, cb, opt_ctx) {
 				if(typeof(opt_step) === 'function')
-					return this.__eachRight(1, opt_step, cb);
+					return this.$._eachRight(1, opt_step, cb);
 				else
-					return this.__eachRight(opt_step, cb, opt_ctx);
+					return this.$._eachRight(opt_step, cb, opt_ctx);
 			},
 			/**
 			 * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -918,7 +971,7 @@
 			 * @param {Object=}  opt_ctx  - optional context for the callback function
 			 * @return {Array}            - this array for chaining
 			 */
-			__eachRight: function(step, cb, opt_ctx) {
+			_eachRight: function(step, cb, opt_ctx) {
 				var from = this.length-1, to = -1;
 				var val;
 
@@ -940,7 +993,7 @@
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {any} first value that is found
 			 */
-			_find: __coll._find,
+			find: __coll.find,
 			/**
 			 * Finds all elements according to the callback function
 			 * @public
@@ -950,8 +1003,8 @@
 			 * @return {Array} first value that is found
 			 */
 			// TODO this should be an alias
-			_findAll: function(cb, opt_ctx) {
-				return this._$selectAll(cb, opt_ctx);
+			findAll: function(cb, opt_ctx) {
+				return this.$.$selectAll(cb, opt_ctx);
 			},
 			/**
 			 * Get/sets: the first element of an array
@@ -960,7 +1013,7 @@
 			 * @param  {any=}      val - value to set on the first element
 			 * @return {any|Array}     - first element of the array or the array itself
 			 */
-			_first: function(val) {
+			first: function(val) {
 				if(val === undefined) return this[0];
 
 				this[0] = val;
@@ -973,9 +1026,9 @@
 			 * @this    {Array}
 			 * @returns {Array} - this for chaining
 			 */
-			_flatten: function() {
-				return this._each(function(val, i) {
-					if(_.isArray(val)) this.splice.apply(this, val._insert(1)._insert(i));
+			flatten: function() {
+				return this.$.each(function(val, i) {
+					if(_.isArray(val)) this.splice.apply(this, val.$.insert(1).$.insert(i));
 				}, this)
 			},
 			/**
@@ -984,7 +1037,7 @@
 			 * @this    {Array}
 			 * @returns {Array} - new flattened version of the array
 			 */
-			_$flatten: function() {
+			$flatten: function() {
 				return this.concat.apply([], this);
 			},
 			/**
@@ -994,7 +1047,7 @@
 			 * @param   {Object}  elm - element to check membership of
 			 * @returns {boolean}     - boolean indicating if the array contains the element
 			 */
-			_has: function(elm) {
+			has: function(elm) {
 				return this.indexOf(elm) > -1;
 			},
 			/**
@@ -1005,7 +1058,7 @@
 			 * @param   {number}  i   - position to insert the element
 			 * @return  {Array  }     - this for chaining
 			 */
-			_insert: function(elm, i) {
+			insert: function(elm, i) {
 				return this.splice(i, 0, elm), this;
 			},
 			/**
@@ -1017,9 +1070,9 @@
 			 * @param  {Array} arr - 2 or more arrays
 			 * @return {Array}     - this for chaining
 			 */
-			_intersect: function(arr) {
-				return this._selectAll(function(val) {
-					return arr._has(val);
+			intersect: function(arr) {
+				return this.$.selectAll(function(val) {
+					return arr.$.has(val);
 				}, this);
 			},
 			/**
@@ -1030,9 +1083,9 @@
 			 * @param  {Array} arr - 2 or more arrays
 			 * @return {Array}     - this for chaining
 			 */
-			_$intersect: function(arr) {
-				return this._$selectAll(function(val) {
-					return arr._has(val);
+			$intersect: function(arr) {
+				return this.$.$selectAll(function(val) {
+					return arr.$.has(val);
 				}, this);
 			},
 			/**
@@ -1042,11 +1095,11 @@
 			 * @param   {Array}  arr - array to check intersection with
 			 * @returns {boolean}     - boolean indicating if the 2 arrays intersect
 			 */
-			_intersects: function(arr) {
+			intersects: function(arr) {
 				var intersects = false;
 
-				this._each(function(val) {
-					if(arr._has(val)) return !(intersects = true);
+				this.$.each(function(val) {
+					if(arr.$.has(val)) return !(intersects = true);
 				});
 
 				return intersects;
@@ -1058,7 +1111,7 @@
 			 * @param   {any}      val - Value to be set as the last element
 			 * @returns {any|Array}    - last element of the array
 			 */
-			_last: function(val) {
+			last: function(val) {
 				if(val === undefined) return this[this.length-1];
 
 				this[this.length-1] = val;
@@ -1072,7 +1125,7 @@
 			 * @param   {Function} opt_compare - optional function to determine the the max in case of non-numeric array
 			 * @returns {number|any} - maximum number or element in the array
 			 */
-			_max: function(opt_compare) {
+			max: function(opt_compare) {
 				if(opt_compare === undefined)
 				{
 					return __math.max.apply(null, this);
@@ -1081,7 +1134,7 @@
 				{
 					var max = this[0];
 
-					this._each(function(elm) {
+					this.$.each(function(elm) {
 						max = opt_compare(elm, max) > 0? elm : max;
 					});
 
@@ -1095,7 +1148,7 @@
 			 * @param   {Function=} opt_compare - optional compare function
 			 * @returns {number|any} - minimum element in the array
 			 */
-			_min: function(opt_compare) {
+			min: function(opt_compare) {
 				if(opt_compare === undefined)
 				{
 					return __math.min.apply(null, this);
@@ -1104,7 +1157,7 @@
 				{
 					var min = this[0];
 
-					this._each(function(elm) {
+					this.$.each(function(elm) {
 						min = opt_compare(elm, min) < 0? elm : min;
 					});
 
@@ -1119,8 +1172,8 @@
 			 * @param   {Object=}  opt_ctx  - optional context for the modifier function
 			 * @returns {Array}             - the modified array
 			 */
-			_modify: function(modifier, opt_ctx) {
-				this._each(function(val, i) {
+			modify: function(modifier, opt_ctx) {
+				this.$.each(function(val, i) {
 					this[i] = modifier.call(opt_ctx, val, i, this);
 				}, this);
 
@@ -1134,9 +1187,9 @@
 			 * @param   {Object=}  opt_ctx  - optional context for the modifier function
 			 * @returns {Array}             - the modified array
 			 */
-			_$modify: function(modifier, opt_ctx)
+			$modify: function(modifier, opt_ctx)
 			{
-				return _.clone(this)._modify(modifier, opt_ctx);
+				return _.clone(this).$.modify(modifier, opt_ctx);
 			},
 			/**
 			 * Accessor: Returns a random element from the array
@@ -1144,7 +1197,7 @@
 			 * @this   {Array}
 			 * @return {any} - random element from the array
 			 */
-			_random: function() {
+			random: function() {
 				return this[_.int.random(0, this.length - 1)];
 			},
 			/**
@@ -1157,11 +1210,11 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - The array without the element
 			 */
-			__rm: function(all, invert, $value, opt_ctx)
+			_rm: function(all, invert, $value, opt_ctx)
 			{
-				return this.__edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+				return this.$._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
 			},
-			_reduce: __arr.prototype.reduce,
+			reduce: __arr.prototype.reduce,
 			/**
 			 * Reduces an array in the reverse order
 			 * @public
@@ -1174,13 +1227,13 @@
 //			{
 //				var reduction = initial;
 //
-//				this._each(function(val) {
+//				this.$.each(function(val) {
 //					reduction = cb(val, reduction);
 //				});
 //
 //				return reduction;
 //			},
-			_reduceRight: __arr.prototype.reduceRight,
+			reduceRight: __arr.prototype.reduceRight,
 			/**
 			 * Select the first occurrence in an array
 			 * @public
@@ -1189,8 +1242,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - array with the selected element
 			 */
-			_select: function($value, opt_ctx) {
-				return this.__rm(false, true, $value, opt_ctx);
+			select: function($value, opt_ctx) {
+				return this.$._rm(false, true, $value, opt_ctx);
 			},
 			/**
 			 * Accessor: Returns the first element found by the selector function
@@ -1200,8 +1253,8 @@
 			 * @param   {Object=}  opt_ctx  - optional context for the callback function
 			 * @returns {any}               - the found element or undefined otherwise
 			 */
-			_$select: function($value, opt_ctx) {
-				return this.__cp(false, false, [], $value, opt_ctx);
+			$select: function($value, opt_ctx) {
+				return this.$._cp(false, false, [], $value, opt_ctx);
 			},
 			/**
 			 * Select all occurrence in an array
@@ -1211,8 +1264,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - array with the selected elements
 			 */
-			_selectAll: function($value, opt_ctx) {
-				return this.__rm(true, true, $value, opt_ctx);
+			selectAll: function($value, opt_ctx) {
+				return this.$._rm(true, true, $value, opt_ctx);
 			},
 			/**
 			 * Select all occurrence in an array and copies them to a new array
@@ -1222,8 +1275,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - array with the selected elements
 			 */
-			_$selectAll: function($value, opt_ctx) {
-				return this.__cp(true, false, [], $value, opt_ctx);
+			$selectAll: function($value, opt_ctx) {
+				return this.$._cp(true, false, [], $value, opt_ctx);
 			},
 			/**
 			 * Retrieves and sets the size of an array
@@ -1232,7 +1285,7 @@
 			 * @param   {number} size  - the new size of the array
 			 * @returns {number|Array} - the length of the arrayu or the array itself
 			 */
-			_size: function(size) {
+			size: function(size) {
 				if(size === undefined) return this.length;
 
 				this.length = size;
@@ -1245,7 +1298,7 @@
 			 * @this    {Array<number>}
 			 * @returns {number} - sum of the  number array
 			 */
-			_sum: function() {
+			sum: function() {
 				return this.reduce(function(a, b) { return a + b; });
 			},
 			/**
@@ -1255,8 +1308,8 @@
 			 * @param  {Array} arr  - array to unfiy
 			 * @return {Array} this - unified with the other
 			 */
-			_unify: function(arr) {
-				return this._append(arr)._unique();
+			unify: function(arr) {
+				return this.$$.append(arr).unique().value;
 			},
 			/**
 			 * Calculates the union for 2 arrays into an new array
@@ -1265,8 +1318,8 @@
 			 * @param  {Array} arr  - array to unfiy
 			 * @return {Array}      - new array containing the unification
 			 */
-			_$unify: function(arr) {
-				return this._$append(arr)._unique();
+			$unify: function(arr) {
+				return this.$$.$append(arr).unique().value;
 			},
 			/**
 			 * Removes duplicate values in an array
@@ -1274,9 +1327,9 @@
 			 * @this    {Array}
 			 * @returns {Array} - new array without duplicates
 			 */
-			_unique: function() {
-				this._eachRight(function(val, i) {
-					this._each(function(duplicate, j) {
+			unique: function() {
+				this.$.eachRight(function(val, i) {
+					this.$.each(function(duplicate, j) {
 						if(val === duplicate && j < i) return this.splice(i, 1), false;
 						return j < i;
 					}, this)
@@ -1290,11 +1343,11 @@
 			 * @this    {Array}
 			 * @returns {Array} - new array without duplicates
 			 */
-			_$unique: function() {
+			$unique: function() {
 				var unique = [];
 
-				this._each(function(val) {
-					if(!unique._has(val)) unique.push(val);
+				this.$.each(function(val) {
+					if(!unique.$.has(val)) unique.push(val);
 				}, this);
 
 				return unique;
@@ -1307,8 +1360,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - The array without the element
 			 */
-			_without: function($value, opt_ctx) {
-				return this.__rm(false, false, $value, opt_ctx);
+			without: function($value, opt_ctx) {
+				return this.$._rm(false, false, $value, opt_ctx);
 			},
 			/**
 			 * Removes the first occurrence in an array
@@ -1318,8 +1371,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array }                     - NEW array without the element
 			 */
-			_$without: function($value, opt_ctx) {
-				return this.__cp(false, true, [], $value, opt_ctx);
+			$without: function($value, opt_ctx) {
+				return this.$._cp(false, true, [], $value, opt_ctx);
 			},
 			/**
 			 * Removes the all occurrence in an array
@@ -1329,8 +1382,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - The array without the element
 			 */
-			_withoutAll: function($value, opt_ctx) {
-				return this.__rm(true, false, $value, opt_ctx);
+			withoutAll: function($value, opt_ctx) {
+				return this.$._rm(true, false, $value, opt_ctx);
 			},
 			/**
 			 * Removes the all occurrence in an array
@@ -1340,8 +1393,8 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - NEW array without the element
 			 */
-			_$withoutAll: function($value, opt_ctx) {
-				return this.__cp(true, true, [], $value, opt_ctx);
+			$withoutAll: function($value, opt_ctx) {
+				return this.$._cp(true, true, [], $value, opt_ctx);
 			},
 			/**
 			 * Remove elements based on index
@@ -1351,9 +1404,9 @@
 			 * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			_withoutKeys: function($index, opt_to_ctx)
+			withoutKeys: function($index, opt_to_ctx)
 			{
-				return this.__del(false, $index, opt_to_ctx);
+				return this.$._del(false, $index, opt_to_ctx);
 			},
 			/**
 			 * Remove elements based on index
@@ -1363,9 +1416,9 @@
 			 * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			_$withoutKeys: function($index, opt_to_ctx)
+			$withoutKeys: function($index, opt_to_ctx)
 			{
-				return this.__cpKeys(true, [], $index, opt_to_ctx);
+				return this.$._cpKeys(true, [], $index, opt_to_ctx);
 			},
 			/**
 			 * Selects elements based on index, removes others
@@ -1375,9 +1428,9 @@
 			 * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			_selectKeys: function($index, opt_to_ctx)
+			selectKeys: function($index, opt_to_ctx)
 			{
-				return this.__del(true, $index, opt_to_ctx);
+				return this.$._del(true, $index, opt_to_ctx);
 			},
 			/**
 			 * Selects elements based on index into a new array
@@ -1387,9 +1440,9 @@
 			 * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}   this   - mutated array for chaining
 			 */
-			_$selectKeys: function($index, opt_to_ctx)
+			$selectKeys: function($index, opt_to_ctx)
 			{
-				return this.__cpKeys(false, [], $index, opt_to_ctx);
+				return this.$._cpKeys(false, [], $index, opt_to_ctx);
 			}
 		}
 	});
@@ -1405,7 +1458,7 @@
 			 * @param   {string} substr - substring to identify the return string
 			 * @returns {string}        - new string containing the string after the given substring
 			 */
-			_after: function(substr) {
+			after: function(substr) {
 				var index = this.indexOf(substr);
 				return (index > -1)? this.slice(index + substr.length) : '';
 			},
@@ -1415,7 +1468,7 @@
 			 * @param   {string} substr - substring to identify the return string
 			 * @returns {string}         - new string containing the string after the given substring
 			 */
-			_afterLast: function(substr) {
+			afterLast: function(substr) {
 				var index = this.indexOf(substr);
 				return (index > -1)? this.slice(index + substr.length) : '';
 			},
@@ -1425,7 +1478,7 @@
 			 * @param   {string} substr - substring to identify the return string
 			 * @returns {string}         - new string containing the string before the given substring
 			 */
-			_before: function(substr) {
+			before: function(substr) {
 				var index = this.indexOf(substr);
 				return (index > -1)? this.slice(0, index) : '';
 			},
@@ -1435,7 +1488,7 @@
 			 * @param   {string} substr - substring to identify the return string
 			 * @returns {string}         - new string containing the string before the given substring
 			 */
-			_beforeLast: function(substr) {
+			beforeLast: function(substr) {
 				var index = this.indexOf(substr);
 				return (index > -1)? this.slice(0, index) : '';
 			},
@@ -1446,15 +1499,15 @@
 			 * @param   {string} post_substr - substring to identify the return string
 			 * @returns {string}             - new string containing the string before the given substring
 			 */
-			_between: function(pre_substr, post_substr) {
-				return this._after(pre_substr)._before(post_substr);
+			between: function(pre_substr, post_substr) {
+				return this.$$.after(pre_substr).before(post_substr).value;
 			},
 			/**
 			 * Capitalize the first character of a string
 			 * @public
 			 * @returns {string} - the capitalized string
 			 */
-			_capitalize: function() {
+			capitalize: function() {
 				return this[0]? this[0].toUpperCase() + this.slice(1): this;
 			},
 			/**
@@ -1462,7 +1515,7 @@
 			 * @public
 			 * @returns {string} - the decapitalized string
 			 */
-			_decapitalize: function() {
+			decapitalize: function() {
 				return this[0]? this[0].toLowerCase() + this.slice(1): this;
 			},
 			/**
@@ -1471,7 +1524,7 @@
 			 * @param   {string}  substr - substring to check for
 			 * @returns {boolean}        - boolean indicating if the string ends with the given substring
 			 */
-			_endsWith: function(substr) {
+			endsWith: function(substr) {
 				return this.slice(-substr.length) === substr;
 			},
 			/**
@@ -1480,7 +1533,7 @@
 			 * @param   {string}  substr - substring to check for
 			 * @returns {boolean}        - boolean indicating if the string contains the substring
 			 */
-			 _has: function(substr) {
+			 has: function(substr) {
 				 return this.indexOf(substr) > -1;
 			 },
 			/**
@@ -1490,15 +1543,15 @@
 			 * @param   {number}  i      - index to insert the substring (can be a negative value as well)
 			 * @returns {string}         - new string with the substring inserted
 			 */
-			_insert: function(substr, i) {
-				return this._splice(i, 0, substr);
+			insert: function(substr, i) {
+				return this.$.splice(i, 0, substr);
 			},
 			/**
 			 * Checks if a string is all lowercase
 			 * @public
 			 * @returns {boolean} - Boolean indicating if the string is lowercase
 			 */
-			_isLowerCase: function() {
+			isLowerCase: function() {
 				return this == this.toLowerCase();
 			},
 			/**
@@ -1506,7 +1559,7 @@
 			 * @public
 			 * @returns {boolean} - Boolean indicating if the string is uppercase
 			 */
-			_isUpperCase: function() {
+			isUpperCase: function() {
 				return this == this.toUpperCase();
 			},
 			/**
@@ -1517,7 +1570,7 @@
 			 * @param   {string}  substr  - substring to insert
 			 * @returns {string}          - NEW string with deleted or inserted characters
 			 */
-			_splice: function(i, howMany, substr) {
+			splice: function(i, howMany, substr) {
 				return this.slice(0,i) + substr + this.slice(i + __math.abs(howMany));
 			},
 			/**
@@ -1526,37 +1579,8 @@
 			 * @param   {string}  substr - substring to check for
 			 * @returns {boolean}        - boolean indicating if the string starts with the given substring
 			 */
-			_startsWith: function(substr) {
+			startsWith: function(substr) {
 				return this.indexOf(substr) === 0;
-			}
-		}
-	});
-
-	/**
-	 * Math
-	 */
-	constructWrapper(Math, 'math', {
-		static: {
-			/**
-			 * Return true based on a certain probability based on a number between 0 & 1;
-			 * @public
-			 * @param   {number}  p - probability to return true
-			 * @returns {boolean}   - true or false based on the probability
-			 */
-			byProb: function(p) {
-				return __math.random() < p;
-			},
-			/**
-			 * Return the distance between 2 points in Euclidean space
-			 * @public
-			 * @param   {number}  x1 - x position for point1
-			 * @param   {number}  y1 - y position for point1
-			 * @param   {number}  x2 - x position for point2
-			 * @param   {number}  y2 - y position for point2
-			 * @returns {number} - distance between the 2 points
-			 */
-			distance: function(x1, y1, x2, y2) {
-				return __math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 			}
 		}
 	});
@@ -1577,7 +1601,7 @@
 				var min = opt_min || 0;
 				var max = opt_max || 1;
 
-				return _.isDefined(opt_max)? __math.random() * (max - min) + min : __math.random();
+				return arguments.length? __math.random() * (max - min) + min : __math.random();
 			},
 			// TODO left inclusive right inclusive or both
 			/**
@@ -1607,7 +1631,7 @@
 			 * @public
 			 * @returns {number} - sign of the number: -1, 0, 1
 			 */
-			get _sign() {
+			get sign() {
 				return this > 0?  1 :
 					   this < 0? -1 :
 								  0 ;
@@ -1617,7 +1641,7 @@
 			 * @public
 			 * @returns {boolean} - indicating if the number is even
 			 */
-			get _even() {
+			get even() {
 				return !(this & 1);
 			},
 			/**
@@ -1625,7 +1649,7 @@
 			 * @public
 			 * @returns {boolean} - indicating if the number is odd
 			 */
-			get _odd() {
+			get odd() {
 				return !!(this & 1);
 			},
 			/**
@@ -1635,7 +1659,7 @@
 			 * @param   {number}  max - maximum value
 			 * @returns {boolean}     - boolean indicating if the value lies between the two values
 			 */
-			_between: function(min, max) {
+			between: function(min, max) {
 				return min <= this && this <= max; // this is correct when saying between the endpoints should be included when saying from to the end point "to" is excluded well for mathematicians that is
 			},
 			/**
@@ -1645,8 +1669,8 @@
 			 * @param   {number}  max - maximum value
 			 * @returns {boolean}     - bounded version of the number that falls between the 2 values
 			 */
-			_bound: function(min, max) {
-				return _.min(_.max(this, min), max);
+			bound: function(min, max) {
+				return __math.min(__math.max(this, min), max);
 			},
 			/**
 			 * Rebounds a number between 2 values. Handy for number ranges that are continuous
@@ -1655,7 +1679,7 @@
 			 * @param   {number}   num - number value
 			 * @returns {function}     - function to add the range
 			 */
-			_rebound: function(min, max)
+			rebound: function(min, max)
 			{
 				return min + this % (max - min);
 			}
@@ -1711,7 +1735,7 @@
 
 				fnc = args.pop();
 
-				return fnc.bind.apply(fnc, [null]._append(args));
+				return fnc.bind.apply(fnc, [null].$.append(args));
 			},
 			/**
 			 * Similar to bind but only prefills the arguments not the context
@@ -1763,6 +1787,40 @@
 			velocity2speed: function(vx, vy) {
 				return _.sqrt(vx*vx + vy*vy)
 			}
+		}
+	});
+
+	/**
+	  * Math
+	  */
+	constructWrapper(Math, 'math', {
+		static: {
+			/**
+			 * Return true based on a certain probability based on a number between 0 & 1;
+			 * @public
+			 * @param   {number}  p - probability to return true
+			 * @returns {boolean}   - true or false based on the probability
+			 */
+			byProb: function(p) {
+				return __math.random() < p;
+			},
+			/**
+			 * Return the distance between 2 points in Euclidean space
+			 * @public
+			 * @param   {number}  x1 - x position for point1
+			 * @param   {number}  y1 - y position for point1
+			 * @param   {number}  x2 - x position for point2
+			 * @param   {number}  y2 - y position for point2
+			 * @returns {number} - distance between the 2 points
+			 */
+			distance: function(x1, y1, x2, y2) {
+				return __math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+			},
+			max: __math.max,
+			min :  __math.min,
+			round: __math.round,
+			sqrt: __math.sqrt
+
 		}
 	});
 

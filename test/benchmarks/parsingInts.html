@@ -14,22 +14,6 @@
             .add('parseInt', function() {
                 elm = parseInt(4.6)
             })
-            .add('keys forEach', function() {
-
-            })
-            .add('keys for', function() {
-                var keys = Object.keys(obj);
-
-                for(var i = 0, max = keys.length; i < max; i++)
-                {
-                    elm = obj[keys[i]];
-                }
-            })
-            .add('_ iterate', function() {
-                _.iterate(obj, function(e) {
-                    elm = e;
-                })
-            })
             // add listeners
             .on('cycle', function(event) {
                 console.log(String(event.target));

@@ -22,7 +22,7 @@
 
         var arr = [];
 
-        arr.$.zwar();
+        arr._zwar();
 
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
@@ -35,7 +35,7 @@
                 arr.zwar();
             })
             .add('bottom_line', function() {
-                arr.$.zwar();
+                arr._zwar();
             })
             // add listeners
             .on('cycle', function(event) {
