@@ -35,7 +35,15 @@
 	var __fnc  = Function;
 	var __math = Math;
 
-	// wrap functions for chaining
+	/**
+	 * Constructs the wrapper objects
+	 *
+	 * @private
+	 * @method
+	 * @param   {Object|null} nativeObj - Native base object. Pass null if none
+	 * @param   {string}      shorthand - Boolean indicating if we should invert the condition
+	 * @param   {Object}      module    - function to be executed on a match
+	 */
 	function constructWrapper(nativeObj, shorthand, module)
 	{
 		// set wrapper object
