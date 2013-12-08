@@ -3,6 +3,7 @@
 .archive/
 .coverage/
 node_modules/
+projectFilesBackup/
 
 #ignored file types
 *.map

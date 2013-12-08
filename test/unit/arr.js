@@ -544,15 +544,6 @@ describe("Array", function() {
 			});
 		});
 
-		describe("reduceRight", function() {
-
-			it("reduceRight ", function() {
-				expect([[0, 1], [2, 3], [4, 5]]._reduceRight(function(a, b) {
-					return a.concat(b);
-				}, [])).to.eql([4, 5, 2, 3, 0, 1]);
-			});
-		});
-
 		describe("select by value", function() {
 
 			it("select one element", function() {
