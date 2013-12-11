@@ -1866,10 +1866,14 @@
 			 * Use bind to prefill args and set context: fnc.bind(this, 'arg1', 'arg2').callAfter(10);
 			 * @public
 			 * @method module:_.fnc.callAfter
-			 * @param {number}   delay   - optional arguments
+			 * @param {number} delay   - optional arguments
+			 * @param {number} cb      - callback function to call after the delay
+			 * @param {number} opt_ctx - optional arguments
 			 */
-			callAfter: function (delay, fnc) {
-				setTimeout(fnc, delay);
+			callAfter: function (delay, cb, opt_ctx) {
+				setTimeout(function() {
+					cb.call(opt_ctx)
+				}, delay);
 			},
 			/**
 			 * Memoization function
