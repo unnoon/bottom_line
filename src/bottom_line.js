@@ -193,11 +193,10 @@
 			 * @return  {Object}  obj          - the extended object
 			 */
 			extend: function(obj, opt_settings, module) {
-				var settings;
+				var settings = opt_settings;
 				var descriptor;
 
-				module   = module? module       : opt_settings;
-				settings = module? opt_settings : {};
+				if(module === undefined) module = opt_settings, settings = {};
 
 				settings.enumerable   = settings.enumerable   !== false;
 				settings.configurable = settings.configurable !== false;
@@ -332,12 +331,29 @@
 				return __obj.keys(this);
 			},
 			/**
+			 * Mixin properties on a class. It is assumed this function is called inside the constructor
+			 * @public
+			 * @param {Object} obj - object containing the mixin properties
+			 * @returns {Object} this for chaining
+			 */
+			_mixin: function(obj) {
+				var extObj = _.clone(obj);
+
+				var init = extObj.init;
+				delete extObj.init;
+
+				_.extend(this.constructor.prototype, extObj);
+
+				if(init) init.call(this);
+
+				return this;
+			},
+			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public
 			 * @method Object#_names
 			 * @return {Array} keys of the object
 			 */
-
 			_names: function() {
 				return __obj.getOwnPropertyNames(this);
 			},
@@ -909,6 +925,36 @@
 			},
 			/**
 			 * Mutator: Creates a multidimensional array. The dimensions come from the array itself
+			 * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+			 * @public
+			 * @this   {Array}
+			 * @param  {any|Function=} opt_init - initial value for the array. Can be either a value or a function specifying the value
+			 * @param  {Object}        opt_ctx  - optional context for the init function
+			 * @return {Array}                  - this for chaining
+			 */
+			_dimit: function(opt_init, opt_ctx)
+			{
+				var dimensions = _.clone(this);
+				this.length    = dimensions[0];
+				var init       = (typeof(opt_init) === 'function')? opt_init : function() {return opt_init};
+
+				// add other dimensions
+				addDim(this, 0, dimensions);
+
+				return this;
+
+				function addDim(arr, dim, dimensions)
+				{
+					for(var i = 0, max = dimensions[dim]; i < max; i++)
+					{
+						arr[i] = (dim === dimensions.length-1)? init.call(opt_ctx) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
+						if(dim === dimensions.length-2 && _.isUndefined(opt_init)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined
+						addDim(arr[i], dim+1, dimensions); // add another dimension
+					}
+				}
+			},
+			/**
+			 * Mutator: Creates a multidimensional array. The dimensions come from the array itself
 			 * i.e. [3, 6]._dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
 			 * @public
 			 * @method Array#_dimit
@@ -917,7 +963,7 @@
 			 * @param  {Object}        opt_ctx  - optional context for the init function
 			 * @return {Array}                  - this initialized multi-dimensional array
 			 */
-			_dimit: function(opt_init, opt_ctx)
+			_$dimit: function(opt_init, opt_ctx)
 			{
 				var dimensions = this;
 				var arr        = new Array(dimensions[0]);
@@ -1983,4 +2029,24 @@
 			}
 		}
 	});
+
+	// some AMD build optimizers like r.js check for condition patterns like the following:
+	if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+		this._ = _;
+		// define as an anonymous module so, through path mapping, it can be
+		// referenced as the "underscore" module
+		define(function() {
+			return _;
+		});
+	}
+	// check for `exports` after `define` in case a build optimizer adds an `exports` object
+	// set browser and nodejs globals
+	else if(typeof(module) !== 'undefined' && module.exports)
+	{
+		module.exports = _;
+	}
+	else
+	{
+		this._ = _;
+	}
 }).call(this); // need to call it specifically in this context, otherwise 'this' is undefined
