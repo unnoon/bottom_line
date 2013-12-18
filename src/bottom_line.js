@@ -1937,6 +1937,17 @@
 				fnc = args.pop();
 
 				return fnc.bind.apply(fnc, args)
+			},
+			/**
+			 * Super simple inheritance function
+			 * @public
+			 * @method module:_.fnc.inherit
+			 * @param   {Function} child  - child
+			 * @param   {Function} parent - parent to inherit from
+			 */
+			inherit: function(child, parent) {
+				child.prototype = Object.create(parent.prototype);
+				child.prototype.constructor = child;
 			}
 		}
 	});
