@@ -17,16 +17,6 @@
 	 */
 	var _ = {};
 
-	// set browser and nodejs globals
-	if(typeof(module) !== 'undefined' && module.exports)
-	{
-		module.exports = _;
-	}
-	else
-	{
-		this._ = _;
-	}
-
 	// some short cuts
 	var __obj  = Object;
 	var __arr  = Array;
