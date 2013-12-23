@@ -282,5 +282,27 @@ describe("Extensions", function() {
 				expect(list.indexOf(123)).to.eql(0);
 			});
 		});
+
+		describe("Math", function() {
+			var rad2Deg = function() {
+				var radianToDegreesFactor = 180/Math.PI;
+
+				return function (radians) {
+					return radians*radianToDegreesFactor;
+				};
+			}();
+
+
+			it("atan2", function() {
+				expect(rad2Deg(Math.atan2( 0, 1))).to.equal(0);  // huh? I would expect 90
+				expect(rad2Deg(Math.atan2( 1, 1))).to.equal(45);
+				expect(rad2Deg(Math.atan2( 1, 0))).to.equal(90);
+				expect(rad2Deg(Math.atan2( 1,-1))).to.equal(135);
+				expect(rad2Deg(Math.atan2( 0,-1))).to.equal(180);
+				expect(rad2Deg(Math.atan2(-1,-1))).to.equal(-135);
+				expect(rad2Deg(Math.atan2(-1, 0))).to.equal(-90);
+				expect(rad2Deg(Math.atan2(-1, 1))).to.equal(-45);
+			});
+		});
 	});
 });

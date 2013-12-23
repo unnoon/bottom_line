@@ -1724,7 +1724,67 @@
 			 */
 			distance: function(x1, y1, x2, y2) {
 				return __math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-			}
+			},
+			/**
+			 * Calculates the angle between a the y-axis and a line through a point x, y calculated clockwise (slope)
+			 * @public
+			 * @method module:_.math.angle
+			 * @param   {number}  x -
+			 * @param   {number}  y -
+			 * @returns {number} - angle in degrees
+			 */
+			angle: function(x, y) {
+				return (_.rad2Deg(Math.atan2(x, -y))+360)%360;
+			},
+			/**
+			 * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
+			 * @public
+			 * @method module:_.math.angle
+			 * @param   {number}  x -
+			 * @param   {number}  y -
+			 * @returns {number} - angle in degrees
+			 */
+			angleSloped: function(x, y) {
+				return (90-_.rad2Deg(Math.atan2(x, y))+360)%360;
+			},
+			/**
+			 * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
+			 * @public
+			 * @method module:_.math.angle
+			 * @param   {number}  angle - angle in degrees
+			 * @returns {number} - angle in degrees
+			 */
+			angleInvert: function(angle) {
+				return (angle+540)%360;
+			},
+			/**
+			 * Convert degrees to radians.
+			 *
+			 * @method module:_.math.deg2Rad
+			 * @param {number} degrees
+			 * @returns {number} radians
+			 */
+			deg2Rad: function() {
+				var degreeToRadiansFactor = Math.PI/180;
+
+				return function (degrees) {
+					return degrees*degreeToRadiansFactor;
+				};
+			}(),
+			/**
+			 * Convert radians to degrees
+			 *
+			 * @method module:_.math.rad2Deg
+			 * @param {number} radians
+			 * @returns {number} degrees
+			 */
+			rad2Deg: function() {
+				var radianToDegreesFactor = 180/Math.PI;
+
+				return function (radians) {
+					return radians*radianToDegreesFactor;
+				};
+			}()
 		}
 	});
 
