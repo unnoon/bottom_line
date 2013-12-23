@@ -28,13 +28,13 @@ describe("math", function() {
 
 			it("angleSloped", function() {
 				expect(_.angleSloped( 1, 0)).to.equal(  0);
-				expect(_.angleSloped( 1, 1)).to.equal( 45);
-				expect(_.angleSloped( 0, 1)).to.equal( 90);
-				expect(_.angleSloped(-1, 1)).to.equal(135);
+				expect(_.angleSloped( 1,-1)).to.equal( 45);
+				expect(_.angleSloped( 0,-1)).to.equal( 90);
+				expect(_.angleSloped(-1,-1)).to.equal(135);
 				expect(_.angleSloped(-1, 0)).to.equal(180);
-				expect(_.angleSloped(-1,-1)).to.equal(225);
-				expect(_.angleSloped( 0,-1)).to.equal(270);
-				expect(_.angleSloped( 1,-1)).to.equal(315);
+				expect(_.angleSloped(-1, 1)).to.equal(225);
+				expect(_.angleSloped( 0, 1)).to.equal(270);
+				expect(_.angleSloped( 1, 1)).to.equal(315);
 			});
 
 //			it("angleCustom", function() {

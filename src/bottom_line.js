@@ -1745,7 +1745,7 @@
 			 * @returns {number} - angle in degrees
 			 */
 			angleSloped: function(x, y) {
-				return (90-_.rad2Deg(Math.atan2(x, y))+360)%360;
+				return (90-_.rad2Deg(Math.atan2(x, -y))+360)%360;
 			},
 			/**
 			 * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
@@ -1866,6 +1866,15 @@
 			 */
 			get _odd() {
 				return !!(this & 1);
+			},
+			/**
+			 * Getter: paity for a number 0: even and 1: for odd
+			 * @public
+			 * @method Number#_parity
+			 * @returns {number} - parity of the number
+			 */
+			get _parity() {
+				return 1 - (this & 1);
 			},
 			/**
 			 * Checks if a number is between to values
