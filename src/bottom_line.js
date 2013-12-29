@@ -7,8 +7,20 @@
  * ________________________________
  */
 'use strict';
-
-(function() {
+!function(root, factory) {
+	if(typeof(define) === 'function' && define.amd)
+	{
+		define(factory);
+	}
+	else if(typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports)
+	{
+		module.exports = factory();
+	}
+	else
+	{
+		root._ = factory();
+	}
+}(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
 	 * Also all static properties (including native ones) will be available on this object
@@ -2105,23 +2117,5 @@
 		}
 	});
 
-	// some AMD build optimizers like r.js check for condition patterns like the following:
-	if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-		this._ = _;
-		// define as an anonymous module so, through path mapping, it can be
-		// referenced as the "underscore" module
-		define(function() {
-			return _;
-		});
-	}
-	// check for `exports` after `define` in case a build optimizer adds an `exports` object
-	// set browser and nodejs globals
-	else if(typeof(module) !== 'undefined' && module.exports)
-	{
-		module.exports = _;
-	}
-	else
-	{
-		this._ = _;
-	}
-}).call(this); // need to call it specifically in this context, otherwise 'this' is undefined
+	return _
+})
