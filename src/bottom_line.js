@@ -2019,7 +2019,7 @@
 			inherit: function(child, parent) {
 				child.prototype = Object.create(parent.prototype);
 				child.prototype.constructor = child;
-				child.prototype._super = parent.prototype;
+				child._super = parent.prototype;
 			}
 		}
 	});
