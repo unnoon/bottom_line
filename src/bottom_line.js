@@ -1900,6 +1900,16 @@
 				return 1 - (this & 1);
 			},
 			/**
+			 * Power of a number
+			 * @public
+			 * @method Number#_pow
+			 * @param   {number}  exponent - the exponent
+			 * @returns {number}           - the powered number
+			 */
+			_pow: function(exponent) {
+				return _.pow(this, exponent)
+			},
+			/**
 			 * Checks if a number is between to values
 			 * @public
 			 * @method Number#_between
