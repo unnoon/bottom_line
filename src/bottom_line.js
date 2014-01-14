@@ -101,6 +101,17 @@
 		})
 	}
 
+	/*
+	 *  'Global' methods
+	 */
+	_.assert = function(condition, message)
+	{
+		if (!condition)
+		{
+			throw message || "Assertion failed";
+		}
+	};
+
 	/**
 	 * Collections general collection object to store general collection functions
 	 *
