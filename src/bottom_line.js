@@ -590,7 +590,7 @@
 			 * @returns  {Array} array containing the concatenated array
 			 */
 			concat: function(var_args) {
-				return __arr.prototype.concat.apply(null, arguments);
+				return __arr.prototype.concat.apply([], arguments);
 			}
 		},
 		/**
@@ -1300,6 +1300,19 @@
 			_$modify: function(modifier, opt_ctx)
 			{
 				return _.clone(this)._modify(modifier, opt_ctx);
+			},
+			/**
+			 * Chainable version of push
+			 * @public
+			 * @method Array#_push
+			 * @this   {Array}
+			 * @param  {any...} var_args - one or more elements to add to an array
+			 * @return {Array}  this     - this for chaining
+			 */
+			_push: function(var_args) {
+				this.push.apply(this, arguments);
+
+				return this;
 			},
 			/**
 			 * Accessor: Returns a random element from the array

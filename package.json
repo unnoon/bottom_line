@@ -14,7 +14,7 @@
     "karma-chrome-launcher": "latest",
     "karma-phantomjs-launcher": "latest",
     "benchmark": "latest",
-    "grunt-jsdoc": "~0.4.2",
+    "grunt-jsdoc": "latest",
     "grunt-contrib-uglify": "~0.2.7"
   }
 }
