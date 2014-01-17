@@ -1808,6 +1808,16 @@
 				};
 			}(),
 			/**
+			 * Decimal log function
+			 * @public
+			 * @method module:_.math.log10
+			 * @param   {number} val - value to get the log10 from
+			 * @returns {number}     - angle in degrees
+			 */
+			log10: function(val) {
+				return _.log(val)/_.LN10;
+			},
+			/**
 			 * Convert radians to degrees
 			 *
 			 * @method module:_.math.rad2Deg
@@ -2115,6 +2125,28 @@
 		 * @memberOf module:_
 		 */
 		static: {
+			/**
+			 * Returns the length of an integer
+			 * @public
+			 * @method module:_.int.length
+			 * @param   {number} int - integer to measure the length
+			 * @returns {number} - length of the integer
+			 */
+			len: function(int) {
+				return int? 1+_.log10(int)|0 : 1;
+//				return (int+'').length;
+			},
+			/**
+			 * Returns the length of an integer
+			 * @public
+			 * @method module:_.int.length
+			 * @param   {number} int    - integer to measure the length
+			 * @param   {number} length - total length of the string including leading zero's
+			 * @returns {string} - string with leading zero's
+			 */
+			leadZeros: function(int, length) {
+				return (int/_.pow(10, length)).toFixed(length).substr(2);
+			},
 			/**
 			 * Returns a random integer between the min and max value
 			 * @public
