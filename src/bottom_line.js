@@ -1601,7 +1601,7 @@
 			 * @returns {string}         - new string containing the string after the given substring
 			 */
 			_afterLast: function(substr) {
-				var index = this.indexOf(substr);
+				var index = this.lastIndexOf(substr);
 				return (index > -1)? this.slice(index + substr.length) : '';
 			},
 			/**
@@ -1623,7 +1623,7 @@
 			 * @returns {string}         - new string containing the string before the given substring
 			 */
 			_beforeLast: function(substr) {
-				var index = this.indexOf(substr);
+				var index = this.lastIndexOf(substr);
 				return (index > -1)? this.slice(0, index) : '';
 			},
 			/**
