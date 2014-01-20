@@ -1705,6 +1705,15 @@
 				return this == this.toUpperCase();
 			},
 			/**
+			 * getter: the last character of a string
+			 * @public
+			 * @method String#_last
+			 * @returns {string} - the last character of the string
+			 */
+			get _last() {
+				return this[this.length-1];
+			},
+			/**
 			 * Splice for string. NOTE string are immutable so this function will return a NEW string
 			 * @public
 			 * @method String#_splice
@@ -1914,13 +1923,13 @@
 				return !!(this & 1);
 			},
 			/**
-			 * Getter: paity for a number 0: even and 1: for odd
+			 * Getter: parity for a number 0: even and 1: for odd
 			 * @public
 			 * @method Number#_parity
 			 * @returns {number} - parity of the number
 			 */
 			get _parity() {
-				return 1 - (this & 1);
+				return this & 1;
 			},
 			/**
 			 * Power of a number
