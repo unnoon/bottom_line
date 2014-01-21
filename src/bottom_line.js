@@ -7,18 +7,18 @@
  * ________________________________
  */
 'use strict';
-!function(root, factory) {
+!function(root, bottom_line) {
 	if(typeof(define) === 'function' && define.amd)
 	{
-		define(factory);
+		define(bottom_line);
 	}
 	else if(typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports)
 	{
-		module.exports = factory();
+		module.exports = bottom_line();
 	}
 	else
 	{
-		root._ = factory();
+		root._ = bottom_line();
 	}
 }(this, function() {
 	/**
@@ -1771,6 +1771,19 @@
 				return __math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 			},
 			/**
+			 * Return the squared distance between 2 points in Euclidean space
+			 * @public
+			 * @method module:_.math.distanceSquared
+			 * @param   {number}  x1 - x position for point1
+			 * @param   {number}  y1 - y position for point1
+			 * @param   {number}  x2 - x position for point2
+			 * @param   {number}  y2 - y position for point2
+			 * @returns {number} - squared distance between the 2 points
+			 */
+			distanceSquared: function(x1, y1, x2, y2) {
+				return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+			},
+			/**
 			 * Calculates the angle between a the y-axis and a line through a point x, y calculated clockwise (slope)
 			 * @public
 			 * @method module:_.math.angle
@@ -1810,7 +1823,7 @@
 			 * @returns {number} radians
 			 */
 			deg2Rad: function() {
-				var degreeToRadiansFactor = Math.PI/180;
+				var degreeToRadiansFactor = _.PI/180;
 
 				return function (degrees) {
 					return degrees*degreeToRadiansFactor;
@@ -1834,7 +1847,7 @@
 			 * @returns {number} degrees
 			 */
 			rad2Deg: function() {
-				var radianToDegreesFactor = 180/Math.PI;
+				var radianToDegreesFactor = 180/_.PI;
 
 				return function (radians) {
 					return radians*radianToDegreesFactor;
