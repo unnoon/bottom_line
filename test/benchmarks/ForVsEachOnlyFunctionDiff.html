@@ -18,25 +18,46 @@
             return arr[i];
         }
 
+        function eachFast(arr, cb) {
+            for(var i = 0, max = arr.length; i < max; i++)
+            {
+                cb(arr[i]);
+            }
+        }
+
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
-            .add('for loop with function', function() {
-                var array = arr;
-
-                for(var i = 0, max = array.length; i < max; i++)
-                {
-                    elm = getindex(array, i);
-                }
-            })
             .add('for loop predifined max', function() {
                 var array = arr;
 
                 for(var i = 0, max = array.length; i < max; i++)
                 {
-                    elm = array[i];
+                    var elm = array[i];
                 }
+            })
+            .add('for loop with function', function() {
+                var array = arr;
+
+                for(var i = 0, max = array.length; i < max; i++)
+                {
+                    var elm = getindex(array, i);
+                }
+            })
+            .add('_each', function() {
+                var array = arr;
+
+                array._each(function(elm) {
+                    var elm1 = elm;
+                })
+            })
+            .add('eachFast', function() {
+                var array = arr;
+
+                eachFast(array, function(elm) {
+                    var elm1 = elm;
+                })
             })
             // add listeners
             .on('cycle', function(event) {
