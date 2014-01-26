@@ -344,24 +344,6 @@
 				return __obj.keys(this);
 			},
 			/**
-			 * Mixin properties on a class. It is assumed this function is called inside the constructor
-			 * @public
-			 * @param {Object} obj - object containing the mixin properties
-			 * @returns {Object} this for chaining
-			 */
-			_mixin: function(obj) {
-				var extObj = _.clone(obj);
-
-				var init = extObj.init;
-				delete extObj.init;
-
-				_.extend(this.constructor.prototype, extObj);
-
-				if(init) init.call(this);
-
-				return this;
-			},
-			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public
 			 * @method Object#_names
@@ -2086,6 +2068,26 @@
 				child.prototype = Object.create(parent.prototype);
 				child.prototype.constructor = child;
 				child._super = parent.prototype;
+			},
+			/**
+			 * Mixin properties on a class. It is assumed this function is called inside the constructor
+			 * @public
+			 * @param {Function}        child - child
+			 * @param {Function|Array} mixins - array or sinlge mixin classes
+			 */
+			mixin: function(child, mixins) {
+				mixins = (typeof(mixins) === 'function')? [mixins] : mixins;
+
+				mixins._each(function(mixin) {
+					var mixmethod = child._mixin;
+					// wrap all mixins in one method
+					child._mixin = !mixmethod? mixin : function() {
+						mixin.call(this);
+						mixmethod.call(this);
+					};
+					// copy prototype functions
+					_.extend(child.prototype, mixin.prototype);
+				})
 			}
 		}
 	});
