@@ -1834,7 +1834,48 @@
 				return function (radians) {
 					return radians*radianToDegreesFactor;
 				};
-			}()
+			}(),
+			/**
+			 * Significantly faster version of Math.max
+			 * See http://jsperf.com/math-s-min-max-vs-homemade/5
+			 * Borrowed from phaser
+			 *
+			 * @method module:_.math.max
+			 * @return {number} The highest value from those given.
+			 */
+			max: function () {
+
+				for (var i = 1, max = 0, len = arguments.length; i < len; i++)
+				{
+					if (arguments[max] < arguments[i])
+					{
+						max = i;
+					}
+				}
+
+				return arguments[max];
+			},
+
+			/**
+			 * Significantly faster version of Math.min
+			 * See http://jsperf.com/math-s-min-max-vs-homemade/5
+			 * Borrowed from phaser
+			 *
+			 * @method module:_.math.min
+			 * @return {number} The lowest value from those given.
+			 */
+			min: function () {
+
+				for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
+				{
+					if (arguments[i] < arguments[min])
+					{
+						min = i;
+					}
+				}
+
+				return arguments[min];
+			}
 		}
 	});
 
