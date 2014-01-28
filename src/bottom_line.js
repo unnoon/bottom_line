@@ -588,7 +588,14 @@
 			 * @returns    {Array} this - Array appended with arr
 			 */
 			_append: function(arr) {
-				this.push.apply(this, arr);
+				var val;
+				var start = this.length;
+
+				for(var i = 0, max = arr.length; i < max; i++)
+				{
+					if((val = arr[i]) === undefined && !arr.hasOwnProperty(i)) continue; // take in account broken arrays
+					this[start+i] = val;
+				}
 
 				return this;
 			},
@@ -601,6 +608,7 @@
 			 * @returns    {Array}  this     - Array appended with arr
 			 */
 			_$append: function(var_args) {
+				// FIXME this need to be adapated for broken arrays I think
 				return _.clone(this)._append(var_args);
 			},
 			/**
