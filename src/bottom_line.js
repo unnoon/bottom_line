@@ -1836,15 +1836,15 @@
 				};
 			}(),
 			/**
-			 * Significantly faster version of Math.max
+			 * Significantly faster version of Math.max if there are more then 2+x elements
 			 * See http://jsperf.com/math-s-min-max-vs-homemade/5
 			 * Borrowed from phaser
 			 *
-			 * @method module:_.math.max
+			 * @method module:_.math.maxmore
 			 * @return {number} The highest value from those given.
 			 */
-			max: function () {
-
+			maxmore: function ()
+			{
 				for (var i = 1, max = 0, len = arguments.length; i < len; i++)
 				{
 					if (arguments[max] < arguments[i])
@@ -1857,14 +1857,14 @@
 			},
 
 			/**
-			 * Significantly faster version of Math.min
+			 * Significantly faster version of Math.min if there are more then 2+x elements
 			 * See http://jsperf.com/math-s-min-max-vs-homemade/5
 			 * Borrowed from phaser
 			 *
-			 * @method module:_.math.min
+			 * @method module:_.math.minmore
 			 * @return {number} The lowest value from those given.
 			 */
-			min: function () {
+			minmore: function () {
 
 				for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
 				{
