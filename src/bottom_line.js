@@ -1837,7 +1837,7 @@
 			 * @returns {number} degrees
 			 */
 			rad2Deg: function() {
-				var radianToDegreesFactor = 180/_.PI;
+				var radianToDegreesFactor = 180/Math.PI;
 
 				return function (radians) {
 					return radians*radianToDegreesFactor;
