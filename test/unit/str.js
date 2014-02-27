@@ -28,6 +28,17 @@ describe("String", function() {
 			});
 		});
 
+		describe("endsWith", function() {
+
+			it("positive testcases", function() {
+				expect('hello'._endsWith('lo')).to.be.true;
+			});
+
+			it("neg case", function() {
+				expect('hello'._endsWith('dough')).to.be.false;
+			});
+		});
+
 		describe("isUpperCase", function() {
 
 			it("positive uppercase case", function() {
