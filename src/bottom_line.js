@@ -1813,7 +1813,7 @@
 			 * @returns {number} radians
 			 */
 			deg2Rad: function() {
-				var degreeToRadiansFactor = _.PI/180;
+				var degreeToRadiansFactor = Math.PI/180;
 
 				return function (degrees) {
 					return degrees*degreeToRadiansFactor;
