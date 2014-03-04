@@ -1448,7 +1448,12 @@
 			 * @return {Array}      - new array containing the unification
 			 */
 			_$unify: function(arr) {
-				return this._$append(arr)._unique();
+				var app = this._$append(arr);
+				var output = app._unique();
+
+				return output;
+
+//				return this._$append(arr)._unique();
 			},
 			/**
 			 * Removes duplicate values in an array
