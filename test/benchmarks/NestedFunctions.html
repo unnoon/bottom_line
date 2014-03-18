@@ -23,6 +23,15 @@
             return named(x);
         }
 
+        function nestedvar(x)
+        {
+            var named = function (x) {
+                return x*2;
+            };
+
+            return named(x);
+        }
+
         function nestedanom(x)
         {
             return (function(x) {
@@ -45,6 +54,9 @@
         suite
             .add('named nested', function() {
                 nestednamed(333);
+            })
+            .add('nested var', function() {
+                nestedvar(333);
             })
             .add('named nested var', function() {
                 nestednamedvar(333);
