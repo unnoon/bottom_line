@@ -267,7 +267,7 @@
 			 * @param   {Object} obj - object tot check the type from
 			 * @returns {string} - type of the object
 			 */
-			typeof: function(obj) {
+			typeOf: function(obj) {
 				return __obj.prototype.toString.call(obj)._between('[object ', ']')._decapitalize();
 			}
 		},
@@ -433,7 +433,7 @@
 			 * @returns {Object}     - The array without the element
 			 */
 			__remove: function(first, $value) {
-				var type = _.typeof($value);
+				var type = _.typeOf($value);
 
 				if(type === 'array')
 				{
@@ -549,7 +549,7 @@
 //		 * @return {Array} the converted object
 //		 */
 		init: function(obj) {
-			var type = _.typeof(obj);
+			var type = _.typeOf(obj);
 
 			switch (type)
 			{
@@ -860,7 +860,7 @@
 			{
 				var normal = !invert;
 
-				switch(_.typeof($index))
+				switch(_.typeOf($index))
 				{
 					case 'number' :
 					{

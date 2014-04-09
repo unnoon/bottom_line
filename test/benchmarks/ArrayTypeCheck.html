@@ -21,7 +21,7 @@
                 var isArray = Array.isArray([]);
             })
             .add('_ typeof', function() {
-                var isArray = _.typeof([]) === 'array';
+                var isArray = _.typeOf([]) === 'array';
             })
             // add listeners
             .on('cycle', function(event) {

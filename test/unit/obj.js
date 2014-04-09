@@ -85,29 +85,29 @@ describe("Object", function() {
 		describe("typeof", function() {
 
 			it("javascript types", function() {
-				expect(_.typeof(6)).to.eql('number');
-				expect(_.typeof(NaN)).to.eql('number');
-				expect(_.typeof(Infinity)).to.eql('number');
-				expect(_.typeof('s')).to.eql('string');
-				expect(_.typeof([])).to.eql('array');
-				expect(_.typeof({})).to.eql('object');
-				expect(_.typeof(function(){})).to.eql('function');
-				expect(_.typeof(null)).to.eql('null');
-				expect(_.typeof(undefined)).to.eql('undefined');
+				expect(_.typeOf(6)).to.eql('number');
+				expect(_.typeOf(NaN)).to.eql('number');
+				expect(_.typeOf(Infinity)).to.eql('number');
+				expect(_.typeOf('s')).to.eql('string');
+				expect(_.typeOf([])).to.eql('array');
+				expect(_.typeOf({})).to.eql('object');
+				expect(_.typeOf(function(){})).to.eql('function');
+				expect(_.typeOf(null)).to.eql('null');
+				expect(_.typeOf(undefined)).to.eql('undefined');
 			});
 
 			it("custom types: named constructor", function() {
 				function Animal() {} // make sure the constructor is a named function
 				var animal = new Animal();
 
-				expect(_.typeof(animal)).to.eql('object');
+				expect(_.typeOf(animal)).to.eql('object');
 			});
 
 			it("custom types: UNnamed constructor", function() {
 				var Cat = function () {};  // unnamed constructor
 				var cat = new Cat();
 
-				expect(_.typeof(cat)).to.eql('object');
+				expect(_.typeOf(cat)).to.eql('object');
 			});
 		});
 	});
