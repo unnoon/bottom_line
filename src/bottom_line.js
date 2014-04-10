@@ -343,6 +343,16 @@
 			_keys: function() {
 				return __obj.keys(this);
 			},
+            /**
+             * Returns the number of own properties on an object
+             * @public
+             * @method Object#_length
+             * @this   {Object}
+             * @return {number} the 'length' of the object
+             */
+            get _length() {
+                return this._names().length;
+            },
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public

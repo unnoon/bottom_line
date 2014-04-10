@@ -242,6 +242,20 @@ describe("Object", function() {
 			});
 		});
 
+        describe("length", function() {
+
+            it("simple values", function() {
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                };
+
+                expect(obj._length).to.deep.equal(4);
+            });
+        });
+
 		describe("without by value", function() {
 
 			it("without one element", function() {
