@@ -216,15 +216,20 @@
 				settings.writable     = settings.writable     !== false;
 
 				module._each(function(val, prop) {
-
-					if(obj.hasOwnProperty(prop))
-					{
-						console.warn('overwriting existing property: '+prop+' while extending: '+obj.toString());
-					}
-					else if(prop in obj)
-					{
-						console.warn('overriding existing property: '+prop+' while extending: '+obj.toString());
-					}
+                    try
+                    {
+                        if(obj.hasOwnProperty(prop))
+                        {
+                            console.warn('overwriting existing property: '+prop+' while extending: '+obj.toString());
+                        }
+                        else if(prop in obj)
+                        {
+                            console.warn('overriding existing property: '+prop+' while extending: '+obj.toString());
+                        }
+                    }
+                    catch(e) {
+                        console.warn("this should only happen in some case like subclassing an array on old devices");
+                    }
 
 					descriptor = __obj.getOwnPropertyDescriptor(module, prop);
 
