@@ -351,7 +351,14 @@
              * @return {number} the 'length' of the object
              */
             get _length() {
-                return this._names().length;
+                var len = 0;
+
+                for(var key in this)
+                {
+                    if(this.hasOwnProperty(key)) len++;
+                }
+
+                return len;
             },
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
