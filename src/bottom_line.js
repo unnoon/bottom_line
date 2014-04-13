@@ -126,7 +126,7 @@
 		 * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
 		 * @param   {Function}           onmatch - function to be executed on a match
 		 * @param   {boolean}            reverse - Boolean indicating if we should use inverse iteration
-		 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+		 * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | function
 		 * @param   {Object}             opt_ctx - optional context for the function
 		 * @returns {Array}                      - new array with the copied elements
 		 */
@@ -135,7 +135,7 @@
 			var first = !all, normal = !invert;
 			var array, match, finish = false;
 
-			var cb = (typeof($value) === 'function')? 	$value                                   :
+			var cb = (typeof($value) === 'function')? 	$value                                  :
 					 (array = _.isArray($value))? 		function(val) {return $value._has(val)} :
 														function(val) {return val === $value};
 
@@ -216,19 +216,14 @@
 				settings.writable     = settings.writable     !== false;
 
 				module._each(function(val, prop) {
-                    try
+
+                    if(obj.hasOwnProperty(prop))
                     {
-                        if(obj.hasOwnProperty(prop))
-                        {
-                            console.warn('overwriting existing property: '+prop+' while extending: '+obj.toString());
-                        }
-                        else if(prop in obj)
-                        {
-                            console.warn('overriding existing property: '+prop+' while extending: '+obj.toString());
-                        }
+                        console.warn('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
-                    catch(e) {
-                        console.warn("this should only happen in some case like subclassing an array on old devices");
+                    else if(prop in obj)
+                    {
+                        console.warn('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
 
 					descriptor = __obj.getOwnPropertyDescriptor(module, prop);
@@ -282,6 +277,23 @@
 		 * @class Object
 		 */
 		prototype: {
+            /**
+             * Copies the occurrences from an array to an new object
+             * @private
+             * @method Object#__cp
+             * @this    {Object}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Object}                     - new array with the copied elements
+             */
+            __cp: function(all, invert, target, $value, opt_ctx)
+            {
+                return this.__edit(all, invert, function(val, key, obj) {
+                    __obj.defineProperty(this, key, __obj.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
+                }, false, target, $value, opt_ctx);
+            },
 			/**
 			 * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
@@ -424,64 +436,6 @@
 //				return obj;
 //			},
 			/**
-			 * Removes the first occurrence in an object
-			 * @public
-			 * @method Object#_remove
-			 * @this    {Object}
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			_remove: function($value) {
-				this.__remove(true, $value);
-			},
-			/**
-			 * Removes the all occurrence in an object
-			 * @public
-			 * @method Object#_removeAll
-			 * @this    {Object}
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			_removeAll: function($value) {
-				this.__remove(false, $value);
-			},
-			/**
-			 * Removes the first occurrence in an object
-			 * @private
-			 * @method Object#__remove
-			 * @this    {Object}
-			 * @param   {boolean} first - Boolean indicating if we should remove the first occurrence only
-			 * @param   {any|Array|Function} $value - Element to be deleted | Array of element | or a function
-			 * @returns {Object}     - The array without the element
-			 */
-			__remove: function(first, $value) {
-				var type = _.typeOf($value);
-
-				if(type === 'array')
-				{
-					var values = $value;
-
-					this._each(function(val, key) {
-						if(values._has(val))
-						{
-							delete this[key];
-
-							if(first) return values._remove(val), !!values.length;
-						}
-					}, this);
-				}
-				else // function or a singular value given
-				{
-					var cb = (type === 'function')? $value : function(val) {return val === $value};
-
-					this._each(function(val, key) {
-						if(cb(val, key, this)) return delete this[key], first;
-					}, this);
-				}
-
-				return this;
-			},
-			/**
 			 * Removes the occurrences from an object based on value
 			 * @public
 			 * @method Object#_rm
@@ -492,7 +446,7 @@
 			 * @param   {Object}             opt_ctx - optional context for the function
 			 * @returns {Array}                      - The array without the element
 			 */
-			_rm: function(all, invert, $value, opt_ctx)
+			__rm: function(all, invert, $value, opt_ctx)
 			{
 				return this.__edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
 			},
@@ -522,8 +476,20 @@
 			 * @returns {Array }                     - The array without the element
 			 */
 			_without: function($value, opt_ctx) {
-				return this._rm(false, false, $value, opt_ctx);
+				return this.__rm(false, false, $value, opt_ctx);
 			},
+            /**
+             * Removes the first occurrence in an array
+             * @public
+             * @method Array#_$without
+             * @this    {Object}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Object }                    - NEW object without the element
+             */
+            _$without: function($value, opt_ctx) {
+                return this.__cp(false, true, {}, $value, opt_ctx);
+            },
 			/**
 			 * Remove elements based on index
 			 * @public
@@ -550,8 +516,60 @@
 				}
 
 				return this;
-			}
+			},
+            /* ------------------------------------------------------------------------ */
+//            /**
+//             * Removes the all occurrence in an array
+//             * @public
+//             * @method Array#_withoutAll
+//             * @this    {Array}
+//             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+//             * @param   {Object}             opt_ctx - optional context or the function
+//             * @returns {Array}                      - The array without the element
+//             */
+//            _withoutAll: function($value, opt_ctx) {
+//                return this.__rm(true, false, $value, opt_ctx);
+//            },
+//            /**
+//             * Removes the all occurrence in an array
+//             * @public
+//             * @method Array#_$withoutAll
+//             * @this    {Array}
+//             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+//             * @param   {Object}             opt_ctx - optional context or the function
+//             * @returns {Array}                      - NEW array without the element
+//             */
+//            _$withoutAll: function($value, opt_ctx) {
+//                return this.__cp(true, true, [], $value, opt_ctx);
+//            },
+////            /**
+////             * Remove elements based on index
+////             * @public
+////             * @method Array#_withoutKeys
+////             * @this   {Array}
+////             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+////             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+////             * @return {Array}   this   - mutated array for chaining
+////             */
+////            _withoutKeys: function($index, opt_to_ctx)
+////            {
+////                return this.__del(false, $index, opt_to_ctx);
+////            },
+//            /**
+//             * Remove elements based on index
+//             * @public
+//             * @method Array#_$withoutKeys
+//             * @this   {Array}
+//             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+//             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+//             * @return {Array}   this   - mutated array for chaining
+//             */
+//            _$withoutKeys: function($index, opt_to_ctx)
+//            {
+//                return this.__cpKeys(true, [], $index, opt_to_ctx);
+//            }
 		}
+        // TODO proper toString function which works on any object. Currently javascript just returns [object Object] for objects for example
 	});
 
 	/**
@@ -868,61 +886,61 @@
 			{
 				return this.__editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
 			},
-			/**
-			 * Remove elements based on index
-			 * @private
-			 * @method Array#__del2
-			 * @this   {Array}
-			 * @param  {boolean}               invert     - boolean indicating if the deletion should be inverted
-			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-			 * @return {Array}                 this       - mutated array for chaining
-			 */
-			__del2: function(invert, $index, opt_to_ctx)
-			{
-				var normal = !invert;
-
-				switch(_.typeOf($index))
-				{
-					case 'number' :
-					{
-						var from = $index;
-						var to   = opt_to_ctx || from;
-
-						if(normal)
-						{
-							this.splice(from, to-from+1);
-						}
-						else
-						{
-							this.splice(to+1, this.length-to);
-							this.splice(0,    from);
-						}
-
-						break;
-					}
-					case 'function' :
-					{
-						var cb = $index;
-
-						this._each(function(val, i, _this, delta) {
-							if(cb.call(opt_to_ctx, i-delta, this) === normal) this.splice(i, 1);
-						}, this);
-
-						break;
-					}
-					case 'array' :
-					{
-						this._each(function(val, i, _this, delta) {
-							if($index._has(i-delta) === normal) return $index._without(i-delta), this.splice(i, 1), !!$index.length;
-						}, this);
-
-						break;
-					}
-				}
-
-				return this;
-			},
+//			/**
+//			 * Remove elements based on index
+//			 * @private
+//			 * @method Array#__del2
+//			 * @this   {Array}
+//			 * @param  {boolean}               invert     - boolean indicating if the deletion should be inverted
+//			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+//			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+//			 * @return {Array}                 this       - mutated array for chaining
+//			 */
+//			__del2: function(invert, $index, opt_to_ctx)
+//			{
+//				var normal = !invert;
+//
+//				switch(_.typeOf($index))
+//				{
+//					case 'number' :
+//					{
+//						var from = $index;
+//						var to   = opt_to_ctx || from;
+//
+//						if(normal)
+//						{
+//							this.splice(from, to-from+1);
+//						}
+//						else
+//						{
+//							this.splice(to+1, this.length-to);
+//							this.splice(0,    from);
+//						}
+//
+//						break;
+//					}
+//					case 'function' :
+//					{
+//						var cb = $index;
+//
+//						this._each(function(val, i, _this, delta) {
+//							if(cb.call(opt_to_ctx, i-delta, this) === normal) this.splice(i, 1);
+//						}, this);
+//
+//						break;
+//					}
+//					case 'array' :
+//					{
+//						this._each(function(val, i, _this, delta) {
+//							if($index._has(i-delta) === normal) return $index._without(i-delta), this.splice(i, 1), !!$index.length;
+//						}, this);
+//
+//						break;
+//					}
+//				}
+//
+//				return this;
+//			},
 			/**
 			 * Returns the difference between 2 arrays
 			 * @public
