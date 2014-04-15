@@ -377,6 +377,16 @@
 
                 return len;
             },
+            /**
+             * Setter to fix some problems with minifiers
+             * @public
+             * @method Object#_length
+             * @this   {Object}
+             * @param {any} val
+             */
+            set _length(val) {
+                console.warn('it is not possible to set the length of an object')
+            },
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
 			 * @public
