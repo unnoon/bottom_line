@@ -363,11 +363,11 @@
             /**
              * Returns the number of own properties on an object
              * @public
-             * @method Object#_length
+             * @method Object#_size
              * @this   {Object}
              * @return {number} the 'length' of the object
              */
-            get _length() {
+            _size: function() {
                 var len = 0;
 
                 for(var key in this)
@@ -376,16 +376,6 @@
                 }
 
                 return len;
-            },
-            /**
-             * Setter to fix some problems with minifiers
-             * @public
-             * @method Object#_length
-             * @this   {Object}
-             * @param {any} val
-             */
-            set _length(val) {
-                console.warn('it is not possible to set the length of an object')
             },
 			/**
 			 * Returns an array containing the names of an object (includes non-enumerable properties)
