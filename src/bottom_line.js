@@ -460,6 +460,17 @@
 			{
 				return this.__edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
 			},
+            /**
+             * Better to string version
+             * @public
+             * @method Object#_toString
+             * @this    {Object}
+             * @returns {string} - string representation of the object
+             */
+            _toString: function()
+            {
+                return JSON.stringify(this);
+            },
 			/**
 			 * Returns an array containing the values of an object (enumerable properties)
 			 * @public
@@ -1479,6 +1490,40 @@
 			_sum: function() {
 				return this.reduce(function(a, b) { return a + b; });
 			},
+            /**
+             * Better to string version
+             * @public
+             * @method Object#_toString
+             * @this    {Object}
+             * @returns {string} - string representation of the object
+             */
+            // FIXME this is an ugly implementation
+            _toString: function()
+            {
+                var output = '';
+
+                // add other dimensions
+                return arrStringify(this);
+
+                function arrStringify(arr)
+                {
+                    output += '[';
+
+                    var elm, i, max;
+                    for(i = 0, max = arr.length; i < max; i++)
+                    {
+                        if(i) output += ',';
+
+                        elm = arr[i];
+                        if(_.isArray(elm))
+                            arrStringify(elm);
+                        else
+                            output += elm;
+                    }
+
+                    return output += ']';
+                }
+            },
 			/**
 			 * Calculates the union for 2 arrays
 			 * @public
