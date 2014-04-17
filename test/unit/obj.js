@@ -242,7 +242,7 @@ describe("Object", function() {
 			});
 		});
 
-        describe("length", function() {
+        describe("_size", function() {
 
             it("simple values", function() {
                 var obj = {
@@ -252,7 +252,7 @@ describe("Object", function() {
                     t: 666
                 };
 
-                expect(obj._length).to.deep.equal(4);
+                expect(obj._size()).to.deep.equal(4);
             });
         });
 
