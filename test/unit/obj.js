@@ -278,62 +278,36 @@ describe("Object", function() {
             });
         });
 
-		describe("without by value", function() {
+		describe("without", function() {
 
-			it("without one element", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 2
-				};
+			it("without by value", function() {
+				var obj = {x: 1,y: 2,z: 3,t: 2};
 
 				obj._without(2);
 
-				expect(obj).to.eql({
-					x: 1,
-					z: 3,
-					t: 2
-				});
+				expect(obj).to.eql({x: 1,z: 3,t: 2});
 			});
 
 			it("without multiple values", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 2
-				};
+				var obj = {x: 1,y: 2,z: 3,t: 2};
 
 				obj._without([2,3]);
 
-				expect(obj).to.eql({
-					x: 1,
-					t: 2
-				});
+				expect(obj).to.eql({x: 1,t: 2});
 			});
 
 			it("without function", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 666
-				};
+				var obj = {x: 1,y: 2,z: 3,t: 666 };
 
 				obj._without(function(val) {
 					return val > 2;
 				});
 
-				expect(obj).to.eql({
-					x: 1,
-					y: 2,
-					t: 666
-				});
+				expect(obj).to.eql({x: 1,y: 2,t: 666});
 			});
 		});
 
-        describe("$without by value", function() {
+        describe("$without", function() {
 
             it("$without one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
@@ -349,7 +323,7 @@ describe("Object", function() {
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$without multiple values", function() {
+            it("$without function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
                 expect(obj._$without(function(val) {
@@ -359,45 +333,79 @@ describe("Object", function() {
             });
         });
 
+        describe("withoutAll", function() {
+
+            it("withoutAll by value", function() {
+                var obj = {x: 1,y: 2,z: 3,t: 2};
+
+                obj._withoutAll(2);
+
+                expect(obj).to.eql({x: 1,z: 3});
+            });
+
+            it("withoutAll multiple values", function() {
+                var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
+
+                obj._withoutAll([2,3]);
+
+                expect(obj).to.eql({x: 1});
+            });
+
+            it("withoutAll function", function() {
+                var obj = {x: 1,y: 2,z: 3,t: 666 };
+
+                obj._withoutAll(function(val) {
+                    return val > 2;
+                });
+
+                expect(obj).to.eql({x: 1,y: 2});
+            });
+        });
+
+        describe("$withoutAll", function() {
+
+            it("$withoutAll one element", function() {
+                var obj = { x: 1,y: 2,z: 3,t: 2};
+
+                expect(obj._$withoutAll(2)).to.eql({ x: 1,z: 3});
+                expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
+            });
+
+            it("$withoutAll multiple values", function() {
+                var obj = { x: 1,y: 2,z: 3,t: 2};
+
+                expect(obj._$withoutAll([2, 1])).to.eql({z: 3});
+                expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
+            });
+
+            it("$withoutAll function", function() {
+                var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
+
+                expect(obj._$withoutAll(function(val) {
+                    return val._startsWith('b');
+                })).to.eql({x: 'a',t: 't'});
+                expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
+            });
+        });        
+        
 		describe("withoutKeys", function() {
 
 			it("withoutKeys", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3
-				};
+				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj._withoutKeys('y')).to.deep.equal({
-					x: 1,
-					z: 3
-				});
+				expect(obj._withoutKeys('y')).to.deep.equal({x: 1,z: 3});
 			});
 
 			it("withoutKeys an array of elements", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3
-				};
+				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj._withoutKeys(['x', 'z'])).to.deep.equal({
-					y: 2
-				});
+				expect(obj._withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
 			});
 
 			it("withoutKeys based on function", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					xy: 4,
-					z: 3
-				};
+				var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-				expect(obj._withoutKeys(function(key) {return key._startsWith('x')})).to.deep.equal({
-					y: 2,
-					z: 3
-				});
+				expect(obj._withoutKeys(function(key) {return key._startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
 	});

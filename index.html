@@ -6,24 +6,13 @@
 
         <script src="src/bottom_line.js"></script>
         <script>
-            var obj = {
-                x: 1,
-                y: 2,
-                z: 3,
-                t: 666
-            };
-            var module = {
-                fnc: function() {
-                    return 'tralala';
-                },
-                prop: 666,
-                _x: 'jeweetzelluf',
-                get x() {
-                    return this._x;
-                }
-            };
+            var obj = {a:1,b:2,c:3};
 
-            _.extend(obj, module);
+            for(var key in obj)
+            {
+                if(key == 'b') delete obj[key];
+                console.log(obj[key]);
+            }
         </script>
     </head>
     <body>

@@ -139,7 +139,8 @@
 					 (array = _.isArray($value))? 		function(val) {return $value._has(val)} :
 														function(val) {return val === $value};
 
-			this['_each'+(reverse?'Right':'')](function(val, i, _this, delta) {
+            // note the reverse check should be fixed when this is also implemented for strings
+			this['_each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
 				match = cb.call(opt_ctx, val, i, _this, delta);
 				// remove normal or inverted match
 				if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -149,6 +150,39 @@
 
 			return target;
 		},
+        /**
+         * Edits an array based on indices
+         * @private
+         * @method Array#__editKeys
+         * @this    {Array|Object}
+         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+         * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
+         * @param   {Object}             $opt_to_ctx - optional context for the function
+         * @returns {Array|Object}                      - new array with the copied elements
+         */
+        __editKeys: function(invert, onmatch, reverse, target, $index, $opt_to_ctx)
+        {
+            var type = typeof($index), index;
+            var first = !(typeof($opt_to_ctx) === 'number' || type === 'function'), normal = !invert;
+            var array, match, finish = false;
+
+            var cb = (type === 'function')?	$index                                               		:
+                     (array = _.isArray($index))?   function(i) {return $index._has(i)}                 :
+                     ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
+                                                    function(i) {return i._between($index, $opt_to_ctx)};
+
+            this['_each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+                index = _.isArray(this)? (i - delta) : i; // the original index in the array
+
+                match = cb.call($opt_to_ctx, index, _this);
+                // remove normal or inverted match
+                if(match === normal || finish) onmatch.call(target, i, _this);
+                if(first && match && !finish) return finish = array? !$index._without(index).length : true, !(normal && finish);
+            }, this);
+
+            return target;
+        },
 		/**
 		 * Finds first element that is picked by the callback function
 		 * @private
@@ -294,6 +328,20 @@
                     __obj.defineProperty(this, key, __obj.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
                 }, false, target, $value, opt_ctx);
             },
+            /**
+             * Removes the occurrences from an object
+             * @private
+             * @method Object#__del
+             * @this    {Object}
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Object}                      - The array without the element
+             */
+            __del: function(invert, $index, opt_to_ctx)
+            {
+                return this.__editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
+            },
 			/**
 			 * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
 			 * @public
@@ -322,6 +370,18 @@
 			 * @returns {Array}                      - new array with the copied elements
 			 */
 			__edit: __coll.__edit,
+            /**
+             * Edits an object based on keys
+             * @private
+             * @method Array#__editKeys
+             * @this    {Object}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Object}                      - new array with the copied elements
+             */
+            __editKeys: __coll.__editKeys,
 			/**
 			 * Filters
 			 * @public
@@ -511,87 +571,57 @@
             _$without: function($value, opt_ctx) {
                 return this.__cp(false, true, {}, $value, opt_ctx);
             },
-			/**
-			 * Remove elements based on index
-			 * @public
-			 * @method Object#_withoutKeys
-			 * @this   {Object}
-			 * @param  {number|Array|Function} $key - singular key, an array of keys or a function specifying specific keys
-			 * @return {Array}   this   - mutated array for chaining
-			 */
-			_withoutKeys: function($key)
-			{
-				var type = typeof($key);
-
-				if(type === 'string')
-				{
-					delete this[$key];
-				}
-				else // function or array
-				{
-					var cb = (type === 'function')? $key : function(key) {return $key._has(key)}; // assumes function otherwise array
-
-					this._each(function(val, key) {
-						if(cb(key)) delete this[key];
-					}, this);
-				}
-
-				return this;
-			}
-//            ,
-            /* ------------------------------------------------------------------------ */
-//            /**
-//             * Removes the all occurrence in an array
-//             * @public
-//             * @method Array#_withoutAll
-//             * @this    {Array}
-//             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-//             * @param   {Object}             opt_ctx - optional context or the function
-//             * @returns {Array}                      - The array without the element
-//             */
-//            _withoutAll: function($value, opt_ctx) {
-//                return this.__rm(true, false, $value, opt_ctx);
-//            },
-//            /**
-//             * Removes the all occurrence in an array
-//             * @public
-//             * @method Array#_$withoutAll
-//             * @this    {Array}
-//             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-//             * @param   {Object}             opt_ctx - optional context or the function
-//             * @returns {Array}                      - NEW array without the element
-//             */
-//            _$withoutAll: function($value, opt_ctx) {
-//                return this.__cp(true, true, [], $value, opt_ctx);
-//            },
-////            /**
-////             * Remove elements based on index
-////             * @public
-////             * @method Array#_withoutKeys
-////             * @this   {Array}
-////             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-////             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
-////             * @return {Array}   this   - mutated array for chaining
-////             */
-////            _withoutKeys: function($index, opt_to_ctx)
-////            {
-////                return this.__del(false, $index, opt_to_ctx);
-////            },
-//            /**
-//             * Remove elements based on index
-//             * @public
-//             * @method Array#_$withoutKeys
-//             * @this   {Array}
-//             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-//             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
-//             * @return {Array}   this   - mutated array for chaining
-//             */
-//            _$withoutKeys: function($index, opt_to_ctx)
-//            {
-//                return this.__cpKeys(true, [], $index, opt_to_ctx);
-//            }
+            /**
+             * Removes the all occurrence in an array
+             * @public
+             * @method Array#_withoutAll
+             * @this    {Object}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Object}                      - The array without the element
+             */
+            _withoutAll: function($value, opt_ctx) {
+                return this.__rm(true, false, $value, opt_ctx);
+            },
+            /**
+             * Removes the all occurrence in an array
+             * @public
+             * @method Array#_$withoutAll
+             * @this    {Object}
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context or the function
+             * @returns {Object}                      - NEW array without the element
+             */
+            _$withoutAll: function($value, opt_ctx) {
+                return this.__cp(true, true, [], $value, opt_ctx);
+            },
+            /**
+             * Remove elements based on index
+             * @public
+             * @method Object#_withoutKeys
+             * @this   {Object}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}   this   - mutated array for chaining
+             */
+            _withoutKeys: function($index, opt_to_ctx)
+            {
+                return this.__del(false, $index, opt_to_ctx);
+            },
+            /**
+             * Remove elements based on index
+             * @public
+             * @method Object#_$withoutKeys
+             * @this   {Object}
+             * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}   this   - mutated array for chaining
+             */
+            _$withoutKeys: function($index, opt_to_ctx)
+            {
+                return this.__cpKeys(true, [], $index, opt_to_ctx);
+            }
 		}
-        // TODO proper toString function which works on any object. Currently javascript just returns [object Object] for objects for example
 	});
 
 	/**
@@ -872,28 +902,7 @@
 			 * @param   {Object}             opt_to_ctx - optional context for the function
 			 * @returns {Array}                      - new array with the copied elements
 			 */
-			__editKeys: function(invert, onmatch, reverse, target, $index, opt_to_ctx)
-			{
-				var type = typeof($index), index;
-				var first = !(typeof(opt_to_ctx) === 'number' || type === 'function'), normal = !invert;
-				var array, match, finish = false;
-
-				var cb = (type === 'function')?	$index                                               							 :
-												(array = _.isArray($index))?function(i) {return $index._has(i)}                 :
-												(opt_to_ctx === undefined)? function(i) {return i === $index}                    :
-																			function(i) {return i._between($index, opt_to_ctx)};
-
-				this['_each'+(reverse?'Right':'')](function(val, i, _this, delta) {
-					index = i - delta; // the original index in the array
-
-					match = cb.call(opt_to_ctx, index, _this);
-					// remove normal or inverted match
-					if(match === normal || finish) onmatch.call(target, i, _this);
-					if(first && match && !finish) return finish = array? !$index._without(index).length : true, !(normal && finish);
-				}, this);
-
-				return target;
-			},
+			__editKeys: __coll.__editKeys,
 			/**
 			 * Removes the occurrences from an array
 			 * @private
@@ -908,61 +917,6 @@
 			{
 				return this.__editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
 			},
-//			/**
-//			 * Remove elements based on index
-//			 * @private
-//			 * @method Array#__del2
-//			 * @this   {Array}
-//			 * @param  {boolean}               invert     - boolean indicating if the deletion should be inverted
-//			 * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-//			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-//			 * @return {Array}                 this       - mutated array for chaining
-//			 */
-//			__del2: function(invert, $index, opt_to_ctx)
-//			{
-//				var normal = !invert;
-//
-//				switch(_.typeOf($index))
-//				{
-//					case 'number' :
-//					{
-//						var from = $index;
-//						var to   = opt_to_ctx || from;
-//
-//						if(normal)
-//						{
-//							this.splice(from, to-from+1);
-//						}
-//						else
-//						{
-//							this.splice(to+1, this.length-to);
-//							this.splice(0,    from);
-//						}
-//
-//						break;
-//					}
-//					case 'function' :
-//					{
-//						var cb = $index;
-//
-//						this._each(function(val, i, _this, delta) {
-//							if(cb.call(opt_to_ctx, i-delta, this) === normal) this.splice(i, 1);
-//						}, this);
-//
-//						break;
-//					}
-//					case 'array' :
-//					{
-//						this._each(function(val, i, _this, delta) {
-//							if($index._has(i-delta) === normal) return $index._without(i-delta), this.splice(i, 1), !!$index.length;
-//						}, this);
-//
-//						break;
-//					}
-//				}
-//
-//				return this;
-//			},
 			/**
 			 * Returns the difference between 2 arrays
 			 * @public
