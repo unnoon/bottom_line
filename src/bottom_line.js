@@ -1441,7 +1441,7 @@
 			 * @public
 			 * @method Array#_push
 			 * @this   {Array}
-			 * @param  {any...} var_args - one or more elements to add to an array
+			 * @param  {...any} var_args - one or more elements to add to an array
 			 * @return {Array}  this     - this for chaining
 			 */
 			_push: function(var_args) {
