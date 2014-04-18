@@ -432,80 +432,158 @@ describe("Object", function() {
                 expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
             });
         });
-        // FIXME these need to be converted to objects
-//        describe("copy", function() {
-//
-//            it("copy value", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copy(arr2, 'b')).to.eql(['b', 'e', 'b']);
-//            });
-//
-//            it("copy values", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copy(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
-//            });
-//
-//            it("copy function", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copy(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
-//
-//            });
-//        });
-//
-//        describe("copyAll", function() {
-//
-//            it("copyAll value", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
-//            });
-//
-//            it("copyAll values", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
-//            });
-//
-//            it("copyAll function", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
-//
-//            });
-//        });
-//
-//        describe("copyKeys", function() {
-//
-//            it("copyKeys value", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
-//            });
-//
-//            it("copyKeys values", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
-//            });
-//
-//            it("copyKeys function", function() {
-//                var arr1 = ['a', 'b', 'c', 'b'];
-//                var arr2 = ['b', 'e'];
-//
-//                expect(arr1._copyKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
-//
-//            });
-//        });
+        
+        describe("copy", function() {
+
+            it("copy value", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copy(obj2, 2)).to.eql({a: 1,b: 2, y:2});
+            });
+
+            it("copy values", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copy(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
+            });
+
+            it("copy function", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copy(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
+            });
+        });
+
+        describe("copyAll", function() {
+
+            it("copyAll value", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+            });
+
+            it("copyAll values", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+            });
+
+            it("copyAll function", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+            });
+        });
+
+        describe("copyKeys", function() {
+
+            it("copyKeys value", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
+            });
+
+            it("copyKeys values", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
+            });
+
+            it("copyKeys function", function() {
+                var obj1 = {x: 1,y: 2,z: 3, zt:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._copyKeys(obj2, function(key) {return key._startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
+            });
+        });
+
+        describe("cut", function() {
+    
+            it("cut value", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+    
+                expect(obj1._cut(obj2, 2)).to.eql({a: 1,b: 2, y:2});
+                expect(obj1).to.eql({x: 1, z:3});
+            });
+    
+            it("cut values", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+    
+                expect(obj1._cut(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1).to.eql({x: 1});
+            });
+    
+            it("cut function", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+    
+                expect(obj1._cut(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
+                expect(obj1).to.eql({x: 1, z:3});
+            });
+        });
+
+        describe("cutAll", function() {
+
+            it("cutAll value", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+                expect(obj1).to.eql({x: 1, z:3});
+            });
+
+            it("cutAll values", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+                expect(obj1).to.eql({x: 1});
+            });
+
+            it("cutAll function", function() {
+                var obj1 = {x: 1,y: 2,z: 3};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1).to.eql({x: 1});
+            });
+        });
+
+        describe("cutKeys", function() {
+
+            it("cutKeys value", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
+                expect(obj1).to.eql({x: 1, z:3, t:2});
+            });
+
+            it("cutKeys values", function() {
+                var obj1 = {x: 1,y: 2,z: 3, t:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
+                expect(obj1).to.eql({x: 1, z:3});
+            });
+
+            it("cutKeys function", function() {
+                var obj1 = {x: 1,y: 2,z: 3, zt:2};
+                var obj2 = {a: 1,b: 2};
+
+                expect(obj1._cutKeys(obj2, function(key) {return key._startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
+                expect(obj1).to.eql({x: 1, y:2});
+            });
+        });  
 	});
 });

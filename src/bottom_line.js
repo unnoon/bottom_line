@@ -386,6 +386,78 @@
                 return this.__cpKeys(false, to, $index, opt_to_ctx);
             },
             /**
+             * Copies the occurrences from an array to an new array
+             * @private
+             * @method Object#__cut
+             * @this    {Object}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Object}                      - new array with the copied elements
+             */
+            __cut: function(all, invert, target, $value, opt_ctx)
+            {
+                return this.__edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+            },
+            /**
+             * Copies the occurrences from an array to an new array
+             * @private
+             * @method Object#__cutKeys
+             * @this    {Object}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_ctx - optional context for the function
+             * @returns {Object}                      - new array with the copied elements
+             */
+            __cutKeys: function(invert, target, $value, opt_ctx)
+            {
+                return this.__editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+            },
+            /**
+             * Cut a value to an array
+             * @public
+             * @method Object#_cut
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _cut: function(to, $value, opt_ctx)
+            {
+                return this.__cut(false, false, to, $value, opt_ctx);
+            },
+            /**
+             * Cut all similar values to an array
+             * @public
+             * @method Object#_cutAll
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _cutAll: function(to, $value, opt_ctx)
+            {
+                return this.__cut(true, false, to, $value, opt_ctx);
+            },
+            /**
+             * Copies keys to an array
+             * @public
+             * @method Object#_cutKeys
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _cutKeys: function(to, $index, opt_to_ctx)
+            {
+                return this.__cutKeys(false, to, $index, opt_to_ctx);
+            },
+            /**
              * Removes the occurrences from an object
              * @private
              * @method Object#__del
