@@ -736,6 +736,21 @@ describe("Array", function() {
 			});
 		});
 
+        describe("_toString", function() {
+
+            it("simple _toString", function() {
+                var arr1 = ['a', 'b', 'c'];
+
+                expect(arr1._toString()).to.eql('["a", "b", "c"]');
+            });
+
+            it("multi dimensional _toString", function() {
+                var arr1 = [[6, 6], [7, 7, [8]]];
+
+                expect(arr1._toString()).to.eql("[[6, 6], [7, 7, [8]]]");
+            });
+        });
+
 		describe("unify", function() {
 
 			it("simple union", function() {

@@ -458,7 +458,7 @@
              * @returns {string} - string representation of the object
              */
             _toString: function()
-            {
+            {   // TODO improve this method to also display functions
                 return JSON.stringify(this);
             },
 			/**
@@ -1483,36 +1483,20 @@
             /**
              * Better to string version
              * @public
-             * @method Object#_toString
-             * @this    {Object}
-             * @returns {string} - string representation of the object
+             * @method Array#_toString
+             * @this    {Array}
+             * @returns {string} - string representation of the array
              */
-            // FIXME this is an ugly implementation
             _toString: function()
             {
-                var output = '';
+                var output = '[';
 
-                // add other dimensions
-                return arrStringify(this);
-
-                function arrStringify(arr)
+                for(var i = 0, max = this.length; i < max; i++)
                 {
-                    output += '[';
-
-                    var elm, i, max;
-                    for(i = 0, max = arr.length; i < max; i++)
-                    {
-                        if(i) output += ',';
-
-                        elm = arr[i];
-                        if(_.isArray(elm))
-                            arrStringify(elm);
-                        else
-                            output += elm;
-                    }
-
-                    return output += ']';
+                    output += (i? ', ' : '') + this[i]._toString();
                 }
+
+                return output + ']';
             },
 			/**
 			 * Calculates the union for 2 arrays
