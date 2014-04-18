@@ -408,5 +408,104 @@ describe("Object", function() {
 				expect(obj._withoutKeys(function(key) {return key._startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
+
+        describe("$withoutKeys", function() {
+
+            it("$withoutKeys", function() {
+                var obj = {x: 1,y: 2,z: 3};
+
+                expect(obj._$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+                expect(obj).to.eql({x: 1,y: 2,z: 3})
+            });
+
+            it("$withoutKeys an array of elements", function() {
+                var obj = {x: 1,y: 2,z: 3};
+
+                expect(obj._$withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
+                expect(obj).to.eql({x: 1,y: 2,z: 3})
+            });
+
+            it("$withoutKeys based on function", function() {
+                var obj = {x: 1,y: 2,xy: 4,z: 3};
+
+                expect(obj._$withoutKeys(function(key) {return key._startsWith('x')})).to.deep.equal({y: 2,z: 3});
+                expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
+            });
+        });
+        // FIXME these need to be converted to objects
+//        describe("copy", function() {
+//
+//            it("copy value", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copy(arr2, 'b')).to.eql(['b', 'e', 'b']);
+//            });
+//
+//            it("copy values", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copy(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
+//            });
+//
+//            it("copy function", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copy(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
+//
+//            });
+//        });
+//
+//        describe("copyAll", function() {
+//
+//            it("copyAll value", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
+//            });
+//
+//            it("copyAll values", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
+//            });
+//
+//            it("copyAll function", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
+//
+//            });
+//        });
+//
+//        describe("copyKeys", function() {
+//
+//            it("copyKeys value", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
+//            });
+//
+//            it("copyKeys values", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
+//            });
+//
+//            it("copyKeys function", function() {
+//                var arr1 = ['a', 'b', 'c', 'b'];
+//                var arr2 = ['b', 'e'];
+//
+//                expect(arr1._copyKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
+//
+//            });
+//        });
 	});
 });

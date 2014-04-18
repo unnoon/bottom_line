@@ -329,6 +329,63 @@
                 }, false, target, $value, opt_ctx);
             },
             /**
+             * Copies the occurrences from an array to an new array
+             * @private
+             * @method Object#__cpKeys
+             * @this    {Object}
+             * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+             * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Object}             opt_to_ctx - optional context for the function
+             * @returns {Object}                      - new array with the copied elements
+             */
+            __cpKeys: function(invert, target, $value, opt_to_ctx)
+            {
+                return this.__editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
+            },
+            /**
+             * Copies a value to an array
+             * @public
+             * @method Object#_copy
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _copy: function(to, $value, opt_ctx)
+            {
+                return this.__cp(false, false, to, $value, opt_ctx);
+            },
+            /**
+             * Copies all similar values to an array
+             * @public
+             * @method Object#_copyAll
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _copyAll: function(to, $value, opt_ctx)
+            {
+                return this.__cp(true, false, to, $value, opt_ctx);
+            },
+            /**
+             * Copies keys to an array
+             * @public
+             * @method Object#_copyKeys
+             * @this   {Object}
+             * @param  {Array}                 to         - array to copy to
+             * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
+             * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
+             * @return {Object}                 this       - mutated array for chaining
+             */
+            _copyKeys: function(to, $index, opt_to_ctx)
+            {
+                return this.__cpKeys(false, to, $index, opt_to_ctx);
+            },
+            /**
              * Removes the occurrences from an object
              * @private
              * @method Object#__del
