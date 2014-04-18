@@ -741,7 +741,7 @@ describe("Array", function() {
             it("simple _toString", function() {
                 var arr1 = ['a', 'b', 'c'];
 
-                expect(arr1._toString()).to.eql('["a", "b", "c"]');
+                expect(arr1._toString()).to.eql('[a, b, c]');
             });
 
             it("multi dimensional _toString", function() {

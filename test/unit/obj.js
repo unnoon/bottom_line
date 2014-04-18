@@ -256,6 +256,28 @@ describe("Object", function() {
             });
         });
 
+        describe("_toString", function() {
+
+            it("simple _toString", function() {
+                var obj = {x: 1, y: 2, z: 3};
+
+                expect(obj._toString()).to.eql('{x: 1, y: 2, z: 3}');
+            });
+
+            it("complex _toString", function() {
+                var obj = {
+                    x: 1,
+                    str: 'aap',
+                    z: 3,
+                    arr: [[6, 6], [7, 7, [8]]],
+                    fnc: function() {},
+                    obj: {xt: 666, arr: [{really: 'yes'}]}
+                };
+
+                expect(obj._toString()).to.eql('{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}');
+            });
+        });
+
 		describe("without by value", function() {
 
 			it("without one element", function() {

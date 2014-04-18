@@ -458,8 +458,18 @@
              * @returns {string} - string representation of the object
              */
             _toString: function()
-            {   // TODO improve this method to also display functions
-                return JSON.stringify(this);
+            {
+                var output = '';
+
+                for(var key in this)
+                {
+                    if(this.hasOwnProperty(key))
+                    {
+                        output += (output? ', ' : '{') + key + ': ' + this[key]._toString();
+                    }
+                }
+
+                return output + '}';
             },
 			/**
 			 * Returns an array containing the values of an object (enumerable properties)
@@ -1799,7 +1809,18 @@
 			 */
 			_startsWith: function(substr) {
 				return this.indexOf(substr) === 0;
-			}
+			},
+            /**
+             * Better to string version
+             * @public
+             * @method String#_toString
+             * @this    {string}
+             * @returns {string} - string representation of the object
+             */
+            _toString: function()
+            {
+                return this;
+            }
 		}
 	});
 
@@ -2093,7 +2114,18 @@
 			_rebound: function(min, max)
 			{
 				return min + this % (max - min);
-			}
+			},
+            /**
+             * Better to string version
+             * @public
+             * @method Number#_toString
+             * @this    {Number}
+             * @returns {string} - string representation of the number
+             */
+            _toString: function()
+            {
+                return this+'';
+            }
 		}
 	});
 
@@ -2213,7 +2245,21 @@
 					_.extend(child.prototype, mixin.prototype);
 				})
 			}
-		}
+		},
+        prototype:
+        {
+            /**
+             * Better to string version
+             * @public
+             * @method Function#_toString
+             * @this    {Function}
+             * @returns {string} - string representation of the object
+             */
+            _toString: function()
+            {
+                return this.toString();
+            }
+        }
 	});
 
 	/**
