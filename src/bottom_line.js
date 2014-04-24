@@ -2075,6 +2075,16 @@
 		 * @memberOf module:_
 		 */
 		static: {
+            /**
+             * Checks if an object is a number
+             * @public
+             * @method module:_.num.isNumber
+             * @param   {any} num - object to check the number for
+             * @returns {boolean} - indicating if it is a number
+             */
+            isNumber: function(num) {
+                return typeof(num) === 'number' && !_.isNaN(num);
+            },
 			/**
 			 * Returns a random integer between the min and max value, or between 0 & 1) if no arguments are given
 			 * @public
