@@ -2083,7 +2083,7 @@
              * @returns {boolean} - indicating if it is a number
              */
             isNumber: function(num) {
-                return typeof(num) === 'number' && !isNaN(num); // use the broken here becauseiOS doesn't support Number.isNaN
+                return typeof(num) === 'number' && !isNaN(num); // use the broken isNaN here because iOS doesn't support Number.isNaN
             },
 			/**
 			 * Returns a random integer between the min and max value, or between 0 & 1) if no arguments are given
