@@ -229,7 +229,6 @@
 
 				return clone;
 			},
-            // TODO: deep clone
             /**
              * Clones an object
              * @public
@@ -239,24 +238,15 @@
              * @return  {Object}  clone - the cloned object
              */
             cloneDeep: function cloneDeep(obj) {
-                try
-                {
-                    var names = __obj.getOwnPropertyNames(obj);
-                }
-                catch (e)
-                {
-                    if (e.message._has("not an object")) {
-                        // is not object
-                        return obj;
-                    }
-                }
+                var names;
 
-                var clone = __obj.create(__obj.getPrototypeOf(obj));
+                try       { names = obj._names(); }
+                catch (e) { if(e.message._has("not an object")) return obj; }
+
+                var clone = __obj.create(obj._proto());
                 names._each(function (name) {
                     var pd = __obj.getOwnPropertyDescriptor(obj, name);
-                    if (pd.value) { // TODO does this woork with getters & setters? Testcase needed!
-                        pd.value = _.deepClone(pd.value);
-                    }
+                    if (pd.value) pd.value = _.deepClone(pd.value);
                     __obj.defineProperty(clone, name, pd);
                 });
                 return clone;
