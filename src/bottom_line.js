@@ -241,12 +241,12 @@
                 var names;
 
                 try       { names = obj._names(); }
-                catch (e) { if(e.message._has("not an object")) return obj; }
+                catch (e) { return obj }
 
                 var clone = __obj.create(obj._proto());
                 names._each(function (name) {
                     var pd = __obj.getOwnPropertyDescriptor(obj, name);
-                    if (pd.value) pd.value = _.deepClone(pd.value);
+                    if (pd.value) pd.value = _.cloneDeep(pd.value);
                     __obj.defineProperty(clone, name, pd);
                 });
                 return clone;

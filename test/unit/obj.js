@@ -28,6 +28,29 @@ describe("Object", function() {
 			});
 		});
 
+        describe("cloneDeep", function() {
+
+            it("simple clone", function() {
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                };
+                var clone = _.cloneDeep(obj);
+                expect(clone).to.deep.equal({
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                });
+                obj.t.z = 777;
+
+                expect(clone.t.z).to.equal(666);
+                expect(clone).to.not.equal(obj);
+            });
+        });
+
 		describe("extend", function() {
 
 			it("simple extend", function() {
