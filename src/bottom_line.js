@@ -229,6 +229,38 @@
 
 				return clone;
 			},
+            // TODO: deep clone
+            /**
+             * Clones an object
+             * @public
+             * @static
+             * @method module:_.obj.cloneDeep
+             * @param   {Object}  obj   - object to be cloned
+             * @return  {Object}  clone - the cloned object
+             */
+            cloneDeep: function cloneDeep(obj) {
+                try
+                {
+                    var names = __obj.getOwnPropertyNames(obj);
+                }
+                catch (e)
+                {
+                    if (e.message._has("not an object")) {
+                        // is not object
+                        return obj;
+                    }
+                }
+
+                var clone = __obj.create(__obj.getPrototypeOf(obj));
+                names._each(function (name) {
+                    var pd = __obj.getOwnPropertyDescriptor(obj, name);
+                    if (pd.value) { // TODO does this woork with getters & setters? Testcase needed!
+                        pd.value = _.deepClone(pd.value);
+                    }
+                    __obj.defineProperty(clone, name, pd);
+                });
+                return clone;
+            },
 			/**
 			 * Extends an object with function/properties from a module object
 			 * @public
