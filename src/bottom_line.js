@@ -211,7 +211,7 @@
 		 * @memberOf module:_
 		 */
 		static: {
-			// TODO: deep clone
+            // TODO object reduce function
 			/**
 			 * Clones an object
 			 * @public
