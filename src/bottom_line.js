@@ -2347,18 +2347,18 @@
 			 * @param {Function|Array} mixins - array or sinlge mixin classes
 			 */
 			mixin: function(child, mixins) {
-				mixins = (typeof(mixins) === 'function')? [mixins] : mixins;
+				mixins = _.isArray(mixins)? mixins : [mixins];
+
+                child._mixin = function(mixin) {
+                    return mixin.prototype;
+                };
 
 				mixins._each(function(mixin) {
-					var mixmethod = child._mixin;
-					// wrap all mixins in one method
-					child._mixin = !mixmethod? mixin : function() {
-						mixin.call(this);
-						mixmethod.call(this);
-					};
+                    // copy static fucntions
+                    _.extend(child, mixin);
 					// copy prototype functions
 					_.extend(child.prototype, mixin.prototype);
-				})
+				});
 			}
 		},
         prototype:
