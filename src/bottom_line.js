@@ -2347,7 +2347,6 @@
 			 * @param {Function|Array} mixins - array or sinlge mixin classes
 			 */
 			mixin: function(child, mixins) {
-				mixins = _.isArray(mixins)? mixins : [mixins];
 
                 child._mixin = function(mixin) {
                     return mixin.prototype;
@@ -2358,6 +2357,8 @@
                     _.extend(child, mixin);
 					// copy prototype functions
 					_.extend(child.prototype, mixin.prototype);
+//                    // run preparation code
+//                    mixin.__prepare__(child); delete child.__prepare__; // delete the copied prepare method
 				});
 			}
 		},
