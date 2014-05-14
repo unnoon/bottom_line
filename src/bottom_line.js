@@ -2373,6 +2373,20 @@
             _toString: function()
             {
                 return this.toString();
+            },
+            /**
+             * Returns the name of a function if it is an unamed function it returns an empty string ''
+             * NOTE avoid using this function as on older browsers name property is not defined and is shimmed
+             * @public
+             * @method Function#_name
+             * @this    {Function}
+             * @returns {string} - the name of the function
+             */
+            // FIXME a better solution is to shim the name property in case it is not defined. In that case we we can use a simpler function
+            _name: function()
+            {
+                if(_.isDefined(Function.prototype.name)) return this.name;
+                else return this.toString().match(/^function\s?([^\s(]*)/)[1];
             }
         }
 	});
