@@ -2,8 +2,14 @@
 .idea/
 .archive/
 .coverage/
+.sass-cache/
 node_modules/
+bower_components/
 projectFilesBackup/
+/docs/
+/doc/
+/dist/
+Backup/
 
 #ignored file types
 *.map
