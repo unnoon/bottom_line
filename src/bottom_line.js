@@ -270,11 +270,13 @@
 				settings.enumerable   = settings.enumerable   !== false;
 				settings.configurable = settings.configurable !== false;
 				settings.writable     = settings.writable     !== false;
+                settings.overwrite    = settings.overwrite    !== false;
 
 				module._each(function(val, prop) {
 
                     if(obj.hasOwnProperty(prop))
                     {
+                        if(!settings.overwrite) return; // continue;
                         console.warn('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
                     else if(prop in obj)
@@ -2357,8 +2359,6 @@
                     _.extend(child, mixin);
 					// copy prototype functions
 					_.extend(child.prototype, mixin.prototype);
-//                    // run preparation code
-//                    mixin.__prepare__(child); delete child.__prepare__; // delete the copied prepare method
 				});
 			}
 		},
