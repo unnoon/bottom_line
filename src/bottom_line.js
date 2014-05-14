@@ -271,6 +271,7 @@
 				settings.configurable = settings.configurable !== false;
 				settings.writable     = settings.writable     !== false;
                 settings.overwrite    = settings.overwrite    !== false;
+                settings.override     = settings.override     !== false;
 
 				module._each(function(val, prop) {
 
@@ -281,6 +282,7 @@
                     }
                     else if(prop in obj)
                     {
+                        if(!settings.override) return; // continue;
                         console.warn('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
 
