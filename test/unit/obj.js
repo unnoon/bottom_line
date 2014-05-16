@@ -84,25 +84,45 @@ describe("Object", function() {
 				expect(descriptor.configurable).to.be.true;
 			});
 
-			it("adding custom descriptors", function() {
-				var obj = {
-					x: 1,
-					y: 2
-				};
-				var module = {
-					prop: 666
-				};
+            it("adding custom descriptors", function() {
+                var obj = {
+                    x: 1,
+                    y: 2
+                };
+                var module = {
+                    prop: 666
+                };
 
-				_.extend(obj,{writable:false, enumerable:false, configurable:false}, module);
+                _.extend(obj,{writable:false, enumerable:false, configurable:false}, module);
 
-				expect(obj.prop).to.equal(666);
+                expect(obj.prop).to.equal(666);
 
-				var descriptor = Object.getOwnPropertyDescriptor(obj, 'prop');
+                var descriptor = Object.getOwnPropertyDescriptor(obj, 'prop');
 
-				expect(descriptor.writable).to.be.false;
-				expect(descriptor.enumerable).to.be.false;
-				expect(descriptor.configurable).to.be.false;
-			});
+                expect(descriptor.writable).to.be.false;
+                expect(descriptor.enumerable).to.be.false;
+                expect(descriptor.configurable).to.be.false;
+            });
+
+
+            it("don't override/overwrite properties", function() {
+                var obj = {
+                    x: 1,
+                    y: 2
+                };
+                var module = {
+                    toLocaleString: 'aap',
+                    y:7,
+                    prop: 666
+                };
+
+                _.extend(obj,{override:false, overwrite:false}, module);
+
+                expect(obj.x).to.equal(1);
+                expect(obj.y).to.equal(2);
+                expect(obj.prop).to.equal(666);
+                expect(typeof(obj.toLocaleString)).to.equal('function');
+            });
 		});
 
 		describe("typeof", function() {

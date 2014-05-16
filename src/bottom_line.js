@@ -8,18 +8,13 @@
  */
 'use strict';
 !function(root, bottom_line) {
-	if(typeof(define) === 'function' && define.amd)
-	{
-		define(bottom_line);
-	}
-	else if(typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports)
-	{
-		module.exports = bottom_line();
-	}
-	else
-	{
-		root._ = bottom_line();
-	}
+    var requirejs = typeof(define) === 'function' && define.amd;
+    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
+    var other     = !requirejs && !nodejs;
+
+	if(requirejs)   define(bottom_line);
+	if(nodejs)      module.exports = bottom_line();
+    if(other)       root._ = bottom_line();
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -243,11 +238,11 @@
                 try       { names = obj._names(); }
                 catch (e) { return obj }
 
-                var clone = __obj.create(obj._proto());
+                var clone = Object.create(obj._proto());
                 names._each(function (name) {
-                    var pd = __obj.getOwnPropertyDescriptor(obj, name);
-                    if (pd.value) pd.value = _.cloneDeep(pd.value);
-                    __obj.defineProperty(clone, name, pd);
+                    var pd = obj._descriptor(name);
+                    if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
+                    clone._define(name, pd);
                 });
                 return clone;
             },
@@ -262,37 +257,57 @@
 			 * @return  {Object}  obj          - the extended object
 			 */
 			extend: function(obj, opt_settings, module) {
-				var settings = opt_settings;
-				var descriptor;
+                var settings = module && opt_settings;
+                var module   = module || opt_settings;
+                var descriptor;
+                var config;
 
-				if(module === undefined) module = opt_settings, settings = {};
+                // default is true to mimic default extending behaviour
+                var enumerable   = !settings || settings.enumerable   !== false;
+                var configurable = !settings || settings.configurable !== false;
+                var writable     = !settings || settings.writable     !== false;
+                var overwrite    = !settings || settings.overwrite    !== false;
+                var override     = !settings || settings.override     !== false;
 
-				settings.enumerable   = settings.enumerable   !== false;
-				settings.configurable = settings.configurable !== false;
-				settings.writable     = settings.writable     !== false;
-                settings.overwrite    = settings.overwrite    !== false;
-                settings.override     = settings.override     !== false;
+                var loglevel     = (settings && settings.loglevel) || 'debug';
 
-				module._each(function(val, prop) {
+				module._each(function(value, prop) {
+                    var overrideProperty  = override;
+                    var overwriteProperty = overwrite;
+                    var aliases           = false;
 
-                    if(obj.hasOwnProperty(prop))
+        			descriptor = module._descriptor(prop);
+                    descriptor.enumerable   = enumerable;
+                    descriptor.configurable = configurable;
+                    if(descriptor._owns('writable')) descriptor.writable = writable; // getters/setters don't have a writable property in their descriptor
+
+                    // special property specific config
+                    if((config = value) && config._owns('value'))
                     {
-                        if(!settings.overwrite) return; // continue;
-                        console.warn('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
+                        if(config.clone) descriptor.value = _.clone(config.value);
+                        if(config.exec)  descriptor.value = config.value();
+                        if(config._owns('enumerable'))     descriptor.enumerable   = config.enumerable;
+                        if(config._owns('configurable'))   descriptor.configurable = config.configurable;
+                        if(config._owns('writable'))       descriptor.writable     = config.writable;
+                        if(config._owns('override'))       overrideProperty  = config.override;
+                        if(config._owns('overwrite'))      overwriteProperty = config.overwrite;
+                        if(config._owns('shim'))           overwriteProperty = config.shim;
+                        if(config.aliases)                 aliases = true;
+                    }
+
+                    if(obj._owns(prop))
+                    {
+                        if(!overwriteProperty) return; // continue;
+                        console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
                     else if(prop in obj)
                     {
-                        if(!settings.override) return; // continue;
-                        console.warn('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
+                        if(!overrideProperty) return; // continue;
+                        console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
 
-					descriptor = __obj.getOwnPropertyDescriptor(module, prop);
-
-					descriptor.enumerable   = settings.enumerable;
-					descriptor.configurable = settings.configurable;
-					if(descriptor.hasOwnProperty('writable')) descriptor.writable = settings.writable; // getters/setters don't have a writable property in their descriptor
-
-					__obj.defineProperty(obj, prop, descriptor);
+					obj._define(prop, descriptor);
+                    if(aliases) config.aliases._each(function(alias) {obj._define(alias, descriptor)})
 				});
 
 				return obj;
@@ -477,11 +492,36 @@
              * @param  {Array}                 to         - array to copy to
              * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-             * @return {Object}                 this       - mutated array for chaining
+             * @return {Object}                 this       - mutated object for chaining
              */
             _cutKeys: function(to, $index, opt_to_ctx)
             {
                 return this.__cutKeys(false, to, $index, opt_to_ctx);
+            },
+            /**
+             * Copies keys to an array
+             * @public
+             * @method Object#_define
+             * @this   {Object}
+             * @param  {string}       prop - the property name
+             * @param  {Object} descriptor - descriptor object
+             * @return {Object}       this - object for chaining
+             */
+            _define: function(prop, descriptor)
+            {
+               return Object.defineProperty(this, prop, descriptor)
+            },
+            /**
+             * Copies keys to an array
+             * @public
+             * @method Object#_define
+             * @this   {Object}
+             * @param  {string}       prop - the property name
+             * @return {Object} descriptor - descriptor object
+             */
+            _descriptor: function(prop)
+            {
+                return Object.getOwnPropertyDescriptor(this, prop)
             },
             /**
              * Removes the occurrences from an object
@@ -587,7 +627,7 @@
 
                 for(var key in this)
                 {
-                    if(this.hasOwnProperty(key)) len++;
+                    if(this._owns(key)) len++;
                 }
 
                 return len;
@@ -601,6 +641,13 @@
 			_names: function() {
 				return __obj.getOwnPropertyNames(this);
 			},
+            /**
+             * Shortcut for hasOwnProperty
+             * @public
+             * @method Object#_owns
+             * @return {boolean} boolean indicating ownership
+             */
+            _owns: Object.prototype.hasOwnProperty,
 			/**
 			 * Returns an array containing the keys & values of an object (enumerable properties)
 			 * @public
@@ -2347,6 +2394,7 @@
 			/**
 			 * Mixin properties on a class. It is assumed this function is called inside the constructor
 			 * @public
+             * @method module:_.fnc.mixin
 			 * @param {Function}        child - child
 			 * @param {Function|Array} mixins - array or sinlge mixin classes
 			 */
