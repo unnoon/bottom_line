@@ -215,6 +215,7 @@
 			 * @param   {Object}  obj   - object to be cloned
 			 * @return  {Object}  clone - the cloned object
 			 */
+            // TODO These should be expanded with frozen, extrnsible states etc
 			clone: function clone(obj) {
 				var clone = __obj.create(__obj.getPrototypeOf(obj));
 
@@ -238,7 +239,7 @@
                 try       { names = obj._names(); }
                 catch (e) { return obj }
 
-                var clone = Object.create(obj._proto());
+                var clone = _.create(obj._proto());
                 names._each(function (name) {
                     var pd = obj._descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
@@ -262,12 +263,11 @@
                 var descriptor;
                 var config;
 
-                // default is true to mimic default extending behaviour
-                var enumerable   = !settings || settings.enumerable   !== false;
-                var configurable = !settings || settings.configurable !== false;
-                var writable     = !settings || settings.writable     !== false;
-                var overwrite    = !settings || settings.overwrite    !== false;
-                var override     = !settings || settings.override     !== false;
+                var enumerable   =  settings && settings.enumerable;
+                var configurable =  settings && settings.configurable;
+                var writable     =  settings && settings.writable;
+                var overwrite    = !settings || settings.overwrite !== false; // default is true
+                var override     = !settings || settings.override  !== false; // default is true
 
                 var loglevel     = (settings && settings.loglevel) || 'debug';
 
@@ -277,14 +277,15 @@
                     var aliases           = false;
 
         			descriptor = module._descriptor(prop);
-                    descriptor.enumerable   = enumerable;
-                    descriptor.configurable = configurable;
-                    if(descriptor._owns('writable')) descriptor.writable = writable; // getters/setters don't have a writable property in their descriptor
+                    // global property overrides
+                    if(_.isDefined(enumerable))                                 descriptor.enumerable = enumerable;
+                    if(_.isDefined(configurable))                               descriptor.configurable = configurable;
+                    if(_.isDefined(writable) && descriptor._owns('writable'))   descriptor.writable = writable;
 
                     // special property specific config
                     if((config = value) && config._owns('value'))
                     {
-                        if(config.clone) descriptor.value = _.clone(config.value);
+                        if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
                         if(config.exec)  descriptor.value = config.value();
                         if(config._owns('enumerable'))     descriptor.enumerable   = config.enumerable;
                         if(config._owns('configurable'))   descriptor.configurable = config.configurable;
