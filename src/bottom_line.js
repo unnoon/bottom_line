@@ -278,15 +278,15 @@
 
         			descriptor = module._descriptor(prop);
                     // global property overrides
-                    if(_.isDefined(enumerable))                                 descriptor.enumerable = enumerable;
+                    if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
                     if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                    if(_.isDefined(writable) && descriptor._owns('writable'))   descriptor.writable = writable;
+                    if(_.isDefined(writable) && descriptor._owns('writable'))   descriptor.writable     = writable;
 
                     // special property specific config
                     if((config = value) && config._owns('value'))
                     {
-                        if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
-                        if(config.exec)  descriptor.value = config.value();
+                        if(config.clone)                   descriptor.value = _.clone(config.value); // clone deep maybe?
+                        if(config.exec)                    descriptor.value = config.value();
                         if(config._owns('enumerable'))     descriptor.enumerable   = config.enumerable;
                         if(config._owns('configurable'))   descriptor.configurable = config.configurable;
                         if(config._owns('writable'))       descriptor.writable     = config.writable;
