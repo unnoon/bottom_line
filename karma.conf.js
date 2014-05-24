@@ -11,9 +11,9 @@ module.exports = function (config) {
 		// list of files / patterns to load in the browser
 		files     : [
 			// these are only watched and served
-			{pattern: 'src/bottom_line_new.js'},
+			{pattern: 'dist/bottom_line.js'},
 			// included files - tests
-			{pattern: 'test/unit/obj_new.js'}
+			{pattern: 'test/unit/obj.js'}
 		],
 
 		preprocessors: {

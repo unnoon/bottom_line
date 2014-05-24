@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-preprocess');
 
 	grunt.initConfig({
 		uglify: {
@@ -17,10 +18,21 @@ module.exports = function(grunt) {
 					destination: 'doc'
 				}
 			}
-		}
+		},
+        preprocess : {
+            options: {
+                context : {
+                    DEBUG: true
+                }
+            },
+            js : {
+                src : 'src/bottom_line_new.js',
+                dest : 'dist/bottom_line.js'
+            }
+        }
 	});
 
-    grunt.registerTask('default', ['jsdoc', 'uglify']);
+    grunt.registerTask('default', ['preprocess']);
 };
 
 

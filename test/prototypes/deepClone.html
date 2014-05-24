@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>typeof vs Instanceof</title>
+    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
+    <script>
+        var obj = {
+            x: 1,
+            y: 2,
+            z: 3,
+            t: {z: 666}
+        };
+        var clone = _.cloneDeep(obj);
+
+        console.log(clone);
+    </script>
+</head>
+<body>
+</body>
+</html>
