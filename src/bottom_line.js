@@ -44,7 +44,10 @@
 	function constructWrapper(nativeObj, shorthand, module)
 	{
 		// set wrapper object
-		var wrapperObj = _[shorthand] = module.init || function(value) {};
+        var wrapperObj = _[shorthand] = module.init || function(value) {
+            // convertor & constructor function
+            this.value = value;
+        };
 
 		// copy native statics to wrapper object & _ for easy use
 		if(nativeObj)
