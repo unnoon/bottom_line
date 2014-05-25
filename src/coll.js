@@ -26,7 +26,7 @@ var __coll = {
                 function(val) {return val === $value};
 
         // note the reverse check should be fixed when this is also implemented for strings
-        this.bl['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+        this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
             match = cb.call(opt_ctx, val, i, _this, delta);
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -58,7 +58,7 @@ var __coll = {
                 ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
                     function(i) {return i._.between($index, $opt_to_ctx)};
 
-        this.bl['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+        this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
             index = _.isArray(this)? (i - delta) : i; // the original index in the array
 
             match = cb.call($opt_to_ctx, index, _this);
