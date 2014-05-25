@@ -8,13 +8,13 @@
  */
 'use strict';
 !function(root, bottom_line) {
-    var requirejs = typeof(define) === 'function' && define.amd;
+    var requirejs = typeof(define) === 'function' && !!define.amd, environment = true;
     var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
-    var other     = !requirejs && !nodejs;
 
-	if(requirejs)   define(bottom_line);
-	if(nodejs)      module.exports = bottom_line();
-    if(other)       root._ = bottom_line();
+    switch(environment) {
+    case requirejs : define(bottom_line); break;
+    case nodejs    : module.exports = bottom_line(); break;
+    default        : root._ = bottom_line(); }
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
