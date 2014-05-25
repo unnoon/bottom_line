@@ -75,7 +75,7 @@ constructWrapper(Array, 'arr', {
          */
         $append: function(var_args) {
             // FIXME this need to be adapated for broken arrays I think
-            return _.clone(this).bl.append(var_args);
+            return _.clone(this)._.append(var_args);
         },
         /**
          * Accessor: Returns the average of an array with numbers
@@ -96,7 +96,7 @@ constructWrapper(Array, 'arr', {
          */
         compact: function()
         {
-            return this.bl.withoutAll(function(val) {return !val});
+            return this._.withoutAll(function(val) {return !val});
         },
         /**
          * Removes al falsey values from an array into a new array
@@ -107,7 +107,7 @@ constructWrapper(Array, 'arr', {
          */
         $compact: function()
         {
-            return this.bl.$withoutAll(function(val) {return !val});
+            return this._.$withoutAll(function(val) {return !val});
         },
         /**
          * Copies a value to an array
@@ -121,7 +121,7 @@ constructWrapper(Array, 'arr', {
          */
         copy: function(to, $value, opt_ctx)
         {
-            return this.bl._cp(false, false, to, $value, opt_ctx);
+            return this._._cp(false, false, to, $value, opt_ctx);
         },
         /**
          * Copies all similar values to an array
@@ -135,7 +135,7 @@ constructWrapper(Array, 'arr', {
          */
         copyAll: function(to, $value, opt_ctx)
         {
-            return this.bl._cp(true, false, to, $value, opt_ctx);
+            return this._._cp(true, false, to, $value, opt_ctx);
         },
         /**
          * Copies keys to an array
@@ -149,7 +149,7 @@ constructWrapper(Array, 'arr', {
          */
         copyKeys: function(to, $index, opt_to_ctx)
         {
-            return this.bl._cpKeys(false, to, $index, opt_to_ctx);
+            return this._._cpKeys(false, to, $index, opt_to_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -164,7 +164,7 @@ constructWrapper(Array, 'arr', {
          */
         _cp: function(all, invert, target, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
+            return this._._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -179,7 +179,7 @@ constructWrapper(Array, 'arr', {
          */
         _cut: function(all, invert, target, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+            return this._._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -194,7 +194,7 @@ constructWrapper(Array, 'arr', {
          */
         _cutKeys: function(invert, target, $value, opt_ctx)
         {
-            return this.bl._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+            return this._._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
         },
         /**
          * Cut a value to an array
@@ -208,7 +208,7 @@ constructWrapper(Array, 'arr', {
          */
         cut: function(to, $value, opt_ctx)
         {
-            return this.bl._cut(false, false, to, $value, opt_ctx);
+            return this._._cut(false, false, to, $value, opt_ctx);
         },
         /**
          * Cut all similar values to an array
@@ -222,7 +222,7 @@ constructWrapper(Array, 'arr', {
          */
         cutAll: function(to, $value, opt_ctx)
         {
-            return this.bl._cut(true, false, to, $value, opt_ctx);
+            return this._._cut(true, false, to, $value, opt_ctx);
         },
         /**
          * Copies keys to an array
@@ -236,7 +236,7 @@ constructWrapper(Array, 'arr', {
          */
         cutKeys: function(to, $index, opt_to_ctx)
         {
-            return this.bl._cutKeys(false, to, $index, opt_to_ctx);
+            return this._._cutKeys(false, to, $index, opt_to_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -251,7 +251,7 @@ constructWrapper(Array, 'arr', {
          */
         _cpKeys: function(invert, target, $value, opt_to_ctx)
         {
-            return this.bl._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
+            return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
         },
         /**
          * Edits the occurrences of an array
@@ -289,7 +289,7 @@ constructWrapper(Array, 'arr', {
          */
         _del: function(invert, $index, opt_to_ctx)
         {
-            return this.bl._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
+            return this._._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
         },
         /**
          * Returns the difference between 2 arrays
@@ -302,7 +302,7 @@ constructWrapper(Array, 'arr', {
         // TODO this should be an alias
         diff: function(arr)
         {
-            return this.bl.without(arr);
+            return this._.without(arr);
         },
         /**
          * Returns the difference between 2 arrays in a new array
@@ -314,7 +314,7 @@ constructWrapper(Array, 'arr', {
          */
         $diff: function(arr)
         {
-            return this.bl.$selectAll(function(val) {return !arr.bl.has(val)});
+            return this._.$selectAll(function(val) {return !arr._.has(val)});
         },
         /**
          * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -349,7 +349,7 @@ constructWrapper(Array, 'arr', {
         },
         /**
          * Mutator: Creates a multidimensional array. The dimensions come from the array itself
-         * i.e. [3, 6].bl.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+         * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
          * @method Array#$dimit
          * @this   {Array}
@@ -391,9 +391,9 @@ constructWrapper(Array, 'arr', {
          */
         each: function(opt_step, cb, opt_ctx) {
             if(typeof(opt_step) === 'function')
-                return this.bl._each(1, opt_step, cb);
+                return this._._each(1, opt_step, cb);
             else
-                return this.bl._each(opt_step, cb, opt_ctx);
+                return this._._each(opt_step, cb, opt_ctx);
         },
         /**
          * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -434,9 +434,9 @@ constructWrapper(Array, 'arr', {
          */
         eachRight: function(opt_step, cb, opt_ctx) {
             if(typeof(opt_step) === 'function')
-                return this.bl._eachRight(1, opt_step, cb);
+                return this._._eachRight(1, opt_step, cb);
             else
-                return this.bl._eachRight(opt_step, cb, opt_ctx);
+                return this._._eachRight(opt_step, cb, opt_ctx);
         },
         /**
          * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -484,7 +484,7 @@ constructWrapper(Array, 'arr', {
          */
         // TODO this should be an alias
         _findAll: function(cb, opt_ctx) {
-            return this.bl.$selectAll(cb, opt_ctx);
+            return this._.$selectAll(cb, opt_ctx);
         },
         /**
          * Get/sets: the first element of an array
@@ -509,8 +509,8 @@ constructWrapper(Array, 'arr', {
          * @returns {Array} - this for chaining
          */
         flatten: function() {
-            return this.bl.each(function(val, i) {
-                if(_.isArray(val)) this.splice.apply(this, val.bl.insert(1).bl.insert(i));
+            return this._.each(function(val, i) {
+                if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
             }, this)
         },
         /**
@@ -556,8 +556,8 @@ constructWrapper(Array, 'arr', {
          * @return {Array}     - this for chaining
          */
         intersect: function(arr) {
-            return this.bl.selectAll(function(val) {
-                return arr.bl.has(val);
+            return this._.selectAll(function(val) {
+                return arr._.has(val);
             }, this);
         },
         /**
@@ -569,8 +569,8 @@ constructWrapper(Array, 'arr', {
          * @return {Array}     - this for chaining
          */
         $intersect: function(arr) {
-            return this.bl.$selectAll(function(val) {
-                return arr.bl.has(val);
+            return this._.$selectAll(function(val) {
+                return arr._.has(val);
             }, this);
         },
         /**
@@ -584,8 +584,8 @@ constructWrapper(Array, 'arr', {
         intersects: function(arr) {
             var intersects = false;
 
-            this.bl.each(function(val) {
-                if(arr.bl.has(val)) return !(intersects = true);
+            this._.each(function(val) {
+                if(arr._.has(val)) return !(intersects = true);
             });
 
             return intersects;
@@ -622,7 +622,7 @@ constructWrapper(Array, 'arr', {
             {
                 var max = this[0];
 
-                this.bl.each(function(elm) {
+                this._.each(function(elm) {
                     max = opt_compare(elm, max) > 0? elm : max;
                 });
 
@@ -646,7 +646,7 @@ constructWrapper(Array, 'arr', {
             {
                 var min = this[0];
 
-                this.bl.each(function(elm) {
+                this._.each(function(elm) {
                     min = opt_compare(elm, min) < 0? elm : min;
                 });
 
@@ -663,7 +663,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}             - the modified array
          */
         modify: function(modifier, opt_ctx) {
-            this.bl.each(function(val, i) {
+            this._.each(function(val, i) {
                 this[i] = modifier.call(opt_ctx, val, i, this);
             }, this);
 
@@ -680,7 +680,7 @@ constructWrapper(Array, 'arr', {
          */
         $modify: function(modifier, opt_ctx)
         {
-            return _.clone(this).bl.modify(modifier, opt_ctx);
+            return _.clone(this)._.modify(modifier, opt_ctx);
         },
         /**
          * Chainable version of push
@@ -718,7 +718,7 @@ constructWrapper(Array, 'arr', {
          */
         _rm: function(all, invert, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+            return this._._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
         },
         /**
          * Select the first occurrence in an array
@@ -730,7 +730,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array }                     - array with the selected element
          */
         select: function($value, opt_ctx) {
-            return this.bl._rm(false, true, $value, opt_ctx);
+            return this._._rm(false, true, $value, opt_ctx);
         },
         /**
          * Accessor: Returns the first element found by the selector function
@@ -742,7 +742,7 @@ constructWrapper(Array, 'arr', {
          * @returns {any}               - the found element or undefined otherwise
          */
         $select: function($value, opt_ctx) {
-            return this.bl._cp(false, false, [], $value, opt_ctx);
+            return this._._cp(false, false, [], $value, opt_ctx);
         },
         /**
          * Select all occurrence in an array
@@ -754,7 +754,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - array with the selected elements
          */
         selectAll: function($value, opt_ctx) {
-            return this.bl._rm(true, true, $value, opt_ctx);
+            return this._._rm(true, true, $value, opt_ctx);
         },
         /**
          * Select all occurrence in an array and copies them to a new array
@@ -766,7 +766,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - array with the selected elements
          */
         $selectAll: function($value, opt_ctx) {
-            return this.bl._cp(true, false, [], $value, opt_ctx);
+            return this._._cp(true, false, [], $value, opt_ctx);
         },
         /**
          * Selects elements based on index, removes others
@@ -779,7 +779,7 @@ constructWrapper(Array, 'arr', {
          */
         selectKeys: function($index, opt_to_ctx)
         {
-            return this.bl._del(true, $index, opt_to_ctx);
+            return this._._del(true, $index, opt_to_ctx);
         },
         /**
          * Selects elements based on index into a new array
@@ -792,7 +792,7 @@ constructWrapper(Array, 'arr', {
          */
         $selectKeys: function($index, opt_to_ctx)
         {
-            return this.bl._cpKeys(false, [], $index, opt_to_ctx);
+            return this._._cpKeys(false, [], $index, opt_to_ctx);
         },
         /**
          * Retrieves and sets the size of an array
@@ -832,7 +832,7 @@ constructWrapper(Array, 'arr', {
 
             for(var i = 0, max = this.length; i < max; i++)
             {
-                output += (i? ', ' : '') + this[i].bl.toString();
+                output += (i? ', ' : '') + this[i]._.toString();
             }
 
             return output + ']';
@@ -846,7 +846,7 @@ constructWrapper(Array, 'arr', {
          * @return {Array} this - unified with the other
          */
         unify: function(arr) {
-            return this.bl.append(arr).bl.unique();
+            return this._.append(arr)._.unique();
         },
         /**
          * Calculates the union for 2 arrays into an new array
@@ -857,12 +857,12 @@ constructWrapper(Array, 'arr', {
          * @return {Array}      - new array containing the unification
          */
         $unify: function(arr) {
-            var app = this.bl.$append(arr);
-            var output = app.bl.unique();
+            var app = this._.$append(arr);
+            var output = app._.unique();
 
             return output;
 
-//				return this.bl.$append(arr).bl.unique();
+//				return this._.$append(arr)._.unique();
         },
         /**
          * Removes duplicate values in an array
@@ -872,8 +872,8 @@ constructWrapper(Array, 'arr', {
          * @returns {Array} - new array without duplicates
          */
         unique: function() {
-            this.bl.eachRight(function(val, i) {
-                this.bl.each(function(duplicate, j) {
+            this._.eachRight(function(val, i) {
+                this._.each(function(duplicate, j) {
                     if(val === duplicate && j < i) return this.splice(i, 1), false;
                     return j < i;
                 }, this)
@@ -891,8 +891,8 @@ constructWrapper(Array, 'arr', {
         $unique: function() {
             var unique = [];
 
-            this.bl.each(function(val) {
-                if(!unique.bl.has(val)) unique.push(val);
+            this._.each(function(val) {
+                if(!unique._.has(val)) unique.push(val);
             }, this);
 
             return unique;
@@ -907,7 +907,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array }                     - The array without the element
          */
         without: function($value, opt_ctx) {
-            return this.bl._rm(false, false, $value, opt_ctx);
+            return this._._rm(false, false, $value, opt_ctx);
         },
         /**
          * Removes the first occurrence in an array
@@ -919,7 +919,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array }                     - NEW array without the element
          */
         $without: function($value, opt_ctx) {
-            return this.bl._cp(false, true, [], $value, opt_ctx);
+            return this._._cp(false, true, [], $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
@@ -931,7 +931,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - The array without the element
          */
         withoutAll: function($value, opt_ctx) {
-            return this.bl._rm(true, false, $value, opt_ctx);
+            return this._._rm(true, false, $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
@@ -943,7 +943,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - NEW array without the element
          */
         $withoutAll: function($value, opt_ctx) {
-            return this.bl._cp(true, true, [], $value, opt_ctx);
+            return this._._cp(true, true, [], $value, opt_ctx);
         },
         /**
          * Remove elements based on index
@@ -956,7 +956,7 @@ constructWrapper(Array, 'arr', {
          */
         withoutKeys: function($index, opt_to_ctx)
         {
-            return this.bl._del(false, $index, opt_to_ctx);
+            return this._._del(false, $index, opt_to_ctx);
         },
         /**
          * Remove elements based on index
@@ -969,7 +969,7 @@ constructWrapper(Array, 'arr', {
          */
         $withoutKeys: function($index, opt_to_ctx)
         {
-            return this.bl._cpKeys(true, [], $index, opt_to_ctx);
+            return this._._cpKeys(true, [], $index, opt_to_ctx);
         }
     }
 });

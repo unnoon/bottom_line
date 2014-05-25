@@ -11,7 +11,7 @@ describe("Object", function() {
 					z: 3
 				};
 
-				expect(obj.bl.keys()).to.eql(['x', 'y', 'z']);
+				expect(obj._.keys()).to.eql(['x', 'y', 'z']);
 			});
 
 		});
@@ -25,7 +25,7 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj.bl.chain
+                expect(obj._.chain
                     .faux()
                     .keys()
                     .value
@@ -43,7 +43,7 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj.bl.chain
+                expect(obj._.chain
                         .faux()
                         .keys()
                         .first()
@@ -62,7 +62,7 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj.bl.$chain
+                expect(obj._.$chain
                         .faux()
                         .keys()
                         .value
@@ -80,7 +80,7 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj.bl.$chain
+                expect(obj._.$chain
                         .faux()
                         .keys()
                         .first()

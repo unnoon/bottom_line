@@ -4,17 +4,17 @@ describe("Bottom_Line._.⌡S", function() {
 
 		it("singular", function() {
 			var names    = ['bobby', 'jean'];
-			var namesExt = names.bl.append(['xavier']);
+			var namesExt = names._.append(['xavier']);
 
 			expect(namesExt).to.eql(['bobby', 'jean', 'xavier']);
 
-			expect(names.bl.has('jean')).to.equal(true);
+			expect(names._.has('jean')).to.equal(true);
 		});
 
 		it("chaining", function() {
 			var names = ['bobby', 'jean'];
 
-			names.bl.chain
+			names._.chain
                 .append(['xavier'])
                 .without('bobby');
 
@@ -24,7 +24,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("chaining different types", function() {
 			var arr = [4,5,6,2];
 
-			expect(arr.bl.chain
+			expect(arr._.chain
                 .without(2)
                 .min()
                 .bound(1, 3)
@@ -36,7 +36,7 @@ describe("Bottom_Line._.⌡S", function() {
 		it("singular type chaining", function() {
 			var arr = [4,5,6,2];
 
-			expect(arr.bl.chain
+			expect(arr._.chain
                 .min()
                 .bound(-1, 1)
                 .value

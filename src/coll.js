@@ -22,7 +22,7 @@ var __coll = {
         var array, match, finish = false;
 
         var cb = (typeof($value) === 'function')? 	$value                                  :
-            (array = _.isArray($value))? 		function(val) {return $value.bl.has(val)} :
+            (array = _.isArray($value))? 		function(val) {return $value._.has(val)} :
                 function(val) {return val === $value};
 
         // note the reverse check should be fixed when this is also implemented for strings
@@ -31,7 +31,7 @@ var __coll = {
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
             // if first and the first match is made check if we are done
-            if(first && match && !finish) return finish = array? !$value.bl.without(val).length : true, !(normal && finish);
+            if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
         }, this);
 
         return target;
@@ -54,9 +54,9 @@ var __coll = {
         var array, match, finish = false;
 
         var cb = (type === 'function')?	$index                                               		:
-            (array = _.isArray($index))?   function(i) {return $index.bl.has(i)}                 :
+            (array = _.isArray($index))?   function(i) {return $index._.has(i)}                 :
                 ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
-                    function(i) {return i.bl.between($index, $opt_to_ctx)};
+                    function(i) {return i._.between($index, $opt_to_ctx)};
 
         this.bl['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
             index = _.isArray(this)? (i - delta) : i; // the original index in the array
@@ -64,7 +64,7 @@ var __coll = {
             match = cb.call($opt_to_ctx, index, _this);
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, i, _this);
-            if(first && match && !finish) return finish = array? !$index.bl.without(index).length : true, !(normal && finish);
+            if(first && match && !finish) return finish = array? !$index._.without(index).length : true, !(normal && finish);
         }, this);
 
         return target;
@@ -80,7 +80,7 @@ var __coll = {
     find: function(cb, opt_ctx) {
         var found;
 
-        this.bl.each(function(elm) {
+        this._.each(function(elm) {
             if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
         });
 

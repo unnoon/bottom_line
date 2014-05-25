@@ -14,7 +14,7 @@
     switch(environment = true) {
     case requirejs : define(bottom_line); break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : root._ = bottom_line(); }
+    default        : root._ = bottom_line(); } // TODO check for conflicts
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -48,9 +48,10 @@
         if(nativeObj && nativeObj.prototype)
         {
             // extend native object with special 'bl' (bottom_line) access property
+            // TODO check for conflicts
             Object.defineProperties(nativeObj.prototype, {
                 // return object containing single use methods
-                bl: {get: function() {
+                _: {get: function() {
                     _.value = this;
                     return wrapper.__instance__
                 }, enumerable: false, configurable: false}
@@ -103,7 +104,7 @@
                 };
                 // chaining
                 descriptor_chain[type] = function () {
-                    return fn.apply(_.value, arguments).bl.chain; // bl makes sure the value is set back tot the wrapper
+                    return fn.apply(_.value, arguments)._.chain; // bl makes sure the value is set back tot the wrapper
                 };
 //                // safe chaining
 //                // TODO proper testing & mixed type chaining

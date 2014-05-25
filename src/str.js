@@ -64,7 +64,7 @@ constructWrapper(String, 'str', {
          * @returns {string}             - new string containing the string before the given substring
          */
         between: function(pre_substr, post_substr) {
-            return this.bl.after(pre_substr).bl.before(post_substr);
+            return this._.after(pre_substr)._.before(post_substr);
         },
         /**
          * Capitalize the first character of a string
@@ -113,7 +113,7 @@ constructWrapper(String, 'str', {
          * @returns {string}         - new string with the substring inserted
          */
         insert: function(substr, i) {
-            return this.bl.splice(i, 0, substr);
+            return this._.splice(i, 0, substr);
         },
         /**
          * Checks if a string is all lowercase

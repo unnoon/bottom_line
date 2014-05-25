@@ -8,13 +8,13 @@
  */
 'use strict';
 !function(root, bottom_line) {
-    var requirejs = typeof(define) === 'function' && define.amd;
-    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
-    var other     = !requirejs && !nodejs;
+    var requirejs = typeof(define) === 'function' && !!define.amd;
+    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports, environment;
 
-	if(requirejs)   define(bottom_line);
-	if(nodejs)      module.exports = bottom_line();
-    if(other)       root._ = bottom_line();
+    switch(environment = true) {
+    case requirejs : define(bottom_line); break;
+    case nodejs    : module.exports = bottom_line(); break;
+    default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -48,9 +48,10 @@
         if(nativeObj && nativeObj.prototype)
         {
             // extend native object with special 'bl' (bottom_line) access property
+            // TODO check for conflicts
             Object.defineProperties(nativeObj.prototype, {
                 // return object containing single use methods
-                bl: {get: function() {
+                _: {get: function() {
                     _.value = this;
                     return wrapper.__instance__
                 }, enumerable: false, configurable: false}
@@ -103,7 +104,7 @@
                 };
                 // chaining
                 descriptor_chain[type] = function () {
-                    return fn.apply(_.value, arguments).bl.chain; // bl makes sure the value is set back tot the wrapper
+                    return fn.apply(_.value, arguments)._.chain; // bl makes sure the value is set back tot the wrapper
                 };
 //                // safe chaining
 //                // TODO proper testing & mixed type chaining
@@ -165,16 +166,16 @@
             var array, match, finish = false;
     
             var cb = (typeof($value) === 'function')? 	$value                                  :
-                (array = _.isArray($value))? 		function(val) {return $value.bl.has(val)} :
+                (array = _.isArray($value))? 		function(val) {return $value._.has(val)} :
                     function(val) {return val === $value};
     
             // note the reverse check should be fixed when this is also implemented for strings
-            this.bl['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
                 match = cb.call(opt_ctx, val, i, _this, delta);
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
                 // if first and the first match is made check if we are done
-                if(first && match && !finish) return finish = array? !$value.bl.without(val).length : true, !(normal && finish);
+                if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
             }, this);
     
             return target;
@@ -197,17 +198,17 @@
             var array, match, finish = false;
     
             var cb = (type === 'function')?	$index                                               		:
-                (array = _.isArray($index))?   function(i) {return $index.bl.has(i)}                 :
+                (array = _.isArray($index))?   function(i) {return $index._.has(i)}                 :
                     ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
-                        function(i) {return i.bl.between($index, $opt_to_ctx)};
+                        function(i) {return i._.between($index, $opt_to_ctx)};
     
-            this.bl['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
                 index = _.isArray(this)? (i - delta) : i; // the original index in the array
     
                 match = cb.call($opt_to_ctx, index, _this);
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, i, _this);
-                if(first && match && !finish) return finish = array? !$index.bl.without(index).length : true, !(normal && finish);
+                if(first && match && !finish) return finish = array? !$index._.without(index).length : true, !(normal && finish);
             }, this);
     
             return target;
@@ -223,7 +224,7 @@
         find: function(cb, opt_ctx) {
             var found;
     
-            this.bl.each(function(elm) {
+            this._.each(function(elm) {
                 if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
             });
     
@@ -252,7 +253,7 @@
             clone: function clone(obj) {
                 var clone = Object.create(Object.getPrototypeOf(obj));
     
-                Object.getOwnPropertyNames(obj).bl.each(function(name) {
+                Object.getOwnPropertyNames(obj)._.each(function(name) {
                     Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
                 });
     
@@ -269,14 +270,14 @@
             cloneDeep: function cloneDeep(obj) {
                 var names;
     
-                try       { names = obj.bl.names(); }
+                try       { names = obj._.names(); }
                 catch (e) { return obj }
     
-                var clone = Object.create(obj.bl.proto());
-                names.bl.each(function (name) {
-                    var pd = obj.bl.descriptor(name);
+                var clone = Object.create(obj._.proto());
+                names._.each(function (name) {
+                    var pd = obj._.descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                    clone.bl.define(name, pd);
+                    clone._.define(name, pd);
                 });
                 return clone;
             },
@@ -304,32 +305,32 @@
     
                 var loglevel     = (settings && settings.loglevel) || 'debug';
     
-                module.bl.each(function(value, prop) {
+                module._.each(function(value, prop) {
                     var overrideProperty  = override;
                     var overwriteProperty = overwrite;
                     var aliases           = false;
     
-                    descriptor = module.bl.descriptor(prop);
+                    descriptor = module._.descriptor(prop);
                     // global property overrides
                     if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
                     if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                    if(_.isDefined(writable) && descriptor.bl.owns('writable'))   descriptor.writable     = writable;
+                    if(_.isDefined(writable) && descriptor._.owns('writable'))   descriptor.writable     = writable;
     
                     // special property specific config
-                    if((config = value) && config.bl.owns('value'))
+                    if((config = value) && config._.owns('value'))
                     {
                         if(config.clone)                   descriptor.value = _.clone(config.value); // clone deep maybe?
                         if(config.exec)                    descriptor.value = config.value();
-                        if(config.bl.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
-                        if(config.bl.owns('configurable'))   descriptor.configurable = config.configurable;
-                        if(config.bl.owns('writable'))       descriptor.writable     = config.writable;
-                        if(config.bl.owns('override'))       overrideProperty  = config.override;
-                        if(config.bl.owns('overwrite'))      overwriteProperty = config.overwrite;
-                        if(config.bl.owns('shim'))           overwriteProperty = config.shim;
+                        if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
+                        if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
+                        if(config._.owns('writable'))       descriptor.writable     = config.writable;
+                        if(config._.owns('override'))       overrideProperty  = config.override;
+                        if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
+                        if(config._.owns('shim'))           overwriteProperty = config.shim;
                         if(config.aliases)                 aliases = true;
                     }
     
-                    if(obj.bl.owns(prop))
+                    if(obj._.owns(prop))
                     {
                         if(!overwriteProperty) return; // continue;
                         console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
@@ -340,8 +341,8 @@
                         console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
                     }
     
-                    obj.bl.define(prop, descriptor);
-                    if(aliases) config.aliases.bl.each(function(alias) {obj.bl.define(alias, descriptor)})
+                    obj._.define(prop, descriptor);
+                    if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
                 });
     
                 return obj;
@@ -377,7 +378,7 @@
              * @returns {string} - type of the object
              */
             typeOf: function(obj) {
-                return Object.prototype.toString.call(obj).bl.between('[object ', ']').bl.decapitalize();
+                return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
             }
         },
         /**
@@ -400,7 +401,7 @@
              */
             _cp: function(all, invert, target, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val, key, obj) {
+                return this._._edit(all, invert, function(val, key, obj) {
                     Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
                 }, false, target, $value, opt_ctx);
             },
@@ -417,7 +418,7 @@
              */
             _cpKeys: function(invert, target, $value, opt_to_ctx)
             {
-                return this.bl._editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
+                return this._._editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
             },
             /**
              * Copies a value to an array
@@ -431,7 +432,7 @@
              */
             copy: function(to, $value, opt_ctx)
             {
-                return this.bl._cp(false, false, to, $value, opt_ctx);
+                return this._._cp(false, false, to, $value, opt_ctx);
             },
             /**
              * Copies all similar values to an array
@@ -445,7 +446,7 @@
              */
             copyAll: function(to, $value, opt_ctx)
             {
-                return this.bl._cp(true, false, to, $value, opt_ctx);
+                return this._._cp(true, false, to, $value, opt_ctx);
             },
             /**
              * Copies keys to an array
@@ -459,7 +460,7 @@
              */
             copyKeys: function(to, $index, opt_to_ctx)
             {
-                return this.bl._cpKeys(false, to, $index, opt_to_ctx);
+                return this._._cpKeys(false, to, $index, opt_to_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -474,7 +475,7 @@
              */
             _cut: function(all, invert, target, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+                return this._._edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -489,7 +490,7 @@
              */
             _cutKeys: function(invert, target, $value, opt_ctx)
             {
-                return this.bl._editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+                return this._._editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
             },
             /**
              * Cut a value to an array
@@ -503,7 +504,7 @@
              */
             cut: function(to, $value, opt_ctx)
             {
-                return this.bl._cut(false, false, to, $value, opt_ctx);
+                return this._._cut(false, false, to, $value, opt_ctx);
             },
             /**
              * Cut all similar values to an array
@@ -517,7 +518,7 @@
              */
             cutAll: function(to, $value, opt_ctx)
             {
-                return this.bl._cut(true, false, to, $value, opt_ctx);
+                return this._._cut(true, false, to, $value, opt_ctx);
             },
             /**
              * Copies keys to an array
@@ -531,7 +532,7 @@
              */
             cutKeys: function(to, $index, opt_to_ctx)
             {
-                return this.bl._cutKeys(false, to, $index, opt_to_ctx);
+                return this._._cutKeys(false, to, $index, opt_to_ctx);
             },
             /**
              * Copies keys to an array
@@ -570,7 +571,7 @@
              */
             _del: function(invert, $index, opt_to_ctx)
             {
-                return this.bl._editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
+                return this._._editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
             },
             /**
              * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -624,7 +625,7 @@
             filter: function(cb, opt_ctx) {
                 var filtered = [];
     
-                this.bl.each(function(elm) {
+                this._.each(function(elm) {
                     if(cb.call(opt_ctx, elm)) filtered.push(elm);
                 });
     
@@ -662,7 +663,7 @@
     
                 for(var key in this)
                 {
-                    if(this.bl.owns(key)) len++;
+                    if(this._.owns(key)) len++;
                 }
     
                 return len;
@@ -693,7 +694,7 @@
             pairs: function() {
                 var pairs = [];
     
-                this.bl.each(function(val, key) {
+                this._.each(function(val, key) {
                     pairs.push(key, val);
                 });
     
@@ -711,7 +712,7 @@
             proto: function(proto) {
                 if(proto === undefined) return Object.getPrototypeOf(this);
     
-                this.bl._proto__ = proto;
+                this._._proto__ = proto;
     
                 return this;
             },
@@ -745,7 +746,7 @@
              */
             _rm: function(all, invert, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
+                return this._._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
             },
             /**
              * Better to string version
@@ -762,7 +763,7 @@
                 {
                     if(this.hasOwnProperty(key))
                     {
-                        output += (output? ', ' : '{') + key + ': ' + this[key].bl.toString();
+                        output += (output? ', ' : '{') + key + ': ' + this[key]._.toString();
                     }
                 }
     
@@ -778,7 +779,7 @@
             values: function() {
                 var values = [];
     
-                this.bl.each(function(elm) {
+                this._.each(function(elm) {
                     values.push(elm);
                 });
     
@@ -794,7 +795,7 @@
              * @returns {Array }                     - The array without the element
              */
             without: function($value, opt_ctx) {
-                return this.bl._rm(false, false, $value, opt_ctx);
+                return this._._rm(false, false, $value, opt_ctx);
             },
             /**
              * Removes the first occurrence in an array
@@ -806,7 +807,7 @@
              * @returns {Object }                    - NEW object without the element
              */
             $without: function($value, opt_ctx) {
-                return this.bl._cp(false, true, {}, $value, opt_ctx);
+                return this._._cp(false, true, {}, $value, opt_ctx);
             },
             /**
              * Removes the all occurrence in an array
@@ -818,7 +819,7 @@
              * @returns {Object}                      - The array without the element
              */
             withoutAll: function($value, opt_ctx) {
-                return this.bl._rm(true, false, $value, opt_ctx);
+                return this._._rm(true, false, $value, opt_ctx);
             },
             /**
              * Removes the all occurrence in an array
@@ -830,7 +831,7 @@
              * @returns {Object}                      - NEW array without the element
              */
             $withoutAll: function($value, opt_ctx) {
-                return this.bl._cp(true, true, [], $value, opt_ctx);
+                return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**
              * Remove elements based on index
@@ -843,7 +844,7 @@
              */
             withoutKeys: function($index, opt_to_ctx)
             {
-                return this.bl._del(false, $index, opt_to_ctx);
+                return this._._del(false, $index, opt_to_ctx);
             },
             /**
              * Remove elements based on index
@@ -856,7 +857,7 @@
              */
             $withoutKeys: function($index, opt_to_ctx)
             {
-                return this.bl._cpKeys(true, [], $index, opt_to_ctx);
+                return this._._cpKeys(true, [], $index, opt_to_ctx);
             }
         }
     });
@@ -937,7 +938,7 @@
              */
             $append: function(var_args) {
                 // FIXME this need to be adapated for broken arrays I think
-                return _.clone(this).bl.append(var_args);
+                return _.clone(this)._.append(var_args);
             },
             /**
              * Accessor: Returns the average of an array with numbers
@@ -958,7 +959,7 @@
              */
             compact: function()
             {
-                return this.bl.withoutAll(function(val) {return !val});
+                return this._.withoutAll(function(val) {return !val});
             },
             /**
              * Removes al falsey values from an array into a new array
@@ -969,7 +970,7 @@
              */
             $compact: function()
             {
-                return this.bl.$withoutAll(function(val) {return !val});
+                return this._.$withoutAll(function(val) {return !val});
             },
             /**
              * Copies a value to an array
@@ -983,7 +984,7 @@
              */
             copy: function(to, $value, opt_ctx)
             {
-                return this.bl._cp(false, false, to, $value, opt_ctx);
+                return this._._cp(false, false, to, $value, opt_ctx);
             },
             /**
              * Copies all similar values to an array
@@ -997,7 +998,7 @@
              */
             copyAll: function(to, $value, opt_ctx)
             {
-                return this.bl._cp(true, false, to, $value, opt_ctx);
+                return this._._cp(true, false, to, $value, opt_ctx);
             },
             /**
              * Copies keys to an array
@@ -1011,7 +1012,7 @@
              */
             copyKeys: function(to, $index, opt_to_ctx)
             {
-                return this.bl._cpKeys(false, to, $index, opt_to_ctx);
+                return this._._cpKeys(false, to, $index, opt_to_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -1026,7 +1027,7 @@
              */
             _cp: function(all, invert, target, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
+                return this._._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -1041,7 +1042,7 @@
              */
             _cut: function(all, invert, target, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+                return this._._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -1056,7 +1057,7 @@
              */
             _cutKeys: function(invert, target, $value, opt_ctx)
             {
-                return this.bl._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
+                return this._._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
             },
             /**
              * Cut a value to an array
@@ -1070,7 +1071,7 @@
              */
             cut: function(to, $value, opt_ctx)
             {
-                return this.bl._cut(false, false, to, $value, opt_ctx);
+                return this._._cut(false, false, to, $value, opt_ctx);
             },
             /**
              * Cut all similar values to an array
@@ -1084,7 +1085,7 @@
              */
             cutAll: function(to, $value, opt_ctx)
             {
-                return this.bl._cut(true, false, to, $value, opt_ctx);
+                return this._._cut(true, false, to, $value, opt_ctx);
             },
             /**
              * Copies keys to an array
@@ -1098,7 +1099,7 @@
              */
             cutKeys: function(to, $index, opt_to_ctx)
             {
-                return this.bl._cutKeys(false, to, $index, opt_to_ctx);
+                return this._._cutKeys(false, to, $index, opt_to_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -1113,7 +1114,7 @@
              */
             _cpKeys: function(invert, target, $value, opt_to_ctx)
             {
-                return this.bl._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
+                return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
             },
             /**
              * Edits the occurrences of an array
@@ -1151,7 +1152,7 @@
              */
             _del: function(invert, $index, opt_to_ctx)
             {
-                return this.bl._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
+                return this._._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
             },
             /**
              * Returns the difference between 2 arrays
@@ -1164,7 +1165,7 @@
             // TODO this should be an alias
             diff: function(arr)
             {
-                return this.bl.without(arr);
+                return this._.without(arr);
             },
             /**
              * Returns the difference between 2 arrays in a new array
@@ -1176,7 +1177,7 @@
              */
             $diff: function(arr)
             {
-                return this.bl.$selectAll(function(val) {return !arr.bl.has(val)});
+                return this._.$selectAll(function(val) {return !arr._.has(val)});
             },
             /**
              * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -1211,7 +1212,7 @@
             },
             /**
              * Mutator: Creates a multidimensional array. The dimensions come from the array itself
-             * i.e. [3, 6].bl.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+             * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
              * @method Array#$dimit
              * @this   {Array}
@@ -1253,9 +1254,9 @@
              */
             each: function(opt_step, cb, opt_ctx) {
                 if(typeof(opt_step) === 'function')
-                    return this.bl._each(1, opt_step, cb);
+                    return this._._each(1, opt_step, cb);
                 else
-                    return this.bl._each(opt_step, cb, opt_ctx);
+                    return this._._each(opt_step, cb, opt_ctx);
             },
             /**
              * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1296,9 +1297,9 @@
              */
             eachRight: function(opt_step, cb, opt_ctx) {
                 if(typeof(opt_step) === 'function')
-                    return this.bl._eachRight(1, opt_step, cb);
+                    return this._._eachRight(1, opt_step, cb);
                 else
-                    return this.bl._eachRight(opt_step, cb, opt_ctx);
+                    return this._._eachRight(opt_step, cb, opt_ctx);
             },
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1346,7 +1347,7 @@
              */
             // TODO this should be an alias
             _findAll: function(cb, opt_ctx) {
-                return this.bl.$selectAll(cb, opt_ctx);
+                return this._.$selectAll(cb, opt_ctx);
             },
             /**
              * Get/sets: the first element of an array
@@ -1371,8 +1372,8 @@
              * @returns {Array} - this for chaining
              */
             flatten: function() {
-                return this.bl.each(function(val, i) {
-                    if(_.isArray(val)) this.splice.apply(this, val.bl.insert(1).bl.insert(i));
+                return this._.each(function(val, i) {
+                    if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
                 }, this)
             },
             /**
@@ -1418,8 +1419,8 @@
              * @return {Array}     - this for chaining
              */
             intersect: function(arr) {
-                return this.bl.selectAll(function(val) {
-                    return arr.bl.has(val);
+                return this._.selectAll(function(val) {
+                    return arr._.has(val);
                 }, this);
             },
             /**
@@ -1431,8 +1432,8 @@
              * @return {Array}     - this for chaining
              */
             $intersect: function(arr) {
-                return this.bl.$selectAll(function(val) {
-                    return arr.bl.has(val);
+                return this._.$selectAll(function(val) {
+                    return arr._.has(val);
                 }, this);
             },
             /**
@@ -1446,8 +1447,8 @@
             intersects: function(arr) {
                 var intersects = false;
     
-                this.bl.each(function(val) {
-                    if(arr.bl.has(val)) return !(intersects = true);
+                this._.each(function(val) {
+                    if(arr._.has(val)) return !(intersects = true);
                 });
     
                 return intersects;
@@ -1484,7 +1485,7 @@
                 {
                     var max = this[0];
     
-                    this.bl.each(function(elm) {
+                    this._.each(function(elm) {
                         max = opt_compare(elm, max) > 0? elm : max;
                     });
     
@@ -1508,7 +1509,7 @@
                 {
                     var min = this[0];
     
-                    this.bl.each(function(elm) {
+                    this._.each(function(elm) {
                         min = opt_compare(elm, min) < 0? elm : min;
                     });
     
@@ -1525,7 +1526,7 @@
              * @returns {Array}             - the modified array
              */
             modify: function(modifier, opt_ctx) {
-                this.bl.each(function(val, i) {
+                this._.each(function(val, i) {
                     this[i] = modifier.call(opt_ctx, val, i, this);
                 }, this);
     
@@ -1542,7 +1543,7 @@
              */
             $modify: function(modifier, opt_ctx)
             {
-                return _.clone(this).bl.modify(modifier, opt_ctx);
+                return _.clone(this)._.modify(modifier, opt_ctx);
             },
             /**
              * Chainable version of push
@@ -1580,7 +1581,7 @@
              */
             _rm: function(all, invert, $value, opt_ctx)
             {
-                return this.bl._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+                return this._._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
             },
             /**
              * Select the first occurrence in an array
@@ -1592,7 +1593,7 @@
              * @returns {Array }                     - array with the selected element
              */
             select: function($value, opt_ctx) {
-                return this.bl._rm(false, true, $value, opt_ctx);
+                return this._._rm(false, true, $value, opt_ctx);
             },
             /**
              * Accessor: Returns the first element found by the selector function
@@ -1604,7 +1605,7 @@
              * @returns {any}               - the found element or undefined otherwise
              */
             $select: function($value, opt_ctx) {
-                return this.bl._cp(false, false, [], $value, opt_ctx);
+                return this._._cp(false, false, [], $value, opt_ctx);
             },
             /**
              * Select all occurrence in an array
@@ -1616,7 +1617,7 @@
              * @returns {Array}                      - array with the selected elements
              */
             selectAll: function($value, opt_ctx) {
-                return this.bl._rm(true, true, $value, opt_ctx);
+                return this._._rm(true, true, $value, opt_ctx);
             },
             /**
              * Select all occurrence in an array and copies them to a new array
@@ -1628,7 +1629,7 @@
              * @returns {Array}                      - array with the selected elements
              */
             $selectAll: function($value, opt_ctx) {
-                return this.bl._cp(true, false, [], $value, opt_ctx);
+                return this._._cp(true, false, [], $value, opt_ctx);
             },
             /**
              * Selects elements based on index, removes others
@@ -1641,7 +1642,7 @@
              */
             selectKeys: function($index, opt_to_ctx)
             {
-                return this.bl._del(true, $index, opt_to_ctx);
+                return this._._del(true, $index, opt_to_ctx);
             },
             /**
              * Selects elements based on index into a new array
@@ -1654,7 +1655,7 @@
              */
             $selectKeys: function($index, opt_to_ctx)
             {
-                return this.bl._cpKeys(false, [], $index, opt_to_ctx);
+                return this._._cpKeys(false, [], $index, opt_to_ctx);
             },
             /**
              * Retrieves and sets the size of an array
@@ -1694,7 +1695,7 @@
     
                 for(var i = 0, max = this.length; i < max; i++)
                 {
-                    output += (i? ', ' : '') + this[i].bl.toString();
+                    output += (i? ', ' : '') + this[i]._.toString();
                 }
     
                 return output + ']';
@@ -1708,7 +1709,7 @@
              * @return {Array} this - unified with the other
              */
             unify: function(arr) {
-                return this.bl.append(arr).bl.unique();
+                return this._.append(arr)._.unique();
             },
             /**
              * Calculates the union for 2 arrays into an new array
@@ -1719,12 +1720,12 @@
              * @return {Array}      - new array containing the unification
              */
             $unify: function(arr) {
-                var app = this.bl.$append(arr);
-                var output = app.bl.unique();
+                var app = this._.$append(arr);
+                var output = app._.unique();
     
                 return output;
     
-    //				return this.bl.$append(arr).bl.unique();
+    //				return this._.$append(arr)._.unique();
             },
             /**
              * Removes duplicate values in an array
@@ -1734,8 +1735,8 @@
              * @returns {Array} - new array without duplicates
              */
             unique: function() {
-                this.bl.eachRight(function(val, i) {
-                    this.bl.each(function(duplicate, j) {
+                this._.eachRight(function(val, i) {
+                    this._.each(function(duplicate, j) {
                         if(val === duplicate && j < i) return this.splice(i, 1), false;
                         return j < i;
                     }, this)
@@ -1753,8 +1754,8 @@
             $unique: function() {
                 var unique = [];
     
-                this.bl.each(function(val) {
-                    if(!unique.bl.has(val)) unique.push(val);
+                this._.each(function(val) {
+                    if(!unique._.has(val)) unique.push(val);
                 }, this);
     
                 return unique;
@@ -1769,7 +1770,7 @@
              * @returns {Array }                     - The array without the element
              */
             without: function($value, opt_ctx) {
-                return this.bl._rm(false, false, $value, opt_ctx);
+                return this._._rm(false, false, $value, opt_ctx);
             },
             /**
              * Removes the first occurrence in an array
@@ -1781,7 +1782,7 @@
              * @returns {Array }                     - NEW array without the element
              */
             $without: function($value, opt_ctx) {
-                return this.bl._cp(false, true, [], $value, opt_ctx);
+                return this._._cp(false, true, [], $value, opt_ctx);
             },
             /**
              * Removes the all occurrence in an array
@@ -1793,7 +1794,7 @@
              * @returns {Array}                      - The array without the element
              */
             withoutAll: function($value, opt_ctx) {
-                return this.bl._rm(true, false, $value, opt_ctx);
+                return this._._rm(true, false, $value, opt_ctx);
             },
             /**
              * Removes the all occurrence in an array
@@ -1805,7 +1806,7 @@
              * @returns {Array}                      - NEW array without the element
              */
             $withoutAll: function($value, opt_ctx) {
-                return this.bl._cp(true, true, [], $value, opt_ctx);
+                return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**
              * Remove elements based on index
@@ -1818,7 +1819,7 @@
              */
             withoutKeys: function($index, opt_to_ctx)
             {
-                return this.bl._del(false, $index, opt_to_ctx);
+                return this._._del(false, $index, opt_to_ctx);
             },
             /**
              * Remove elements based on index
@@ -1831,7 +1832,7 @@
              */
             $withoutKeys: function($index, opt_to_ctx)
             {
-                return this.bl._cpKeys(true, [], $index, opt_to_ctx);
+                return this._._cpKeys(true, [], $index, opt_to_ctx);
             }
         }
     });
@@ -1901,7 +1902,7 @@
              * @returns {string}             - new string containing the string before the given substring
              */
             between: function(pre_substr, post_substr) {
-                return this.bl.after(pre_substr).bl.before(post_substr);
+                return this._.after(pre_substr)._.before(post_substr);
             },
             /**
              * Capitalize the first character of a string
@@ -1950,7 +1951,7 @@
              * @returns {string}         - new string with the substring inserted
              */
             insert: function(substr, i) {
-                return this.bl.splice(i, 0, substr);
+                return this._.splice(i, 0, substr);
             },
             /**
              * Checks if a string is all lowercase
@@ -2237,7 +2238,7 @@
     
                 fnc = args.pop();
     
-                return fnc.bind.apply(fnc, [null].bl.append(args));
+                return fnc.bind.apply(fnc, [null]._.append(args));
             },
             /**
              * Similar to bind but only prefills the arguments not the context
@@ -2280,7 +2281,7 @@
                     return mixin.prototype;
                 };
     
-                mixins.bl.each(function(mixin) {
+                mixins._.each(function(mixin) {
                     // copy static fucntions
                     _.extend(child, mixin);
                     // copy prototype functions

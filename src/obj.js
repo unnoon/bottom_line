@@ -20,7 +20,7 @@ constructWrapper(Object, 'obj', {
         clone: function clone(obj) {
             var clone = Object.create(Object.getPrototypeOf(obj));
 
-            Object.getOwnPropertyNames(obj).bl.each(function(name) {
+            Object.getOwnPropertyNames(obj)._.each(function(name) {
                 Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
             });
 
@@ -37,14 +37,14 @@ constructWrapper(Object, 'obj', {
         cloneDeep: function cloneDeep(obj) {
             var names;
 
-            try       { names = obj.bl.names(); }
+            try       { names = obj._.names(); }
             catch (e) { return obj }
 
-            var clone = Object.create(obj.bl.proto());
-            names.bl.each(function (name) {
-                var pd = obj.bl.descriptor(name);
+            var clone = Object.create(obj._.proto());
+            names._.each(function (name) {
+                var pd = obj._.descriptor(name);
                 if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                clone.bl.define(name, pd);
+                clone._.define(name, pd);
             });
             return clone;
         },
@@ -72,32 +72,32 @@ constructWrapper(Object, 'obj', {
 
             var loglevel     = (settings && settings.loglevel) || 'debug';
 
-            module.bl.each(function(value, prop) {
+            module._.each(function(value, prop) {
                 var overrideProperty  = override;
                 var overwriteProperty = overwrite;
                 var aliases           = false;
 
-                descriptor = module.bl.descriptor(prop);
+                descriptor = module._.descriptor(prop);
                 // global property overrides
                 if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
                 if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                if(_.isDefined(writable) && descriptor.bl.owns('writable'))   descriptor.writable     = writable;
+                if(_.isDefined(writable) && descriptor._.owns('writable'))   descriptor.writable     = writable;
 
                 // special property specific config
-                if((config = value) && config.bl.owns('value'))
+                if((config = value) && config._.owns('value'))
                 {
                     if(config.clone)                   descriptor.value = _.clone(config.value); // clone deep maybe?
                     if(config.exec)                    descriptor.value = config.value();
-                    if(config.bl.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
-                    if(config.bl.owns('configurable'))   descriptor.configurable = config.configurable;
-                    if(config.bl.owns('writable'))       descriptor.writable     = config.writable;
-                    if(config.bl.owns('override'))       overrideProperty  = config.override;
-                    if(config.bl.owns('overwrite'))      overwriteProperty = config.overwrite;
-                    if(config.bl.owns('shim'))           overwriteProperty = config.shim;
+                    if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
+                    if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
+                    if(config._.owns('writable'))       descriptor.writable     = config.writable;
+                    if(config._.owns('override'))       overrideProperty  = config.override;
+                    if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
+                    if(config._.owns('shim'))           overwriteProperty = config.shim;
                     if(config.aliases)                 aliases = true;
                 }
 
-                if(obj.bl.owns(prop))
+                if(obj._.owns(prop))
                 {
                     if(!overwriteProperty) return; // continue;
                     console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
@@ -108,8 +108,8 @@ constructWrapper(Object, 'obj', {
                     console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
                 }
 
-                obj.bl.define(prop, descriptor);
-                if(aliases) config.aliases.bl.each(function(alias) {obj.bl.define(alias, descriptor)})
+                obj._.define(prop, descriptor);
+                if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
             });
 
             return obj;
@@ -145,7 +145,7 @@ constructWrapper(Object, 'obj', {
          * @returns {string} - type of the object
          */
         typeOf: function(obj) {
-            return Object.prototype.toString.call(obj).bl.between('[object ', ']').bl.decapitalize();
+            return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
         }
     },
     /**
@@ -168,7 +168,7 @@ constructWrapper(Object, 'obj', {
          */
         _cp: function(all, invert, target, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val, key, obj) {
+            return this._._edit(all, invert, function(val, key, obj) {
                 Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
             }, false, target, $value, opt_ctx);
         },
@@ -185,7 +185,7 @@ constructWrapper(Object, 'obj', {
          */
         _cpKeys: function(invert, target, $value, opt_to_ctx)
         {
-            return this.bl._editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
+            return this._._editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
         },
         /**
          * Copies a value to an array
@@ -199,7 +199,7 @@ constructWrapper(Object, 'obj', {
          */
         copy: function(to, $value, opt_ctx)
         {
-            return this.bl._cp(false, false, to, $value, opt_ctx);
+            return this._._cp(false, false, to, $value, opt_ctx);
         },
         /**
          * Copies all similar values to an array
@@ -213,7 +213,7 @@ constructWrapper(Object, 'obj', {
          */
         copyAll: function(to, $value, opt_ctx)
         {
-            return this.bl._cp(true, false, to, $value, opt_ctx);
+            return this._._cp(true, false, to, $value, opt_ctx);
         },
         /**
          * Copies keys to an array
@@ -227,7 +227,7 @@ constructWrapper(Object, 'obj', {
          */
         copyKeys: function(to, $index, opt_to_ctx)
         {
-            return this.bl._cpKeys(false, to, $index, opt_to_ctx);
+            return this._._cpKeys(false, to, $index, opt_to_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -242,7 +242,7 @@ constructWrapper(Object, 'obj', {
          */
         _cut: function(all, invert, target, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+            return this._._edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -257,7 +257,7 @@ constructWrapper(Object, 'obj', {
          */
         _cutKeys: function(invert, target, $value, opt_ctx)
         {
-            return this.bl._editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
+            return this._._editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
         },
         /**
          * Cut a value to an array
@@ -271,7 +271,7 @@ constructWrapper(Object, 'obj', {
          */
         cut: function(to, $value, opt_ctx)
         {
-            return this.bl._cut(false, false, to, $value, opt_ctx);
+            return this._._cut(false, false, to, $value, opt_ctx);
         },
         /**
          * Cut all similar values to an array
@@ -285,7 +285,7 @@ constructWrapper(Object, 'obj', {
          */
         cutAll: function(to, $value, opt_ctx)
         {
-            return this.bl._cut(true, false, to, $value, opt_ctx);
+            return this._._cut(true, false, to, $value, opt_ctx);
         },
         /**
          * Copies keys to an array
@@ -299,7 +299,7 @@ constructWrapper(Object, 'obj', {
          */
         cutKeys: function(to, $index, opt_to_ctx)
         {
-            return this.bl._cutKeys(false, to, $index, opt_to_ctx);
+            return this._._cutKeys(false, to, $index, opt_to_ctx);
         },
         /**
          * Copies keys to an array
@@ -338,7 +338,7 @@ constructWrapper(Object, 'obj', {
          */
         _del: function(invert, $index, opt_to_ctx)
         {
-            return this.bl._editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
+            return this._._editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
         },
         /**
          * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -392,7 +392,7 @@ constructWrapper(Object, 'obj', {
         filter: function(cb, opt_ctx) {
             var filtered = [];
 
-            this.bl.each(function(elm) {
+            this._.each(function(elm) {
                 if(cb.call(opt_ctx, elm)) filtered.push(elm);
             });
 
@@ -430,7 +430,7 @@ constructWrapper(Object, 'obj', {
 
             for(var key in this)
             {
-                if(this.bl.owns(key)) len++;
+                if(this._.owns(key)) len++;
             }
 
             return len;
@@ -461,7 +461,7 @@ constructWrapper(Object, 'obj', {
         pairs: function() {
             var pairs = [];
 
-            this.bl.each(function(val, key) {
+            this._.each(function(val, key) {
                 pairs.push(key, val);
             });
 
@@ -479,7 +479,7 @@ constructWrapper(Object, 'obj', {
         proto: function(proto) {
             if(proto === undefined) return Object.getPrototypeOf(this);
 
-            this.bl._proto__ = proto;
+            this._._proto__ = proto;
 
             return this;
         },
@@ -513,7 +513,7 @@ constructWrapper(Object, 'obj', {
          */
         _rm: function(all, invert, $value, opt_ctx)
         {
-            return this.bl._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
+            return this._._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
         },
         /**
          * Better to string version
@@ -530,7 +530,7 @@ constructWrapper(Object, 'obj', {
             {
                 if(this.hasOwnProperty(key))
                 {
-                    output += (output? ', ' : '{') + key + ': ' + this[key].bl.toString();
+                    output += (output? ', ' : '{') + key + ': ' + this[key]._.toString();
                 }
             }
 
@@ -546,7 +546,7 @@ constructWrapper(Object, 'obj', {
         values: function() {
             var values = [];
 
-            this.bl.each(function(elm) {
+            this._.each(function(elm) {
                 values.push(elm);
             });
 
@@ -562,7 +562,7 @@ constructWrapper(Object, 'obj', {
          * @returns {Array }                     - The array without the element
          */
         without: function($value, opt_ctx) {
-            return this.bl._rm(false, false, $value, opt_ctx);
+            return this._._rm(false, false, $value, opt_ctx);
         },
         /**
          * Removes the first occurrence in an array
@@ -574,7 +574,7 @@ constructWrapper(Object, 'obj', {
          * @returns {Object }                    - NEW object without the element
          */
         $without: function($value, opt_ctx) {
-            return this.bl._cp(false, true, {}, $value, opt_ctx);
+            return this._._cp(false, true, {}, $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
@@ -586,7 +586,7 @@ constructWrapper(Object, 'obj', {
          * @returns {Object}                      - The array without the element
          */
         withoutAll: function($value, opt_ctx) {
-            return this.bl._rm(true, false, $value, opt_ctx);
+            return this._._rm(true, false, $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
@@ -598,7 +598,7 @@ constructWrapper(Object, 'obj', {
          * @returns {Object}                      - NEW array without the element
          */
         $withoutAll: function($value, opt_ctx) {
-            return this.bl._cp(true, true, [], $value, opt_ctx);
+            return this._._cp(true, true, [], $value, opt_ctx);
         },
         /**
          * Remove elements based on index
@@ -611,7 +611,7 @@ constructWrapper(Object, 'obj', {
          */
         withoutKeys: function($index, opt_to_ctx)
         {
-            return this.bl._del(false, $index, opt_to_ctx);
+            return this._._del(false, $index, opt_to_ctx);
         },
         /**
          * Remove elements based on index
@@ -624,7 +624,7 @@ constructWrapper(Object, 'obj', {
          */
         $withoutKeys: function($index, opt_to_ctx)
         {
-            return this.bl._cpKeys(true, [], $index, opt_to_ctx);
+            return this._._cpKeys(true, [], $index, opt_to_ctx);
         }
     }
 });

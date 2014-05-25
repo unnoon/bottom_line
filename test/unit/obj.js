@@ -169,7 +169,7 @@ describe("Object", function() {
 
 				var sum = 0;
 
-				obj.bl.each(function(elm) {
+				obj._.each(function(elm) {
 					sum += elm;
 				});
 
@@ -185,7 +185,7 @@ describe("Object", function() {
 
 				var sum = 0;
 
-				obj.bl.each(function(elm) {
+				obj._.each(function(elm) {
 					if(elm === 2) return false;
 
 					sum += elm;
@@ -202,7 +202,7 @@ describe("Object", function() {
 //					z: 3
 //				};
 //
-//				expect(obj.bl.each()).to.throw(TypeError);
+//				expect(obj._.each()).to.throw(TypeError);
 //			});
 
 			it("it is possible to pass a different context for the callback function", function() {
@@ -218,7 +218,7 @@ describe("Object", function() {
 
 				var sum = 0;
 
-				obj.bl.each(function(elm) {
+				obj._.each(function(elm) {
 					sum += elm + this.c;
 				}, obj2);
 
@@ -236,7 +236,7 @@ describe("Object", function() {
 					t: 666
 				};
 
-				var result = obj.bl.filter(function(elm) {
+				var result = obj._.filter(function(elm) {
 					return elm < 3;
 				});
 
@@ -254,7 +254,7 @@ describe("Object", function() {
 					t: 666
 				};
 
-				expect(obj.bl.find(function(elm) {return elm > 2})).to.deep.equal(3);
+				expect(obj._.find(function(elm) {return elm > 2})).to.deep.equal(3);
 			});
 		});
 
@@ -268,7 +268,7 @@ describe("Object", function() {
 					t: 666
 				};
 
-				expect(obj.bl.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
+				expect(obj._.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
 			});
 		});
 
@@ -282,7 +282,7 @@ describe("Object", function() {
 					t: 666
 				};
 
-				expect(obj.bl.values()).to.deep.equal([1,2,3,666]);
+				expect(obj._.values()).to.deep.equal([1,2,3,666]);
 			});
 		});
 
@@ -296,7 +296,7 @@ describe("Object", function() {
                     t: 666
                 };
 
-                expect(obj.bl.size()).to.deep.equal(4);
+                expect(obj._.size()).to.deep.equal(4);
             });
         });
 
@@ -305,7 +305,7 @@ describe("Object", function() {
             it("simple _toString", function() {
                 var obj = {x: 1, y: 2, z: 3};
 
-                expect(obj.bl.toString()).to.eql('{x: 1, y: 2, z: 3}');
+                expect(obj._.toString()).to.eql('{x: 1, y: 2, z: 3}');
             });
 
             it("complex _toString", function() {
@@ -318,7 +318,7 @@ describe("Object", function() {
                     obj: {xt: 666, arr: [{really: 'yes'}]}
                 };
 
-                expect(obj.bl.toString()).to.eql('{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}');
+                expect(obj._.toString()).to.eql('{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}');
             });
         });
 
@@ -327,7 +327,7 @@ describe("Object", function() {
 			it("without by value", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 2};
 
-				obj.bl.without(2);
+				obj._.without(2);
 
 				expect(obj).to.eql({x: 1,z: 3,t: 2});
 			});
@@ -335,7 +335,7 @@ describe("Object", function() {
 			it("without multiple values", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 2};
 
-				obj.bl.without([2,3]);
+				obj._.without([2,3]);
 
 				expect(obj).to.eql({x: 1,t: 2});
 			});
@@ -343,7 +343,7 @@ describe("Object", function() {
 			it("without function", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-				obj.bl.without(function(val) {
+				obj._.without(function(val) {
 					return val > 2;
 				});
 
@@ -356,22 +356,22 @@ describe("Object", function() {
             it("$without one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj.bl.$without(2)).to.eql({ x: 1,z: 3,t: 2});
+                expect(obj._.$without(2)).to.eql({ x: 1,z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$without multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj.bl.$without([2, 1])).to.eql({z: 3,t: 2});
+                expect(obj._.$without([2, 1])).to.eql({z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$without function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj.bl.$without(function(val) {
-                    return val.bl.startsWith('b');
+                expect(obj._.$without(function(val) {
+                    return val._.startsWith('b');
                 })).to.eql({x: 'a', z: 'bb',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
             });
@@ -382,7 +382,7 @@ describe("Object", function() {
             it("withoutAll by value", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2};
 
-                obj.bl.withoutAll(2);
+                obj._.withoutAll(2);
 
                 expect(obj).to.eql({x: 1,z: 3});
             });
@@ -390,7 +390,7 @@ describe("Object", function() {
             it("withoutAll multiple values", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
 
-                obj.bl.withoutAll([2,3]);
+                obj._.withoutAll([2,3]);
 
                 expect(obj).to.eql({x: 1});
             });
@@ -398,7 +398,7 @@ describe("Object", function() {
             it("withoutAll function", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-                obj.bl.withoutAll(function(val) {
+                obj._.withoutAll(function(val) {
                     return val > 2;
                 });
 
@@ -411,22 +411,22 @@ describe("Object", function() {
             it("$withoutAll one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj.bl.$withoutAll(2)).to.eql({ x: 1,z: 3});
+                expect(obj._.$withoutAll(2)).to.eql({ x: 1,z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$withoutAll multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj.bl.$withoutAll([2, 1])).to.eql({z: 3});
+                expect(obj._.$withoutAll([2, 1])).to.eql({z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$withoutAll function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj.bl.$withoutAll(function(val) {
-                    return val.bl.startsWith('b');
+                expect(obj._.$withoutAll(function(val) {
+                    return val._.startsWith('b');
                 })).to.eql({x: 'a',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
             });
@@ -437,19 +437,19 @@ describe("Object", function() {
 			it("withoutKeys", function() {
 				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj.bl.withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+				expect(obj._.withoutKeys('y')).to.deep.equal({x: 1,z: 3});
 			});
 
 			it("withoutKeys an array of elements", function() {
 				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj.bl.withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
+				expect(obj._.withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
 			});
 
 			it("withoutKeys based on function", function() {
 				var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-				expect(obj.bl.withoutKeys(function(key) {return key.bl.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+				expect(obj._.withoutKeys(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
 
@@ -458,21 +458,21 @@ describe("Object", function() {
             it("$withoutKeys", function() {
                 var obj = {x: 1,y: 2,z: 3};
 
-                expect(obj.bl.$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+                expect(obj._.$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,z: 3})
             });
 
             it("$withoutKeys an array of elements", function() {
                 var obj = {x: 1,y: 2,z: 3};
 
-                expect(obj.bl.$withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
+                expect(obj._.$withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
                 expect(obj).to.eql({x: 1,y: 2,z: 3})
             });
 
             it("$withoutKeys based on function", function() {
                 var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-                expect(obj.bl.$withoutKeys(function(key) {return key.bl.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+                expect(obj._.$withoutKeys(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
             });
         });
@@ -483,21 +483,21 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copy(obj2, 2)).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.copy(obj2, 2)).to.eql({a: 1,b: 2, y:2});
             });
 
             it("copy values", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copy(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.copy(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
             });
 
             it("copy function", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copy(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.copy(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
             });
         });
 
@@ -507,21 +507,21 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+                expect(obj1._.copyAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
             });
 
             it("copyAll values", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+                expect(obj1._.copyAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
             });
 
             it("copyAll function", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.copyAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
             });
         });
 
@@ -531,21 +531,21 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.copyKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
             });
 
             it("copyKeys values", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
+                expect(obj1._.copyKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
             });
 
             it("copyKeys function", function() {
                 var obj1 = {x: 1,y: 2,z: 3, zt:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.copyKeys(obj2, function(key) {return key.bl.startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
+                expect(obj1._.copyKeys(obj2, function(key) {return key._.startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
             });
         });
 
@@ -555,7 +555,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
     
-                expect(obj1.bl.cut(obj2, 2)).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.cut(obj2, 2)).to.eql({a: 1,b: 2, y:2});
                 expect(obj1).to.eql({x: 1, z:3});
             });
     
@@ -563,7 +563,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
     
-                expect(obj1.bl.cut(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.cut(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3});
                 expect(obj1).to.eql({x: 1});
             });
     
@@ -571,7 +571,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
     
-                expect(obj1.bl.cut(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.cut(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2});
                 expect(obj1).to.eql({x: 1, z:3});
             });
         });
@@ -582,7 +582,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+                expect(obj1._.cutAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
                 expect(obj1).to.eql({x: 1, z:3});
             });
 
@@ -590,7 +590,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+                expect(obj1._.cutAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
                 expect(obj1).to.eql({x: 1});
             });
 
@@ -598,7 +598,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.cutAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
                 expect(obj1).to.eql({x: 1});
             });
         });
@@ -609,7 +609,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
+                expect(obj1._.cutKeys(obj2, 'y')).to.eql({a: 1,b: 2, y:2});
                 expect(obj1).to.eql({x: 1, z:3, t:2});
             });
 
@@ -617,7 +617,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
+                expect(obj1._.cutKeys(obj2, ['y', 't'])).to.eql({a: 1,b: 2, y:2, t: 2});
                 expect(obj1).to.eql({x: 1, z:3});
             });
 
@@ -625,7 +625,7 @@ describe("Object", function() {
                 var obj1 = {x: 1,y: 2,z: 3, zt:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1.bl.cutKeys(obj2, function(key) {return key.bl.startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
+                expect(obj1._.cutKeys(obj2, function(key) {return key._.startsWith('z')})).to.eql({a: 1,b: 2, z:3, zt: 2});
                 expect(obj1).to.eql({x: 1, y:2});
             });
         });  

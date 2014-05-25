@@ -65,7 +65,7 @@ constructWrapper(Function, 'fnc', {
 
             fnc = args.pop();
 
-            return fnc.bind.apply(fnc, [null].bl.append(args));
+            return fnc.bind.apply(fnc, [null]._.append(args));
         },
         /**
          * Similar to bind but only prefills the arguments not the context
@@ -108,7 +108,7 @@ constructWrapper(Function, 'fnc', {
                 return mixin.prototype;
             };
 
-            mixins.bl.each(function(mixin) {
+            mixins._.each(function(mixin) {
                 // copy static fucntions
                 _.extend(child, mixin);
                 // copy prototype functions
