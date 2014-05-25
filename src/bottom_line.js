@@ -8,10 +8,10 @@
  */
 'use strict';
 !function(root, bottom_line) {
-    var requirejs = typeof(define) === 'function' && !!define.amd, environment = true;
-    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
+    var requirejs = typeof(define) === 'function' && !!define.amd;
+    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports, environment;
 
-    switch(environment) {
+    switch(environment = true) {
     case requirejs : define(bottom_line); break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : root._ = bottom_line(); }
