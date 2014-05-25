@@ -2,39 +2,46 @@ describe("Bottom_Line._.⌡S", function() {
 
 	describe("bottom line js", function() {
 
-		it("static test", function() {
-			expect(_.obj.getOwnPropertyNames).not.to.equal(undefined);
-			expect(_.getOwnPropertyNames).not.to.equal(undefined);
+		it("singular", function() {
+			var names    = ['bobby', 'jean'];
+			var namesExt = names.bl.append(['xavier']);
+
+			expect(namesExt).to.eql(['bobby', 'jean', 'xavier']);
+
+			expect(names.bl.has('jean')).to.equal(true);
 		});
 
-//		it("singular", function() {
-//			var names    = ['bobby', 'jean'];
-//			var namesExt = names.$.append(['xavier']);
-//
-//			expect(namesExt).to.eql(['bobby', 'jean', 'xavier']);
-//
-//			expect(names.$.has('jean')).to.equal(true);
-//		});
-//
-//		it("chaining", function() {
-//			var names = ['bobby', 'jean'];
-//
-//			names.$$.append(['xavier']).without('bobby');
-//
-//			expect(names).to.eql(['jean', 'xavier']);
-//		});
-//
-//		it("chaining different types", function() {
-//			var arr = [4,5,6,2];
-//
-//			expect(arr.$$.without(2).min().$$.bound(1, 3).between(2,4).value).to.be.true;
-//		});
-//
-//		it("singular type chaining", function() {
-//			var arr = [4,5,6,2];
-//
-//			expect(arr.$.min().$.bound(-1, 1)).to.equal(1);
-//		});
+		it("chaining", function() {
+			var names = ['bobby', 'jean'];
+
+			names.bl.chain
+                .append(['xavier'])
+                .without('bobby');
+
+			expect(names).to.eql(['jean', 'xavier']);
+		});
+
+		it("chaining different types", function() {
+			var arr = [4,5,6,2];
+
+			expect(arr.bl.chain
+                .without(2)
+                .min()
+                .bound(1, 3)
+                .between(2,4)
+                .value
+            ).to.be.true;
+		});
+
+		it("singular type chaining", function() {
+			var arr = [4,5,6,2];
+
+			expect(arr.bl.chain
+                .min()
+                .bound(-1, 1)
+                .value
+            ).to.equal(1);
+		});
 	});
 
 /*

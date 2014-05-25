@@ -13,7 +13,7 @@ module.exports = function (config) {
 			// these are only watched and served
 			{pattern: 'dist/bottom_line.js'},
 			// included files - tests
-			{pattern: 'test/unit/obj.js'}
+			{pattern: 'test/unit/**/*.js'}
 		],
 
 		preprocessors: {

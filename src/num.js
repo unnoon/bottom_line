@@ -30,7 +30,7 @@ constructWrapper(Number, 'num', {
             var min = opt_min || 0;
             var max = opt_max || 1;
 
-            return _.isDefined(opt_max)? __math.random() * (max - min) + min : __math.random();
+            return (opt_max !== undefined)? Math.random() * (max - min) + min : Math.random();
         },
         // TODO left inclusive right inclusive or both
         /**
@@ -105,7 +105,7 @@ constructWrapper(Number, 'num', {
          * @returns {number}           - the powered number
          */
         pow: function(exponent) {
-            return __math.pow(this, exponent)
+            return Math.pow(this, exponent)
         },
         /**
          * Checks if a number is between to values
@@ -127,7 +127,7 @@ constructWrapper(Number, 'num', {
          * @returns {boolean}     - bounded version of the number that falls between the 2 values
          */
         bound: function(min, max) {
-            return _.min(_.max(this, min), max);
+            return Math.min(Math.max(this, min), max);
         },
         /**
          * Rebounds a number between 2 values. Handy for number ranges that are continuous

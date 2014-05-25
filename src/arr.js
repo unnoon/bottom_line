@@ -19,9 +19,9 @@ constructWrapper(Array, 'arr', {
 
         switch (type)
         {
-            case 'arguments' : return __arr.prototype.slice.call(obj, 0);
+            case 'arguments' : return Array.prototype.slice.call(obj, 0);
             case 'object'    :
-            case 'function'  : return __obj.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
+            case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
             case 'array'     : return obj;
             case 'undefined' :
             case 'null'      : return [];
@@ -38,7 +38,7 @@ constructWrapper(Array, 'arr', {
          * @returns  {Array} array containing the concatenated array
          */
         concat: function(var_args) {
-            return __arr.prototype.concat.apply([], arguments);
+            return Array.prototype.concat.apply([], arguments);
         }
     },
     /**
@@ -616,7 +616,7 @@ constructWrapper(Array, 'arr', {
         max: function(opt_compare) {
             if(opt_compare === undefined)
             {
-                return __math.max.apply(null, this);
+                return Math.max.apply(null, this);
             }
             else
             {
@@ -640,7 +640,7 @@ constructWrapper(Array, 'arr', {
         min: function(opt_compare) {
             if(opt_compare === undefined)
             {
-                return __math.min.apply(null, this);
+                return Math.min.apply(null, this);
             }
             else
             {

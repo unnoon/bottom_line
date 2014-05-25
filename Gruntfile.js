@@ -26,7 +26,7 @@ module.exports = function(grunt) {
                 }
             },
             js : {
-                src : 'src/bottom_line_new.js',
+                src : 'src/bottom_line.js',
                 dest : 'dist/bottom_line.js'
             }
         }

@@ -17,7 +17,7 @@ describe("Array", function() {
 			it("append an array", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._append(['d', 'e']);
+				arr.bl.append(['d', 'e']);
 
 				expect(arr).to.eql(['a', 'b', 'c', 'd', 'e']);
 			});
@@ -28,7 +28,7 @@ describe("Array", function() {
 			it("$append an array", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._$append(['d', 'e'])).to.eql(['a', 'b', 'c', 'd', 'e']);
+				expect(arr.bl.$append(['d', 'e'])).to.eql(['a', 'b', 'c', 'd', 'e']);
 				expect(arr).to.eql(['a', 'b', 'c']);
 			});
 		});
@@ -38,7 +38,7 @@ describe("Array", function() {
 			it("compact array", function() {
 				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN];
 
-				expect(arr1._compact()).to.eql(['a', 'b', 'c']);
+				expect(arr1.bl.compact()).to.eql(['a', 'b', 'c']);
 			});
 		});
 
@@ -47,7 +47,7 @@ describe("Array", function() {
 			it("$compact array", function() {
 				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd'];
 
-				expect(arr1._$compact()).to.eql(['a', 'b', 'c', 'd']);
+				expect(arr1.bl.$compact()).to.eql(['a', 'b', 'c', 'd']);
 //				expect(arr1).to.eql(['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd']); // somehow this fails bug in chai???
 				expect(arr1[9]).to.eql('d');
 			});
@@ -59,21 +59,21 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copy(arr2, 'b')).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.copy(arr2, 'b')).to.eql(['b', 'e', 'b']);
 			});
 
 			it("copy values", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copy(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1.bl.copy(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
 			});
 
 			it("copy function", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copy(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.copy(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
 
 			});
 		});
@@ -84,21 +84,21 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1.bl.copyAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
 			});
 
 			it("copyAll values", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
+				expect(arr1.bl.copyAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
 			});
 
 			it("copyAll function", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1.bl.copyAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
 
 			});
 		});
@@ -109,21 +109,21 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.copyKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
 			});
 
 			it("copyKeys values", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1.bl.copyKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
 			});
 
 			it("copyKeys function", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._copyKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
+				expect(arr1.bl.copyKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
 
 			});
 		});
@@ -134,7 +134,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cut(arr2, 'b')).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.cut(arr2, 'b')).to.eql(['b', 'e', 'b']);
 				expect(arr1).to.eql(['a', 'c', 'b']);
 			});
 
@@ -142,7 +142,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cut(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1.bl.cut(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c']);
 				expect(arr1).to.eql(['a', 'b']);
 			});
 
@@ -150,7 +150,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cut(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.cut(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b']);
 				expect(arr1).to.eql(['a', 'c', 'b']);
 			});
 		});
@@ -161,7 +161,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1.bl.cutAll(arr2, 'b')).to.eql(['b', 'e', 'b', 'b']);
 				expect(arr1).to.eql(['a', 'c']);
 			});
 
@@ -169,7 +169,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
+				expect(arr1.bl.cutAll(arr2, ['b', 'c'])).to.eql(['b', 'e', 'b', 'c', 'b']);
 				expect(arr1).to.eql(['a']);
 			});
 
@@ -177,7 +177,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
+				expect(arr1.bl.cutAll(arr2, function(val) {return val === 'b'})).to.eql(['b', 'e', 'b', 'b']);
 				expect(arr1).to.eql(['a', 'c']);
 
 			});
@@ -189,7 +189,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
+				expect(arr1.bl.cutKeys(arr2, 1)).to.eql(['b', 'e', 'b']);
 				expect(arr1).to.eql(['a', 'c', 'b']);
 			});
 
@@ -197,7 +197,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
+				expect(arr1.bl.cutKeys(arr2, [1, 2])).to.eql(['b', 'e', 'b', 'c']);
 				expect(arr1).to.eql(['a', 'b']);
 			});
 
@@ -205,7 +205,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c', 'b'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._cutKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
+				expect(arr1.bl.cutKeys(arr2, function(i) {return i > 1})).to.eql(['b', 'e', 'c', 'b']);
 				expect(arr1).to.eql(['a', 'b']);
 
 			});
@@ -217,7 +217,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._diff(arr2)).to.eql(['a', 'c']);
+				expect(arr1.bl.diff(arr2)).to.eql(['a', 'c']);
 			});
 		});
 
@@ -227,7 +227,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'e'];
 
-				expect(arr1._$diff(arr2)).to.eql(['a', 'c']);
+				expect(arr1.bl.$diff(arr2)).to.eql(['a', 'c']);
 				expect(arr1).to.eql(['a', 'b', 'c']);
 				expect(arr1).to.equal(arr1);
 			});
@@ -236,7 +236,7 @@ describe("Array", function() {
 		describe("dimit", function() {
 
 			it("2D array", function() {
-				var arr = [2, 3]._dimit(0);
+				var arr = [2, 3].bl.dimit(0);
 
 				expect(arr).to.eql([
 					[0,0,0],
@@ -245,7 +245,7 @@ describe("Array", function() {
 			});
 
 			it("2D array: init undefined", function() {
-				var arr = [2, 3]._dimit();
+				var arr = [2, 3].bl.dimit();
 
 				expect(arr).to.eql([
 					[],
@@ -264,7 +264,7 @@ describe("Array", function() {
 
 				var sum = 0;
 
-				arr._each(function(elm) {
+				arr.bl.each(function(elm) {
 					sum += elm;
 				});
 
@@ -276,7 +276,7 @@ describe("Array", function() {
 
 				var sum = 0;
 
-				arr._each(2,function(elm) {
+				arr.bl.each(2,function(elm) {
 					sum += elm;
 				});
 
@@ -286,7 +286,7 @@ describe("Array", function() {
 			it("elastic step each", function() {
 				var arr = [1, 2, 3, 4, 5, 6];
 
-				arr._each(function(elm, i, arr) {
+				arr.bl.each(function(elm, i, arr) {
 					if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
 				});
 
@@ -296,7 +296,7 @@ describe("Array", function() {
 			it("elastic step 2 each", function() {
 				var arr = [1, 2, 3, 4, 5, 6];
 
-				arr._each(2, function(elm, i, arr) {
+				arr.bl.each(2, function(elm, i, arr) {
 					if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
 				});
 
@@ -308,7 +308,7 @@ describe("Array", function() {
 
 				var div = 36;
 
-				arr._eachRight(1, function(elm) {
+				arr.bl.eachRight(1, function(elm) {
 					div /= elm;
 				});
 
@@ -318,7 +318,7 @@ describe("Array", function() {
 			it("elastic negative step each", function() {
 				var arr = [1, 2, 3, 4, 5, 6];
 
-				arr._eachRight(1, function(elm, i, arr) {
+				arr.bl.eachRight(1, function(elm, i, arr) {
 					if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
 				});
 
@@ -328,7 +328,7 @@ describe("Array", function() {
 			it("elastic negative step 2 each", function() {
 				var arr = [1, 2, 3, 4, 5, 6];
 
-				arr._eachRight(2, function(elm, i, arr) {
+				arr.bl.eachRight(2, function(elm, i, arr) {
 					if(elm === 2 || elm === 3 || elm === 4) arr.splice(i, 1);
 				});
 
@@ -344,7 +344,7 @@ describe("Array", function() {
 				var sum   = 0;
 				var count = 0;
 
-				arr._each(function(elm, i, arr) {
+				arr.bl.each(function(elm, i, arr) {
 					sum += elm;
 					count++;
 				});
@@ -363,7 +363,7 @@ describe("Array", function() {
 				var sum   = 0;
 				var count = 0;
 
-				arr._each(function(elm, i, arr) {
+				arr.bl.each(function(elm, i, arr) {
 					sum += elm;
 					count++;
 				});
@@ -378,22 +378,22 @@ describe("Array", function() {
 			it("return first", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._first()).to.eql('a');
+				expect(arr.bl.first()).to.eql('a');
 			});
 
 			it("set first", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._first('z');
+				arr.bl.first('z');
 
-				expect(arr._first()).to.eql('z');
+				expect(arr.bl.first()).to.eql('z');
 				expect(arr).to.eql(['z', 'b', 'c']);
 			});
 
 			it("complex first chain", function() {
 				var arr = [['a', 'b'], 'b', 'c'];
 
-				arr._append(['d'])._first()._without('b');
+				arr.bl.append(['d']).bl.first().bl.without('b');
 
 				expect(arr).to.eql([['a'], 'b', 'c', 'd']);
 			});
@@ -404,7 +404,7 @@ describe("Array", function() {
 			it("1-dimensional flatten", function() {
 				var arr1 = [['a', 'b'], 'c', ['d', 'e']];
 
-				arr1._flatten();
+				arr1.bl.flatten();
 
 				expect(arr1).to.eql(['a', 'b', 'c', 'd', 'e']);
 			});
@@ -415,7 +415,7 @@ describe("Array", function() {
 			it("1-dimensional flatten", function() {
 				var arr1 = [['a', 'b'], 'c', ['d', 'e']];
 
-				expect(arr1._$flatten()).to.eql(['a', 'b', 'c', 'd', 'e']);
+				expect(arr1.bl.$flatten()).to.eql(['a', 'b', 'c', 'd', 'e']);
 				expect(arr1).to.eql([['a', 'b'], 'c', ['d', 'e']]);
 			});
 		});
@@ -425,7 +425,7 @@ describe("Array", function() {
 			it("insert beginning", function() {
 				var arr = [1, 2, 3];
 
-				arr._insert(0, 0);
+				arr.bl.insert(0, 0);
 
 				expect(arr).to.eql([0, 1, 2, 3]);
 			});
@@ -433,7 +433,7 @@ describe("Array", function() {
 			it("insert end", function() {
 				var arr = [1, 2, 3];
 
-				arr._insert(4, 3);
+				arr.bl.insert(4, 3);
 
 				expect(arr).to.eql([1, 2, 3, 4]);
 			});
@@ -441,7 +441,7 @@ describe("Array", function() {
 			it("insert middle", function() {
 				var arr = [1, 2, 3];
 
-				arr._insert(1.5, 1);
+				arr.bl.insert(1.5, 1);
 
 				expect(arr).to.eql([1, 1.5, 2, 3]);
 			});
@@ -449,7 +449,7 @@ describe("Array", function() {
 			it("insert out of bounds -", function() {
 				var arr = [1, 2, 3];
 
-				arr._insert(-1, -2);
+				arr.bl.insert(-1, -2);
 
 				expect(arr).to.eql([1, -1, 2, 3]);
 			});
@@ -457,7 +457,7 @@ describe("Array", function() {
 			it("insert out of bounds", function() {
 				var arr = [1, 2, 3];
 
-				arr._insert(5, 4);
+				arr.bl.insert(5, 4);
 
 				expect(arr).to.eql([1, 2, 3, 5]);
 			});
@@ -469,14 +469,14 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'c', 'd', 'e'];
 
-				expect(arr1._intersect(arr2)).to.eql(['b', 'c']);
+				expect(arr1.bl.intersect(arr2)).to.eql(['b', 'c']);
 			});
 
 			it("non intersecting arrrays", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['d', 'e'];
 
-				expect(arr1._intersect(arr2)).to.eql([]);
+				expect(arr1.bl.intersect(arr2)).to.eql([]);
 			});
 		});
 
@@ -486,7 +486,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'c', 'd', 'e'];
 
-				expect(arr1._$intersect(arr2)).to.eql(['b', 'c']);
+				expect(arr1.bl.$intersect(arr2)).to.eql(['b', 'c']);
 				expect(arr1).to.eql(['a', 'b', 'c']);
 				expect(arr1).to.equal(arr1);
 			});
@@ -495,7 +495,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['d', 'e'];
 
-				expect(arr1._$intersect(arr2)).to.eql([]);
+				expect(arr1.bl.$intersect(arr2)).to.eql([]);
 				expect(arr1).to.eql(['a', 'b', 'c']);
 				expect(arr1).to.equal(arr1);
 			});
@@ -507,14 +507,14 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'c', 'd', 'e'];
 
-				expect(arr1._intersects(arr2)).to.be.true;
+				expect(arr1.bl.intersects(arr2)).to.be.true;
 			});
 
 			it("non intersecting arrrays", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['d', 'e'];
 
-				expect(arr1._intersects(arr2)).to.be.false;
+				expect(arr1.bl.intersects(arr2)).to.be.false;
 			});
 		});
 
@@ -523,7 +523,7 @@ describe("Array", function() {
 			it("modify ", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._modify(function(val) {
+				arr.bl.modify(function(val) {
 					return val + 'x';
 				});
 
@@ -536,7 +536,7 @@ describe("Array", function() {
 			it("$modify ", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._$modify(function(val) {
+				expect(arr.bl.$modify(function(val) {
 					return val + 'x';
 				})).to.eql(['ax', 'bx', 'cx']);
 				expect(arr).to.eql(['a', 'b', 'c']);
@@ -549,21 +549,21 @@ describe("Array", function() {
 			it("select one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				expect(arr._select('a')).to.eql(['a']);
+				expect(arr.bl.select('a')).to.eql(['a']);
 				expect(arr).to.eql(['a']);
 			});
 
 			it("select multiple elements", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._select(['a', 'b'])).to.eql(['a', 'b']);
+				expect(arr.bl.select(['a', 'b'])).to.eql(['a', 'b']);
 				expect(arr).to.eql(['a', 'b']);
 			});
 
 			it("select by function", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._select(function(elm) {
+				expect(arr.bl.select(function(elm) {
 					return elm === 'b';
 				})).to.eql(['b']);
 				expect(arr).to.eql(['b']);
@@ -575,21 +575,21 @@ describe("Array", function() {
 			it("$select one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				expect(arr._$select('a')).to.eql(['a']);
+				expect(arr.bl.$select('a')).to.eql(['a']);
 				expect(arr).to.equal(arr);
 			});
 
 			it("$select multiple elements", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._$select(['a', 'b'])).to.eql(['a', 'b']);
+				expect(arr.bl.$select(['a', 'b'])).to.eql(['a', 'b']);
 				expect(arr).to.equal(arr);
 			});
 
 			it("$select by function", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._$select(function(elm) {
+				expect(arr.bl.$select(function(elm) {
 					return elm === 'b';
 				})).to.eql(['b']);
 				expect(arr).to.equal(arr);
@@ -601,21 +601,21 @@ describe("Array", function() {
 			it("selectAll one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				expect(arr._selectAll('a')).to.eql(['a', 'a']);
+				expect(arr.bl.selectAll('a')).to.eql(['a', 'a']);
 				expect(arr).to.eql(['a', 'a']);
 			});
 
 			it("selectAll multiple elements", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._selectAll(['a', 'b'])).to.eql(['a', 'b', 'a', 'b']);
+				expect(arr.bl.selectAll(['a', 'b'])).to.eql(['a', 'b', 'a', 'b']);
 				expect(arr).to.eql(['a', 'b', 'a', 'b']);
 			});
 
 			it("selectAll by function", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._selectAll(function(elm) {
+				expect(arr.bl.selectAll(function(elm) {
 					return elm === 'b';
 				})).to.eql(['b', 'b']);
 				expect(arr).to.eql(['b', 'b']);
@@ -627,7 +627,7 @@ describe("Array", function() {
 			it("$selectAll one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				expect(arr._$selectAll('a')).to.eql(['a', 'a']);
+				expect(arr.bl.$selectAll('a')).to.eql(['a', 'a']);
 				expect(arr).to.eql(['a', 'b', 'a', 'c']);
 				expect(arr).to.equal(arr);
 			});
@@ -635,7 +635,7 @@ describe("Array", function() {
 			it("$selectAll multiple elements", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._$selectAll(['a', 'b'])).to.eql(['a', 'b', 'a', 'b']);
+				expect(arr.bl.$selectAll(['a', 'b'])).to.eql(['a', 'b', 'a', 'b']);
 				expect(arr).to.eql(['a', 'b', 'a', 'c', 'b']);
 				expect(arr).to.equal(arr);
 			});
@@ -643,7 +643,7 @@ describe("Array", function() {
 			it("$selectAll by function", function() {
 				var arr = ['a', 'b', 'a', 'c', 'b'];
 
-				expect(arr._$selectAll(function(elm) {
+				expect(arr.bl.$selectAll(function(elm) {
 					return elm === 'b';
 				})).to.eql(['b', 'b']);
 				expect(arr).to.eql(['a', 'b', 'a', 'c', 'b']);
@@ -656,7 +656,7 @@ describe("Array", function() {
 			it("selectKeys one index", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._selectKeys(1);
+				arr.bl.selectKeys(1);
 
 				expect(arr).to.deep.equal(['b']);
 			});
@@ -664,7 +664,7 @@ describe("Array", function() {
 			it("selectKeys from to index", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._selectKeys(1, 3);
+				arr.bl.selectKeys(1, 3);
 
 				expect(arr).to.deep.equal(['b', 'c', 'd']);
 			});
@@ -672,7 +672,7 @@ describe("Array", function() {
 			it("selectKeys from to index out of bounds", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._selectKeys(1, 6);
+				arr.bl.selectKeys(1, 6);
 
 				expect(arr).to.deep.equal(['b', 'c', 'd', 'e']);
 			});
@@ -680,7 +680,7 @@ describe("Array", function() {
 			it("selectKeys indexes with function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._selectKeys(function(i) {
+				arr.bl.selectKeys(function(i) {
 					return i % 2 === 0;
 				});
 
@@ -690,7 +690,7 @@ describe("Array", function() {
 			it("selectKeys indexes within array", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._selectKeys([0, 3, 4]);
+				arr.bl.selectKeys([0, 3, 4]);
 
 				expect(arr).to.eql(['a', 'd', 'e']);
 			});
@@ -701,28 +701,28 @@ describe("Array", function() {
 			it("$selectKeys one index", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._$selectKeys(1)).to.deep.equal(['b']);
+				expect(arr.bl.$selectKeys(1)).to.deep.equal(['b']);
 				expect(arr).to.deep.equal(['a', 'b', 'c']);
 			});
 
 			it("$selectKeys from to index", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$selectKeys(1, 3)).to.deep.equal(['b', 'c', 'd']);
+				expect(arr.bl.$selectKeys(1, 3)).to.deep.equal(['b', 'c', 'd']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 
 			it("$selectKeys from to index out of bounds", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$selectKeys(1, 6)).to.deep.equal(['b', 'c', 'd', 'e']);
+				expect(arr.bl.$selectKeys(1, 6)).to.deep.equal(['b', 'c', 'd', 'e']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 
 			it("$selectKeys indexes with function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$selectKeys(function(i) {
+				expect(arr.bl.$selectKeys(function(i) {
 					return i % 2 === 0;
 				})).to.eql(['a', 'c', 'e']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
@@ -731,7 +731,7 @@ describe("Array", function() {
 			it("$selectKeys indexes within array", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$selectKeys([0, 3, 4])).to.eql(['a', 'd', 'e']);
+				expect(arr.bl.$selectKeys([0, 3, 4])).to.eql(['a', 'd', 'e']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 		});
@@ -741,13 +741,13 @@ describe("Array", function() {
             it("simple _toString", function() {
                 var arr1 = ['a', 'b', 'c'];
 
-                expect(arr1._toString()).to.eql('[a, b, c]');
+                expect(arr1.bl.toString()).to.eql('[a, b, c]');
             });
 
             it("multi dimensional _toString", function() {
                 var arr1 = [[6, 6], [7, 7, [8]]];
 
-                expect(arr1._toString()).to.eql("[[6, 6], [7, 7, [8]]]");
+                expect(arr1.bl.toString()).to.eql("[[6, 6], [7, 7, [8]]]");
             });
         });
 
@@ -757,14 +757,14 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'c', 'd', 'e'];
 
-				expect(arr1._unify(arr2)).to.eql(['a', 'b', 'c', 'd', 'e']);
+				expect(arr1.bl.unify(arr2)).to.eql(['a', 'b', 'c', 'd', 'e']);
 			});
 
 			it("union of empty arrays", function() {
 				var arr1 = [];
 				var arr2 = [];
 
-				expect(arr1._unify(arr2)).to.eql([]);
+				expect(arr1.bl.unify(arr2)).to.eql([]);
 			});
 		});
         // FIXME
@@ -774,7 +774,7 @@ describe("Array", function() {
 				var arr1 = ['a', 'b', 'c'];
 				var arr2 = ['b', 'c', 'd', 'e'];
 
-				expect(arr1._$unify(arr2)).to.eql(['a', 'b', 'c', 'd', 'e']);
+				expect(arr1.bl.$unify(arr2)).to.eql(['a', 'b', 'c', 'd', 'e']);
 				expect(arr1).to.eql(['a', 'b', 'c']);
 				expect(arr1).to.equal(arr1);
 			});
@@ -785,7 +785,7 @@ describe("Array", function() {
 			it("simple unique", function() {
 				var arr1 = ['a', 'b', 'a', 'b', 'c'];
 
-				expect(arr1._unique()).to.eql(['a', 'b', 'c']);
+				expect(arr1.bl.unique()).to.eql(['a', 'b', 'c']);
 			});
 		});
 
@@ -794,7 +794,7 @@ describe("Array", function() {
 			it("simple $unique", function() {
 				var arr1 = ['a', 'b', 'a', 'b', 'c'];
 
-				expect(arr1._$unique()).to.eql(['a', 'b', 'c']);
+				expect(arr1.bl.$unique()).to.eql(['a', 'b', 'c']);
 				expect(arr1).to.eql(['a', 'b', 'a', 'b', 'c']);
 				expect(arr1).to.equal(arr1);
 			});
@@ -805,7 +805,7 @@ describe("Array", function() {
 			it("without one element", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._without('b');
+				arr.bl.without('b');
 
 				expect(arr).to.eql(['a', 'c']);
 			});
@@ -813,7 +813,7 @@ describe("Array", function() {
 			it("without multiple values", function() {
 				var arr = ['a', 'b', 'c', 'd'];
 
-				arr._without(['b','d']);
+				arr.bl.without(['b','d']);
 
 				expect(arr).to.eql(['a', 'c']);
 			});
@@ -821,8 +821,8 @@ describe("Array", function() {
 			it("without function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'bb'];
 
-				arr._without(function(val) {
-					return val._startsWith('b');
+				arr.bl.without(function(val) {
+					return val.bl.startsWith('b');
 				});
 
 				expect(arr).to.eql(['a', 'c', 'd', 'bb']);
@@ -834,22 +834,22 @@ describe("Array", function() {
 			it("$without one element", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._$without('b')).to.eql(['a', 'c']);
+				expect(arr.bl.$without('b')).to.eql(['a', 'c']);
 				expect(arr).to.eql(['a', 'b', 'c']);
 			});
 
 			it("$without multiple values", function() {
 				var arr = ['a', 'b', 'c', 'd'];
 
-				expect(arr._$without(['b','d'])).to.eql(['a', 'c']);
+				expect(arr.bl.$without(['b','d'])).to.eql(['a', 'c']);
 				expect(arr).to.eql(['a', 'b', 'c', 'd']);
 			});
 
 			it("$without function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'bb'];
 
-				expect(arr._$without(function(val) {
-					return val._startsWith('b');
+				expect(arr.bl.$without(function(val) {
+					return val.bl.startsWith('b');
 				})).to.eql(['a', 'c', 'd', 'bb']);
 				expect(arr).to.eql(['a', 'b', 'c', 'd', 'bb']);
 			});
@@ -860,7 +860,7 @@ describe("Array", function() {
 			it("without one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				arr._withoutAll('a');
+				arr.bl.withoutAll('a');
 
 				expect(arr).to.eql(['b', 'c']);
 			});
@@ -868,7 +868,7 @@ describe("Array", function() {
 			it("without one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				arr._withoutAll(function(val) {return val === 'c'});
+				arr.bl.withoutAll(function(val) {return val === 'c'});
 
 				expect(arr).to.eql(['a', 'b', 'a']);
 			});
@@ -876,7 +876,7 @@ describe("Array", function() {
 			it("without multiple values", function() {
 				var arr = ['a', 'b', 'c', 'b', 'd', 'd'];
 
-				arr._withoutAll(['b','d']);
+				arr.bl.withoutAll(['b','d']);
 
 				expect(arr).to.eql(['a', 'c']);
 			});
@@ -884,8 +884,8 @@ describe("Array", function() {
 			it("without multiple function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'bb', 'bb'];
 
-				arr._withoutAll(function(val) {
-					return val._startsWith('b');
+				arr.bl.withoutAll(function(val) {
+					return val.bl.startsWith('b');
 				});
 
 				expect(arr).to.eql(['a', 'c', 'd']);
@@ -897,7 +897,7 @@ describe("Array", function() {
 			it("$withoutAll one element", function() {
 				var arr = ['a', 'b', 'a', 'c'];
 
-				expect(arr._$withoutAll('a')).to.eql(['b', 'c']);
+				expect(arr.bl.$withoutAll('a')).to.eql(['b', 'c']);
 				expect(arr).to.equal(arr);
 				expect(arr).to.eql(['a', 'b', 'a', 'c']);
 			});
@@ -905,7 +905,7 @@ describe("Array", function() {
 			it("$withoutAll multiple values", function() {
 				var arr = ['a', 'b', 'c', 'b', 'd', 'd'];
 
-				expect(arr._$withoutAll(['b','d'])).to.eql(['a', 'c']);
+				expect(arr.bl.$withoutAll(['b','d'])).to.eql(['a', 'c']);
 				expect(arr).to.equal(arr);
 				expect(arr).to.eql(['a', 'b', 'c', 'b', 'd', 'd']);
 			});
@@ -913,8 +913,8 @@ describe("Array", function() {
 			it("$withoutAll multiple function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'bb', 'bb'];
 
-				expect(arr._$withoutAll(function(val) {
-					return val._startsWith('b');
+				expect(arr.bl.$withoutAll(function(val) {
+					return val.bl.startsWith('b');
 				})).to.eql(['a', 'c', 'd']);
 				expect(arr).to.equal(arr);
 				expect(arr).to.eql(['a', 'b', 'c', 'd', 'bb', 'bb']);
@@ -926,7 +926,7 @@ describe("Array", function() {
 			it("withoutKeys one index", function() {
 				var arr = ['a', 'b', 'c'];
 
-				arr._withoutKeys(1);
+				arr.bl.withoutKeys(1);
 
 				expect(arr).to.deep.equal(['a', 'c']);
 			});
@@ -934,7 +934,7 @@ describe("Array", function() {
 			it("withoutKeys from to index", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._withoutKeys(1, 3);
+				arr.bl.withoutKeys(1, 3);
 
 				expect(arr).to.deep.equal(['a', 'e']);
 			});
@@ -942,7 +942,7 @@ describe("Array", function() {
 			it("withoutKeys from to index out of bounds", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._withoutKeys(1, 6);
+				arr.bl.withoutKeys(1, 6);
 
 				expect(arr).to.deep.equal(['a']);
 			});
@@ -950,7 +950,7 @@ describe("Array", function() {
 			it("withoutKeys indexes with function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._withoutKeys(function(i) {
+				arr.bl.withoutKeys(function(i) {
 					return i % 2 === 0;
 				});
 
@@ -960,7 +960,7 @@ describe("Array", function() {
 			it("withoutKeys indexes within array", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				arr._withoutKeys([0, 3, 4]);
+				arr.bl.withoutKeys([0, 3, 4]);
 
 				expect(arr).to.eql(['b', 'c']);
 			});
@@ -971,28 +971,28 @@ describe("Array", function() {
 			it("withoutKeys one index", function() {
 				var arr = ['a', 'b', 'c'];
 
-				expect(arr._$withoutKeys(1)).to.deep.equal(['a', 'c']);
+				expect(arr.bl.$withoutKeys(1)).to.deep.equal(['a', 'c']);
 				expect(arr).to.deep.equal(['a', 'b', 'c']);
 			});
 
 			it("$withoutKeys from to index", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$withoutKeys(1, 3)).to.deep.equal(['a', 'e']);
+				expect(arr.bl.$withoutKeys(1, 3)).to.deep.equal(['a', 'e']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 
 			it("withoutKeys from to index out of bounds", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$withoutKeys(1, 6)).to.deep.equal(['a']);
+				expect(arr.bl.$withoutKeys(1, 6)).to.deep.equal(['a']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 
 			it("withoutKeys indexes with function", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$withoutKeys(function(i) {
+				expect(arr.bl.$withoutKeys(function(i) {
 					return i % 2 === 0;
 				})).to.eql(['b', 'd']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
@@ -1001,7 +1001,7 @@ describe("Array", function() {
 			it("withoutKeys indexes within array", function() {
 				var arr = ['a', 'b', 'c', 'd', 'e'];
 
-				expect(arr._$withoutKeys([0, 3, 4])).to.eql(['b', 'c']);
+				expect(arr.bl.$withoutKeys([0, 3, 4])).to.eql(['b', 'c']);
 				expect(arr).to.deep.equal(['a', 'b', 'c', 'd', 'e']);
 			});
 		});

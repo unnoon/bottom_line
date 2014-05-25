@@ -18,10 +18,10 @@ constructWrapper(Object, 'obj', {
          */
         // TODO These should be expanded with frozen, extrnsible states etc
         clone: function clone(obj) {
-            var clone = __obj.create(__obj.getPrototypeOf(obj));
+            var clone = Object.create(Object.getPrototypeOf(obj));
 
-            __obj.getOwnPropertyNames(obj).bl.each(function(name) {
-                __obj.defineProperty(clone, name, __obj.getOwnPropertyDescriptor(obj, name));
+            Object.getOwnPropertyNames(obj).bl.each(function(name) {
+                Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
             });
 
             return clone;
@@ -145,7 +145,7 @@ constructWrapper(Object, 'obj', {
          * @returns {string} - type of the object
          */
         typeOf: function(obj) {
-            return __obj.prototype.toString.call(obj).bl.between('[object ', ']').bl.decapitalize();
+            return Object.prototype.toString.call(obj).bl.between('[object ', ']').bl.decapitalize();
         }
     },
     /**
@@ -169,7 +169,7 @@ constructWrapper(Object, 'obj', {
         _cp: function(all, invert, target, $value, opt_ctx)
         {
             return this.bl._edit(all, invert, function(val, key, obj) {
-                __obj.defineProperty(this, key, __obj.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
+                Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
             }, false, target, $value, opt_ctx);
         },
         /**
@@ -416,7 +416,7 @@ constructWrapper(Object, 'obj', {
          * @return {Array} keys of the object
          */
         keys: function() {
-            return __obj.keys(this);
+            return Object.keys(this);
         },
         /**
          * Returns the number of own properties on an object
@@ -442,7 +442,7 @@ constructWrapper(Object, 'obj', {
          * @return {Array} keys of the object
          */
         names: function() {
-            return __obj.getOwnPropertyNames(this);
+            return Object.getOwnPropertyNames(this);
         },
         /**
          * Shortcut for hasOwnProperty
@@ -477,7 +477,7 @@ constructWrapper(Object, 'obj', {
          * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
          */
         proto: function(proto) {
-            if(proto === undefined) return __obj.getPrototypeOf(this);
+            if(proto === undefined) return Object.getPrototypeOf(this);
 
             this.bl._proto__ = proto;
 

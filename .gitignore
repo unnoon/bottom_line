@@ -1,6 +1,5 @@
 #ignored folders
 .idea/
-.archive/
 .coverage/
 .sass-cache/
 node_modules/

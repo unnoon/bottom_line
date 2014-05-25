@@ -53,7 +53,7 @@ describe("Object", function() {
 
         });
 
-        describe("safe chaining", function() {
+        xdescribe("safe chaining", function() {
 
             it("simple simple", function() {
                 var obj = {
