@@ -14,7 +14,7 @@
     switch(environment = true) {
     case requirejs : define(bottom_line); break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : Object.defineProperty(root, '_', {value: bottom_line(), writable: true}) } // TODO check for conflicts
+    default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
