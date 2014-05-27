@@ -81,7 +81,7 @@ constructWrapper(Object, 'obj', {
                 // global property overrides
                 if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
                 if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                if(_.isDefined(writable) && descriptor._.owns('writable'))   descriptor.writable     = writable;
+                if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
 
                 // special property specific config
                 if((config = value) && config._.owns('value'))
