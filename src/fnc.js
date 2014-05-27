@@ -21,6 +21,18 @@ constructWrapper(Function, 'fnc', {
             }, delay);
         },
         /**
+         * Defers some methods so they'll get set to the end of the stack
+         * @public
+         * @method module:_.fnc.defer
+         * @param {number} cb      - callback function to call after the delay
+         * @param {number} opt_ctx - optional context
+         */
+        defer: function (cb, opt_ctx) {
+            setTimeout(function() {
+                cb.call(opt_ctx)
+            }, 0);
+        },
+        /**
          * Memoization function
          * @public
          * @method module:_.fnc.memoize
