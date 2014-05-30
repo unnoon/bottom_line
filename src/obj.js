@@ -86,15 +86,18 @@ constructWrapper(Object, 'obj', {
                 // special property specific config
                 if((config = value) && config._.owns('value'))
                 {
-                    if(config.clone)                   descriptor.value = _.clone(config.value); // clone deep maybe?
-                    if(config.exec)                    descriptor.value = config.value();
+                    descriptor.value = config.value;
+
+                    if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
+                    if(config.exec)                     descriptor.value = config.value();
                     if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
                     if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
                     if(config._.owns('writable'))       descriptor.writable     = config.writable;
                     if(config._.owns('override'))       overrideProperty  = config.override;
                     if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
                     if(config._.owns('shim'))           overwriteProperty = config.shim;
-                    if(config.aliases)                 aliases = true;
+                    if(config.aliases)                  aliases = true;
+                    if(config.wrap && obj._.owns(prop)) descriptor.value = _.nest(obj[prop], config.value);
                 }
 
                 if(obj._.owns(prop))

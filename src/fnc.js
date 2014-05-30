@@ -126,6 +126,23 @@ constructWrapper(Function, 'fnc', {
                 // copy prototype functions
                 _.extend(child.prototype, mixin.prototype);
             });
+        },
+        /**
+         * Nests functions together.
+         * @public
+         * @method module:_.fnc.nest
+         * @param {Array|Function} $arr_fnc - an array of functions or a single function in case of supplying
+         * @param {...Function}    var_args - one or multiple functions
+         */
+        nest: function($arr_fnc, var_args) {
+            var fns = (var_args === undefined)? $arr_fnc : arguments;
+
+            return function() {
+                for(var i = 0, max = fns.length; i < max; i++)
+                {
+                    fns[i].apply(this, arguments);
+                }
+            }
         }
     },
     prototype:

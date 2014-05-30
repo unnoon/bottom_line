@@ -314,20 +314,23 @@
                     // global property overrides
                     if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
                     if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                    if(_.isDefined(writable) && descriptor._.owns('writable'))   descriptor.writable     = writable;
+                    if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
     
                     // special property specific config
                     if((config = value) && config._.owns('value'))
                     {
-                        if(config.clone)                   descriptor.value = _.clone(config.value); // clone deep maybe?
-                        if(config.exec)                    descriptor.value = config.value();
+                        descriptor.value = config.value;
+    
+                        if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
+                        if(config.exec)                     descriptor.value = config.value();
                         if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
                         if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
                         if(config._.owns('writable'))       descriptor.writable     = config.writable;
                         if(config._.owns('override'))       overrideProperty  = config.override;
                         if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
                         if(config._.owns('shim'))           overwriteProperty = config.shim;
-                        if(config.aliases)                 aliases = true;
+                        if(config.aliases)                  aliases = true;
+                        if(config.wrap && obj._.owns(prop)) descriptor.value = _.nest(obj[prop], config.value);
                     }
     
                     if(obj._.owns(prop))
@@ -2194,6 +2197,18 @@
                 }, delay);
             },
             /**
+             * Defers some methods so they'll get set to the end of the stack
+             * @public
+             * @method module:_.fnc.defer
+             * @param {number} cb      - callback function to call after the delay
+             * @param {number} opt_ctx - optional context
+             */
+            defer: function (cb, opt_ctx) {
+                setTimeout(function() {
+                    cb.call(opt_ctx)
+                }, 0);
+            },
+            /**
              * Memoization function
              * @public
              * @method module:_.fnc.memoize
@@ -2287,6 +2302,26 @@
                     // copy prototype functions
                     _.extend(child.prototype, mixin.prototype);
                 });
+            },
+            /**
+             * Nests functions together.
+             * @public
+             * @method module:_.fnc.nest
+             * @param {Array|Function} $arr_fnc - an array of functions or a single function in case of supplying
+             * @param {...Function}    var_args - one or multiple functions
+             */
+            nest: function($arr_fnc, var_args) {
+                var fns = (var_args === undefined)? $arr_fnc : arguments;
+
+                if(fns.length === 1)
+                    return fns[0];
+                else if(fns.length > 1)
+                    return function() {
+                        for(var i = 0, max = fns.length; i < max; i++)
+                        {
+                            fns[i].apply(this, arguments);
+                        }
+                    }
             }
         },
         prototype:
