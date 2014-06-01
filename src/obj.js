@@ -97,7 +97,6 @@ constructWrapper(Object, 'obj', {
                     if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
                     if(config._.owns('shim'))           overwriteProperty = config.shim;
                     if(config.aliases)                  aliases = true;
-                    if(config.wrap && obj._.owns(prop)) descriptor.value = _.nest(obj[prop], config.value);
                 }
 
                 if(obj._.owns(prop))
