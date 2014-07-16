@@ -124,6 +124,36 @@ describe("Object", function() {
                 expect(obj.prop).to.equal(666);
                 expect(typeof(obj.toLocaleString)).to.equal('function');
             });
+
+            it("getters & setters", function() {
+                var obj = {
+                    x: 1,
+                    y: 2
+                };
+
+                var module = {
+                    toLocaleString: 'aap',
+                    y:7,
+                    prop: 666,
+                    get theX() {
+                        return this.x;
+                    },
+                    set theX(val) {
+                        return this.x = 666;
+                    }
+                };
+
+                _.extend(obj,{override:false, overwrite:false}, module);
+
+                obj.theX = 666;
+                expect(obj.theX).to.equal(666);
+                expect(obj.x).to.equal(666);
+
+                expect(obj.y).to.equal(2);
+                expect(obj.prop).to.equal(666);
+                expect(typeof(obj.toLocaleString)).to.equal('function');
+            });
+
 		});
 
 		describe("typeof", function() {

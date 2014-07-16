@@ -70,9 +70,9 @@ constructWrapper(Object, 'obj', {
             var overwrite    = !settings || settings.overwrite !== false; // default is true
             var override     = !settings || settings.override  !== false; // default is true
 
-            var loglevel     = (settings && settings.loglevel) || 'debug';
+            var loglevel     = (settings && settings.loglevel) || (console.debug? 'debug' : 'log');
 
-            module._.each(function(value, prop) {
+            module._.each(function(value, prop) {  // fix for non-enumerable properties maybe???
                 var overrideProperty  = override;
                 var overwriteProperty = overwrite;
                 var aliases           = false;
