@@ -251,7 +251,7 @@
              */
             // TODO These should be expanded with frozen, extrnsible states etc
             clone: function clone(obj) {
-                var clone = Object.create(Object.getPrototypeOf(obj));
+                var clone = Array.isArray(obj)? [] : Object.create(Object.getPrototypeOf(obj));
     
                 Object.getOwnPropertyNames(obj)._.each(function(name) {
                     Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
@@ -273,7 +273,7 @@
                 try       { names = obj._.names(); }
                 catch (e) { return obj }
     
-                var clone = Object.create(obj._.proto());
+                var clone = _.isArray(obj)? [] : Object.create(obj._.proto());
                 names._.each(function (name) {
                     var pd = obj._.descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
@@ -304,49 +304,57 @@
                 var override     = !settings || settings.override  !== false; // default is true
     
                 var loglevel     = (settings && settings.loglevel) || 'debug';
+                if(loglevel === 'debug' && !console.debug) loglevel = 'log'; // shim for old browsers i.e 10... better solve it with a shim though
     
-                module._.each(function(value, prop) {
-                    var overrideProperty  = override;
-                    var overwriteProperty = overwrite;
-                    var aliases           = false;
-    
-                    descriptor = module._.descriptor(prop);
-                    // global property overrides
-                    if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
-                    if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                    if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
-    
-                    // special property specific config
-                    if((config = value) && config._.owns('value'))
+                for(var prop in module) // we can't use ._.each here otherwise we will execute the getter
+                {   if(module.hasOwnProperty(prop))
                     {
-                        descriptor.value = config.value;
+                        descriptor = module._.descriptor(prop);
     
-                        if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
-                        if(config.exec)                     descriptor.value = config.value();
-                        if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
-                        if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
-                        if(config._.owns('writable'))       descriptor.writable     = config.writable;
-                        if(config._.owns('override'))       overrideProperty  = config.override;
-                        if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
-                        if(config._.owns('shim'))           overwriteProperty = config.shim;
-                        if(config.aliases)                  aliases = true;
-                        if(config.wrap && obj._.owns(prop)) descriptor.value = _.nest(obj[prop], config.value);
-                    }
+                        var overrideProperty    = override;
+                        var overwriteProperty   = overwrite;
+                        var aliases             = false;
+                        var isGetterSetter      = !!(descriptor.get || descriptor.set);
     
-                    if(obj._.owns(prop))
-                    {
-                        if(!overwriteProperty) return; // continue;
-                        console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
-                    }
-                    else if(prop in obj)
-                    {
-                        if(!overrideProperty) return; // continue;
-                        console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
-                    }
+                        // global property overrides
+                        if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
+                        if(_.isDefined(configurable))                               descriptor.configurable = configurable;
+                        if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
     
-                    obj._.define(prop, descriptor);
-                    if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
-                });
+                        // special property specific config
+                        // FIXME this doesn't work for getters & setters
+                        if(!isGetterSetter && module[prop]._.owns('value'))
+                        {
+                            config = module[prop];
+                            descriptor.value = config.value;
+    
+                            if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
+                            if(config.exec)                     descriptor.value = config.value();
+                            if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
+                            if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
+                            if(config._.owns('writable'))       descriptor.writable     = config.writable;
+                            if(config._.owns('override'))       overrideProperty  = config.override;
+                            if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
+                            if(config._.owns('shim'))           overwriteProperty = config.shim;
+                            if(config.aliases)                  aliases = true;
+                        }
+    
+                        if(obj._.owns(prop))
+                        {
+                            if(!overwriteProperty) continue; // continue;
+                            console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
+                        }
+                        else if(prop in obj)
+                        {
+                            if(!overrideProperty) continue; // continue;
+                            console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
+                        }
+    
+                        obj._.define(prop, descriptor);
+                        if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
+                    }
+                }
+    
     
                 return obj;
             },
@@ -585,6 +593,7 @@
              * @param {Object=}  opt_ctx - optional context
              */
             each: function(cb, opt_ctx) {
+                // FIXME this[key] will execute getter properties...!!!
                 // TODO maybe a faster version using keys. I now prefer using for in  because it will not create a new array object with the keys
                 for(var key in this)
                 {
@@ -2312,16 +2321,13 @@
              */
             nest: function($arr_fnc, var_args) {
                 var fns = (var_args === undefined)? $arr_fnc : arguments;
-
-                if(fns.length === 1)
-                    return fns[0];
-                else if(fns.length > 1)
-                    return function() {
-                        for(var i = 0, max = fns.length; i < max; i++)
-                        {
-                            fns[i].apply(this, arguments);
-                        }
+    
+                return function() {
+                    for(var i = 0, max = fns.length; i < max; i++)
+                    {
+                        fns[i].apply(this, arguments);
                     }
+                }
             }
         },
         prototype:

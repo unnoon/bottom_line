@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>object without keys</title>
+    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
+    <script>
+
+            var obj = {x: 1,y: 2,z: 3};
+
+//            var clone = _.clone(obj);
+
+            var wt = obj._.$withoutKeys('y');
+
+
+            console.log(wt._.toString());
+//            console.log(clone._.toString());
+
+//            expect(obj._.$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+//            expect(obj).to.eql({x: 1,y: 2,z: 3})
+    </script>
+</head>
+<body>
+</body>
+</html>
