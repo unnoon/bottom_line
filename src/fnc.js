@@ -167,7 +167,7 @@ constructWrapper(Function, 'fnc', {
          * @returns {string} - the name of the function
          */
         // FIXME a better solution is to shim the name property in case it is not defined. In that case we we can use a simpler function
-        name: function()
+        get name()
         {
             if(_.isDefined(Function.prototype.name)) return this.name;
             else return this.toString().match(/^function\s?([^\s(]*)/)[1];
