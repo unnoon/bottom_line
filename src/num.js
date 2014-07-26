@@ -67,8 +67,8 @@ constructWrapper(Number, 'num', {
          */
         get sign() {
             return this > 0?  1 :
-                    this < 0? -1 :
-                0 ;
+                   this < 0? -1 :
+                              0 ;
         },
         /**
          * Getter: indicator if the the number is even
