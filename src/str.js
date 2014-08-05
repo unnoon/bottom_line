@@ -20,7 +20,7 @@ constructWrapper(String, 'str', {
          */
         after: function(substr) {
             var index = this.indexOf(substr);
-            return (index > -1)? this.slice(index + substr.length) : '';
+            return (index > -1)? this.slice(index + substr.length) : this;
         },
         /**
          * Returns the rest of the string after a certain substring (last occurrence)
@@ -31,7 +31,7 @@ constructWrapper(String, 'str', {
          */
         afterLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (index > -1)? this.slice(index + substr.length) : '';
+            return (index > -1)? this.slice(index + substr.length) : this;
         },
         /**
          * Returns the rest of the string before a certain substring (1st occurrence)
@@ -42,7 +42,7 @@ constructWrapper(String, 'str', {
          */
         before: function(substr) {
             var index = this.indexOf(substr);
-            return (index > -1)? this.slice(0, index) : '';
+            return (index > -1)? this.slice(0, index) : this;
         },
         /**
          * Returns the rest of the string before a certain substring (last occurrence)
@@ -53,7 +53,7 @@ constructWrapper(String, 'str', {
          */
         beforeLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (index > -1)? this.slice(0, index) : '';
+            return (index > -1)? this.slice(0, index) : this;
         },
         /**
          * Returns the string between a prefix && post substring
