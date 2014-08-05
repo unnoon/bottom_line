@@ -3,7 +3,7 @@
 <head>
     <title>Difference in functional wrapping</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
-    <script src="../../src/bottom_line.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
     <!--<script src="../../src/bottom_line.old.js"></script>-->
     <script>
         var arr = [];
@@ -48,7 +48,7 @@
             .add('_each', function() {
                 var array = arr;
 
-                array._each(function(elm) {
+                array._.each(function(elm) {
                     var elm1 = elm;
                 })
             })
@@ -56,6 +56,13 @@
                 var array = arr;
 
                 eachFast(array, function(elm) {
+                    var elm1 = elm;
+                })
+            })
+            .add('forEach', function() {
+                var array = arr;
+
+                array.forEach(function(elm) {
                     var elm1 = elm;
                 })
             })
