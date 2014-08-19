@@ -86,6 +86,18 @@ describe("Extensions", function() {
 			});
 		});
 
+        describe("hasOwnProperty non-enumerable", function() {
+            it("can't be used on non-enumerable properties", function() {
+                var obj = {
+                    monkey: 'skull'
+                };
+
+                Object.defineProperty(obj, 'aap', {value: 'gorilla', enumerable: false});
+
+                expect(obj.aap).to.equal('gorilla');
+                expect(obj.hasOwnProperty('aap')).to.equal(null);
+            });
+        });
 
 		describe("typeof", function() {
 

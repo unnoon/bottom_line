@@ -165,7 +165,6 @@ constructWrapper(Object, 'obj', {
      * @class Object
      */
     prototype: {
-        faux: function() {return this},
         /**
          * Copies the occurrences from an array to an new object
          * @private
