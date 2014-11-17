@@ -13,7 +13,7 @@
     var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
 
     switch(environments) {
-    case requirejs : define(bottom_line); break;
+    case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
 }(this, function() {
@@ -40,7 +40,7 @@
 //            ,
 //            $chain: {get: function() {return new wrapper(_.value)},   enumerable: false, configurable: false}
         });
-        // stores non-chainable use methods
+        // stores chainable use methods
         wrapper.__chain__ = (shorthand === 'obj')? {} : Object.create(_.obj.__chain__); // inherit from object
         Object.defineProperties(wrapper.__chain__, {
             value:  {get: function() {return _.value},                enumerable: false, configurable: false}
