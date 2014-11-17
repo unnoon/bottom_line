@@ -20,7 +20,7 @@ constructWrapper(String, 'str', {
          */
         after: function(substr) {
             var index = this.indexOf(substr);
-            return (index > -1)? this.slice(index + substr.length) : this;
+            return (~index)? this.slice(index + substr.length) : this;
         },
         /**
          * Returns the rest of the string after a certain substring (last occurrence)
@@ -31,7 +31,7 @@ constructWrapper(String, 'str', {
          */
         afterLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (index > -1)? this.slice(index + substr.length) : this;
+            return (~index)? this.slice(index + substr.length) : this;
         },
         /**
          * Returns the rest of the string before a certain substring (1st occurrence)
@@ -42,7 +42,7 @@ constructWrapper(String, 'str', {
          */
         before: function(substr) {
             var index = this.indexOf(substr);
-            return (index > -1)? this.slice(0, index) : this;
+            return (~index)? this.slice(0, index) : this;
         },
         /**
          * Returns the rest of the string before a certain substring (last occurrence)
@@ -53,7 +53,7 @@ constructWrapper(String, 'str', {
          */
         beforeLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (index > -1)? this.slice(0, index) : this;
+            return (~index)? this.slice(0, index) : this;
         },
         /**
          * Returns the string between a prefix && post substring
@@ -102,7 +102,7 @@ constructWrapper(String, 'str', {
          * @returns {boolean}        - boolean indicating if the string contains the substring
          */
         has: function(substr) {
-            return this.indexOf(substr) > -1;
+            return !!~this.indexOf(substr);
         },
         /**
          * Inserts a substring in a string
@@ -162,7 +162,7 @@ constructWrapper(String, 'str', {
          * @returns {boolean}        - boolean indicating if the string starts with the given substring
          */
         startsWith: function(substr) {
-            return this.indexOf(substr) === 0;
+            return !this.indexOf(substr);
         },
         /**
          * Better to string version

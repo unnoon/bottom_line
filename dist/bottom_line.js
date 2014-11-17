@@ -1870,7 +1870,7 @@
              */
             after: function(substr) {
                 var index = this.indexOf(substr);
-                return (index > -1)? this.slice(index + substr.length) : this;
+                return (~index)? this.slice(index + substr.length) : this;
             },
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
@@ -1881,7 +1881,7 @@
              */
             afterLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (index > -1)? this.slice(index + substr.length) : this;
+                return (~index)? this.slice(index + substr.length) : this;
             },
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
@@ -1892,7 +1892,7 @@
              */
             before: function(substr) {
                 var index = this.indexOf(substr);
-                return (index > -1)? this.slice(0, index) : this;
+                return (~index)? this.slice(0, index) : this;
             },
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
@@ -1903,7 +1903,7 @@
              */
             beforeLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (index > -1)? this.slice(0, index) : this;
+                return (~index)? this.slice(0, index) : this;
             },
             /**
              * Returns the string between a prefix && post substring
@@ -1952,7 +1952,7 @@
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
             has: function(substr) {
-                return this.indexOf(substr) > -1;
+                return !!~this.indexOf(substr);
             },
             /**
              * Inserts a substring in a string
@@ -2012,7 +2012,7 @@
              * @returns {boolean}        - boolean indicating if the string starts with the given substring
              */
             startsWith: function(substr) {
-                return this.indexOf(substr) === 0;
+                return !this.indexOf(substr);
             },
             /**
              * Better to string version
@@ -2057,10 +2057,10 @@
              * @returns {number} - random number in between
              */
             random: function(min_max_, max_min_) {
-                if(min_max_ === undefined) return Math.random(); // normal random functionality
+                if(min_max_ === undefined) return Math.random(); // normal random functionality (no arguments)
     
                 var diff   = (max_min_ || 0) - min_max_;
-                var offset = diff? min_max_: 0;
+                var offset = diff? min_max_: 0; // cover the case in which both arguments have the same value
     
                 return Math.random()*diff + offset;
             },
@@ -2097,7 +2097,7 @@
              * @method Number#sign
              * @returns {number} - sign of the number: -1, 0, 1
              */
-            get sign() { // TODO this should be a normal function so we can also set the sign
+            get sign() { // TODO this should be a normal function so we can also set the sign (this can be annoying otherwise)
                 return this > 0?  1 :
                        this < 0? -1 :
                                   0 ;
