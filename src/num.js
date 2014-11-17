@@ -28,10 +28,10 @@ constructWrapper(Number, 'num', {
          * @returns {number} - random number in between
          */
         random: function(min_max_, max_min_) {
-            if(min_max_ === undefined) return Math.random(); // normal random functionality
+            if(min_max_ === undefined) return Math.random(); // normal random functionality (no arguments)
 
             var diff   = (max_min_ || 0) - min_max_;
-            var offset = diff? min_max_: 0;
+            var offset = diff? min_max_: 0; // cover the case in which both arguments have the same value
 
             return Math.random()*diff + offset;
         },
@@ -68,7 +68,7 @@ constructWrapper(Number, 'num', {
          * @method Number#sign
          * @returns {number} - sign of the number: -1, 0, 1
          */
-        get sign() { // TODO this should be a normal function so we can also set the sign
+        get sign() { // TODO this should be a normal function so we can also set the sign (this can be annoying otherwise)
             return this > 0?  1 :
                    this < 0? -1 :
                               0 ;

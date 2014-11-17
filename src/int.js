@@ -44,9 +44,18 @@ constructWrapper(null, 'int', {
          * @param   {number} max - integer upper bound
          * @returns {number} - random integer in between
          */
+        // TODO do all random options as for _.num.random see below
         random: function(min, max) {
             return min + (Math.random() * (max + 1 - min))|0;
         },
+        //random: function(min_max_, max_min_) {
+        //    if(min_max_ === undefined) return Math.random(); // normal random functionality
+        //
+        //    var diff   = (max_min_ || 0) - min_max_;
+        //    var offset = diff? min_max_: 0;
+        //
+        //    return min + (Math.random() * (max + 1 - min))|0;
+        //},
         /**
          * Rebounds a number between 2 values. Handy for arrays that are continuous
          * Curried version: for example - __int.rebound(4)(-5, 7)

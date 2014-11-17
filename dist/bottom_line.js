@@ -2060,9 +2060,7 @@
                 if(min_max_ === undefined) return Math.random(); // normal random functionality
     
                 var diff   = (max_min_ || 0) - min_max_;
-                var offset = min_max_;
-    
-                //var offset = diff? min_max_: 0;
+                var offset = diff? min_max_: 0;
     
                 return Math.random()*diff + offset;
             },
@@ -2099,7 +2097,7 @@
              * @method Number#sign
              * @returns {number} - sign of the number: -1, 0, 1
              */
-            get sign() {
+            get sign() { // TODO this should be a normal function so we can also set the sign
                 return this > 0?  1 :
                        this < 0? -1 :
                                   0 ;
@@ -2568,9 +2566,18 @@
              * @param   {number} max - integer upper bound
              * @returns {number} - random integer in between
              */
+            // TODO do all random options as for _.num.random see below
             random: function(min, max) {
                 return min + (Math.random() * (max + 1 - min))|0;
             },
+            //random: function(min_max_, max_min_) {
+            //    if(min_max_ === undefined) return Math.random(); // normal random functionality
+            //
+            //    var diff   = (max_min_ || 0) - min_max_;
+            //    var offset = diff? min_max_: 0;
+            //
+            //    return min + (Math.random() * (max + 1 - min))|0;
+            //},
             /**
              * Rebounds a number between 2 values. Handy for arrays that are continuous
              * Curried version: for example - __int.rebound(4)(-5, 7)
