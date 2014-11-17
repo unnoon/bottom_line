@@ -19,18 +19,21 @@ constructWrapper(Number, 'num', {
             return typeof(num) === 'number' && !isNaN(num); // use the broken isNaN here because iOS doesn't support Number.isNaN
         },
         /**
-         * Returns a random integer between the min and max value, or between 0 & 1) if no arguments are given
+         * Returns a random numer between the min and max value, or between 0 & 1) if no arguments are given.
+         * In case a singular argument is given iy will return the bound between 0 and this value
          * @public
          * @method module:_.num.random
-         * @param   {number=} opt_min - integer lower bound
-         * @param   {number=} opt_max - integer upper bound
+         * @param   {number=} min_max_ - optional lower or upper bound
+         * @param   {number=} max_min_ - optional lower or upper bound
          * @returns {number} - random number in between
          */
-        random: function(opt_min, opt_max) {
-            var min = opt_min || 0;
-            var max = opt_max || 1;
+        random: function(min_max_, max_min_) {
+            if(min_max_ === undefined) return Math.random(); // normal random functionality
 
-            return (opt_max !== undefined)? Math.random() * (max - min) + min : Math.random();
+            var diff   = (max_min_ || 0) - min_max_;
+            var offset = diff? min_max_: 0;
+
+            return Math.random()*diff + offset;
         },
         // TODO left inclusive right inclusive or both
         /**
@@ -65,7 +68,7 @@ constructWrapper(Number, 'num', {
          * @method Number#sign
          * @returns {number} - sign of the number: -1, 0, 1
          */
-        get sign() {
+        get sign() { // TODO this should be a normal function so we can also set the sign
             return this > 0?  1 :
                    this < 0? -1 :
                               0 ;

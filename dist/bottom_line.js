@@ -8,10 +8,11 @@
  */
 'use strict';
 !function(root, bottom_line) {
+    var environments = true;
     var requirejs = typeof(define) === 'function' && !!define.amd;
-    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports, environment;
+    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
 
-    switch(environment = true) {
+    switch(environments) {
     case requirejs : define(bottom_line); break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
@@ -398,7 +399,6 @@
          * @class Object
          */
         prototype: {
-            faux: function() {return this},
             /**
              * Copies the occurrences from an array to an new object
              * @private
@@ -1870,7 +1870,7 @@
              */
             after: function(substr) {
                 var index = this.indexOf(substr);
-                return (index > -1)? this.slice(index + substr.length) : '';
+                return (index > -1)? this.slice(index + substr.length) : this;
             },
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
@@ -1881,7 +1881,7 @@
              */
             afterLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (index > -1)? this.slice(index + substr.length) : '';
+                return (index > -1)? this.slice(index + substr.length) : this;
             },
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
@@ -1892,7 +1892,7 @@
              */
             before: function(substr) {
                 var index = this.indexOf(substr);
-                return (index > -1)? this.slice(0, index) : '';
+                return (index > -1)? this.slice(0, index) : this;
             },
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
@@ -1903,7 +1903,7 @@
              */
             beforeLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (index > -1)? this.slice(0, index) : '';
+                return (index > -1)? this.slice(0, index) : this;
             },
             /**
              * Returns the string between a prefix && post substring
@@ -2048,18 +2048,23 @@
                 return typeof(num) === 'number' && !isNaN(num); // use the broken isNaN here because iOS doesn't support Number.isNaN
             },
             /**
-             * Returns a random integer between the min and max value, or between 0 & 1) if no arguments are given
+             * Returns a random numer between the min and max value, or between 0 & 1) if no arguments are given.
+             * In case a singular argument is given iy will return the bound between 0 and this value
              * @public
              * @method module:_.num.random
-             * @param   {number=} opt_min - integer lower bound
-             * @param   {number=} opt_max - integer upper bound
+             * @param   {number=} min_max_ - optional lower or upper bound
+             * @param   {number=} max_min_ - optional lower or upper bound
              * @returns {number} - random number in between
              */
-            random: function(opt_min, opt_max) {
-                var min = opt_min || 0;
-                var max = opt_max || 1;
+            random: function(min_max_, max_min_) {
+                if(min_max_ === undefined) return Math.random(); // normal random functionality
     
-                return (opt_max !== undefined)? Math.random() * (max - min) + min : Math.random();
+                var diff   = (max_min_ || 0) - min_max_;
+                var offset = min_max_;
+    
+                //var offset = diff? min_max_: 0;
+    
+                return Math.random()*diff + offset;
             },
             // TODO left inclusive right inclusive or both
             /**
@@ -2096,8 +2101,8 @@
              */
             get sign() {
                 return this > 0?  1 :
-                        this < 0? -1 :
-                    0 ;
+                       this < 0? -1 :
+                                  0 ;
             },
             /**
              * Getter: indicator if the the number is even
@@ -2352,7 +2357,7 @@
              * @returns {string} - the name of the function
              */
             // FIXME a better solution is to shim the name property in case it is not defined. In that case we we can use a simpler function
-            name: function()
+            get name()
             {
                 if(_.isDefined(Function.prototype.name)) return this.name;
                 else return this.toString().match(/^function\s?([^\s(]*)/)[1];
