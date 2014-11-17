@@ -4,7 +4,7 @@ function asyncFunction(cb) {
     }, 1999)
 }
 
-describe("Misc", function() {
+xdescribe("Misc", function() {
 
 	describe("async", function() {
 

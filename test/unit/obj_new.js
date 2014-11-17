@@ -26,7 +26,6 @@ describe("Object", function() {
                 };
 
                 expect(obj._.chain
-                    .faux()
                     .keys()
                     .value
                 ).to.eql(['x', 'y', 'z']);
@@ -44,7 +43,6 @@ describe("Object", function() {
                 };
 
                 expect(obj._.chain
-                        .faux()
                         .keys()
                         .first()
                         .value

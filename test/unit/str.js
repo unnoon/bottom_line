@@ -9,7 +9,7 @@ describe("String", function() {
 			});
 
 			it("negative after test", function() {
-				expect('one'._.after('.t')).to.eql('');
+				expect('one'._.after('.t')).to.eql('one');
 			});
 		});
 
