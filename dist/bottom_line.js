@@ -931,13 +931,12 @@
             append: function(arr) {
                 if(!arr) return this;
     
-                var val;
                 var start = this.length;
     
                 for(var i = 0, max = arr.length; i < max; i++)
                 {
-                    if((val = arr[i]) === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
-                    this[start+i] = val;
+                    if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
+                    this[start+i] = arr[i];
                 }
     
                 return this;
