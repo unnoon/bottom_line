@@ -13,7 +13,7 @@
     var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
 
     switch(environments) {
-    case requirejs : define(bottom_line); break;
+    case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
 }(this, function() {
@@ -40,7 +40,7 @@
 //            ,
 //            $chain: {get: function() {return new wrapper(_.value)},   enumerable: false, configurable: false}
         });
-        // stores non-chainable use methods
+        // stores chainable use methods
         wrapper.__chain__ = (shorthand === 'obj')? {} : Object.create(_.obj.__chain__); // inherit from object
         Object.defineProperties(wrapper.__chain__, {
             value:  {get: function() {return _.value},                enumerable: false, configurable: false}
@@ -905,14 +905,14 @@
         },
         static: {
             /**
-             * Concats 2 or more array. Result is an new array
+             * Concats array into a new array
              * @public
              * @static
              * @method module:_.arr.concat
-             * @param {...Array} var_args     - 2 or more arrays
-             * @returns  {Array} array containing the concatenated array
+             * @param {...Array} __arrays - arrays to concat
+             * @returns  {Array}          - the concatenated array
              */
-            concat: function(var_args) {
+            concat: function(__arrays) {
                 return Array.prototype.concat.apply([], arguments);
             }
         },
@@ -921,36 +921,37 @@
          */
         prototype: {
             /**
-             * Mutator: Append 1 or more arrays to the current array
+             * Append an array to the current array
              * @public
-             * @method Array#append
+             * @method module:_.arr.append
              * @this       {Array}
              * @param      {Array} arr  - array to be appended
-             * @returns    {Array} this - Array appended with arr
+             * @returns    {Array} this - this appended with the array
              */
             append: function(arr) {
+                if(!arr) return this;
+    
                 var val;
                 var start = this.length;
     
                 for(var i = 0, max = arr.length; i < max; i++)
                 {
-                    if((val = arr[i]) === undefined && !arr.hasOwnProperty(i)) continue; // take in account broken arrays
+                    if((val = arr[i]) === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
                     this[start+i] = val;
                 }
     
                 return this;
             },
             /**
-             * appends 1 or more arrays toa new array
+             * Append an array to the current array. The result is a new array
              * @public
-             * @method Array#$append
-             * @this       {Array}
-             * @param   {...Array} var_args - 1 or more arrays to be appended
-             * @returns    {Array}  this     - Array appended with arr
+             * @method module:_.arr.$append
+             * @this    {Array}
+             * @param   {Array} arr  - array to be appended
+             * @returns {Array}      - The new array that is the result of appending
              */
-            $append: function(var_args) {
-                // FIXME this need to be adapated for broken arrays I think
-                return _.clone(this)._.append(var_args);
+            $append: function(arr) {
+                return _.clone(this)._.append(arr);
             },
             /**
              * Accessor: Returns the average of an array with numbers

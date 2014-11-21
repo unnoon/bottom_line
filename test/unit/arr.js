@@ -1,7 +1,46 @@
 describe("Array", function() {
 
 	describe("static methods", function() {
+		describe("concat: concatenates multiple arrays into 1 new array", function() {
 
+			it("simple concatenation", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [4, 5, 6];
+
+				expect(_.arr.concat(arr1, arr2)).to.deep.equal([1, 2, 3, 4, 5, 6]);
+				expect(arr1).to.deep.equal([1, 2, 3]);
+				expect(arr2).to.deep.equal([4, 5, 6]);
+			});
+
+			it("1st arg empty array", function() {
+				var arr1 = [];
+				var arr2 = [4, 5, 6];
+
+				expect(_.arr.concat(arr1, arr2)).to.deep.equal([4, 5, 6]);
+				expect(arr1).to.deep.equal([]);
+				expect(arr2).to.deep.equal([4, 5, 6]);
+			});
+
+			it("2nd arg empty array", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [];
+
+				expect(_.arr.concat(arr1, arr2)).to.deep.equal([1, 2, 3]);
+				expect(arr1).to.deep.equal([1, 2, 3]);
+				expect(arr2).to.deep.equal([]);
+			});
+
+			it("single argument", function() {
+				var arr1 = [1, 2, 3];
+
+				expect(_.arr.concat(arr1)).to.deep.equal([1, 2, 3]);
+				expect(arr1).to.deep.equal([1, 2, 3]);
+			});
+
+			it("no args", function() {
+				expect(_.arr.concat()).to.deep.equal([]);
+			});
+		});
 	});
 
 	describe("prototype methods", function() {
@@ -15,41 +54,132 @@ describe("Array", function() {
 		describe("append", function() {
 
 			it("append an array", function() {
-				var arr = ['a', 'b', 'c'];
+				var arr1 = [1, 2, 3];
+				var arr2 = [4, 5, 6];
 
-				arr._.append(['d', 'e']);
+				arr1._.append(arr2);
 
-				expect(arr).to.eql(['a', 'b', 'c', 'd', 'e']);
+				expect(arr1).to.eql([1, 2, 3, 4, 5, 6]);
+				expect(arr2).to.eql([4, 5, 6]);
+			});
+
+			it("append an broken front array", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [];
+
+				arr2[1] = 5;
+				arr2[2] = 6;
+
+				var testArr = [1, 2, 3];
+				testArr[4] = 5;
+				testArr[5] = 6;
+
+				arr1._.append(arr2);
+
+				expect(arr1).to.eql(testArr);
+			});
+
+			it("append an broken middle array", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [];
+
+				arr2[0] = 4;
+				arr2[2] = 6;
+
+				var testArr = [1, 2, 3, 4];
+				testArr[5] = 6;
+
+				arr1._.append(arr2);
+
+				expect(arr1).to.eql(testArr);
+			});
+
+			it("append an broken back array", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [];
+
+				arr2[0] = 4;
+				arr2[1] = 5;
+
+				var testArr = [1, 2, 3, 4, 5];
+				testArr.length = 6;
+
+				arr1._.append(arr2);
+
+				expect(arr1).to.eql(testArr);
+			});
+
+			it("handle undefined values", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [undefined, undefined, undefined];
+
+				arr1._.append(arr2);
+
+				expect(arr1).to.eql([1, 2, 3, undefined, undefined, undefined]);
+			});
+
+			it("no input", function() {
+				var arr1 = [1, 2, 3];
+
+				arr1._.append();
+
+				expect(arr1).to.eql([1, 2, 3]);
 			});
 		});
 
 		describe("$append", function() {
 
 			it("$append an array", function() {
-				var arr = ['a', 'b', 'c'];
+				var arr1 = [1, 2, 3];
+				var arr2 = [4, 5, 6];
 
-				expect(arr._.$append(['d', 'e'])).to.eql(['a', 'b', 'c', 'd', 'e']);
-				expect(arr).to.eql(['a', 'b', 'c']);
+				expect(arr1._.$append(arr2)).to.eql([1, 2, 3, 4, 5, 6]);
+				expect(arr1).to.eql([1, 2, 3]);
+				expect(arr2).to.eql([4, 5, 6]);
 			});
+
+			it("$append an broken front array", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [];
+
+				arr2[1] = 5;
+				arr2[2] = 6;
+
+				var testArr = [1, 2, 3];
+				testArr[4] = 5;
+				testArr[5] = 6;
+
+				expect(arr1._.$append(arr2)).to.eql(testArr);
+				expect(arr1).to.eql([1, 2, 3]);
+			});
+			// no further as this basically uses clone and the normal append
 		});
 
 		describe("compact", function() {
 
 			it("compact array", function() {
-				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN];
+				var arr1 = [0, 1, '', false, 2, null, undefined, 3, NaN];
 
-				expect(arr1._.compact()).to.eql(['a', 'b', 'c']);
+				expect(arr1._.compact()).to.eql([1, 2, 3]);
 			});
 		});
 
 		describe("$compact", function() {
 
 			it("$compact array", function() {
-				var arr1 = ['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd'];
+				var arr1 = [0, 1, '', false, 2, null, undefined, 3, NaN];
 
-				expect(arr1._.$compact()).to.eql(['a', 'b', 'c', 'd']);
-//				expect(arr1).to.eql(['a', 0, 'b', '', false, 'c', null, undefined, NaN, 'd']); // somehow this fails bug in chai???
-				expect(arr1[9]).to.eql('d');
+				expect(arr1._.$compact()).to.eql([1, 2, 3]);
+				// we cannot normally compare because NaN === NaN fails...
+				expect(arr1[0]).to.eql(0);
+				expect(arr1[1]).to.eql(1);
+				expect(arr1[2]).to.eql('');
+				expect(arr1[3]).to.eql(false);
+				expect(arr1[4]).to.eql(2);
+				expect(arr1[5]).to.eql(null);
+				expect(arr1[6]).to.eql(undefined);
+				expect(arr1[7]).to.eql(3);
+				expect(Number.isNaN(arr1[8])).to.be.true;
 			});
 		});
 
