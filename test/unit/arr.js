@@ -44,6 +44,7 @@ describe("Array", function() {
 	});
 
 	describe("prototype methods", function() {
+		// TODO proper unit tests
 		describe("converter", function() {
 
 			it("convert to array", function() {
@@ -65,14 +66,12 @@ describe("Array", function() {
 
 			it("append an broken front array", function() {
 				var arr1 = [1, 2, 3];
-				var arr2 = [];
+				var arr2 = [4, 5, 6];
 
-				arr2[1] = 5;
-				arr2[2] = 6;
+				delete arr2[0];
 
-				var testArr = [1, 2, 3];
-				testArr[4] = 5;
-				testArr[5] = 6;
+				var testArr = [1, 2, 3, 4, 5, 6];
+				delete testArr[3];
 
 				arr1._.append(arr2);
 
@@ -81,13 +80,12 @@ describe("Array", function() {
 
 			it("append an broken middle array", function() {
 				var arr1 = [1, 2, 3];
-				var arr2 = [];
+				var arr2 = [4, 5, 6];
 
-				arr2[0] = 4;
-				arr2[2] = 6;
+				delete arr2[1];
 
-				var testArr = [1, 2, 3, 4];
-				testArr[5] = 6;
+				var testArr = [1, 2, 3, 4, 5, 6];
+				delete testArr[4];
 
 				arr1._.append(arr2);
 
@@ -96,13 +94,12 @@ describe("Array", function() {
 
 			it("append an broken back array", function() {
 				var arr1 = [1, 2, 3];
-				var arr2 = [];
+				var arr2 = [4, 5, 6];
 
-				arr2[0] = 4;
-				arr2[1] = 5;
+				delete arr2[2];
 
-				var testArr = [1, 2, 3, 4, 5];
-				testArr.length = 6;
+				var testArr = [1, 2, 3, 4, 5, 6];
+				delete testArr[5];
 
 				arr1._.append(arr2);
 
@@ -124,6 +121,21 @@ describe("Array", function() {
 				arr1._.append();
 
 				expect(arr1).to.eql([1, 2, 3]);
+			});
+
+			it("multiple arrays", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [4, 5, 6];
+				var arr3 = [7, 8, 9];
+
+				delete arr2[1];
+
+				var testArr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+				delete testArr[4];
+
+				arr1._.append(arr2, arr3);
+
+				expect(arr1).to.eql(testArr);
 			});
 		});
 
@@ -153,6 +165,31 @@ describe("Array", function() {
 				expect(arr1).to.eql([1, 2, 3]);
 			});
 			// no further as this basically uses clone and the normal append
+		});
+
+		describe("avg: average of a umber based array", function() {
+
+			it("avg", function() {
+				var arr = [1, 2, 3];
+
+				expect(arr._.avg()).to.eql(2);
+			});
+
+			it("not number array given", function() {
+				var arr = [1, [], {}];
+
+				expect(Number.isNaN(arr._.avg())).to.true;
+			});
+
+			it("length 1", function() {
+				var arr = [1];
+
+				expect(arr._.avg()).to.eql(1);
+			});
+
+			it("length 0", function() {
+				expect([]._.avg()).to.be.undefined;
+			});
 		});
 
 		describe("compact", function() {

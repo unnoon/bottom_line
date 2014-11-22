@@ -925,18 +925,24 @@
              * @public
              * @method module:_.arr.append
              * @this       {Array}
-             * @param      {Array} arr  - array to be appended
-             * @returns    {Array} this - this appended with the array
+             * @param   {...Array} __arrays - arrays to be appended
+             * @returns    {Array}     this - this appended with the array
              */
-            append: function(arr) {
-                if(!arr) return this;
+            append: function(__arrays) {
+                var arr;
+                var start;
+                var j, max;
     
-                var start = this.length;
-    
-                for(var i = 0, max = arr.length; i < max; i++)
+                for(var i = 0, args = arguments.length; i < args; i++)
                 {
-                    if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
-                    this[start+i] = arr[i];
+                    if(!(arr = arguments[i])) continue;
+                    start = this.length;
+    
+                    for(j = 0, max = arr.length; j < max; j++)
+                    {
+                        if(arr[j] === undefined && !arr.hasOwnProperty(j)) continue; // take into account broken arrays
+                        this[start+j] = arr[j];
+                    }
                 }
     
                 return this;
@@ -946,21 +952,23 @@
              * @public
              * @method module:_.arr.$append
              * @this    {Array}
-             * @param   {Array} arr  - array to be appended
-             * @returns {Array}      - The new array that is the result of appending
+             * @param   {...Array} __arrays - arrays to be appended
+             * @returns {Array}             - The new array that is the result of appending
              */
-            $append: function(arr) {
-                return _.clone(this)._.append(arr);
+            $append: function(__arrays) {
+                return _.clone(this)._.append.apply(this, arguments);
             },
             /**
-             * Accessor: Returns the average of an array with numbers
+             * Returns the average of a number based array
              * @public
-             * @method Array#avg
+             * @method module:_.arr.avg
              * @this    {Array<number>}
-             * @returns {Number} - Average of the numbers in the array
+             * @returns {number} - Average of the numbers in the array
              */
             avg: function() {
-                return this.sum()/this.length;
+                if(!this.length) return;
+    
+                return this._.sum()/this.length;
             },
             /**
              * Removes al falsey values from an array
@@ -1692,7 +1700,9 @@
              * @returns {number} - sum of the  number array
              */
             sum: function() {
-                return this.reduce(function(a, b) { return a + b; });
+                if(!this.length) return;
+    
+                return this.reduce(function(a, b) { return a + b });
             },
             /**
              * Better to string version
