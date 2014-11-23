@@ -928,6 +928,7 @@
              * @param   {...Array} __arrays - arrays to be appended
              * @returns    {Array}     this - this appended with the array
              */
+            // NOTE this can probably done using several copies
             append: function(__arrays) {
                 var arr;
                 var start;
@@ -975,7 +976,7 @@
             /**
              * Removes al falsey values from an array
              * @public
-             * @method Array#compact
+             * @method module:_.arr.compact
              * @this   {Array}
              * @return {Array}                 this       - mutated array for chaining
              */
@@ -986,7 +987,7 @@
             /**
              * Removes al falsey values from an array into a new array
              * @public
-             * @method Array#$compact
+             * @method module:_.arr.$compact
              * @this   {Array}
              * @return {Array}                 this       - mutated array for chaining
              */
@@ -1049,7 +1050,7 @@
              */
             _cp: function(all, invert, target, $value, opt_ctx)
             {
-                return this._._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
+                return this._._edit(all, invert, function(val) {this.push(val)}, false, target, $value, opt_ctx);
             },
             /**
              * Copies the occurrences from an array to an new array
@@ -1139,17 +1140,37 @@
                 return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
             },
             /**
-             * Edits the occurrences of an array
+             * Edits the key valuer pairs of an object
              * @private
-             * @method Array#_edit
-             * @this    {Array}
+             * @this    {Array|Object}
              * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {Function}           onmatch - function to be executed on a match
+             * @param   {boolean}            reverse - Boolean indicating if we should use inverse iteration
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | function
              * @param   {Object}             opt_ctx - optional context for the function
              * @returns {Array}                      - new array with the copied elements
              */
-            _edit: __coll._edit,
+            _edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
+            {
+                var first = !all, normal = !invert;
+                var array, match, finish = false;
+    
+                var cb = (typeof($value) === 'function')? 	$value                                  :
+                    (array = _.isArray($value))? 		function(val) {return $value._.has(val)} :
+                        function(val) {return val === $value};
+    
+                // note the reverse check should be fixed when this is also implemented for strings
+                this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+                    match = cb.call(opt_ctx, val, i, _this, delta);
+                    // remove normal or inverted match
+                    if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
+                    // if first and the first match is made check if we are done
+                    if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+                }, this);
+    
+                return target;
+            },
             /**
              * Edits an array based on indices
              * @private
@@ -1813,7 +1834,7 @@
              * @public
              * @method Array#withoutAll
              * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+             * @param   {any|Array|Function} $value  - Element to be deleted | Array of elements | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - The array without the element
              */
