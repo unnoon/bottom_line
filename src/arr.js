@@ -56,17 +56,19 @@ constructWrapper(Array, 'arr', {
         append: function(__arrays) {
             var arr;
             var start;
-            var j, max;
+            var i, max;
 
-            for(var i = 0, args = arguments.length; i < args; i++)
+            for(var k = 0; k < arguments.length; k++)
             {
-                if(!(arr = arguments[i])) continue;
-                start = this.length;
+                arr = arguments[k]; if(!arr) continue;
 
-                for(j = 0, max = arr.length; j < max; j++)
+                start        = this.length; // start position to start appending
+                this.length += arr.length;  // set the length to the length after appending
+                // copy the properties in case defined
+                for(i = 0, max = arr.length; i < max; i++)
                 {
-                    if(arr[j] === undefined && !arr.hasOwnProperty(j)) continue; // take into account broken arrays
-                    this[start+j] = arr[j];
+                    if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
+                    this[start+i] = arr[i];
                 }
             }
 
@@ -98,7 +100,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes al falsey values from an array
          * @public
-         * @method Array#compact
+         * @method module:_.arr.compact
          * @this   {Array}
          * @return {Array}                 this       - mutated array for chaining
          */
@@ -109,7 +111,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes al falsey values from an array into a new array
          * @public
-         * @method Array#$compact
+         * @method module:_.arr.$compact
          * @this   {Array}
          * @return {Array}                 this       - mutated array for chaining
          */
@@ -936,7 +938,7 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array#withoutAll
          * @this    {Array}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+         * @param   {any|Array|Function} $value  - Element to be deleted | Array of elements | or a function
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Array}                      - The array without the element
          */

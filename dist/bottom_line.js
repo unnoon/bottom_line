@@ -931,17 +931,19 @@
             append: function(__arrays) {
                 var arr;
                 var start;
-                var j, max;
+                var i, max;
     
-                for(var i = 0, args = arguments.length; i < args; i++)
+                for(var k = 0; k < arguments.length; k++)
                 {
-                    if(!(arr = arguments[i])) continue;
-                    start = this.length;
+                    arr = arguments[k]; if(!arr) continue;
     
-                    for(j = 0, max = arr.length; j < max; j++)
+                    start        = this.length; // start position to start appending
+                    this.length += arr.length;  // set the length to the length after appending
+                    // copy the properties in case defined
+                    for(i = 0, max = arr.length; i < max; i++)
                     {
-                        if(arr[j] === undefined && !arr.hasOwnProperty(j)) continue; // take into account broken arrays
-                        this[start+j] = arr[j];
+                        if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
+                        this[start+i] = arr[i];
                     }
                 }
     
