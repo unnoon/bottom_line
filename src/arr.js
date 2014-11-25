@@ -30,14 +30,14 @@ constructWrapper(Array, 'arr', {
     },
     static: {
         /**
-         * Concats 2 or more array. Result is an new array
+         * Concats array into a new array
          * @public
          * @static
          * @method module:_.arr.concat
-         * @param {...Array} var_args     - 2 or more arrays
-         * @returns  {Array} array containing the concatenated array
+         * @param {...Array} __arrays - arrays to concat
+         * @returns  {Array}          - the concatenated array
          */
-        concat: function(var_args) {
+        concat: function(__arrays) {
             return Array.prototype.concat.apply([], arguments);
         }
     },
@@ -46,51 +46,62 @@ constructWrapper(Array, 'arr', {
      */
     prototype: {
         /**
-         * Mutator: Append 1 or more arrays to the current array
+         * Append an array to the current array
          * @public
-         * @method Array#append
+         * @method module:_.arr.append
          * @this       {Array}
-         * @param      {Array} arr  - array to be appended
-         * @returns    {Array} this - Array appended with arr
+         * @param   {...Array} __arrays - arrays to be appended
+         * @returns    {Array}     this - this appended with the array
          */
-        append: function(arr) {
-            var val;
-            var start = this.length;
+        // NOTE this can probably done using several copies
+        append: function(__arrays) {
+            var arr;
+            var start;
+            var i, max;
 
-            for(var i = 0, max = arr.length; i < max; i++)
+            for(var k = 0; k < arguments.length; k++)
             {
-                if((val = arr[i]) === undefined && !arr.hasOwnProperty(i)) continue; // take in account broken arrays
-                this[start+i] = val;
+                arr = arguments[k]; if(!arr) continue;
+
+                start        = this.length; // start position to start appending
+                this.length += arr.length;  // set the length to the length after appending
+                // copy the properties in case defined
+                for(i = 0, max = arr.length; i < max; i++)
+                {
+                    if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
+                    this[start+i] = arr[i];
+                }
             }
 
             return this;
         },
         /**
-         * appends 1 or more arrays toa new array
+         * Append an array to the current array. The result is a new array
          * @public
-         * @method Array#$append
-         * @this       {Array}
-         * @param   {...Array} var_args - 1 or more arrays to be appended
-         * @returns    {Array}  this     - Array appended with arr
+         * @method module:_.arr.$append
+         * @this    {Array}
+         * @param   {...Array} __arrays - arrays to be appended
+         * @returns {Array}             - The new array that is the result of appending
          */
-        $append: function(var_args) {
-            // FIXME this need to be adapated for broken arrays I think
-            return _.clone(this)._.append(var_args);
+        $append: function(__arrays) {
+            return _.clone(this)._.append.apply(this, arguments);
         },
         /**
-         * Accessor: Returns the average of an array with numbers
+         * Returns the average of a number based array
          * @public
-         * @method Array#avg
+         * @method module:_.arr.avg
          * @this    {Array<number>}
-         * @returns {Number} - Average of the numbers in the array
+         * @returns {number} - Average of the numbers in the array
          */
         avg: function() {
-            return this.sum()/this.length;
+            if(!this.length) return;
+
+            return this._.sum()/this.length;
         },
         /**
          * Removes al falsey values from an array
          * @public
-         * @method Array#compact
+         * @method module:_.arr.compact
          * @this   {Array}
          * @return {Array}                 this       - mutated array for chaining
          */
@@ -101,7 +112,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes al falsey values from an array into a new array
          * @public
-         * @method Array#$compact
+         * @method module:_.arr.$compact
          * @this   {Array}
          * @return {Array}                 this       - mutated array for chaining
          */
@@ -164,7 +175,7 @@ constructWrapper(Array, 'arr', {
          */
         _cp: function(all, invert, target, $value, opt_ctx)
         {
-            return this._._edit(all, invert, function(val) {this.push(val);}, false, target, $value, opt_ctx);
+            return this._._edit(all, invert, function(val) {this.push(val)}, false, target, $value, opt_ctx);
         },
         /**
          * Copies the occurrences from an array to an new array
@@ -254,17 +265,38 @@ constructWrapper(Array, 'arr', {
             return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
         },
         /**
-         * Edits the occurrences of an array
+         * Edits the key valuer pairs of an object
          * @private
-         * @method Array#_edit
-         * @this    {Array}
+         * @this    {Array|Object}
          * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
          * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+         * @param   {Function}           onmatch - function to be executed on a match
+         * @param   {boolean}            reverse - Boolean indicating if we should use inverse iteration
+         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | function
          * @param   {Object}             opt_ctx - optional context for the function
          * @returns {Array}                      - new array with the copied elements
          */
-        _edit: __coll._edit,
+        // TODO decide we make a specialized array version of edit
+        _edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
+        {
+            var first = !all, normal = !invert;
+            var array, match, finish = false;
+
+            var cb = (typeof($value) === 'function')? 	$value                                   :
+                     (array = _.isArray($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
+                                                        function(val) {return val === $value};
+
+            // note the reverse check should be fixed when this is also implemented for strings
+            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+                match = cb.call(opt_ctx, val, i, _this, delta);
+                // remove normal or inverted match
+                if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
+                // if first and the first match is made check if we are done
+                if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+            }, this);
+
+            return target;
+        },
         /**
          * Edits an array based on indices
          * @private
@@ -817,7 +849,9 @@ constructWrapper(Array, 'arr', {
          * @returns {number} - sum of the  number array
          */
         sum: function() {
-            return this.reduce(function(a, b) { return a + b; });
+            if(!this.length) return;
+
+            return this.reduce(function(a, b) { return a + b });
         },
         /**
          * Better to string version
@@ -926,7 +960,7 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array#withoutAll
          * @this    {Array}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+         * @param   {any|Array|Function} $value  - Element to be deleted | Array of elements | or a function
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Array}                      - The array without the element
          */
