@@ -49,6 +49,20 @@ constructWrapper(Object, 'obj', {
             return clone;
         },
         /**
+         * Empties an object without destroying the object itself
+         * @public
+         * @static
+         * @method module:_.obj.empty
+         * @return  {Object}  this - for chaining
+         */
+        empty: function() {
+            this.each(function(prop) {
+                delete this[prop];
+            }, this);
+
+            return this
+        },
+        /**
          * Extends an object with function/properties from a module object
          * @public
          * @static
