@@ -50,7 +50,7 @@ constructWrapper(Function, 'fnc', {
          * @returns {function}          - partial version of the function
          */
         partial: function (var_args, fnc) {
-            var args = arguments; // is to array needed??
+            var args = arguments;
 
             return function() {
                 for(var i = 0, arg = 0; i < args.length && arg < arguments.length; i++)
@@ -60,7 +60,7 @@ constructWrapper(Function, 'fnc', {
                         args[i] = arguments[arg++];
                     }
                 }
-                return fnc.apply(this. args);
+                return fnc.apply(this, args);
             }
         },
         /**
