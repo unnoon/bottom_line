@@ -228,14 +228,14 @@ constructWrapper(Object, 'obj', {
         /**
          * Copies all similar values to an array
          * @public
-         * @method Object#_copyAll
+         * @method Object#_copy$
          * @this   {Object}
          * @param  {Array}                 to         - array to copy to
          * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
          * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
          * @return {Object}                 this       - mutated array for chaining
          */
-        copyAll: function(to, $value, opt_ctx)
+        copy$: function(to, $value, opt_ctx)
         {
             return this._._cp(true, false, to, $value, opt_ctx);
         },
@@ -307,7 +307,7 @@ constructWrapper(Object, 'obj', {
          * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
          * @return {Object}                 this       - mutated array for chaining
          */
-        cutAll: function(to, $value, opt_ctx)
+        cut$: function(to, $value, opt_ctx)
         {
             return this._._cut(true, false, to, $value, opt_ctx);
         },
@@ -610,7 +610,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Object}                      - The array without the element
          */
-        withoutAll: function($value, opt_ctx) {
+        without$: function($value, opt_ctx) {
             return this._._rm(true, false, $value, opt_ctx);
         },
         /**
@@ -622,7 +622,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Object}                      - NEW array without the element
          */
-        $withoutAll: function($value, opt_ctx) {
+        $without$: function($value, opt_ctx) {
             return this._._cp(true, true, [], $value, opt_ctx);
         },
         /**

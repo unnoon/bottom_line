@@ -598,7 +598,7 @@
 			 */
 			compact: function()
 			{
-				return this.$.withoutAll(function(val) {return !val});
+				return this.$.without$(function(val) {return !val});
 			},
 			/**
 			 * Removes al falsey values from an array into a new array
@@ -608,7 +608,7 @@
 			 */
 			$compact: function()
 			{
-				return this.$.$withoutAll(function(val) {return !val});
+				return this.$.$without$(function(val) {return !val});
 			},
 			/**
 			 * Copies a value to an array
@@ -632,7 +632,7 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			copyAll: function(to, $value, opt_ctx)
+			copy$: function(to, $value, opt_ctx)
 			{
 				return this.$._cp(true, false, to, $value, opt_ctx);
 			},

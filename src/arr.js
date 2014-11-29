@@ -107,7 +107,7 @@ constructWrapper(Array, 'arr', {
          */
         compact: function()
         {
-            return this._.withoutAll(function(val) {return !val});
+            return this._.without$(function(val) {return !val});
         },
         /**
          * Removes al falsey values from an array into a new array
@@ -118,7 +118,7 @@ constructWrapper(Array, 'arr', {
          */
         $compact: function()
         {
-            return this._.$withoutAll(function(val) {return !val});
+            return this._.$without$(function(val) {return !val});
         },
         /**
          * Copies a value to an array
@@ -137,14 +137,14 @@ constructWrapper(Array, 'arr', {
         /**
          * Copies all similar values to an array
          * @public
-         * @method Array#copyAll
+         * @method Array#copy$
          * @this   {Array}
          * @param  {Array}                 to         - array to copy to
          * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
          * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
          * @return {Array}                 this       - mutated array for chaining
          */
-        copyAll: function(to, $value, opt_ctx)
+        copy$: function(to, $value, opt_ctx)
         {
             return this._._cp(true, false, to, $value, opt_ctx);
         },
@@ -224,7 +224,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Cut all similar values to an array
          * @public
-         * @method Array#cutAll
+         * @method Array#cut$
          * @this   {Array}
          * @param  {Array}                 to         - array to copy to
          * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
@@ -250,7 +250,7 @@ constructWrapper(Array, 'arr', {
             return this._._cutKeys(false, to, $index, opt_to_ctx);
         },
         /**
-         * Copies the occurrences from an array to an new array
+         * Copies the occurrences from an array to an new array. Results are copied at the end of the array. // TODO copy at specific index
          * @private
          * @method Array#_cpKeys
          * @this    {Array}
@@ -483,14 +483,11 @@ constructWrapper(Array, 'arr', {
          */
         _eachRight: function(step, cb, opt_ctx) {
             var from = this.length-1, to = -1;
-            var val;
-
-            cb = opt_ctx? cb.bind(opt_ctx) : cb;
 
             for(var i = from; i > to; i -= step)
             {
-                if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                if(cb(this[i], i, this) === false) break;
+                if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
+                if(cb.call(opt_ctx, this[i], i, this) === false) break;
             }
 
             return this;
@@ -958,19 +955,22 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes the all occurrence in an array
          * @public
-         * @method Array#withoutAll
+         * @method Array#without$
          * @this    {Array}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of elements | or a function
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Array}                      - The array without the element
          */
+        //without$: function($value, opt_ctx) {
+        //    return this._._rm(true, false, $value, opt_ctx);
+        //},
         withoutAll: function($value, opt_ctx) {
             return this._._rm(true, false, $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
          * @public
-         * @method Array#$withoutAll
+         * @method Array#$without$
          * @this    {Array}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context or the function

@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-preprocess');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.initConfig({
 		uglify: {
@@ -29,7 +30,16 @@ module.exports = function(grunt) {
                 src : 'src/bottom_line.js',
                 dest : 'dist/bottom_line.js'
             }
-        }
+        },
+		watch: {
+			scripts: {
+				files: ['**/*.js'],
+				tasks: ['preprocess'],
+				options: {
+					spawn: false
+				}
+			}
+		}
 	});
 
     grunt.registerTask('default', ['preprocess']);

@@ -406,28 +406,28 @@ describe("Object", function() {
             });
         });
 
-        describe("withoutAll", function() {
+        describe("without$", function() {
 
-            it("withoutAll by value", function() {
+            it("without$ by value", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2};
 
-                obj._.withoutAll(2);
+                obj._.without$(2);
 
                 expect(obj).to.eql({x: 1,z: 3});
             });
 
-            it("withoutAll multiple values", function() {
+            it("without$ multiple values", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
 
-                obj._.withoutAll([2,3]);
+                obj._.without$([2,3]);
 
                 expect(obj).to.eql({x: 1});
             });
 
-            it("withoutAll function", function() {
+            it("without$ function", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-                obj._.withoutAll(function(val) {
+                obj._.without$(function(val) {
                     return val > 2;
                 });
 
@@ -435,26 +435,26 @@ describe("Object", function() {
             });
         });
 
-        describe("$withoutAll", function() {
+        describe("$without$", function() {
 
-            it("$withoutAll one element", function() {
+            it("$without$ one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$withoutAll(2)).to.eql({ x: 1,z: 3});
+                expect(obj._.$without$(2)).to.eql({ x: 1,z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$withoutAll multiple values", function() {
+            it("$without$ multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$withoutAll([2, 1])).to.eql({z: 3});
+                expect(obj._.$without$([2, 1])).to.eql({z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$withoutAll function", function() {
+            it("$without$ function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.$withoutAll(function(val) {
+                expect(obj._.$without$(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
@@ -530,27 +530,27 @@ describe("Object", function() {
             });
         });
 
-        describe("copyAll", function() {
+        describe("copy$", function() {
 
-            it("copyAll value", function() {
+            it("copy$ value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.copyAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+                expect(obj1._.copy$(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
             });
 
-            it("copyAll values", function() {
+            it("copy$ values", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.copyAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+                expect(obj1._.copy$(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
             });
 
-            it("copyAll function", function() {
+            it("copy$ function", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.copyAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.copy$(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
             });
         });
 
@@ -605,29 +605,29 @@ describe("Object", function() {
             });
         });
 
-        describe("cutAll", function() {
+        describe("cut$", function() {
 
-            it("cutAll value", function() {
+            it("cut$ value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.cutAll(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
+                expect(obj1._.cut$(obj2, 2)).to.eql({a: 1,b: 2, y:2, t:2});
                 expect(obj1).to.eql({x: 1, z:3});
             });
 
-            it("cutAll values", function() {
+            it("cut$ values", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.cutAll(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
+                expect(obj1._.cut$(obj2,[2,3,4])).to.eql({a: 1,b: 2, y:2, z:3, t:2});
                 expect(obj1).to.eql({x: 1});
             });
 
-            it("cutAll function", function() {
+            it("cut$ function", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
                 var obj2 = {a: 1,b: 2};
 
-                expect(obj1._.cutAll(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
+                expect(obj1._.cut$(obj2, function(val) {return val > 1})).to.eql({a: 1,b: 2, y:2, z:3});
                 expect(obj1).to.eql({x: 1});
             });
         });
