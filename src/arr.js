@@ -745,9 +745,24 @@ constructWrapper(Array, 'arr', {
          * @param   {Object}             opt_ctx - optional context for the function
          * @returns {Array}                      - The array without the element
          */
-        _rm: function(all, invert, $value, opt_ctx)
+        _rm: function(invert, $value, opt_ctx)
         {
-            return this._._edit(all, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+            return this._._edit(false, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+        },
+        /**
+         * Removes all the occurrences from an array
+         * @private
+         * @method Array#_rm
+         * @this    {Array}
+         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
+         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
+         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+         * @param   {Object}             opt_ctx - optional context for the function
+         * @returns {Array}                      - The array without the element
+         */
+        _rm$: function(invert, $value, opt_ctx)
+        {
+            return this._._edit(true, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
         },
         /**
          * Select the first occurrence in an array
@@ -759,7 +774,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array }                     - array with the selected element
          */
         select: function($value, opt_ctx) {
-            return this._._rm(false, true, $value, opt_ctx);
+            return this._._rm(true, $value, opt_ctx);
         },
         /**
          * Accessor: Returns the first element found by the selector function
@@ -783,7 +798,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - array with the selected elements
          */
         select$: function($value, opt_ctx) {
-            return this._._rm(true, true, $value, opt_ctx);
+            return this._._rm$(true, $value, opt_ctx);
         },
         /**
          * Select all occurrence in an array and copies them to a new array
@@ -938,7 +953,7 @@ constructWrapper(Array, 'arr', {
          * @returns {Array }                     - The array without the element
          */
         without: function($value, opt_ctx) {
-            return this._._rm(false, false, $value, opt_ctx);
+            return this._._rm(false, $value, opt_ctx);
         },
         /**
          * Removes the first occurrence in an array
@@ -962,10 +977,10 @@ constructWrapper(Array, 'arr', {
          * @returns {Array}                      - The array without the element
          */
         //without$: function($value, opt_ctx) {
-        //    return this._._rm(true, false, $value, opt_ctx);
+        //    return this._._rm$(false, $value, opt_ctx);
         //},
         without$: function($value, opt_ctx) {
-            return this._._rm(true, false, $value, opt_ctx);
+            return this._._rm$(false, $value, opt_ctx);
         },
         /**
          * Removes the all occurrence in an array
