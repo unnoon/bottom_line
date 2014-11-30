@@ -957,7 +957,7 @@
                     // copy the properties in case defined
                     for(i = 0, max = arr.length; i < max; i++)
                     {
-                        if(arr[i] === undefined && !arr.hasOwnProperty(i)) continue; // take into account broken arrays
+                        if(arr[i] === undefined && !arr._.owns(i)) continue; // take into account broken arrays
                         this[start+i] = arr[i];
                     }
                 }
@@ -1120,7 +1120,7 @@
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
              * @return {Array}                 this       - mutated array for chaining
              */
-            cutAll: function(to, $value, opt_ctx)
+            cut$: function(to, $value, opt_ctx)
             {
                 return this._._cut(true, false, to, $value, opt_ctx);
             },
@@ -1235,7 +1235,7 @@
              */
             $diff: function(arr)
             {
-                return this._.$selectAll(function(val) {return !arr._.has(val)});
+                return this._.$select$(function(val) {return !arr._.has(val)});
             },
             /**
              * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -1394,15 +1394,15 @@
             /**
              * Finds all elements according to the callback function
              * @public
-             * @method Array#_findAll
+             * @method Array#_find$
              * @this   {Array}
              * @param  {Function} cb      - callback function to be called for each element
              * @param  {Object=}  opt_ctx - optional context
              * @return {Array} first value that is found
              */
             // TODO this should be an alias
-            _findAll: function(cb, opt_ctx) {
-                return this._.$selectAll(cb, opt_ctx);
+            _find$: function(cb, opt_ctx) {
+                return this._.$select$(cb, opt_ctx);
             },
             /**
              * Get/sets: the first element of an array
@@ -1474,7 +1474,7 @@
              * @return {Array}     - this for chaining
              */
             intersect: function(arr) {
-                return this._.selectAll(function(val) {
+                return this._.select$(function(val) {
                     return arr._.has(val);
                 }, this);
             },
@@ -1487,7 +1487,7 @@
              * @return {Array}     - this for chaining
              */
             $intersect: function(arr) {
-                return this._.$selectAll(function(val) {
+                return this._.$select$(function(val) {
                     return arr._.has(val);
                 }, this);
             },
@@ -1665,25 +1665,25 @@
             /**
              * Select all occurrence in an array
              * @public
-             * @method Array#selectAll
+             * @method Array#select$
              * @this    {Array}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - array with the selected elements
              */
-            selectAll: function($value, opt_ctx) {
+            select$: function($value, opt_ctx) {
                 return this._._rm(true, true, $value, opt_ctx);
             },
             /**
              * Select all occurrence in an array and copies them to a new array
              * @public
-             * @method Array#$selectAll
+             * @method Array#$select$
              * @this    {Array}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - array with the selected elements
              */
-            $selectAll: function($value, opt_ctx) {
+            $select$: function($value, opt_ctx) {
                 return this._._cp(true, false, [], $value, opt_ctx);
             },
             /**
@@ -1853,7 +1853,7 @@
             //without$: function($value, opt_ctx) {
             //    return this._._rm(true, false, $value, opt_ctx);
             //},
-            withoutAll: function($value, opt_ctx) {
+            without$: function($value, opt_ctx) {
                 return this._._rm(true, false, $value, opt_ctx);
             },
             /**
@@ -1865,7 +1865,7 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - NEW array without the element
              */
-            $withoutAll: function($value, opt_ctx) {
+            $without$: function($value, opt_ctx) {
                 return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**

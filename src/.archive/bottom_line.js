@@ -1307,14 +1307,14 @@
 			/**
 			 * Finds all elements according to the callback function
 			 * @public
-			 * @method Array#_findAll
+			 * @method Array#_find$
 			 * @this   {Array}
 			 * @param  {Function} cb      - callback function to be called for each element
 			 * @param  {Object=}  opt_ctx - optional context
 			 * @return {Array} first value that is found
 			 */
 			// TODO this should be an alias
-			_findAll: function(cb, opt_ctx) {
+			_find$: function(cb, opt_ctx) {
 				return this._$selectAll(cb, opt_ctx);
 			},
 			/**

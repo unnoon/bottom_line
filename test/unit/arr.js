@@ -785,54 +785,54 @@ describe("Array", function() {
 			});
 		});
 
-		describe("selectAll by value", function() {
+		describe("select$ by value", function() {
 
-			it("selectAll one element", function() {
+			it("select$ one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.selectAll(1)).to.eql([1, 1]);
+				expect(arr._.select$(1)).to.eql([1, 1]);
 				expect(arr).to.eql([1, 1]);
 			});
 
-			it("selectAll multiple elements", function() {
+			it("select$ multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.selectAll([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.select$([1, 2])).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 2]);
 			});
 
-			it("selectAll by function", function() {
+			it("select$ by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.selectAll(function(elm) {
+				expect(arr._.select$(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([2, 2]);
 			});
 		});
 
-		describe("$selectAll by value", function() {
+		describe("$select$ by value", function() {
 
-			it("$selectAll one element", function() {
+			it("$select$ one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$selectAll(1)).to.eql([1, 1]);
+				expect(arr._.$select$(1)).to.eql([1, 1]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$selectAll multiple elements", function() {
+			it("$select$ multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.$select$([1, 2])).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$selectAll by function", function() {
+			it("$select$ by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll(function(elm) {
+				expect(arr._.$select$(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
