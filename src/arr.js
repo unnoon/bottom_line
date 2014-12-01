@@ -29,6 +29,9 @@ constructWrapper(Array, 'arr', {
         }
     },
     static: {
+        _utils: {
+            remove: function(i) {}
+        },
         /**
          * Concats array into a new array
          * @public
@@ -748,6 +751,12 @@ constructWrapper(Array, 'arr', {
         _rm: function(invert, $value, opt_ctx)
         {
             return this._._edit(false, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+
+            //for(var i = 0; i < this.length; i++)
+            //{
+            //
+            //}
+
         },
         /**
          * Removes all the occurrences from an array
