@@ -23,3 +23,14 @@ $select: this._._cp(false, false, [], $value, opt_ctx);
 without:  this._._rm(false, false, $value, opt_ctx);
 $without: this._._cp(false, true, [], $value, opt_ctx);
 
+- mixed arrays???
+
+without(fnc1, fnc2, fnc3)  // remove function values
+without(arr1, arr2, arr3)  // remove array values (from multi-dimensional array)
+// how to distinguish these 2 from the above 2
+// rename this function to remove to distinguish between the 2
+remove(fnc, ctx_)         // remove values based on a function
+
+select
+pick/choose/favor
+

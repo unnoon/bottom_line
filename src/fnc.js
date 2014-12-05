@@ -159,7 +159,7 @@ constructWrapper(Function, 'fnc', {
             return this.toString();
         },
         /**
-         * Returns the name of a function if it is an unamed function it returns an empty string ''
+         * Returns the name of a function if it is an unnamed function it returns an empty string ''
          * NOTE avoid using this function as on older browsers name property is not defined and is shimmed
          * @public
          * @method Function#name
