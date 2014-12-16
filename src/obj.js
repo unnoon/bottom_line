@@ -555,7 +555,7 @@ constructWrapper(Object, 'obj', {
             {
                 if(this.hasOwnProperty(key))
                 {
-                    output += (output? ', ' : '{') + key + ': ' + this[key]._.toString();
+                    output += (output? ', ' : '{') + key + ': ' + (this[key] && this[key]._.toString());
                 }
             }
 
