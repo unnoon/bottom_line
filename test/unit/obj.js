@@ -349,6 +349,22 @@ describe("Object", function() {
 
                 expect(obj._.toString()).to.eql('{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}');
             });
+
+			it("falsey _toString", function() {
+				var obj = {
+					x: 0,
+					y: undefined,
+					z: null,
+					a: NaN,
+					b: 0,
+					c: '',
+					d: false,
+					e: 666,
+					f: {x: 0, y:1}
+				};
+
+				expect(obj._.toString()).to.eql('{x: 0, y: undefined, z: null, a: NaN, b: 0, c: , d: false, e: 666, f: {x: 0, y: 1}}');
+			});
         });
 
 		describe("without", function() {

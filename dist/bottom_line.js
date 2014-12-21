@@ -788,8 +788,9 @@
                 for(var key in this)
                 {
                     if(this.hasOwnProperty(key))
-                    {
-                        output += (output? ', ' : '{') + key + ': ' + this[key]._.toString();
+                    {   // TODO add punctuation mark if the key holds a string
+                        // TODO add proper formatting
+                        output += (output? ', ' : '{') + key + ': ' + (this[key]? this[key]._.toString() : this[key]);
                     }
                 }
     

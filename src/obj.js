@@ -16,7 +16,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}  obj   - object to be cloned
          * @return  {Object}  clone - the cloned object
          */
-        // TODO These should be expanded with frozen, extrnsible states etc
+        // TODO These should be expanded with frozen, extensible states etc
         clone: function clone(obj) {
             var clone = Array.isArray(obj)? [] : Object.create(Object.getPrototypeOf(obj));
 
@@ -37,10 +37,10 @@ constructWrapper(Object, 'obj', {
         cloneDeep: function cloneDeep(obj) {
             var names;
 
-            try       { names = obj._.names(); }
+            try       { names = obj._.names(); } // this is ugly add a is primitive & is object function
             catch (e) { return obj }
 
-            var clone = _.isArray(obj)? [] : Object.create(obj._.proto());
+            var clone = Object.create(obj._.proto());
             names._.each(function (name) {
                 var pd = obj._.descriptor(name);
                 if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
@@ -48,7 +48,7 @@ constructWrapper(Object, 'obj', {
             });
             return clone;
         },
-        /**
+        /**""
          * Empties an object without destroying the object itself
          * @public
          * @static
@@ -554,8 +554,9 @@ constructWrapper(Object, 'obj', {
             for(var key in this)
             {
                 if(this.hasOwnProperty(key))
-                {
-                    output += (output? ', ' : '{') + key + ': ' + this[key]._.toString();
+                {   // TODO add punctuation mark if the key holds a string
+                    // TODO add proper formatting
+                    output += (output? ', ' : '{') + key + ': ' + (this[key]? this[key]._.toString() : this[key]);
                 }
             }
 
