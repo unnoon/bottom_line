@@ -34,9 +34,9 @@
         var wrapper = module.init || function() {};
 
         _[key] = wrapper;
-
-        wrapper.__instance__ = (key === 'obj') ? {} : Object.create(_.obj.__instance__); // inherit from object. // stores non-chainable use methods
-        wrapper.__chain__    = (key === 'obj') ? {} : Object.create(_.obj.__chain__);    // inherit from object.  // stores chainable use methods
+        // create instance and chain object including not wrapper
+        wrapper.__instance__ = (key === 'obj') ? {not:{}} : Object.create(_.obj.__instance__, {not:{value:Object.create(_.obj.__instance__.not)}}); // inherit from object. // stores non-chainable use methods
+        wrapper.__chain__    = (key === 'obj') ? {not:{}} : Object.create(_.obj.__chain__,    {not:{value:Object.create(_.obj.__chain__.not)}});    // inherit from object.  // stores chainable use methods
 
         Object.defineProperty(wrapper.__instance__, 'chain', {get: function() {return wrapper.__chain__},   enumerable: false, configurable: false});
         Object.defineProperty(wrapper.__chain__,    'value', {get: function() {return _.value},             enumerable: false, configurable: false});
@@ -80,12 +80,12 @@
 
         Object.getOwnPropertyNames(prototype).forEach(function(name) {
             var descriptor   = Object.getOwnPropertyDescriptor(prototype, name);
-            var descriptor_instance  = clone(descriptor); // normal descriptor
-            var descriptor_chain     = clone(descriptor); // chaining descriptor
+            descriptor.enumerable = false; // make properties non enumerable
 
-            // make properties non enumerable
-            descriptor_instance.enumerable = false;
-            descriptor_chain.enumerable    = false;
+            var descriptor_instance     = clone(descriptor); // normal descriptor
+            var descriptor_chain        = clone(descriptor); // chaining descriptor
+            var descriptor_instance_not = clone(descriptor); // normal descriptor
+            var descriptor_chain_not    = clone(descriptor); // chaining descriptor
 
             // wrap function & getters & setters
             if(typeof(descriptor.value) === 'function') wrap('value');
@@ -95,18 +95,17 @@
             function wrap(type) {
                 var fn = descriptor[type];
 
-                // singular
-                descriptor_instance[type] = function () {
-                    return fn.apply(_.value, arguments);
-                };
-                // chaining
-                descriptor_chain[type] = function () {
-                    return fn.apply(_.value, arguments)._.chain; // bl makes sure the value is set back tot the _[shorthand]
-                };
+                descriptor_instance[type] = function () {return fn.apply(_.value, arguments)};
+                descriptor_chain[type]    = function () {return fn.apply(_.value, arguments)._.chain};
+                // NOT
+                descriptor_instance_not[type] = function () {return !fn.apply(_.value, arguments)};
+                descriptor_chain_not[type]    = function () {return !fn.apply(_.value, arguments)._.chain};
             }
 
-            Object.defineProperty(wrapper.__instance__,  name, descriptor_instance);
-            Object.defineProperty(wrapper.__chain__,     name, descriptor_chain);
+            Object.defineProperty(wrapper.__instance__,     name, descriptor_instance);
+            Object.defineProperty(wrapper.__chain__,        name, descriptor_chain);
+            Object.defineProperty(wrapper.__instance__.not, name, descriptor_instance_not);
+            Object.defineProperty(wrapper.__chain__.not,    name, descriptor_chain_not);
         })
     }
 

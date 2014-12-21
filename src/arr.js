@@ -71,7 +71,7 @@ constructWrapper(Array, 'arr', {
                 // copy the properties in case defined
                 for(i = 0, max = arr.length; i < max; i++)
                 {
-                    if(arr[i] === undefined && !arr._.owns(i)) continue; // take into account broken arrays
+                    if(arr[i] === undefined && arr._.not.owns(i)) continue; // take into account broken arrays
                     this[start+i] = arr[i];
                 }
             }
