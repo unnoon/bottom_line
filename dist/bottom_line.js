@@ -1,5 +1,5 @@
 /*!
- * _____________Bottom_Line._.⌡S___
+ * _____________bottom_line.js_____
  * Bottom_line JavaScript Library
  *
  * Copyright 2013, Rogier Geertzema
@@ -9,8 +9,8 @@
 'use strict';
 !function(root, bottom_line) {
     var environments = true;
-    var requirejs = typeof(define) === 'function' && !!define.amd;
-    var nodejs    = typeof(module) === 'object' && typeof(exports) === 'object' && module.exports === exports;
+    var requirejs = typeof(define) === 'function'  && !!define.amd;
+    var nodejs    = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
 
     switch(environments) {
     case requirejs : define(bottom_line);            break;
@@ -29,54 +29,52 @@
     };
 
     // wrap functions for chaining
-    function constructWrapper(nativeObj, shorthand, module)
+    function constructWrapper(obj, key, module)
     {
-        var wrapper = _[shorthand] = module.init || function() {};
+        var wrapper = module.init || function() {};
 
-        // stores non-chainable use methods
-        wrapper.__instance__ = (shorthand === 'obj')? {} : Object.create(_.obj.__instance__); // inherit from object
-        Object.defineProperties(wrapper.__instance__, {
-            chain:  {get: function() {return wrapper.__chain__},      enumerable: false, configurable: false}
-//            ,
-//            $chain: {get: function() {return new wrapper(_.value)},   enumerable: false, configurable: false}
-        });
-        // stores chainable use methods
-        wrapper.__chain__ = (shorthand === 'obj')? {} : Object.create(_.obj.__chain__); // inherit from object
-        Object.defineProperties(wrapper.__chain__, {
-            value:  {get: function() {return _.value},                enumerable: false, configurable: false}
-        });
+        _[key] = wrapper;
 
-        if(nativeObj && nativeObj.prototype)
+        wrapper.__instance__ = (key === 'obj') ? {} : Object.create(_.obj.__instance__); // inherit from object. // stores non-chainable use methods
+        wrapper.__chain__    = (key === 'obj') ? {} : Object.create(_.obj.__chain__);    // inherit from object.  // stores chainable use methods
+
+        Object.defineProperty(wrapper.__instance__, 'chain', {get: function() {return wrapper.__chain__},   enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.__chain__,    'value', {get: function() {return _.value},             enumerable: false, configurable: false});
+
+        if(obj && obj.prototype)
         {
-            // extend native object with special 'bl' (bottom_line) access property
+            // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperties(nativeObj.prototype, {
-                // return object containing single use methods
-                _: {get: function() {
-                    _.value = this;
-                    return wrapper.__instance__
-                }, enumerable: false, configurable: false}
-            });
+            Object.defineProperty(obj.prototype, '_', {get: function() {_.value = this; return wrapper.__instance__}, enumerable: false, configurable: false});
         }
 
-        // copy statics to wrapper & _
+        wrapStatics(wrapper, key, module);
+        wrapPrototype(wrapper, key, module);
+    }
+
+    // wrap functions for chaining
+    function wrapStatics(wrapper, key, module) {
+        // copy statics to _[shorthand] & _
         var statics = module.static || {};
         Object.getOwnPropertyNames(statics).forEach(function(name) {
             var descriptor = Object.getOwnPropertyDescriptor(statics, name);
             descriptor.enumerable = false;
 
-            if(wrapper.hasOwnProperty(name)) console.debug('overwriting existing property: '+name+' on _.'+shorthand+' while copying statics');
-            // copy static methods to wrapper
+            if(wrapper.hasOwnProperty(name)) console.debug('overwriting existing property: '+name+' on _.'+key+' while copying statics');
+            // copy static methods to _[shorthand]
             Object.defineProperty(wrapper, name, descriptor);
 
             // copy static properties to the bottom line _ object
-            if(shorthand !== 'int') // except for the int class
+            if(key !== 'int') // except for the int class
             {
                 if(_.hasOwnProperty(name)) console.debug('overwriting existing property: '+name+' on _ while copying statics');
                 Object.defineProperty(_, name, descriptor);
             }
         });
+    }
 
+    function wrapPrototype(wrapper, key, module)
+    {
         // prototype
         var prototype = module.prototype || {};
 
@@ -84,12 +82,10 @@
             var descriptor   = Object.getOwnPropertyDescriptor(prototype, name);
             var descriptor_instance  = clone(descriptor); // normal descriptor
             var descriptor_chain     = clone(descriptor); // chaining descriptor
-//            var descriptor_$chain    = clone(descriptor); // safe chaining descriptor
 
             // make properties non enumerable
             descriptor_instance.enumerable = false;
             descriptor_chain.enumerable    = false;
-//            descriptor_$chain.enumerable   = false;
 
             // wrap function & getters & setters
             if(typeof(descriptor.value) === 'function') wrap('value');
@@ -105,19 +101,12 @@
                 };
                 // chaining
                 descriptor_chain[type] = function () {
-                    return fn.apply(_.value, arguments)._.chain; // bl makes sure the value is set back tot the wrapper
+                    return fn.apply(_.value, arguments)._.chain; // bl makes sure the value is set back tot the _[shorthand]
                 };
-//                // safe chaining
-//                // TODO proper testing & mixed type chaining
-//                descriptor_$chain[type] = function () {
-//                    this.value = fn.apply(this.value, arguments);
-//                    return this;
-//                };
             }
 
             Object.defineProperty(wrapper.__instance__,  name, descriptor_instance);
             Object.defineProperty(wrapper.__chain__,     name, descriptor_chain);
-//            Object.defineProperty(wrapper.prototype,     name, descriptor_$chain);
         })
     }
 
@@ -250,7 +239,7 @@
              * @param   {Object}  obj   - object to be cloned
              * @return  {Object}  clone - the cloned object
              */
-            // TODO These should be expanded with frozen, extrnsible states etc
+            // TODO These should be expanded with frozen, extensible states etc
             clone: function clone(obj) {
                 var clone = Array.isArray(obj)? [] : Object.create(Object.getPrototypeOf(obj));
     
@@ -271,10 +260,10 @@
             cloneDeep: function cloneDeep(obj) {
                 var names;
     
-                try       { names = obj._.names(); }
+                try       { names = obj._.names(); } // this is ugly add a is primitive & is object function
                 catch (e) { return obj }
     
-                var clone = _.isArray(obj)? [] : Object.create(obj._.proto());
+                var clone = Object.create(obj._.proto());
                 names._.each(function (name) {
                     var pd = obj._.descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
@@ -282,7 +271,7 @@
                 });
                 return clone;
             },
-            /**
+            /**""
              * Empties an object without destroying the object itself
              * @public
              * @static
@@ -302,13 +291,13 @@
              * @static
              * @method module:_.obj.extend
              * @param   {Object}  obj          - object to be extended
-             * @param   {Object=} opt_settings - optional settings/default descriptor
+             * @param   {Object=} settings_ - optional settings/default descriptor
              * @param   {Object}  module       - object containing functions/properties to extend the object with
              * @return  {Object}  obj          - the extended object
              */
-            extend: function(obj, opt_settings, module) {
-                var settings = module && opt_settings;
-                var module   = module || opt_settings;
+            extend: function(obj, settings_, module) {
+                var settings = module && settings_;
+                var module   = module || settings_;
                 var descriptor;
                 var config;
     

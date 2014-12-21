@@ -68,13 +68,13 @@ constructWrapper(Object, 'obj', {
          * @static
          * @method module:_.obj.extend
          * @param   {Object}  obj          - object to be extended
-         * @param   {Object=} opt_settings - optional settings/default descriptor
+         * @param   {Object=} settings_ - optional settings/default descriptor
          * @param   {Object}  module       - object containing functions/properties to extend the object with
          * @return  {Object}  obj          - the extended object
          */
-        extend: function(obj, opt_settings, module) {
-            var settings = module && opt_settings;
-            var module   = module || opt_settings;
+        extend: function(obj, settings_, module) {
+            var settings = module && settings_;
+            var module   = module || settings_;
             var descriptor;
             var config;
 
