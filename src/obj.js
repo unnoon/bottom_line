@@ -235,7 +235,7 @@ constructWrapper(Object, 'obj', {
          * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
          * @return {Object}                 this       - mutated array for chaining
          */
-        copy$: function(to, $value, opt_ctx)
+        copyAll: function(to, $value, opt_ctx)
         {
             return this._._cp(true, false, to, $value, opt_ctx);
         },
@@ -307,7 +307,7 @@ constructWrapper(Object, 'obj', {
          * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
          * @return {Object}                 this       - mutated array for chaining
          */
-        cut$: function(to, $value, opt_ctx)
+        cutAll: function(to, $value, opt_ctx)
         {
             return this._._cut(true, false, to, $value, opt_ctx);
         },
@@ -610,7 +610,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Object}                      - The array without the element
          */
-        without$: function($value, opt_ctx) {
+        withoutAll: function($value, opt_ctx) {
             return this._._rm(true, false, $value, opt_ctx);
         },
         /**
@@ -622,7 +622,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Object}                      - NEW array without the element
          */
-        $without$: function($value, opt_ctx) {
+        $withoutAll: function($value, opt_ctx) {
             return this._._cp(true, true, [], $value, opt_ctx);
         },
         /**

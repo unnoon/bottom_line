@@ -469,7 +469,7 @@
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
              * @return {Object}                 this       - mutated array for chaining
              */
-            copy$: function(to, $value, opt_ctx)
+            copyAll: function(to, $value, opt_ctx)
             {
                 return this._._cp(true, false, to, $value, opt_ctx);
             },
@@ -541,7 +541,7 @@
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
              * @return {Object}                 this       - mutated array for chaining
              */
-            cut$: function(to, $value, opt_ctx)
+            cutAll: function(to, $value, opt_ctx)
             {
                 return this._._cut(true, false, to, $value, opt_ctx);
             },
@@ -844,7 +844,7 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Object}                      - The array without the element
              */
-            without$: function($value, opt_ctx) {
+            withoutAll: function($value, opt_ctx) {
                 return this._._rm(true, false, $value, opt_ctx);
             },
             /**
@@ -856,7 +856,7 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Object}                      - NEW array without the element
              */
-            $without$: function($value, opt_ctx) {
+            $withoutAll: function($value, opt_ctx) {
                 return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**
@@ -918,6 +918,9 @@
             }
         },
         static: {
+            _utils: {
+                remove: function(i) {}
+            },
             /**
              * Concats array into a new array
              * @public
@@ -996,7 +999,7 @@
              */
             compact: function()
             {
-                return this._.without$(function(val) {return !val});
+                return this._.withoutAll(function(val) {return !val});
             },
             /**
              * Removes al falsey values from an array into a new array
@@ -1007,7 +1010,7 @@
              */
             $compact: function()
             {
-                return this._.$without$(function(val) {return !val});
+                return this._.$withoutAll(function(val) {return !val});
             },
             /**
              * Copies a value to an array
@@ -1026,14 +1029,14 @@
             /**
              * Copies all similar values to an array
              * @public
-             * @method Array#copy$
+             * @method Array#copyAll
              * @this   {Array}
              * @param  {Array}                 to         - array to copy to
              * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
              * @return {Array}                 this       - mutated array for chaining
              */
-            copy$: function(to, $value, opt_ctx)
+            copyAll: function(to, $value, opt_ctx)
             {
                 return this._._cp(true, false, to, $value, opt_ctx);
             },
@@ -1113,14 +1116,14 @@
             /**
              * Cut all similar values to an array
              * @public
-             * @method Array#cut$
+             * @method Array#cutAll
              * @this   {Array}
              * @param  {Array}                 to         - array to copy to
              * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
              * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
              * @return {Array}                 this       - mutated array for chaining
              */
-            cut$: function(to, $value, opt_ctx)
+            cutAll: function(to, $value, opt_ctx)
             {
                 return this._._cut(true, false, to, $value, opt_ctx);
             },
@@ -1235,7 +1238,7 @@
              */
             $diff: function(arr)
             {
-                return this._.$select$(function(val) {return !arr._.has(val)});
+                return this._.$selectAll(function(val) {return !arr._.has(val)});
             },
             /**
              * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -1394,15 +1397,15 @@
             /**
              * Finds all elements according to the callback function
              * @public
-             * @method Array#_find$
+             * @method Array#_findAll
              * @this   {Array}
              * @param  {Function} cb      - callback function to be called for each element
              * @param  {Object=}  opt_ctx - optional context
              * @return {Array} first value that is found
              */
             // TODO this should be an alias
-            _find$: function(cb, opt_ctx) {
-                return this._.$select$(cb, opt_ctx);
+            _findAll: function(cb, opt_ctx) {
+                return this._.$selectAll(cb, opt_ctx);
             },
             /**
              * Get/sets: the first element of an array
@@ -1474,7 +1477,7 @@
              * @return {Array}     - this for chaining
              */
             intersect: function(arr) {
-                return this._.select$(function(val) {
+                return this._.selectAll(function(val) {
                     return arr._.has(val);
                 }, this);
             },
@@ -1487,7 +1490,7 @@
              * @return {Array}     - this for chaining
              */
             $intersect: function(arr) {
-                return this._.$select$(function(val) {
+                return this._.$selectAll(function(val) {
                     return arr._.has(val);
                 }, this);
             },
@@ -1637,6 +1640,12 @@
             _rm: function(invert, $value, opt_ctx)
             {
                 return this._._edit(false, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
+    
+                //for(var i = 0; i < this.length; i++)
+                //{
+                //
+                //}
+    
             },
             /**
              * Removes all the occurrences from an array
@@ -1649,7 +1658,7 @@
              * @param   {Object}             opt_ctx - optional context for the function
              * @returns {Array}                      - The array without the element
              */
-            _rm$: function(invert, $value, opt_ctx)
+            _rmAll: function(invert, $value, opt_ctx)
             {
                 return this._._edit(true, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
             },
@@ -1680,25 +1689,25 @@
             /**
              * Select all occurrence in an array
              * @public
-             * @method Array#select$
+             * @method Array#selectAll
              * @this    {Array}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - array with the selected elements
              */
-            select$: function($value, opt_ctx) {
-                return this._._rm$(true, $value, opt_ctx);
+            selectAll: function($value, opt_ctx) {
+                return this._._rmAll(true, $value, opt_ctx);
             },
             /**
              * Select all occurrence in an array and copies them to a new array
              * @public
-             * @method Array#$select$
+             * @method Array#$selectAll
              * @this    {Array}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - array with the selected elements
              */
-            $select$: function($value, opt_ctx) {
+            $selectAll: function($value, opt_ctx) {
                 return this._._cp(true, false, [], $value, opt_ctx);
             },
             /**
@@ -1859,28 +1868,28 @@
             /**
              * Removes the all occurrence in an array
              * @public
-             * @method Array#without$
+             * @method Array#withoutAll
              * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of elements | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array}                      - The array without the element
+             * @param   {any|Array|Function} $value - Element to be deleted | Array of elements | or a function
+             * @param   {Object=}             ctx_  - optional context or the function
+             * @returns {Array}                     - The array without the element
              */
-            //without$: function($value, opt_ctx) {
-            //    return this._._rm$(false, $value, opt_ctx);
+            //withoutAll: function($value, opt_ctx) {
+            //    return this._._rmAll(false, $value, opt_ctx);
             //},
-            without$: function($value, opt_ctx) {
-                return this._._rm$(false, $value, opt_ctx);
+            withoutAll: function($value, ctx_) {
+                return this._._rmAll(false, $value, ctx_);
             },
             /**
              * Removes the all occurrence in an array
              * @public
-             * @method Array#$without$
+             * @method Array#$withoutAll
              * @this    {Array}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - NEW array without the element
              */
-            $without$: function($value, opt_ctx) {
+            $withoutAll: function($value, opt_ctx) {
                 return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**
@@ -1889,12 +1898,12 @@
              * @method Array#withoutKeys
              * @this   {Array}
              * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-             * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+             * @param  {number=} to_ctx_ - to index to delete to | or the context for the function
              * @return {Array}   this   - mutated array for chaining
              */
-            withoutKeys: function($index, opt_to_ctx)
+            withoutKeys: function($index, to_ctx_)
             {
-                return this._._del(false, $index, opt_to_ctx);
+                return this._._del(false, $index, to_ctx_);
             },
             /**
              * Remove elements based on index
@@ -2410,7 +2419,7 @@
                 return this.toString();
             },
             /**
-             * Returns the name of a function if it is an unamed function it returns an empty string ''
+             * Returns the name of a function if it is an unnamed function it returns an empty string ''
              * NOTE avoid using this function as on older browsers name property is not defined and is shimmed
              * @public
              * @method Function#name

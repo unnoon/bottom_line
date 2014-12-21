@@ -598,7 +598,7 @@
 			 */
 			compact: function()
 			{
-				return this.$.without$(function(val) {return !val});
+				return this.$.withoutAll(function(val) {return !val});
 			},
 			/**
 			 * Removes al falsey values from an array into a new array
@@ -608,7 +608,7 @@
 			 */
 			$compact: function()
 			{
-				return this.$.$without$(function(val) {return !val});
+				return this.$.$withoutAll(function(val) {return !val});
 			},
 			/**
 			 * Copies a value to an array
@@ -632,7 +632,7 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			copy$: function(to, $value, opt_ctx)
+			copyAll: function(to, $value, opt_ctx)
 			{
 				return this.$._cp(true, false, to, $value, opt_ctx);
 			},
@@ -713,7 +713,7 @@
 			 * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
 			 * @return {Array}                 this       - mutated array for chaining
 			 */
-			cut$: function(to, $value, opt_ctx)
+			cutAll: function(to, $value, opt_ctx)
 			{
 				return this.$._cut(true, false, to, $value, opt_ctx);
 			},
@@ -872,7 +872,7 @@
 			 */
 			$diff: function(arr)
 			{
-				return this.$.$select$(function(val) {return !arr.$.has(val)});
+				return this.$.$selectAll(function(val) {return !arr.$.has(val)});
 			},
 			/**
 			 * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -1004,7 +1004,7 @@
 			 */
 			// TODO this should be an alias
 			findAll: function(cb, opt_ctx) {
-				return this.$.$select$(cb, opt_ctx);
+				return this.$.$selectAll(cb, opt_ctx);
 			},
 			/**
 			 * Get/sets: the first element of an array
@@ -1071,7 +1071,7 @@
 			 * @return {Array}     - this for chaining
 			 */
 			intersect: function(arr) {
-				return this.$.select$(function(val) {
+				return this.$.selectAll(function(val) {
 					return arr.$.has(val);
 				}, this);
 			},
@@ -1084,7 +1084,7 @@
 			 * @return {Array}     - this for chaining
 			 */
 			$intersect: function(arr) {
-				return this.$.$select$(function(val) {
+				return this.$.$selectAll(function(val) {
 					return arr.$.has(val);
 				}, this);
 			},
@@ -1264,7 +1264,7 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - array with the selected elements
 			 */
-			select$: function($value, opt_ctx) {
+			selectAll: function($value, opt_ctx) {
 				return this.$._rm(true, true, $value, opt_ctx);
 			},
 			/**
@@ -1275,7 +1275,7 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - array with the selected elements
 			 */
-			$select$: function($value, opt_ctx) {
+			$selectAll: function($value, opt_ctx) {
 				return this.$._cp(true, false, [], $value, opt_ctx);
 			},
 			/**
@@ -1382,7 +1382,7 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - The array without the element
 			 */
-			without$: function($value, opt_ctx) {
+			withoutAll: function($value, opt_ctx) {
 				return this.$._rm(true, false, $value, opt_ctx);
 			},
 			/**
@@ -1393,7 +1393,7 @@
 			 * @param   {Object}             opt_ctx - optional context or the function
 			 * @returns {Array}                      - NEW array without the element
 			 */
-			$without$: function($value, opt_ctx) {
+			$withoutAll: function($value, opt_ctx) {
 				return this.$._cp(true, true, [], $value, opt_ctx);
 			},
 			/**

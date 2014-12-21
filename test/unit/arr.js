@@ -267,27 +267,27 @@ describe("Array", function() {
 			});
 		});
 
-		describe("copy$", function() {
+		describe("copyAll", function() {
 
-			it("copy$ value", function() {
+			it("copyAll value", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.copy$(arr2, 2)).to.eql([2, 5, 2, 2]);
+				expect(arr1._.copyAll(arr2, 2)).to.eql([2, 5, 2, 2]);
 			});
 
-			it("copy$ values", function() {
+			it("copyAll values", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.copy$(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
+				expect(arr1._.copyAll(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
 			});
 
-			it("copy$ function", function() {
+			it("copyAll function", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.copy$(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
+				expect(arr1._.copyAll(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
 
 			});
 		});
@@ -344,29 +344,29 @@ describe("Array", function() {
 			});
 		});
 
-		describe("cut$", function() {
+		describe("cutAll", function() {
 
-			it("cut$ value", function() {
+			it("cutAll value", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.cut$(arr2, 2)).to.eql([2, 5, 2, 2]);
+				expect(arr1._.cutAll(arr2, 2)).to.eql([2, 5, 2, 2]);
 				expect(arr1).to.eql([1, 3]);
 			});
 
-			it("cut$ values", function() {
+			it("cutAll values", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.cut$(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
+				expect(arr1._.cutAll(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
 				expect(arr1).to.eql([1]);
 			});
 
-			it("cut$ function", function() {
+			it("cutAll function", function() {
 				var arr1 = [1, 2, 3, 2];
 				var arr2 = [2, 5];
 
-				expect(arr1._.cut$(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
+				expect(arr1._.cutAll(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
 				expect(arr1).to.eql([1, 3]);
 
 			});
@@ -785,54 +785,54 @@ describe("Array", function() {
 			});
 		});
 
-		describe("select$ by value", function() {
+		describe("selectAll by value", function() {
 
-			it("select$ one element", function() {
+			it("selectAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.select$(1)).to.eql([1, 1]);
+				expect(arr._.selectAll(1)).to.eql([1, 1]);
 				expect(arr).to.eql([1, 1]);
 			});
 
-			it("select$ multiple elements", function() {
+			it("selectAll multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.select$([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.selectAll([1, 2])).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 2]);
 			});
 
-			it("select$ by function", function() {
+			it("selectAll by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.select$(function(elm) {
+				expect(arr._.selectAll(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([2, 2]);
 			});
 		});
 
-		describe("$select$ by value", function() {
+		describe("$selectAll by value", function() {
 
-			it("$select$ one element", function() {
+			it("$selectAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$select$(1)).to.eql([1, 1]);
+				expect(arr._.$selectAll(1)).to.eql([1, 1]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$select$ multiple elements", function() {
+			it("$selectAll multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select$([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.$selectAll([1, 2])).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$select$ by function", function() {
+			it("$selectAll by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select$(function(elm) {
+				expect(arr._.$selectAll(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
@@ -1049,7 +1049,7 @@ describe("Array", function() {
 			it("without one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				arr._.without$(1);
+				arr._.withoutAll(1);
 
 				expect(arr).to.eql([2, 3]);
 			});
@@ -1057,7 +1057,7 @@ describe("Array", function() {
 			it("without one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				arr._.without$(function(val) {return val === 3});
+				arr._.withoutAll(function(val) {return val === 3});
 
 				expect(arr).to.eql([1, 2, 1]);
 			});
@@ -1065,7 +1065,7 @@ describe("Array", function() {
 			it("without multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
-				arr._.without$([2,4]);
+				arr._.withoutAll([2,4]);
 
 				expect(arr).to.eql([1, 3]);
 			});
@@ -1073,7 +1073,7 @@ describe("Array", function() {
 			it("without multiple function", function() {
 				var arr = ['a', 'b', 'c', 'bb', 'bb'];
 
-				arr._.without$(function(val) {
+				arr._.withoutAll(function(val) {
 					return val._.startsWith('b');
 				});
 
@@ -1081,26 +1081,26 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$without$ by value", function() {
+		describe("$withoutAll by value", function() {
 
-			it("$without$ one element", function() {
+			it("$withoutAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$without$(1)).to.eql([2, 3]);
+				expect(arr._.$withoutAll(1)).to.eql([2, 3]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 			});
 
-			it("$without$ multiple values", function() {
+			it("$withoutAll multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
-				expect(arr._.$without$([2,4])).to.eql([1, 3]);
+				expect(arr._.$withoutAll([2,4])).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 2, 4, 4]);
 			});
 
-			it("$without$ multiple function", function() {
+			it("$withoutAll multiple function", function() {
 				var arr = ['a', 'b', 'c', 'bb', 'bb'];
 
-				expect(arr._.$without$(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
+				expect(arr._.$withoutAll(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
 				expect(arr).to.eql(['a', 'b', 'c', 'bb', 'bb']);
 			});
 		});
