@@ -609,6 +609,15 @@ describe("Array", function() {
 			});
 		});
 
+		describe("has", function() {
+
+			it("contains functionality", function() {
+				var arr1 = [[1, 2], 3, [4, 5]];
+
+				expect(arr1._.has(3)).to.be.true;
+			});
+		});
+
 		describe("insert", function() {
 
 			it("insert beginning", function() {

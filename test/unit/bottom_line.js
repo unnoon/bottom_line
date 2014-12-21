@@ -42,6 +42,11 @@ describe("Bottom_Line._.⌡S", function() {
                 .value
             ).to.equal(1);
 		});
+
+		it("not", function() {
+			expect(_.obj.not.isDefined(undefined)).to.true;
+			expect(_.not.isDefined(undefined)).to.true;
+		});
 	});
 
 /*
