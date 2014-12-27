@@ -72,73 +72,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}  module       - object containing functions/properties to extend the object with
          * @return  {Object}  obj          - the extended object
          */
-        extend: function(obj, settings_, module) {
-            var settings = module && settings_;
-            var module   = module || settings_;
-            var descriptor;
-            var config;
-
-            var enumerable   =  settings && settings.enumerable;
-            var configurable =  settings && settings.configurable;
-            var writable     =  settings && settings.writable;
-            var overwrite    = !settings || settings.overwrite !== false; // default is true
-            var override     = !settings || settings.override  !== false; // default is true
-
-            var loglevel     = (settings && settings.loglevel) || 'debug';
-            if(loglevel === 'debug' && !console.debug) loglevel = 'log'; // shim for old browsers i.e 10... better solve it with a shim though
-
-            for(var prop in module) // we can't use ._.each here otherwise we will execute the getter
-            {   if(module.hasOwnProperty(prop))
-                {
-                    descriptor = module._.descriptor(prop);
-
-                    var overrideProperty    = override;
-                    var overwriteProperty   = overwrite;
-                    var aliases             = false;
-                    var isGetterSetter      = !!(descriptor.get || descriptor.set);
-
-                    // global property overrides
-                    if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
-                    if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                    if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
-
-                    // special property specific config
-                    // FIXME this doesn't work for getters & setters
-                    if(!isGetterSetter && module[prop]._.owns('value'))
-                    {
-                        config = module[prop];
-                        descriptor.value = config.value;
-
-                        if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
-                        if(config.exec)                     descriptor.value = config.value();
-                        if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
-                        if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
-                        if(config._.owns('writable'))       descriptor.writable     = config.writable;
-                        if(config._.owns('override'))       overrideProperty  = config.override;
-                        if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
-                        if(config._.owns('shim'))           overwriteProperty = config.shim;
-                        if(config.aliases)                  aliases = true;
-                    }
-
-                    if(obj._.owns(prop))
-                    {
-                        if(!overwriteProperty) continue; // continue;
-                        console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
-                    }
-                    else if(prop in obj)
-                    {
-                        if(!overrideProperty) continue; // continue;
-                        console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
-                    }
-
-                    obj._.define(prop, descriptor);
-                    if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
-                }
-            }
-
-
-            return obj;
-        },
+        extend: extend,
         /**
          * Checks is a property is defined
          * @public

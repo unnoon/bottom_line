@@ -95,8 +95,8 @@
 
             // wrap function & getters & setters
             if(descriptor.value) wrap('value');
-            if(descriptor.get) 	 wrap('get');
-            if(descriptor.set)	 wrap('set');
+            //if(descriptor.get) 	 wrap('get');
+            //if(descriptor.set)	 wrap('set');
 
             function wrap(type) {
                 if(typeof(descriptor[type]) !== 'function') return;
@@ -109,13 +109,51 @@
                 descriptor_instance_not[type] = function () {return !fn.apply(_.value, arguments)};
                 descriptor_chain_not[type]    = function () {return !fn.apply(_.value, arguments)._.chain};
             }
-
             Object.defineProperty(wrapper.__instance__,     name, descriptor_instance);
             Object.defineProperty(wrapper.__chain__,        name, descriptor_chain);
             Object.defineProperty(wrapper.__instance__.not, name, descriptor_instance_not);
             Object.defineProperty(wrapper.__chain__.not,    name, descriptor_chain_not);
-        })
+        });
+        //extend(wrapper.__instance__, {enumerable: false}, prototype, function(fn) { return function () {return fn.apply(_.value, arguments)}});
     }
+
+    //function wrapPrototype(wrapper, key, module)
+    //{
+    //    // prototype
+    //    var prototype = module.prototype || {};
+    //
+    //    Object.getOwnPropertyNames(prototype).forEach(function(name) {
+    //        var descriptor   = Object.getOwnPropertyDescriptor(prototype, name);
+    //        descriptor.enumerable = false; // make properties non enumerable
+    //
+    //        var descriptor_instance     = clone(descriptor); // normal descriptor
+    //        var descriptor_chain        = clone(descriptor); // chaining descriptor
+    //        var descriptor_instance_not = clone(descriptor); // normal descriptor
+    //        var descriptor_chain_not    = clone(descriptor); // chaining descriptor
+    //
+    //        // wrap function & getters & setters
+    //        if(descriptor.value) wrap('value');
+    //        //if(descriptor.get) 	 wrap('get');
+    //        //if(descriptor.set)	 wrap('set');
+    //
+    //        function wrap(type) {
+    //            if(typeof(descriptor[type]) !== 'function') return;
+    //
+    //            var fn = descriptor[type];
+    //
+    //            descriptor_instance[type] = function () {return fn.apply(_.value, arguments)};
+    //            descriptor_chain[type]    = function () {return fn.apply(_.value, arguments)._.chain};
+    //            // NOT
+    //            descriptor_instance_not[type] = function () {return !fn.apply(_.value, arguments)};
+    //            descriptor_chain_not[type]    = function () {return !fn.apply(_.value, arguments)._.chain};
+    //        }
+    //
+    //        Object.defineProperty(wrapper.__instance__,     name, descriptor_instance);
+    //        Object.defineProperty(wrapper.__chain__,        name, descriptor_chain);
+    //        Object.defineProperty(wrapper.__instance__.not, name, descriptor_instance_not);
+    //        Object.defineProperty(wrapper.__chain__.not,    name, descriptor_chain_not);
+    //    })
+    //}
 
     // simple cloning function
     function clone(obj) {
@@ -126,6 +164,86 @@
         });
 
         return clone;
+    }
+
+    /**
+     * Extends an object with function/properties from a module object
+     * @public
+     * @static
+     * @method module:_.obj.extend
+     * @param   {Object}  obj          - object to be extended
+     * @param   {Object=} settings_    - optional settings/default descriptor
+     * @param   {Object}  module       - object containing functions/properties to extend the object with
+     * @param   {function=} modifier_  - modifier function to apply to functions
+     * @return  {Object}  obj          - the extended object
+     */
+    function extend(obj, settings_, module, modifier_) {
+        var settings = module && settings_;
+        var module   = module || settings_;
+        var descriptor;
+        var config;
+
+        var enumerable   =  settings && settings.enumerable;
+        var configurable =  settings && settings.configurable;
+        var writable     =  settings && settings.writable;
+        var overwrite    = !settings || settings.overwrite !== false; // default is true
+        var override     = !settings || settings.override  !== false; // default is true
+
+        var loglevel     = (settings && settings.loglevel) || 'debug';
+        if(loglevel === 'debug' && !console.debug) loglevel = 'log'; // shim for old browsers i.e 10... better solve it with a shim though
+
+        for(var prop in module)
+        {   if(module.hasOwnProperty(prop))
+            {
+                descriptor = Object.getOwnPropertyDescriptor(module, prop);
+
+                var overrideProperty    = override;
+                var overwriteProperty   = overwrite;
+                var aliases             = false;
+                var isGetterSetter      = !!(descriptor.get || descriptor.set);
+
+                // global property overrides
+                if(enumerable   !== undefined)                                           descriptor.enumerable   = enumerable;
+                if(configurable !== undefined)                                           descriptor.configurable = configurable;
+                if(writable     !== undefined && descriptor.hasOwnProperty('writable'))  descriptor.writable     = writable;
+
+                // special property specific config
+                // FIXME this doesn't work for getters & setters
+                if(!isGetterSetter && module[prop].hasOwnProperty('value'))
+                {
+                    config = module[prop];
+                    descriptor.value = config.value;
+
+                    if(config.clone)                            descriptor.value = _.clone(config.value); // clone deep maybe?
+                    if(config.exec)                             descriptor.value = config.value();
+                    if(config.hasOwnProperty('enumerable'))     descriptor.enumerable   = config.enumerable;
+                    if(config.hasOwnProperty('configurable'))   descriptor.configurable = config.configurable;
+                    if(config.hasOwnProperty('writable'))       descriptor.writable     = config.writable;
+                    if(config.hasOwnProperty('override'))       overrideProperty  = config.override;
+                    if(config.hasOwnProperty('overwrite'))      overwriteProperty = config.overwrite;
+                    if(config.hasOwnProperty('shim'))           overwriteProperty = config.shim;
+                    if(config.aliases)                          aliases = true;
+
+                    descriptor.value = modifier_(descriptor.value);
+                }
+
+                if(obj.hasOwnProperty(prop))
+                {
+                    if(!overwriteProperty) continue; // continue;
+                    //console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
+                }
+                else if(prop in obj)
+                {
+                    if(!overrideProperty) continue; // continue;
+                    //console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
+                }
+
+                Object.defineProperty(obj, prop, descriptor);
+                if(aliases) config.aliases.forEach(function(alias) {Object.defineProperty(obj, alias, descriptor)})
+            }
+        }
+
+        return obj;
     }
 
     // FIXME small fix
@@ -302,73 +420,7 @@
              * @param   {Object}  module       - object containing functions/properties to extend the object with
              * @return  {Object}  obj          - the extended object
              */
-            extend: function(obj, settings_, module) {
-                var settings = module && settings_;
-                var module   = module || settings_;
-                var descriptor;
-                var config;
-    
-                var enumerable   =  settings && settings.enumerable;
-                var configurable =  settings && settings.configurable;
-                var writable     =  settings && settings.writable;
-                var overwrite    = !settings || settings.overwrite !== false; // default is true
-                var override     = !settings || settings.override  !== false; // default is true
-    
-                var loglevel     = (settings && settings.loglevel) || 'debug';
-                if(loglevel === 'debug' && !console.debug) loglevel = 'log'; // shim for old browsers i.e 10... better solve it with a shim though
-    
-                for(var prop in module) // we can't use ._.each here otherwise we will execute the getter
-                {   if(module.hasOwnProperty(prop))
-                    {
-                        descriptor = module._.descriptor(prop);
-    
-                        var overrideProperty    = override;
-                        var overwriteProperty   = overwrite;
-                        var aliases             = false;
-                        var isGetterSetter      = !!(descriptor.get || descriptor.set);
-    
-                        // global property overrides
-                        if(_.isDefined(enumerable))                                 descriptor.enumerable   = enumerable;
-                        if(_.isDefined(configurable))                               descriptor.configurable = configurable;
-                        if(_.isDefined(writable) && descriptor._.owns('writable'))  descriptor.writable     = writable;
-    
-                        // special property specific config
-                        // FIXME this doesn't work for getters & setters
-                        if(!isGetterSetter && module[prop]._.owns('value'))
-                        {
-                            config = module[prop];
-                            descriptor.value = config.value;
-    
-                            if(config.clone)                    descriptor.value = _.clone(config.value); // clone deep maybe?
-                            if(config.exec)                     descriptor.value = config.value();
-                            if(config._.owns('enumerable'))     descriptor.enumerable   = config.enumerable;
-                            if(config._.owns('configurable'))   descriptor.configurable = config.configurable;
-                            if(config._.owns('writable'))       descriptor.writable     = config.writable;
-                            if(config._.owns('override'))       overrideProperty  = config.override;
-                            if(config._.owns('overwrite'))      overwriteProperty = config.overwrite;
-                            if(config._.owns('shim'))           overwriteProperty = config.shim;
-                            if(config.aliases)                  aliases = true;
-                        }
-    
-                        if(obj._.owns(prop))
-                        {
-                            if(!overwriteProperty) continue; // continue;
-                            console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
-                        }
-                        else if(prop in obj)
-                        {
-                            if(!overrideProperty) continue; // continue;
-                            console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
-                        }
-    
-                        obj._.define(prop, descriptor);
-                        if(aliases) config.aliases._.each(function(alias) {obj._.define(alias, descriptor)})
-                    }
-                }
-    
-    
-                return obj;
-            },
+            extend: extend,
             /**
              * Checks is a property is defined
              * @public
