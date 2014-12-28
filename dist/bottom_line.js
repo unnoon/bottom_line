@@ -55,105 +55,27 @@
     }
 
     // wrap functions for chaining
-    function wrapStatics(wrapper, key, module) {
-        // copy statics to _[shorthand] & _
-        var statics = module.static || {};
+    function wrapStatics(wrapper, key, module)
+    {
+        if(!module.static) return;
 
-        Object.getOwnPropertyNames(statics).forEach(function(name) {
-            var descriptor        = Object.getOwnPropertyDescriptor(statics, name);
-            descriptor.enumerable = false;
-            var descriptor_not    = clone(descriptor);
-            var fn                = descriptor.value;
+        extend(wrapper,     {enumerable: false}, module.static);
+        extend(wrapper.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        if(key === 'int') return; // except for the int class
+        extend(_,     {enumerable: false}, module.static);
+        extend(_.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
-            descriptor_not.value  = function () {return !fn.apply(wrapper, arguments)};
-
-            if(wrapper.hasOwnProperty(name)) console.debug('overwriting existing property: '+name+' on _.'+key+' while copying statics');
-            if(_.hasOwnProperty(name))       console.debug('overwriting existing property: '+name+' on _ while copying statics');
-
-            // copy static methods to _[shorthand]
-            Object.defineProperty(wrapper,     name, descriptor); // except for the int class
-            Object.defineProperty(wrapper.not, name, descriptor_not);
-            if(key === 'int') return; // except for the int class
-            Object.defineProperty(_,     name,       descriptor); // copy static properties to the bottom line _ object
-            Object.defineProperty(_.not, name,       descriptor_not); // copy static properties to the bottom line _ object
-        });
     }
 
     function wrapPrototype(wrapper, key, module)
     {
-        // prototype
-        var prototype = module.prototype || {};
+        if(!module.prototype) return;
 
-        Object.getOwnPropertyNames(prototype).forEach(function(name) {
-            var descriptor   = Object.getOwnPropertyDescriptor(prototype, name);
-            descriptor.enumerable = false; // make properties non enumerable
-
-            var descriptor_instance     = clone(descriptor); // normal descriptor
-            var descriptor_chain        = clone(descriptor); // chaining descriptor
-            var descriptor_instance_not = clone(descriptor); // normal descriptor
-            var descriptor_chain_not    = clone(descriptor); // chaining descriptor
-
-            // wrap function & getters & setters
-            if(descriptor.value) wrap('value');
-            //if(descriptor.get) 	 wrap('get');
-            //if(descriptor.set)	 wrap('set');
-
-            function wrap(type) {
-                if(typeof(descriptor[type]) !== 'function') return;
-
-                var fn = descriptor[type];
-
-                descriptor_instance[type] = function () {return fn.apply(_.value, arguments)};
-                descriptor_chain[type]    = function () {return fn.apply(_.value, arguments)._.chain};
-                // NOT
-                descriptor_instance_not[type] = function () {return !fn.apply(_.value, arguments)};
-                descriptor_chain_not[type]    = function () {return !fn.apply(_.value, arguments)._.chain};
-            }
-            Object.defineProperty(wrapper.__instance__,     name, descriptor_instance);
-            Object.defineProperty(wrapper.__chain__,        name, descriptor_chain);
-            Object.defineProperty(wrapper.__instance__.not, name, descriptor_instance_not);
-            Object.defineProperty(wrapper.__chain__.not,    name, descriptor_chain_not);
-        });
-        //extend(wrapper.__instance__, {enumerable: false}, prototype, function(fn) { return function () {return fn.apply(_.value, arguments)}});
+        extend(wrapper.__instance__,     {enumerable: false, wrap: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.__instance__.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.__chain__,        {enumerable: false, wrap: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.__chain__.not,    {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
     }
-
-    //function wrapPrototype(wrapper, key, module)
-    //{
-    //    // prototype
-    //    var prototype = module.prototype || {};
-    //
-    //    Object.getOwnPropertyNames(prototype).forEach(function(name) {
-    //        var descriptor   = Object.getOwnPropertyDescriptor(prototype, name);
-    //        descriptor.enumerable = false; // make properties non enumerable
-    //
-    //        var descriptor_instance     = clone(descriptor); // normal descriptor
-    //        var descriptor_chain        = clone(descriptor); // chaining descriptor
-    //        var descriptor_instance_not = clone(descriptor); // normal descriptor
-    //        var descriptor_chain_not    = clone(descriptor); // chaining descriptor
-    //
-    //        // wrap function & getters & setters
-    //        if(descriptor.value) wrap('value');
-    //        //if(descriptor.get) 	 wrap('get');
-    //        //if(descriptor.set)	 wrap('set');
-    //
-    //        function wrap(type) {
-    //            if(typeof(descriptor[type]) !== 'function') return;
-    //
-    //            var fn = descriptor[type];
-    //
-    //            descriptor_instance[type] = function () {return fn.apply(_.value, arguments)};
-    //            descriptor_chain[type]    = function () {return fn.apply(_.value, arguments)._.chain};
-    //            // NOT
-    //            descriptor_instance_not[type] = function () {return !fn.apply(_.value, arguments)};
-    //            descriptor_chain_not[type]    = function () {return !fn.apply(_.value, arguments)._.chain};
-    //        }
-    //
-    //        Object.defineProperty(wrapper.__instance__,     name, descriptor_instance);
-    //        Object.defineProperty(wrapper.__chain__,        name, descriptor_chain);
-    //        Object.defineProperty(wrapper.__instance__.not, name, descriptor_instance_not);
-    //        Object.defineProperty(wrapper.__chain__.not,    name, descriptor_chain_not);
-    //    })
-    //}
 
     // simple cloning function
     function clone(obj) {
@@ -177,7 +99,7 @@
      * @param   {function=} modifier_  - modifier function to apply to functions
      * @return  {Object}  obj          - the extended object
      */
-    function extend(obj, settings_, module, modifier_) {
+    function extend(obj, settings_, module) {
         var settings = module && settings_;
         var module   = module || settings_;
         var descriptor;
@@ -223,8 +145,10 @@
                     if(config.hasOwnProperty('overwrite'))      overwriteProperty = config.overwrite;
                     if(config.hasOwnProperty('shim'))           overwriteProperty = config.shim;
                     if(config.aliases)                          aliases = true;
-
-                    descriptor.value = modifier_(descriptor.value);
+                }
+                // FIXME cleanup
+                if(settings && settings.wrap && typeof(descriptor.value) === 'function') {
+                    descriptor.value = settings.wrap(descriptor.value);
                 }
 
                 if(obj.hasOwnProperty(prop))
@@ -1444,19 +1368,6 @@
              */
             find: __coll.find,
             /**
-             * Finds all elements according to the callback function
-             * @public
-             * @method Array#_findAll
-             * @this   {Array}
-             * @param  {Function} cb      - callback function to be called for each element
-             * @param  {Object=}  opt_ctx - optional context
-             * @return {Array} first value that is found
-             */
-            // TODO this should be an alias
-            _findAll: function(cb, opt_ctx) {
-                return this._.$selectAll(cb, opt_ctx);
-            },
-            /**
              * Get/sets: the first element of an array
              * @public
              * @method Array#first
@@ -1501,9 +1412,9 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: function(elm) {
+            has: {aliases: ['contains'], value: function(elm) {
                 return this.indexOf(elm) > -1;
-            },
+            }},
             /**
              * Mutator: Inserts an element in a specific location in an array
              * @public
@@ -1756,9 +1667,9 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array}                      - array with the selected elements
              */
-            $selectAll: function($value, opt_ctx) {
+            $selectAll: {aliases: ['findAll'], value: function($value, opt_ctx) {
                 return this._._cp(true, false, [], $value, opt_ctx);
-            },
+            }},
             /**
              * Selects elements based on index, removes others
              * @public

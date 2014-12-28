@@ -506,19 +506,6 @@ constructWrapper(Array, 'arr', {
          */
         find: __coll.find,
         /**
-         * Finds all elements according to the callback function
-         * @public
-         * @method Array#_findAll
-         * @this   {Array}
-         * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
-         * @return {Array} first value that is found
-         */
-        // TODO this should be an alias
-        _findAll: function(cb, opt_ctx) {
-            return this._.$selectAll(cb, opt_ctx);
-        },
-        /**
          * Get/sets: the first element of an array
          * @public
          * @method Array#first
@@ -563,9 +550,9 @@ constructWrapper(Array, 'arr', {
          * @param   {Object}  elm - element to check membership of
          * @returns {boolean}     - boolean indicating if the array contains the element
          */
-        has: function(elm) {
+        has: {aliases: ['contains'], value: function(elm) {
             return this.indexOf(elm) > -1;
-        },
+        }},
         /**
          * Mutator: Inserts an element in a specific location in an array
          * @public
@@ -818,9 +805,9 @@ constructWrapper(Array, 'arr', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Array}                      - array with the selected elements
          */
-        $selectAll: function($value, opt_ctx) {
+        $selectAll: {aliases: ['findAll'], value: function($value, opt_ctx) {
             return this._._cp(true, false, [], $value, opt_ctx);
-        },
+        }},
         /**
          * Selects elements based on index, removes others
          * @public

@@ -1,4 +1,4 @@
-describe("Bottom_Line._.⌡S", function() {
+describe("bottom_line.js", function() {
 
 	describe("bottom line js", function() {
 
@@ -49,46 +49,57 @@ describe("Bottom_Line._.⌡S", function() {
 		});
 	});
 
-/*
-	describe("Underscore", function() {
+	describe("aliases", function() {
 
-		describe("static methods", function() {
+		it("has & contains aliases", function() {
+			var arr1 = [[1, 2], 3, [4, 5]];
 
-			describe("Object properties available from underscore", function() {
-
-				it("test keys Object properties", function() {
-					 var obj = {x:1, y:2};
-
-					expect(_.keys(obj)).to.eql(['x', 'y']);
-				});
-			});
-
-			describe("Iterate", function() {
-
-				it("test keys Object properties", function() {
-					var obj = {x:1, y:2, z:3};
-					var values = []
-
-					_.each(obj, function(e) {values.push(e)});
-
-					expect(values).to.eql([1, 2, 3]);
-				});
-			});
-
-			describe("Integer", function() {
-
-				it("test keys Object properties", function() {
-					var num = new __num(4);
-
-					expect(num.rebound(1, 2)).to.eql(1);
-				});
-
-				it("test keys Object properties", function() {
-					var int = new __int(4);
-
-					expect(int.rebound(1, 2)).to.eql(1);
-				});
-			});
+			expect(arr1._.has(3)).to.be.true;
+			expect(arr1._.contains(3)).to.be.true;
 		});
-	}); */
+	});
+
+
+	/*
+        describe("Underscore", function() {
+
+            describe("static methods", function() {
+
+                describe("Object properties available from underscore", function() {
+
+                    it("test keys Object properties", function() {
+                         var obj = {x:1, y:2};
+
+                        expect(_.keys(obj)).to.eql(['x', 'y']);
+                    });
+                });
+
+                describe("Iterate", function() {
+
+                    it("test keys Object properties", function() {
+                        var obj = {x:1, y:2, z:3};
+                        var values = []
+
+                        _.each(obj, function(e) {values.push(e)});
+
+                        expect(values).to.eql([1, 2, 3]);
+                    });
+                });
+
+                describe("Integer", function() {
+
+                    it("test keys Object properties", function() {
+                        var num = new __num(4);
+
+                        expect(num.rebound(1, 2)).to.eql(1);
+                    });
+
+                    it("test keys Object properties", function() {
+                        var int = new __int(4);
+
+                        expect(int.rebound(1, 2)).to.eql(1);
+                    });
+                });
+            });
+        }); */
 });
