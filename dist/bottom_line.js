@@ -1189,18 +1189,15 @@
                 return this._._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
             },
             /**
+             * @alias without
              * Returns the difference between 2 arrays
              * @public
              * @method Array#diff
              * @this     {Array}
-             * @param {...Array} var_args - 2 or more arrays to calc the difference from
+             * @param {...Array} __arrays - 2 or more arrays to calc the difference from
              * @returns  {Array}          - this for chaining
              */
-            // TODO this should be an alias
-            diff: function(arr)
-            {
-                return this._.without(arr);
-            },
+            //diff: function(__arrays) {...},
             /**
              * Returns the difference between 2 arrays in a new array
              * @public
@@ -1367,6 +1364,17 @@
              * @return {any} first value that is found
              */
             find: __coll.find,
+            /**
+             * @alias $selectAll
+             * Finds all elements according to the callback function
+             * @public
+             * @method Array#_findAll
+             * @this   {Array}
+             * @param  {Function} cb      - callback function to be called for each element
+             * @param  {Object=}  opt_ctx - optional context
+             * @return {Array} first value that is found
+             */
+            //_findAll: function(cb, opt_ctx) {...},
             /**
              * Get/sets: the first element of an array
              * @public
@@ -1810,9 +1818,9 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array }                     - The array without the element
              */
-            without: function($value, opt_ctx) {
+            without: {aliases: ['diff'], value: function($value, opt_ctx) {
                 return this._._rm(false, $value, opt_ctx);
-            },
+            }},
             /**
              * Removes the first occurrence in an array
              * @public
