@@ -22,11 +22,11 @@ var __coll = {
         var array, match, finish = false;
 
         var cb = (typeof($value) === 'function')? 	$value                                  :
-            (array = _.isArray($value))? 		function(val) {return $value._.has(val)} :
+            (array = _.is.array($value))? 		function(val) {return $value._.has(val)} :
                 function(val) {return val === $value};
 
         // note the reverse check should be fixed when this is also implemented for strings
-        this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+        this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
             match = cb.call(opt_ctx, val, i, _this, delta);
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -54,12 +54,12 @@ var __coll = {
         var array, match, finish = false;
 
         var cb = (type === 'function')?	$index                                               		:
-            (array = _.isArray($index))?   function(i) {return $index._.has(i)}                 :
+            (array = _.is.array($index))?   function(i) {return $index._.has(i)}                 :
                 ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
                     function(i) {return i._.between($index, $opt_to_ctx)};
 
-        this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
-            index = _.isArray(this)? (i - delta) : i; // the original index in the array
+        this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
+            index = _.is.array(this)? (i - delta) : i; // the original index in the array
 
             match = cb.call($opt_to_ctx, index, _this);
             // remove normal or inverted match

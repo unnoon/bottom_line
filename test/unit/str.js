@@ -45,5 +45,12 @@ describe("String", function() {
 				expect('HF_GD123'._.isUpperCase()).to.be.true;
 			});
 		});
+
+		describe("between", function() {
+
+			it("positive testcase", function() {
+				expect('12[345]67'._.between('[', ']')).to.eql('345');
+			});
+		});
 	});
 });

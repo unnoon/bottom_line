@@ -15,7 +15,7 @@
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : Object.defineProperty(root, '_', {value: bottom_line()}) } // TODO check for conflicts
+    default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -60,10 +60,10 @@
         if(!module.static) return;
 
         extend(wrapper,     {enumerable: false}, module.static);
-        extend(wrapper.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
         if(key === 'int') return; // except for the int class
         extend(_,     {enumerable: false}, module.static);
-        extend(_.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(_.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
     }
 
@@ -71,10 +71,10 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper.__instance__,     {enumerable: false, wrap: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.__instance__.not, {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.__chain__,        {enumerable: false, wrap: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-        extend(wrapper.__chain__.not,    {enumerable: false, wrap: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.__instance__,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.__instance__.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.__chain__,        {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.__chain__.not,    {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
     }
 
     // simple cloning function
@@ -95,24 +95,29 @@
      * @method module:_.obj.extend
      * @param   {Object}  obj          - object to be extended
      * @param   {Object=} settings_    - optional settings/default descriptor
+     *      {boolean} [enumerable=true]   - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *      {boolean} [configurable=true] - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *      {boolean} [writable=true]     - boolean indicating if all properties should be writable. can be overwritten on a config level
+     *      {boolean} [override=true]     - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
+     *      {boolean} [overwrite=true]    - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {string}  [loglevel='log']    - console log level. Use 'none' to disable all logging
+     *      {function}[modifier]          - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
-     * @param   {function=} modifier_  - modifier function to apply to functions
      * @return  {Object}  obj          - the extended object
      */
     function extend(obj, settings_, module) {
-        var settings = module && settings_;
+        var settings = module && settings_ || {};
         var module   = module || settings_;
         var descriptor;
         var config;
 
-        var enumerable   =  settings && settings.enumerable;
-        var configurable =  settings && settings.configurable;
-        var writable     =  settings && settings.writable;
-        var overwrite    = !settings || settings.overwrite !== false; // default is true
-        var override     = !settings || settings.override  !== false; // default is true
+        var enumerable   = settings.enumerable      !== false;
+        var configurable = settings.configurable    !== false;
+        var writable     = settings.writable        !== false;
+        var overwrite    = settings.overwrite       !== false; // default is true
+        var override     = settings.override        !== false; // default is true
 
-        var loglevel     = (settings && settings.loglevel) || 'debug';
-        if(loglevel === 'debug' && !console.debug) loglevel = 'log'; // shim for old browsers i.e 10... better solve it with a shim though
+        var loglevel     = settings.loglevel || 'log';
 
         for(var prop in module)
         {   if(module.hasOwnProperty(prop))
@@ -122,7 +127,7 @@
                 var overrideProperty    = override;
                 var overwriteProperty   = overwrite;
                 var aliases             = false;
-                var isGetterSetter      = !!(descriptor.get || descriptor.set);
+                var encapsulator        = !!(descriptor.get || descriptor.set);
 
                 // global property overrides
                 if(enumerable   !== undefined)                                           descriptor.enumerable   = enumerable;
@@ -130,8 +135,7 @@
                 if(writable     !== undefined && descriptor.hasOwnProperty('writable'))  descriptor.writable     = writable;
 
                 // special property specific config
-                // FIXME this doesn't work for getters & setters
-                if(!isGetterSetter && module[prop].hasOwnProperty('value'))
+                if(!encapsulator && module[prop].hasOwnProperty('value'))
                 {
                     config = module[prop];
                     descriptor.value = config.value;
@@ -147,19 +151,19 @@
                     if(config.aliases)                          aliases = true;
                 }
                 // FIXME cleanup
-                if(settings && settings.wrap && typeof(descriptor.value) === 'function') {
-                    descriptor.value = settings.wrap(descriptor.value);
+                if(settings.modifier && typeof(descriptor.value) === 'function') {
+                    descriptor.value = settings.modifier(descriptor.value);
                 }
 
                 if(obj.hasOwnProperty(prop))
                 {
                     if(!overwriteProperty) continue; // continue;
-                    //console[loglevel]('overwriting existing property: '+prop+' while extending: '+_.typeOf(obj));
+                    if(loglevel !== 'none')console[loglevel]('overwriting existing property: '+prop);
                 }
                 else if(prop in obj)
                 {
                     if(!overrideProperty) continue; // continue;
-                    //console[loglevel]('overriding existing property: '+prop+' while extending: '+_.typeOf(obj));
+                    if(loglevel !== 'none')console[loglevel]('overriding existing property: '+prop);
                 }
 
                 Object.defineProperty(obj, prop, descriptor);
@@ -170,16 +174,20 @@
         return obj;
     }
 
-    // FIXME small fix
-    _.isArray = Array.isArray;
+    // is object
+    // is should be static so we can also apply it to null & undefined
+    _.is = {
+        array: Array.isArray
+    };
+    // convertor functions
+    _.to = {
 
-    /*
+    };
+    /**
      *  'Global' methods
      */
-    _.assert = function(condition, message)
-    {
-        if (!condition) throw message || "Assertion failed";
-    };
+
+
 
     /**
      * Collections general collection object to store general collection functions
@@ -205,11 +213,11 @@
             var array, match, finish = false;
     
             var cb = (typeof($value) === 'function')? 	$value                                  :
-                (array = _.isArray($value))? 		function(val) {return $value._.has(val)} :
+                (array = _.is.array($value))? 		function(val) {return $value._.has(val)} :
                     function(val) {return val === $value};
     
             // note the reverse check should be fixed when this is also implemented for strings
-            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+            this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
                 match = cb.call(opt_ctx, val, i, _this, delta);
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -237,12 +245,12 @@
             var array, match, finish = false;
     
             var cb = (type === 'function')?	$index                                               		:
-                (array = _.isArray($index))?   function(i) {return $index._.has(i)}                 :
+                (array = _.is.array($index))?   function(i) {return $index._.has(i)}                 :
                     ($opt_to_ctx === undefined)?   function(i) {return i === $index}                   :
                         function(i) {return i._.between($index, $opt_to_ctx)};
     
-            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
-                index = _.isArray(this)? (i - delta) : i; // the original index in the array
+            this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
+                index = _.is.array(this)? (i - delta) : i; // the original index in the array
     
                 match = cb.call($opt_to_ctx, index, _this);
                 // remove normal or inverted match
@@ -1148,11 +1156,11 @@
                 var array, match, finish = false;
     
                 var cb = (typeof($value) === 'function')? 	$value                                   :
-                         (array = _.isArray($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
+                         (array = _.is.array($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
                                                             function(val) {return val === $value};
     
                 // note the reverse check should be fixed when this is also implemented for strings
-                this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+                this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
                     match = cb.call(opt_ctx, val, i, _this, delta);
                     // remove normal or inverted match
                     if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -1399,7 +1407,7 @@
              */
             flatten: function() {
                 return this._.each(function(val, i) {
-                    if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
+                    if(_.is.array(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
                 }, this)
             },
             /**

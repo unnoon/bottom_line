@@ -286,11 +286,11 @@ constructWrapper(Array, 'arr', {
             var array, match, finish = false;
 
             var cb = (typeof($value) === 'function')? 	$value                                   :
-                     (array = _.isArray($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
+                     (array = _.is.array($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
                                                         function(val) {return val === $value};
 
             // note the reverse check should be fixed when this is also implemented for strings
-            this._['each'+((reverse && _.isArray(this))?'Right':'')](function(val, i, _this, delta) {
+            this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
                 match = cb.call(opt_ctx, val, i, _this, delta);
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
@@ -537,7 +537,7 @@ constructWrapper(Array, 'arr', {
          */
         flatten: function() {
             return this._.each(function(val, i) {
-                if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
+                if(_.is.array(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
             }, this)
         },
         /**
