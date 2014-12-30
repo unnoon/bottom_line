@@ -100,7 +100,10 @@
      *      {boolean} [writable]       - boolean indicating if all properties should be writable. can be overwritten on a config level
      *      {boolean} [override=true]  - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
      *      {boolean} [overwrite=true] - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
-     *      {string}  [loglevel]       - console log level. default logging is disabled
+     *
+     *      {string}  [log]            - console log level for overwrites&overrides
+     *      {string}  [validate=false] - validate overwrites & overrides should be set to true in the config
+
      *      {function}[modifier]       - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
@@ -108,6 +111,9 @@
     function extend(obj, settings_, module) {
         var settings = module && settings_ || {};
         var module   = module || settings_;
+
+        settings.override  = settings.override  !== false; // default = true
+        settings.overwrite = settings.overwrite !== false; // default = true
 
         for(var prop in module)
         {   if(module.hasOwnProperty(prop))
@@ -123,7 +129,7 @@
                     descriptor.value = config.value;
 
                     if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
-                    if(config.exec)  descriptor.value = config.value();
+                    if(config.exec)  descriptor.value = config.value(obj);
                 }
 
                 descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
@@ -136,22 +142,27 @@
                     descriptor.value = settings.modifier(descriptor.value);
                 }
 
-                var override  = (config.override  !== undefined) ? config.override  : settings.override  !== false;
-                var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite !== false;
+                var override  = (config.override  !== undefined) ? config.override  : settings.override;
+                var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite;
 
-                if(obj.hasOwnProperty(prop))
-                {
-                    if(!overwrite) continue; // continue;
-                    if(settings.loglevel)console[loglevel]('overwriting existing property: '+prop);
-                }
-                else if(prop in obj)
-                {
-                    if(!override) continue; // continue;
-                    if(settings.loglevel)console[loglevel]('overriding existing property: '+prop);
-                }
+                var props = (config.aliases || []).concat(prop);
 
-                Object.defineProperty(obj, prop, descriptor);
-                if(config.aliases) config.aliases.forEach(function(alias) {Object.defineProperty(obj, alias, descriptor)})
+                props.forEach(function(prop) {
+                    if(obj.hasOwnProperty(prop)) // overwrite
+                    {
+                        if(!overwrite)                              return; // continue
+                        if(settings.validate && !config.overwrite)  throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
+                        if(settings.log)                            console[settings.log]('overwriting existing property: '+prop);
+                    }
+                    else if(prop in obj) // override
+                    {
+                        if(!override)                             return; // continue
+                        if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object" ;
+                        if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
+                    }
+
+                    Object.defineProperty(obj, prop, descriptor)
+                });
             }
         }
 
