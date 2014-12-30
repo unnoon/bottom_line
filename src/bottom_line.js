@@ -98,11 +98,12 @@
      *      {boolean} [enumerable]     - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *      {boolean} [configurable]   - boolean indicating if all properties should be configurable. can be overwritten on a config level
      *      {boolean} [writable]       - boolean indicating if all properties should be writable. can be overwritten on a config level
+     *
      *      {boolean} [override=true]  - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
      *      {boolean} [overwrite=true] - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
      *
      *      {string}  [log]            - console log level for overwrites&overrides
-     *      {string}  [validate=false] - validate overwrites & overrides should be set to true in the config
+     *      {boolean} [validate=false] - validate overwrites & overrides should be set to true in the config
 
      *      {function}[modifier]       - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
