@@ -95,79 +95,63 @@
      * @method module:_.obj.extend
      * @param   {Object}  obj          - object to be extended
      * @param   {Object=} settings_    - optional settings/default descriptor
-     *      {boolean} [enumerable=true]   - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-     *      {boolean} [configurable=true] - boolean indicating if all properties should be configurable. can be overwritten on a config level
-     *      {boolean} [writable=true]     - boolean indicating if all properties should be writable. can be overwritten on a config level
-     *      {boolean} [override=true]     - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean} [overwrite=true]    - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
-     *      {string}  [loglevel='log']    - console log level. Use 'none' to disable all logging
-     *      {function}[modifier]          - modifier function to apply on all functions.
+     *      {boolean} [enumerable]     - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *      {boolean} [configurable]   - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *      {boolean} [writable]       - boolean indicating if all properties should be writable. can be overwritten on a config level
+     *      {boolean} [override=true]  - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
+     *      {boolean} [overwrite=true] - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {string}  [loglevel]       - console log level. default logging is disabled
+     *      {function}[modifier]       - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
      */
     function extend(obj, settings_, module) {
         var settings = module && settings_ || {};
         var module   = module || settings_;
-        var descriptor;
-        var config;
-
-        var enumerable   = settings.enumerable      !== false;
-        var configurable = settings.configurable    !== false;
-        var writable     = settings.writable        !== false;
-        var overwrite    = settings.overwrite       !== false; // default is true
-        var override     = settings.override        !== false; // default is true
-
-        var loglevel     = settings.loglevel || 'log';
 
         for(var prop in module)
         {   if(module.hasOwnProperty(prop))
             {
-                descriptor = Object.getOwnPropertyDescriptor(module, prop);
-
-                var overrideProperty    = override;
-                var overwriteProperty   = overwrite;
-                var aliases             = false;
-                var encapsulator        = !!(descriptor.get || descriptor.set);
-
-                // global property overrides
-                if(enumerable   !== undefined)                                           descriptor.enumerable   = enumerable;
-                if(configurable !== undefined)                                           descriptor.configurable = configurable;
-                if(writable     !== undefined && descriptor.hasOwnProperty('writable'))  descriptor.writable     = writable;
+                var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
+                var encapsulator = !!(descriptor.get || descriptor.set);
+                var config       = {};
 
                 // special property specific config
                 if(!encapsulator && module[prop].hasOwnProperty('value'))
                 {
-                    config = module[prop];
+                    config           = module[prop];
                     descriptor.value = config.value;
 
-                    if(config.clone)                            descriptor.value = _.clone(config.value); // clone deep maybe?
-                    if(config.exec)                             descriptor.value = config.value();
-                    if(config.hasOwnProperty('enumerable'))     descriptor.enumerable   = config.enumerable;
-                    if(config.hasOwnProperty('configurable'))   descriptor.configurable = config.configurable;
-                    if(config.hasOwnProperty('writable'))       descriptor.writable     = config.writable;
-                    if(config.hasOwnProperty('override'))       overrideProperty  = config.override;
-                    if(config.hasOwnProperty('overwrite'))      overwriteProperty = config.overwrite;
-                    if(config.hasOwnProperty('shim'))           overwriteProperty = config.shim;
-                    if(config.aliases)                          aliases = true;
+                    if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
+                    if(config.exec)  descriptor.value = config.value();
                 }
-                // FIXME cleanup
+
+                descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
+                descriptor.configurable = (config.configurable !== undefined) ? config.configurable : (settings.configurable !== undefined) ? settings.configurable : descriptor.configurable;
+                descriptor.writable     = (config.writable     !== undefined) ? config.writable     : (settings.writable     !== undefined) ? settings.writable     : descriptor.writable;
+                // getters & setters don't have a writable option
+                if(encapsulator) delete descriptor.writable;
+
                 if(settings.modifier && typeof(descriptor.value) === 'function') {
                     descriptor.value = settings.modifier(descriptor.value);
                 }
 
+                var override  = (config.override  !== undefined) ? config.override  : settings.override  !== false;
+                var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite !== false;
+
                 if(obj.hasOwnProperty(prop))
                 {
-                    if(!overwriteProperty) continue; // continue;
-                    if(loglevel !== 'none')console[loglevel]('overwriting existing property: '+prop);
+                    if(!overwrite) continue; // continue;
+                    if(settings.loglevel)console[loglevel]('overwriting existing property: '+prop);
                 }
                 else if(prop in obj)
                 {
-                    if(!overrideProperty) continue; // continue;
-                    if(loglevel !== 'none')console[loglevel]('overriding existing property: '+prop);
+                    if(!override) continue; // continue;
+                    if(settings.loglevel)console[loglevel]('overriding existing property: '+prop);
                 }
 
                 Object.defineProperty(obj, prop, descriptor);
-                if(aliases) config.aliases.forEach(function(alias) {Object.defineProperty(obj, alias, descriptor)})
+                if(config.aliases) config.aliases.forEach(function(alias) {Object.defineProperty(obj, alias, descriptor)})
             }
         }
 
