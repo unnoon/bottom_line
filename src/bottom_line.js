@@ -145,18 +145,16 @@
                 var override  = (config.override  !== undefined) ? config.override  : settings.override;
                 var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite;
 
-                var props = (config.aliases || []).concat(prop);
+                var props = (config.aliases || []).concat(prop); // this is not super nice
 
                 props.forEach(function(prop) {
-                    if(obj.hasOwnProperty(prop)) // overwrite
+                    if(obj.hasOwnProperty(prop) && overwrite) // overwrite
                     {
-                        if(!overwrite)                              return; // continue
                         if(settings.validate && !config.overwrite)  throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
                         if(settings.log)                            console[settings.log]('overwriting existing property: '+prop);
                     }
-                    else if(prop in obj) // override
+                    else if(prop in obj && override) // override
                     {
-                        if(!override)                             return; // continue
                         if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object" ;
                         if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
                     }
