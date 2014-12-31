@@ -19,7 +19,7 @@
 }(this, function() {
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
-	 * Also all static properties (including native ones) will be available on this object
+	 * Also all static properties will be available on this object
 	 *
 	 * @module _
 	 */
@@ -34,24 +34,28 @@
     {
         var wrapper = module.init || function() {};
 
-        _[key] = wrapper;
         // create instance and chain object including not wrapper
         wrapper.__instance__ = (key === 'obj') ? {not:{}} : Object.create(_.obj.__instance__, {not:{value:Object.create(_.obj.__instance__.not)}}); // inherit from object. // stores non-chainable use methods
         wrapper.__chain__    = (key === 'obj') ? {not:{}} : Object.create(_.obj.__chain__,    {not:{value:Object.create(_.obj.__chain__.not)}});    // inherit from object.  // stores chainable use methods
-        wrapper.not          = {};
+        wrapper.not          = {}; // static not functions
 
-        Object.defineProperty(wrapper.__instance__, 'chain', {get: function() {return wrapper.__chain__},   enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.__chain__,    'value', {get: function() {return _.value},             enumerable: false, configurable: false});
+        var methods = wrapper.__instance__;
+        var chains  = wrapper.__chain__;
+
+        Object.defineProperty(wrapper.__instance__, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.__chain__,    'value', {get: function() {return _.value},  enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {_.value = this; return wrapper.__instance__}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {get: function() {return _.value = this, methods}, enumerable: false, configurable: false});
         }
 
         wrapStatics(wrapper, key, module);
         wrapPrototype(wrapper, key, module);
+
+        _[key] = wrapper; // add wrapper to the bottom_line object
     }
 
     // wrap functions for chaining
@@ -151,8 +155,8 @@
                 props.forEach(function(prop) {
                     if(obj.hasOwnProperty(prop) && overwrite) // overwrite
                     {
-                        if(settings.validate && !config.overwrite)  throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
-                        if(settings.log)                            console[settings.log]('overwriting existing property: '+prop);
+                        if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
+                        if(settings.log)                           console[settings.log]('overwriting existing property: '+prop);
                     }
                     else if(prop in obj && override) // override
                     {
