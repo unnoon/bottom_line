@@ -400,7 +400,7 @@ describe("Array", function() {
 			});
 		});
 		// FIXME fix diff
-		xdescribe("diff", function() {
+		describe("diff", function() {
 
 			it("simple difference", function() {
 				var arr1 = [1, 2, 3];

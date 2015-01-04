@@ -145,9 +145,11 @@ constructWrapper(Array, 'arr', {
 
             return target;
         },
-        removeAll: {aliases: ['diff'], value: function(__values) {
-            this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                if(~Array.prototype.indexOf.call(arguments, val)) {this.splice(i, 1)}
+        removeAll: {aliases: [], value: function(__values) {
+            var args = arguments;
+
+            this._.eachRight(function(val, i) { // eachRight is a little bit faster
+                if(~Array.prototype.indexOf.call(args, val)) {this.splice(i, 1)}
             }, this);
 
             return this;
@@ -161,9 +163,10 @@ constructWrapper(Array, 'arr', {
         },
         $removeAll: function(__values) {
             var output = [];
+            var args   = arguments;
 
-            this._.each(function(val, i, arr, delta) {
-                if(!~Array.prototype.indexOf.call(arguments, val)) {output.push(val)}
+            this._.each(function(val) {
+                if(!~Array.prototype.indexOf.call(args, val)) {output.push(val)}
             }, this);
 
             return output;
@@ -233,6 +236,10 @@ constructWrapper(Array, 'arr', {
         $diff: function(arr)
         {
             return this._.$selectAll(function(val) {return !arr._.has(val)});
+        },
+        diff: function(arr)
+        {
+            return this._.removeAll.apply(this, arr); // FIXME technically this should be remove
         },
         /**
          * Mutator: Creates a multidimensional array. The dimensions come from the array itself
