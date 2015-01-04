@@ -106,11 +106,13 @@ describe("Extensions", function() {
 				expect(typeof NaN).to.eql('number');
 				expect(typeof Infinity).to.eql('number');
 				expect(typeof 's').to.eql('string');
+				expect(typeof new String()).to.eql('object'); // counter intuitive
 				expect(typeof []).to.eql('object'); // counter intuitive
 				expect(typeof {}).to.eql('object');
 				expect(typeof function(){}).to.eql('function');
 				expect(typeof null).to.eql('object'); // counter intuitive. Although only objects can have the value null...
 				expect(typeof undefined).to.eql('undefined');
+				expect((function() {return typeof arguments})()).to.eql('object')
 			});
 
 			it("javascript types", function() {

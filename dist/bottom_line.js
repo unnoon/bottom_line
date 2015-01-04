@@ -957,7 +957,7 @@
              */
             compact: function()
             {
-                return this._.withoutAll(function(val) {return !val});
+                return this._.removeAll$(function(val) {return !val});
             },
             /**
              * Removes al falsey values from an array into a new array
@@ -968,7 +968,7 @@
              */
             $compact: function()
             {
-                return this._.$withoutAll(function(val) {return !val});
+                return this._.$removeAll$(function(val) {return !val});
             },
             /**
              * Copies a value to an array
@@ -1123,22 +1123,23 @@
              * @param   {Function}           onmatch - function to be executed on a match
              * @param   {boolean}            reverse - Boolean indicating if we should use inverse iteration
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | function
-             * @param   {Object}             opt_ctx - optional context for the function
+             * @param   {Object}             ctx_ - optional context for the function
              * @returns {Array}                      - new array with the copied elements
              */
             // TODO decide we make a specialized array version of edit
-            _edit: function(all, invert, onmatch, reverse, target, $value, opt_ctx)
+            _edit: function(all, invert, onmatch, reverse, target, $value, ctx_)
             {
                 var first = !all, normal = !invert;
                 var array, match, finish = false;
     
                 var cb = (typeof($value) === 'function')? 	$value                                   :
                          (array = _.is.array($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
-                                                            function(val) {return val === $value};
+                             (_.typeOf($value) === 'arguments') ? function() {console.log('ARGUMENTS given')} :
+                             function(val) {return val === $value};
     
                 // note the reverse check should be fixed when this is also implemented for strings
-                this._['each'+((reverse && _.is.array(this))?'Right':'')](function(val, i, _this, delta) {
-                    match = cb.call(opt_ctx, val, i, _this, delta);
+                this._['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
+                    match = cb.call(ctx_, val, i, _this, delta);
                     // remove normal or inverted match
                     if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
                     // if first and the first match is made check if we are done
@@ -1147,6 +1148,59 @@
     
                 return target;
             },
+            removeAll: function(__values) {
+                this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
+                    if(~Array.prototype.indexOf.call(arguments, val)) {this.splice(i, 1)}
+                }, this);
+    
+                return this;
+            },
+            removeAll$: function(match$, ctx_) {
+                this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
+                    if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
+                }, this);
+    
+                return this;
+            },
+            $removeAll: function(__values) {
+                var output = [];
+    
+                this._.each(function(val, i, arr, delta) {
+                    if(!~Array.prototype.indexOf.call(arguments, val)) {output.push(val)}
+                }, this);
+    
+                return output;
+            },
+            $removeAll$: function(match$, ctx_) {
+                var output = [];
+    
+                this._.each(function(val, i, arr, delta) {
+                    if(!match$.call(ctx_, val, i, arr, delta)) {output.push(val)}
+                }, this);
+    
+                return output;
+            },
+            //_edit: function(all, invert, onmatch, reverse, target, $value, ctx_)
+            //{
+            //    var first = !all, normal = !invert;
+            //    var array, match, finish = false;
+            //
+            //    var cb = (typeof($value) === 'function')? 	$value                                   :
+            //        (array = _.is.array($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
+            //            (_.typeOf($value) === 'arguments') ? function() {console.log('ARGUMENTS given')} :
+            //                function(val) {return val === $value};
+            //
+            //    // note the reverse check should be fixed when this is also implemented for strings
+            //    this._['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
+            //        match = cb.call(ctx_, val, i, _this, delta);
+            //        // remove normal or inverted match
+            //        if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
+            //        // if first and the first match is made check if we are done
+            //        if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+            //    }, this);
+            //
+            //    return target;
+            //},
             /**
              * Edits an array based on indices
              * @private
@@ -1191,6 +1245,10 @@
              * @param    {Array} arr - array to subtract from this
              * @returns  {Array}     - new array containing the difference between the first array and the others
              */
+            // FIX multi input
+            diff: function(arr) {
+                return this._._rm(false, arguments);
+            },
             $diff: function(arr)
             {
                 return this._.$selectAll(function(val) {return !arr._.has(val)});
@@ -1263,16 +1321,16 @@
              * @public
              * @method Array#each
              * @this   {Array}
-             * @param  {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb       - callback function to be called for each element
-             * @param  {Object=}  opt_ctx  - optional context for the callback function
+             * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {Array}             - this array for chaining
              */
-            each: function(opt_step, cb, opt_ctx) {
-                if(typeof(opt_step) === 'function')
-                    return this._._each(1, opt_step, cb);
+            each: function(step_, cb, ctx_) {
+                if(typeof(step_) === 'function')
+                    return this._._each(1, step_, cb);
                 else
-                    return this._._each(opt_step, cb, opt_ctx);
+                    return this._._each(step_, cb, ctx_);
             },
             /**
              * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1282,19 +1340,19 @@
              * @this   {Array}
              * @param  {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb       - callback function to be called for each element
-             * @param  {Object=}  opt_ctx  - optional context for the callback function
+             * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {boolean}           - the result for the halting condition of the callback function.
              * 								 false means iteration was broken prematurely.
              * 								 This information can passed on in nested loops for multi-dimensional arrays
              */
-            _each: function(step, cb, opt_ctx) {
+            _each: function(step, cb, ctx_) {
                 var from = 0, to = this.length;
                 var val, diff, size = to, delta = 0;
     
                 for(var i = from; i < to; i += step)
                 {
                     if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                    if(cb.call(opt_ctx, this[i], i, this, delta) === false) return false; // return result of the callback function
+                    if(cb.call(ctx_, this[i], i, this, delta) === false) return false; // return result of the callback function
                     if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
                 }
     
@@ -1306,16 +1364,16 @@
              * @public
              * @method Array#eachRight
              * @this  {Array}
-             * @param {number=}  opt_step - step for the iteration. In case this is a negative value it will do a reverse iteration
+             * @param {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param {function} cb       - callback function to be called for each element
-             * @param {Object=}  opt_ctx  - optional context for the callback function
+             * @param {Object=}  ctx_  - optional context for the callback function
              * @return {Array}            - this array for chaining
              */
-            eachRight: function(opt_step, cb, opt_ctx) {
-                if(typeof(opt_step) === 'function')
-                    return this._._eachRight(1, opt_step, cb);
+            eachRight: function(step_, cb, ctx_) {
+                if(typeof(step_) === 'function')
+                    return this._._eachRight(1, step_, cb);
                 else
-                    return this._._eachRight(opt_step, cb, opt_ctx);
+                    return this._._eachRight(step_, cb, ctx_);
             },
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1803,9 +1861,9 @@
              * @param   {Object}             opt_ctx - optional context or the function
              * @returns {Array }                     - The array without the element
              */
-            without: {aliases: ['diff'], value: function($value, opt_ctx) {
+            without: function($value, opt_ctx) {
                 return this._._rm(false, $value, opt_ctx);
-            }},
+            },
             /**
              * Removes the first occurrence in an array
              * @public
