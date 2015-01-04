@@ -32,12 +32,11 @@
     // wrap functions for chaining
     function constructWrapper(obj, key, module)
     {
-        var wrapper = module.init || function() {};
+        var wrapper = {not:{}};
 
         // create instance and chain object including not wrapper
         var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
         var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,    {not:{value:Object.create(_.obj.chains.not)}});    // inherit from object.  // stores chainable use methods
-        wrapper.not = {}; // static not functions
 
         Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
         Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value},  enumerable: false, configurable: false});
