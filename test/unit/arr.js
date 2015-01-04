@@ -243,7 +243,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("copy", function() {
+		xdescribe("copy", function() {
 
 			it("copy value", function() {
 				var arr1 = [1, 2, 3, 2];
@@ -267,7 +267,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("copyAll", function() {
+		xdescribe("copyAll", function() {
 
 			it("copyAll value", function() {
 				var arr1 = [1, 2, 3, 2];
@@ -292,7 +292,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("copyKeys", function() {
+		xdescribe("copyKeys", function() {
 
 			it("copyKeys value", function() {
 				var arr1 = [1, 2, 3, 2];
@@ -317,7 +317,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("cut", function() {
+		xdescribe("cut", function() {
 
 			it("cut value", function() {
 				var arr1 = [1, 2, 3, 2];
@@ -344,7 +344,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("cutAll", function() {
+		xdescribe("cutAll", function() {
 
 			it("cutAll value", function() {
 				var arr1 = [1, 2, 3, 2];
@@ -372,7 +372,7 @@ describe("Array", function() {
 			});
 		});
 
-		describe("cutKeys", function() {
+		xdescribe("cutKeys", function() {
 
 			it("cutKeys value", function() {
 				var arr1 = [1, 2, 3, 2];

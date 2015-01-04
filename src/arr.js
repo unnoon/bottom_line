@@ -103,150 +103,6 @@ constructWrapper(Array, 'arr', {
             return this._.$removeAll$(function(val) {return !val});
         },
         /**
-         * Copies a value to an array
-         * @public
-         * @method Array#copy
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        copy: function(to, $value, opt_ctx)
-        {
-            return this._._cp(false, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies all similar values to an array
-         * @public
-         * @method Array#copyAll
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        copyAll: function(to, $value, opt_ctx)
-        {
-            return this._._cp(true, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies keys to an array
-         * @public
-         * @method Array#copyKeys
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        copyKeys: function(to, $index, opt_to_ctx)
-        {
-            return this._._cpKeys(false, to, $index, opt_to_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Array#_cp
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _cp: function(all, invert, target, $value, opt_ctx)
-        {
-            return this._._edit(all, invert, function(val) {this.push(val)}, false, target, $value, opt_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Array#_cut
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _cut: function(all, invert, target, $value, opt_ctx)
-        {
-            return this._._edit(all, invert, function(val, i, _this) {this.push(val); _this.splice(i, 1)}, false, target, $value, opt_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Array#_cutKeys
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _cutKeys: function(invert, target, $value, opt_ctx)
-        {
-            return this._._editKeys(invert, function(i, _this) {this.push(_this[i]); _this.splice(i, 1)}, false, target, $value, opt_ctx);
-        },
-        /**
-         * Cut a value to an array
-         * @public
-         * @method Array#cut
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        cut: function(to, $value, opt_ctx)
-        {
-            return this._._cut(false, false, to, $value, opt_ctx);
-        },
-        /**
-         * Cut all similar values to an array
-         * @public
-         * @method Array#cutAll
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        cutAll: function(to, $value, opt_ctx)
-        {
-            return this._._cut(true, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies keys to an array
-         * @public
-         * @method Array#cutKeys
-         * @this   {Array}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Array}                 this       - mutated array for chaining
-         */
-        cutKeys: function(to, $index, opt_to_ctx)
-        {
-            return this._._cutKeys(false, to, $index, opt_to_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array. Results are copied at the end of the array. // TODO copy at specific index
-         * @private
-         * @method Array#_cpKeys
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _cpKeys: function(invert, target, $value, opt_to_ctx)
-        {
-            return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
-        },
-        /**
          * Edits the key valuer pairs of an object
          * @private
          * @this    {Array|Object}
@@ -280,13 +136,13 @@ constructWrapper(Array, 'arr', {
 
             return target;
         },
-        removeAll: function(__values) {
+        removeAll: {aliases: ['diff'], value: function(__values) {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(~Array.prototype.indexOf.call(arguments, val)) {this.splice(i, 1)}
             }, this);
 
             return this;
-        },
+        }},
         removeAll$: function(match$, ctx_) {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
@@ -334,18 +190,6 @@ constructWrapper(Array, 'arr', {
         //    return target;
         //},
         /**
-         * Edits an array based on indices
-         * @private
-         * @method Array#_editKeys
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _editKeys: __coll._editKeys,
-        /**
          * Removes the occurrences from an array
          * @private
          * @method Array#_del
@@ -377,10 +221,6 @@ constructWrapper(Array, 'arr', {
          * @param    {Array} arr - array to subtract from this
          * @returns  {Array}     - new array containing the difference between the first array and the others
          */
-        // FIX multi input
-        diff: function(arr) {
-            return this._._rm(false, arguments);
-        },
         $diff: function(arr)
         {
             return this._.$selectAll(function(val) {return !arr._.has(val)});
