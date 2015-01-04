@@ -23,6 +23,7 @@
 	 *
 	 * @module _
 	 */
+    // TODO this should be a function where we can wrap for example arguments and apply an array function to it
 	var _ = {
         // TODO investigate if this can give errors other per type values are possible. But this is a good way to check if this will give any problems (asynxhronous stuff...)
         value: null, // wrapped value
