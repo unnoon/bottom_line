@@ -3,12 +3,6 @@
  * // TODO check if we can do something with signed arrays
  */
 constructWrapper(null, 'int', {
-    /*
-     * Converter function
-     */
-    init: function(num) {
-        return num|0;
-    },
     /**
      * @namespace int
      * @memberOf module:_

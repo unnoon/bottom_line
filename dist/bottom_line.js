@@ -35,15 +35,12 @@
         var wrapper = module.init || function() {};
 
         // create instance and chain object including not wrapper
-        wrapper.__instance__ = (key === 'obj') ? {not:{}} : Object.create(_.obj.__instance__, {not:{value:Object.create(_.obj.__instance__.not)}}); // inherit from object. // stores non-chainable use methods
-        wrapper.__chain__    = (key === 'obj') ? {not:{}} : Object.create(_.obj.__chain__,    {not:{value:Object.create(_.obj.__chain__.not)}});    // inherit from object.  // stores chainable use methods
-        wrapper.not          = {}; // static not functions
+        var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
+        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,    {not:{value:Object.create(_.obj.chains.not)}});    // inherit from object.  // stores chainable use methods
+        wrapper.not = {}; // static not functions
 
-        var methods = wrapper.__instance__;
-        var chains  = wrapper.__chain__;
-
-        Object.defineProperty(wrapper.__instance__, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.__chain__,    'value', {get: function() {return _.value},  enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value},  enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
@@ -75,21 +72,10 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper.__instance__,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.__instance__.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.__chain__,        {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-        extend(wrapper.__chain__.not,    {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-    }
-
-    // simple cloning function
-    function clone(obj) {
-        var clone = Object.create(Object.getPrototypeOf(obj));
-
-        Object.getOwnPropertyNames(obj).forEach(function(name) {
-            Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
-        });
-
-        return clone;
+        extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
+        extend(wrapper.chains,        {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains.not,    {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
     }
 
     /**
@@ -150,16 +136,18 @@
                 var override  = (config.override  !== undefined) ? config.override  : settings.override;
                 var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite;
 
-                var props = (config.aliases || []).concat(prop); // this is not super nice
+                var names = (config.aliases || []).concat(prop); // this is not super nice
 
-                props.forEach(function(prop) {
-                    if(obj.hasOwnProperty(prop) && overwrite) // overwrite
+                names.forEach(function(prop) {
+                    if(obj.hasOwnProperty(prop)) // overwrite
                     {
+                        if(!overwrite)                             return; // continue
                         if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
                         if(settings.log)                           console[settings.log]('overwriting existing property: '+prop);
                     }
-                    else if(prop in obj && override) // override
+                    else if(prop in obj) // override
                     {
+                        if(!override)                             return; // continue
                         if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object" ;
                         if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
                     }
@@ -179,12 +167,25 @@
     };
     // convertor functions
     _.to = {
+        array: function(obj) {
+            var type = _.typeOf(obj);
 
+            switch (type)
+            {
+                case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                case 'object'    :
+                case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
+                case 'array'     : return obj;
+                case 'undefined' :
+                case 'null'      : return [];
+                default          : return [obj];
+            }
+        },
+        int: function(num) {return num|0}
     };
     /**
      *  'Global' methods
      */
-
 
 
     /**
@@ -875,33 +876,12 @@
          * @namespace arr
          * @memberOf module:_
          */
-    //		TODO add proper documentation
-    // 		/**
-    //		 * Converter function: converts an object to an array
-    //		 *
-    //		 * @param  {Object} obj - object to convert
-    //		 * @return {Array} the converted object
-    //		 */
-        init: function(obj) {
-            var type = _.typeOf(obj);
-    
-            switch (type)
-            {
-                case 'arguments' : return Array.prototype.slice.call(obj, 0);
-                case 'object'    :
-                case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
-                case 'array'     : return obj;
-                case 'undefined' :
-                case 'null'      : return [];
-                default          : return [obj];
-            }
-        },
         static: {
             _utils: {
                 remove: function(i) {}
             },
             /**
-             * Concats array into a new array
+             * Concats arrays into a new array
              * @public
              * @static
              * @method module:_.arr.concat
@@ -2307,7 +2287,7 @@
              */
             // TODO add partial support
             strap: function(var_args, fnc) {
-                var args = _.arr(arguments); // convert to array
+                var args = _.to.array(arguments); // convert to array
     
                 fnc = args.pop();
     
@@ -2571,12 +2551,6 @@
      * // TODO check if we can do something with signed arrays
      */
     constructWrapper(null, 'int', {
-        /*
-         * Converter function
-         */
-        init: function(num) {
-            return num|0;
-        },
         /**
          * @namespace int
          * @memberOf module:_

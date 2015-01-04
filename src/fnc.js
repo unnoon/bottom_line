@@ -73,7 +73,7 @@ constructWrapper(Function, 'fnc', {
          */
         // TODO add partial support
         strap: function(var_args, fnc) {
-            var args = _.arr(arguments); // convert to array
+            var args = _.to.array(arguments); // convert to array
 
             fnc = args.pop();
 

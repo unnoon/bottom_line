@@ -62,7 +62,7 @@ describe("Array", function() {
 		describe("converter", function() {
 
 			it("convert to array", function() {
-				expect(_.arr(4)).to.deep.equal([4]);
+				expect(_.to.array(4)).to.deep.equal([4]);
 			});
 		});
 

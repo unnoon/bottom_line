@@ -7,33 +7,12 @@ constructWrapper(Array, 'arr', {
      * @namespace arr
      * @memberOf module:_
      */
-//		TODO add proper documentation
-// 		/**
-//		 * Converter function: converts an object to an array
-//		 *
-//		 * @param  {Object} obj - object to convert
-//		 * @return {Array} the converted object
-//		 */
-    init: function(obj) {
-        var type = _.typeOf(obj);
-
-        switch (type)
-        {
-            case 'arguments' : return Array.prototype.slice.call(obj, 0);
-            case 'object'    :
-            case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
-            case 'array'     : return obj;
-            case 'undefined' :
-            case 'null'      : return [];
-            default          : return [obj];
-        }
-    },
     static: {
         _utils: {
             remove: function(i) {}
         },
         /**
-         * Concats array into a new array
+         * Concats arrays into a new array
          * @public
          * @static
          * @method module:_.arr.concat
