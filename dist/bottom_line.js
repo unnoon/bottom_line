@@ -1373,7 +1373,7 @@
                 var intersects = false;
     
                 this._.each(function(val) {
-                    if(arr._.has(val)) return !(intersects = true);
+                    if(arr._.has(val)) {intersects = true; return false}
                 });
     
                 return intersects;
