@@ -970,6 +970,15 @@
             {
                 return this._.$removeAll$(function(val) {return !val});
             },
+            // FIXME added temporarily
+            _cpKeys: function(invert, target, $value, opt_to_ctx)
+            {
+                return this._._editKeys(invert, function(i, _this) {this.push(_this[i]);}, false, target, $value, opt_to_ctx);
+            },
+            _cp: function(all, invert, target, $value, opt_ctx)
+            {
+                return this._._edit(all, invert, function(val) {this.push(val)}, false, target, $value, opt_ctx);
+            },
             /**
              * Edits the key valuer pairs of an object
              * @private
