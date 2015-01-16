@@ -1,4 +1,7 @@
 define all collective stuff on object
+an iterator function that does something x times. short for: for(var i = 0; i < max; i++)
+
+let all collection classes inherit from object!
 
 2 types of arguments values or a function. for simplicity only offer multiple arguments or a function and no array input. An array input can be simulated by using .apply
 Also it would rule out more dimensional arrays...
