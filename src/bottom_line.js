@@ -37,10 +37,10 @@
 
         // create instance and chain object including not wrapper
         var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
-        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,    {not:{value:Object.create(_.obj.chains.not)}});    // inherit from object.  // stores chainable use methods
+        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value},  enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},  enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
@@ -62,10 +62,9 @@
 
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
-        if(key === 'int') return; // except for the int class
-        extend(_,     {enumerable: false}, module.static);
-        extend(_.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
+        extend(_,     {enumerable: false, overwrite: false}, module.static);
+        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }
 
     function wrapPrototype(wrapper, key, module)
@@ -74,8 +73,8 @@
 
         extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
         extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.chains,        {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-        extend(wrapper.chains.not,    {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
     }
 
     /**

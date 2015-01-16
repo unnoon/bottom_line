@@ -490,7 +490,7 @@
     };
 
     // Return a version of the array that does not contain the specified value(s).
-    _.without = function(array) {
+    _.remove = function(array) {
         return _.difference(array, slice.call(arguments, 1));
     };
 
@@ -661,7 +661,7 @@
     };
 
     // Partially apply a function by creating a version that has had some of its
-    // arguments pre-filled, without changing its dynamic `this` context. _ acts
+    // arguments pre-filled, remove changing its dynamic `this` context. _ acts
     // as a placeholder, allowing any combination of arguments to be pre-filled.
     _.partial = function(func) {
         var boundArgs = slice.call(arguments, 1);
@@ -718,7 +718,7 @@
 
     // Returns a function, that, when invoked, will only be triggered at most once
     // during a given window of time. Normally, the throttled function will run
-    // as much as it can, without ever going more than once per `wait` duration;
+    // as much as it can, remove ever going more than once per `wait` duration;
     // but if you'd like to disable the execution on the leading edge, pass
     // `{leading: false}`. To disable execution on the trailing edge, ditto.
     _.throttle = function(func, wait, options) {
@@ -931,7 +931,7 @@
         return result;
     };
 
-    // Return a copy of the object without the blacklisted properties.
+    // Return a copy of the object remove the blacklisted properties.
     _.omit = function(obj, iteratee, context) {
         if (_.isFunction(iteratee)) {
             iteratee = _.negate(iteratee);

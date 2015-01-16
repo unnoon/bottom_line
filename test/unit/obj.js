@@ -367,28 +367,28 @@ describe("Object", function() {
 			});
         });
 
-		describe("without", function() {
+		describe("remove", function() {
 
-			it("without by value", function() {
+			it("remove by value", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 2};
 
-				obj._.without(2);
+				obj._.remove(2);
 
 				expect(obj).to.eql({x: 1,z: 3,t: 2});
 			});
 
-			it("without multiple values", function() {
+			it("remove multiple values", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 2};
 
-				obj._.without([2,3]);
+				obj._.remove([2,3]);
 
 				expect(obj).to.eql({x: 1,t: 2});
 			});
 
-			it("without function", function() {
+			it("remove function", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-				obj._.without(function(val) {
+				obj._.remove(function(val) {
 					return val > 2;
 				});
 
@@ -398,21 +398,21 @@ describe("Object", function() {
 
         describe("$without", function() {
 
-            it("$without one element", function() {
+            it("$remove one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
                 expect(obj._.$without(2)).to.eql({ x: 1,z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$without multiple values", function() {
+            it("$remove multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
                 expect(obj._.$without([2, 1])).to.eql({z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$without function", function() {
+            it("$remove function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
                 expect(obj._.$without(function(val) {
@@ -422,28 +422,28 @@ describe("Object", function() {
             });
         });
 
-        describe("withoutAll", function() {
+        describe("removeAll", function() {
 
-            it("withoutAll by value", function() {
+            it("removeAll by value", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2};
 
-                obj._.withoutAll(2);
+                obj._.removeAll(2);
 
                 expect(obj).to.eql({x: 1,z: 3});
             });
 
-            it("withoutAll multiple values", function() {
+            it("removeAll multiple values", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
 
-                obj._.withoutAll([2,3]);
+                obj._.removeAll([2,3]);
 
                 expect(obj).to.eql({x: 1});
             });
 
-            it("withoutAll function", function() {
+            it("removeAll function", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-                obj._.withoutAll(function(val) {
+                obj._.removeAll(function(val) {
                     return val > 2;
                 });
 
@@ -451,26 +451,26 @@ describe("Object", function() {
             });
         });
 
-        describe("$withoutAll", function() {
+        describe("$removeAll", function() {
 
-            it("$withoutAll one element", function() {
+            it("$removeAll one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$withoutAll(2)).to.eql({ x: 1,z: 3});
+                expect(obj._.$removeAll(2)).to.eql({ x: 1,z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$withoutAll multiple values", function() {
+            it("$removeAll multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$withoutAll([2, 1])).to.eql({z: 3});
+                expect(obj._.$removeAll([2, 1])).to.eql({z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("$withoutAll function", function() {
+            it("$removeAll function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.$withoutAll(function(val) {
+                expect(obj._.$removeAll(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});

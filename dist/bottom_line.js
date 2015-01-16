@@ -37,10 +37,10 @@
 
         // create instance and chain object including not wrapper
         var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
-        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,    {not:{value:Object.create(_.obj.chains.not)}});    // inherit from object.  // stores chainable use methods
+        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},   enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value},  enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},  enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
@@ -62,10 +62,9 @@
 
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
-        if(key === 'int') return; // except for the int class
-        extend(_,     {enumerable: false}, module.static);
-        extend(_.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
+        extend(_,     {enumerable: false, overwrite: false}, module.static);
+        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }
 
     function wrapPrototype(wrapper, key, module)
@@ -74,8 +73,8 @@
 
         extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
         extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.chains,        {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-        extend(wrapper.chains.not,    {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
     }
 
     /**
@@ -221,7 +220,7 @@
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
                 // if first and the first match is made check if we are done
-                if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+                if(first && match && !finish) return finish = array? !$value._.remove(val).length : true, !(normal && finish);
             }, this);
     
             return target;
@@ -254,7 +253,7 @@
                 match = cb.call($opt_to_ctx, index, _this);
                 // remove normal or inverted match
                 if(match === normal || finish) onmatch.call(target, i, _this);
-                if(first && match && !finish) return finish = array? !$index._.without(index).length : true, !(normal && finish);
+                if(first && match && !finish) return finish = array? !$index._.remove(index).length : true, !(normal && finish);
             }, this);
     
             return target;
@@ -328,7 +327,7 @@
                 return clone;
             },
             /**""
-             * Empties an object without destroying the object itself
+             * Empties an object remove destroying the object itself
              * @public
              * @static
              * @method module:_.obj.empty
@@ -571,7 +570,7 @@
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
              * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_to_ctx - optional context for the function
-             * @returns {Object}                      - The array without the element
+             * @returns {Object}                      - The array remove the element
              */
             _del: function(invert, $index, opt_to_ctx)
             {
@@ -747,7 +746,7 @@
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context for the function
-             * @returns {Array}                      - The array without the element
+             * @returns {Array}                      - The array remove the element
              */
             _rm: function(all, invert, $value, opt_ctx)
             {
@@ -798,19 +797,19 @@
              * @this    {Object}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array }                     - The array without the element
+             * @returns {Array }                     - The array remove the element
              */
-            without: function($value, opt_ctx) {
+            remove: function($value, opt_ctx) {
                 return this._._rm(false, false, $value, opt_ctx);
             },
             /**
              * Removes the first occurrence in an array
              * @public
-             * @method Array#_$without
+             * @method Array#_$remove
              * @this    {Object}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Object }                    - NEW object without the element
+             * @returns {Object }                    - NEW object remove the element
              */
             $without: function($value, opt_ctx) {
                 return this._._cp(false, true, {}, $value, opt_ctx);
@@ -822,9 +821,9 @@
              * @this    {Object}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Object}                      - The array without the element
+             * @returns {Object}                      - The array remove the element
              */
-            withoutAll: function($value, opt_ctx) {
+            removeAll: function($value, opt_ctx) {
                 return this._._rm(true, false, $value, opt_ctx);
             },
             /**
@@ -834,9 +833,9 @@
              * @this    {Object}
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Object}                      - NEW array without the element
+             * @returns {Object}                      - NEW array remove the element
              */
-            $withoutAll: function($value, opt_ctx) {
+            $removeAll: function($value, opt_ctx) {
                 return this._._cp(true, true, [], $value, opt_ctx);
             },
             /**
@@ -1009,12 +1008,32 @@
                     // remove normal or inverted match
                     if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
                     // if first and the first match is made check if we are done
-                    if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+                    if(first && match && !finish) return finish = array? !$value._.remove(val).length : true, !(normal && finish);
                 }, this);
     
                 return target;
             },
-            removeAll: {aliases: [], value: function(__values) {
+    
+            remove: function(__values) {
+                var args = arguments;
+                var index;
+    
+                this._.each(function(val, i) {
+                    index = Array.prototype.indexOf.call(args, val);
+                    if(~index) {this.splice(i, 1); return !!Array.prototype.splice.call(args, index, 1).length}
+                }, this);
+    
+                return this;
+            },
+            remove$: function(match$, ctx_) {
+                this._.each(function(val, i, arr, delta) { // eachRight is a little bit faster
+                    if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1); return false}
+                }, this);
+    
+                return this;
+            },
+    
+            removeAll: function(__values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1022,7 +1041,7 @@
                 }, this);
     
                 return this;
-            }},
+            },
             removeAll$: function(match$, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
@@ -1049,6 +1068,24 @@
     
                 return output;
             },
+    
+    
+            selectAll: function(__values) {
+                var args = arguments;
+                return this._.removeAll$(function(val) {return !~Array.prototype.indexOf.call(args, val)});
+            },
+            selectAll$: function(match$, ctx_) {
+                return this._.removeAll$(_.fnc.not(match$), ctx_);
+            },
+            $selectAll: function(__values) {
+                var args = arguments;
+                return this._.$removeAll$(function(val) {return !~Array.prototype.indexOf.call(args, val)});
+            },
+            $selectAll$: function(match$, ctx_) {
+                return this._.$removeAll$(_.fnc.not(match$), ctx_);
+            },
+    
+    
             //_edit: function(all, invert, onmatch, reverse, target, $value, ctx_)
             //{
             //    var first = !all, normal = !invert;
@@ -1065,7 +1102,7 @@
             //        // remove normal or inverted match
             //        if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
             //        // if first and the first match is made check if we are done
-            //        if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+            //        if(first && match && !finish) return finish = array? !$value._.remove(val).length : true, !(normal && finish);
             //    }, this);
             //
             //    return target;
@@ -1078,14 +1115,14 @@
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
              * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_to_ctx - optional context for the function
-             * @returns {Array}                      - The array without the element
+             * @returns {Array}                      - The array remove the element
              */
             _del: function(invert, $index, opt_to_ctx)
             {
                 return this._._editKeys(invert, function(i) {this.splice(i, 1);}, false, this, $index, opt_to_ctx);
             },
             /**
-             * @alias without
+             * @alias remove
              * Returns the difference between 2 arrays
              * @public
              * @method Array#diff
@@ -1503,7 +1540,7 @@
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context for the function
-             * @returns {Array}                      - The array without the element
+             * @returns {Array}                      - The array remove the element
              */
             _rm: function(invert, $value, opt_ctx)
             {
@@ -1524,7 +1561,7 @@
              * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
              * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
              * @param   {Object}             opt_ctx - optional context for the function
-             * @returns {Array}                      - The array without the element
+             * @returns {Array}                      - The array remove the element
              */
             _rmAll: function(invert, $value, opt_ctx)
             {
@@ -1554,30 +1591,30 @@
             $select: function($value, opt_ctx) {
                 return this._._cp(false, false, [], $value, opt_ctx);
             },
-            /**
-             * Select all occurrence in an array
-             * @public
-             * @method Array#selectAll
-             * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array}                      - array with the selected elements
-             */
-            selectAll: function($value, opt_ctx) {
-                return this._._rmAll(true, $value, opt_ctx);
-            },
-            /**
-             * Select all occurrence in an array and copies them to a new array
-             * @public
-             * @method Array#$selectAll
-             * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array}                      - array with the selected elements
-             */
-            $selectAll: {aliases: ['findAll'], value: function($value, opt_ctx) {
-                return this._._cp(true, false, [], $value, opt_ctx);
-            }},
+            ///**
+            // * Select all occurrence in an array
+            // * @public
+            // * @method Array#selectAll
+            // * @this    {Array}
+            // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+            // * @param   {Object}             opt_ctx - optional context or the function
+            // * @returns {Array}                      - array with the selected elements
+            // */
+            //selectAll: function($value, opt_ctx) {
+            //    return this._._rmAll(true, $value, opt_ctx);
+            //},
+            ///**
+            // * Select all occurrence in an array and copies them to a new array
+            // * @public
+            // * @method Array#$selectAll
+            // * @this    {Array}
+            // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+            // * @param   {Object}             opt_ctx - optional context or the function
+            // * @returns {Array}                      - array with the selected elements
+            // */
+            //$selectAll: {aliases: ['findAll'], value: function($value, opt_ctx) {
+            //    return this._._cp(true, false, [], $value, opt_ctx);
+            //}},
             /**
              * Selects elements based on index, removes others
              * @public
@@ -1681,7 +1718,7 @@
              * @public
              * @method Array#unique
              * @this    {Array}
-             * @returns {Array} - new array without duplicates
+             * @returns {Array} - new array remove duplicates
              */
             unique: function() {
                 this._.eachRight(function(val, i) {
@@ -1694,11 +1731,11 @@
                 return this;
             },
             /**
-             * Accessor: Returns a new version of the array without duplicates
+             * Accessor: Returns a new version of the array remove duplicates
              * @public
              * @method Array#$unique
              * @this    {Array}
-             * @returns {Array} - new array without duplicates
+             * @returns {Array} - new array remove duplicates
              */
             $unique: function() {
                 var unique = [];
@@ -1709,57 +1746,57 @@
     
                 return unique;
             },
-            /**
-             * Removes the first occurrence in an array
-             * @public
-             * @method Array#without
-             * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array }                     - The array without the element
-             */
-            without: function($value, opt_ctx) {
-                return this._._rm(false, $value, opt_ctx);
-            },
-            /**
-             * Removes the first occurrence in an array
-             * @public
-             * @method Array#$without
-             * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array }                     - NEW array without the element
-             */
-            $without: function($value, opt_ctx) {
-                return this._._cp(false, true, [], $value, opt_ctx);
-            },
+            ///**
+            // * Removes the first occurrence in an array
+            // * @public
+            // * @method Array#remove
+            // * @this    {Array}
+            // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+            // * @param   {Object}             opt_ctx - optional context or the function
+            // * @returns {Array }                     - The array remove the element
+            // */
+            //remove: function($value, opt_ctx) {
+            //    return this._._rm(false, $value, opt_ctx);
+            //},
+            ///**
+            // * Removes the first occurrence in an array
+            // * @public
+            // * @method Array#$remove
+            // * @this    {Array}
+            // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+            // * @param   {Object}             opt_ctx - optional context or the function
+            // * @returns {Array }                     - NEW array remove the element
+            // */
+            //$remove: function($value, opt_ctx) {
+            //    return this._._cp(false, true, [], $value, opt_ctx);
+            //},
             /**
              * Removes the all occurrence in an array
              * @public
-             * @method Array#withoutAll
+             * @method Array#removeAll
              * @this    {Array}
              * @param   {any|Array|Function} $value - Element to be deleted | Array of elements | or a function
              * @param   {Object=}             ctx_  - optional context or the function
-             * @returns {Array}                     - The array without the element
+             * @returns {Array}                     - The array remove the element
              */
-            //withoutAll: function($value, opt_ctx) {
+            //removeAll: function($value, opt_ctx) {
             //    return this._._rmAll(false, $value, opt_ctx);
             //},
-            withoutAll: function($value, ctx_) {
-                return this._._rmAll(false, $value, ctx_);
-            },
-            /**
-             * Removes the all occurrence in an array
-             * @public
-             * @method Array#$withoutAll
-             * @this    {Array}
-             * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-             * @param   {Object}             opt_ctx - optional context or the function
-             * @returns {Array}                      - NEW array without the element
-             */
-            $withoutAll: function($value, opt_ctx) {
-                return this._._cp(true, true, [], $value, opt_ctx);
-            },
+            //removeAll: function($value, ctx_) {
+            //    return this._._rmAll(false, $value, ctx_);
+            //},
+            ///**
+            // * Removes the all occurrence in an array
+            // * @public
+            // * @method Array#$removeAll
+            // * @this    {Array}
+            // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+            // * @param   {Object}             opt_ctx - optional context or the function
+            // * @returns {Array}                      - NEW array remove the element
+            // */
+            //$removeAll: function($value, opt_ctx) {
+            //    return this._._cp(true, true, [], $value, opt_ctx);
+            //},
             /**
              * Remove elements based on index
              * @public
@@ -2271,6 +2308,16 @@
                         fns[i].apply(this, arguments);
                     }
                 }
+            },
+            /**
+             * returns a negated form of a function
+             * @public
+             * @method module:_.fnc.not
+             * @param  {function} fnc - an array of functions or a single function in case of supplying
+             * @return {function} negated form of the function
+             */
+            not: function(fnc) {
+                return function() { return !fnc.apply(this, arguments)}
             }
         },
         prototype:

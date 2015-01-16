@@ -1,9 +1,9 @@
-let array & object inherit from collections
+define all collective stuff on object
 
 2 types of arguments values or a function. for simplicity only offer multiple arguments or a function and no array input. An array input can be simulated by using .apply
 Also it would rule out more dimensional arrays...
 
-In theory rm could be simulated with an cut function without a to target. However deleting in reverse order is faster in case we do a a removeAll.
+In theory rm could be simulated with an cut function remove a to target. However deleting in reverse order is faster in case we do a a removeAll.
 Because the number of items that need to be arranged in the back gets smaller.
 
 hmmmzz maybe I can't even do functions as arrays can hold funtions as well. We need to do something smart here... maybe arrays as input is not such a bad idea after all
@@ -22,13 +22,13 @@ cut:  function(to, $value, opt_ctx) this._._cut(false, false, to, $value, opt_ct
 select:  this._._rm(false, true, $value, opt_ctx);
 $select: this._._cp(false, false, [], $value, opt_ctx);
 
-without:  this._._rm(false, false, $value, opt_ctx);
-$without: this._._cp(false, true, [], $value, opt_ctx);
+remove:  this._._rm(false, false, $value, opt_ctx);
+$remove: this._._cp(false, true, [], $value, opt_ctx);
 
 - mixed arrays???
 
-without(fnc1, fnc2, fnc3)  // remove function values
-without(arr1, arr2, arr3)  // remove array values (from multi-dimensional array)
+remove(fnc1, fnc2, fnc3)  // remove function values
+remove(arr1, arr2, arr3)  // remove array values (from multi-dimensional array)
 // how to distinguish these 2 from the above 2
 // rename this function to remove to distinguish between the 2
 remove(fnc, ctx_)         // remove values based on a function

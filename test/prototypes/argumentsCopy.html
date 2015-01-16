@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>arguments edit</title>
+    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
+    <script>
+        var arr = [1, 2, 3];
+
+        function argTest() {
+            arguments[0] = 'kabouter';
+            console.log(arr[0]);
+
+            delete arguments[0];
+
+            console.log(arr[0]);
+        }
+
+        argTest.apply(null, arr);
+
+    </script>
+</head>
+<body>
+</body>
+</html>

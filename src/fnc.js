@@ -143,6 +143,16 @@ constructWrapper(Function, 'fnc', {
                     fns[i].apply(this, arguments);
                 }
             }
+        },
+        /**
+         * returns a negated form of a function
+         * @public
+         * @method module:_.fnc.not
+         * @param  {function} fnc - an array of functions or a single function in case of supplying
+         * @return {function} negated form of the function
+         */
+        not: function(fnc) {
+            return function() { return !fnc.apply(this, arguments)}
         }
     },
     prototype:

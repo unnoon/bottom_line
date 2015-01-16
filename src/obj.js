@@ -49,7 +49,7 @@ constructWrapper(Object, 'obj', {
             return clone;
         },
         /**""
-         * Empties an object without destroying the object itself
+         * Empties an object remove destroying the object itself
          * @public
          * @static
          * @method module:_.obj.empty
@@ -292,7 +292,7 @@ constructWrapper(Object, 'obj', {
          * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
          * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Object}                      - The array without the element
+         * @returns {Object}                      - The array remove the element
          */
         _del: function(invert, $index, opt_to_ctx)
         {
@@ -468,7 +468,7 @@ constructWrapper(Object, 'obj', {
          * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - The array without the element
+         * @returns {Array}                      - The array remove the element
          */
         _rm: function(all, invert, $value, opt_ctx)
         {
@@ -519,19 +519,19 @@ constructWrapper(Object, 'obj', {
          * @this    {Object}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Array }                     - The array without the element
+         * @returns {Array }                     - The array remove the element
          */
-        without: function($value, opt_ctx) {
+        remove: function($value, opt_ctx) {
             return this._._rm(false, false, $value, opt_ctx);
         },
         /**
          * Removes the first occurrence in an array
          * @public
-         * @method Array#_$without
+         * @method Array#_$remove
          * @this    {Object}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object }                    - NEW object without the element
+         * @returns {Object }                    - NEW object remove the element
          */
         $without: function($value, opt_ctx) {
             return this._._cp(false, true, {}, $value, opt_ctx);
@@ -543,9 +543,9 @@ constructWrapper(Object, 'obj', {
          * @this    {Object}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object}                      - The array without the element
+         * @returns {Object}                      - The array remove the element
          */
-        withoutAll: function($value, opt_ctx) {
+        removeAll: function($value, opt_ctx) {
             return this._._rm(true, false, $value, opt_ctx);
         },
         /**
@@ -555,9 +555,9 @@ constructWrapper(Object, 'obj', {
          * @this    {Object}
          * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
          * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object}                      - NEW array without the element
+         * @returns {Object}                      - NEW array remove the element
          */
-        $withoutAll: function($value, opt_ctx) {
+        $removeAll: function($value, opt_ctx) {
             return this._._cp(true, true, [], $value, opt_ctx);
         },
         /**

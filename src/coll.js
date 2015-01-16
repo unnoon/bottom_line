@@ -31,7 +31,7 @@ var __coll = {
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
             // if first and the first match is made check if we are done
-            if(first && match && !finish) return finish = array? !$value._.without(val).length : true, !(normal && finish);
+            if(first && match && !finish) return finish = array? !$value._.remove(val).length : true, !(normal && finish);
         }, this);
 
         return target;
@@ -64,7 +64,7 @@ var __coll = {
             match = cb.call($opt_to_ctx, index, _this);
             // remove normal or inverted match
             if(match === normal || finish) onmatch.call(target, i, _this);
-            if(first && match && !finish) return finish = array? !$index._.without(index).length : true, !(normal && finish);
+            if(first && match && !finish) return finish = array? !$index._.remove(index).length : true, !(normal && finish);
         }, this);
 
         return target;

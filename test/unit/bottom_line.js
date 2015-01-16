@@ -16,7 +16,7 @@ describe("bottom_line.js", function() {
 
 			names._.chain
                 .append(['xavier'])
-                .without('bobby');
+                .remove('bobby');
 
 			expect(names).to.eql(['jean', 'xavier']);
 		});
@@ -25,7 +25,7 @@ describe("bottom_line.js", function() {
 			var arr = [4,5,6,2];
 
 			expect(arr._.chain
-                .without(2)
+                .remove(2)
                 .min()
                 .bound(1, 3)
                 .between(2,4)

@@ -582,7 +582,7 @@ describe("Array", function() {
 			it("complex first chain", function() {
 				var arr = [[1, 2], 2, 3];
 
-				arr._.append([4])._.first()._.without(2);
+				arr._.append([4])._.first()._.remove(2);
 
 				expect(arr).to.eql([[1], 2, 3, 4]);
 			});
@@ -803,17 +803,17 @@ describe("Array", function() {
 				expect(arr).to.eql([1, 1]);
 			});
 
-			xit("selectAll multiple elements", function() {
+			it("selectAll multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.selectAll([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.selectAll(1, 2)).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 2]);
 			});
 
 			it("selectAll by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.selectAll(function(elm) {
+				expect(arr._.selectAll$(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([2, 2]);
@@ -833,7 +833,7 @@ describe("Array", function() {
 			xit("$selectAll multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll([1, 2])).to.eql([1, 2, 1, 2]);
+				expect(arr._.$selectAll(1, 2)).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
 				expect(arr).to.equal(arr);
 			});
@@ -841,7 +841,7 @@ describe("Array", function() {
 			it("$selectAll by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll(function(elm) {
+				expect(arr._.$selectAll$(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
@@ -998,28 +998,28 @@ describe("Array", function() {
 			});
 		});
 
-		describe("without by value", function() {
+		describe("remove by value", function() {
 
-			it("without one element", function() {
+			it("remove one element", function() {
 				var arr = [1, 2, 3];
 
-				arr._.without(2);
+				arr._.remove(2);
 
 				expect(arr).to.eql([1, 3]);
 			});
 
-			xit("without multiple values", function() {
-				var arr = [1, 2, 3, 4];
+			it("remove multiple values", function() {
+				var arr = [1, 2, 3, 4, 4];
 
-				arr._.without([2,4]);
+				arr._.remove(2,4);
 
-				expect(arr).to.eql([1, 3]);
+				expect(arr).to.eql([1, 3, 4]);
 			});
 
-			it("without function", function() {
+			it("remove function", function() {
 				var arr = ['a', 'b', 'c', 'bb'];
 
-				arr._.without(function(val) {
+				arr._.remove$(function(val) {
 					return val._.startsWith('b');
 				});
 
@@ -1027,23 +1027,23 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$without by value", function() {
+		describe("$remove by value", function() {
 
-			it("$without one element", function() {
+			it("$remove one element", function() {
 				var arr = [1, 2, 3];
 
 				expect(arr._.$without(2)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3]);
 			});
 
-			xit("$without multiple values", function() {
+			xit("$remove multiple values", function() {
 				var arr = [1, 2, 3, 4];
 
 				expect(arr._.$without([2,4])).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 4]);
 			});
 
-			it("$without function", function() {
+			it("$remove function", function() {
 				var arr = ['a', 'b', 'c', 'bb'];
 
 				expect(arr._.$without(function(val) {
@@ -1053,36 +1053,36 @@ describe("Array", function() {
 			});
 		});
 
-		describe("without all by value", function() {
+		describe("removeAll by value", function() {
 
-			it("without one element", function() {
+			it("remove one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				arr._.withoutAll(1);
+				arr._.removeAll(1);
 
 				expect(arr).to.eql([2, 3]);
 			});
 
-			it("without one element", function() {
+			it("remove one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				arr._.withoutAll(function(val) {return val === 3});
+				arr._.removeAll$(function(val) {return val === 3});
 
 				expect(arr).to.eql([1, 2, 1]);
 			});
 
-			xit("without multiple values", function() {
+			xit("remove multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
-				arr._.withoutAll([2,4]);
+				arr._.removeAll(2,4);
 
 				expect(arr).to.eql([1, 3]);
 			});
 
-			it("without multiple function", function() {
+			it("remove multiple function", function() {
 				var arr = ['a', 'b', 'c', 'bb', 'bb'];
 
-				arr._.withoutAll(function(val) {
+				arr._.removeAll$(function(val) {
 					return val._.startsWith('b');
 				});
 
@@ -1090,26 +1090,26 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$withoutAll by value", function() {
+		describe("$removeAll by value", function() {
 
-			it("$withoutAll one element", function() {
+			it("$removeAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$withoutAll(1)).to.eql([2, 3]);
+				expect(arr._.$removeAll(1)).to.eql([2, 3]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 			});
 
-			xit("$withoutAll multiple values", function() {
+			it("$removeAll multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
-				expect(arr._.$withoutAll([2,4])).to.eql([1, 3]);
+				expect(arr._.$removeAll(2,4)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 2, 4, 4]);
 			});
 
-			it("$withoutAll multiple function", function() {
+			it("$removeAll multiple function", function() {
 				var arr = ['a', 'b', 'c', 'bb', 'bb'];
 
-				expect(arr._.$withoutAll(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
+				expect(arr._.$removeAll$(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
 				expect(arr).to.eql(['a', 'b', 'c', 'bb', 'bb']);
 			});
 		});
