@@ -396,26 +396,26 @@ describe("Object", function() {
 			});
 		});
 
-        describe("$without", function() {
+        describe("$remove", function() {
 
             it("$remove one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$without(2)).to.eql({ x: 1,z: 3,t: 2});
+                expect(obj._.$remove(2)).to.eql({ x: 1,z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$remove multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$without([2, 1])).to.eql({z: 3,t: 2});
+                expect(obj._.$remove([2, 1])).to.eql({z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$remove function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.$without(function(val) {
+                expect(obj._.$remove(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a', z: 'bb',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});

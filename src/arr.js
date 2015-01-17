@@ -151,25 +151,52 @@ constructWrapper(Array, 'arr', {
             var index;
 
             this._.each(function(val, i) {
-                index = Array.prototype.indexOf.call(args, val);
+                index = args._.indexOf(val);
                 if(~index) {this.splice(i, 1); return !!Array.prototype.splice.call(args, index, 1).length}
             }, this);
 
             return this;
         },
+
         remove$: function(match$, ctx_) {
-            this._.each(function(val, i, arr, delta) { // eachRight is a little bit faster
+            this._.each(function(val, i, arr, delta) {
                 if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1); return false}
             }, this);
 
             return this;
         },
 
+        $remove: function(__values) {
+            var output = _.create(Object.getPrototypeOf(this));
+            var args   = arguments;
+            var index;
+
+            this._.each(function(val) {
+                index = args._.indexOf(val);
+                if(~index) {Array.prototype.splice.call(args, index, 1)}
+                else       {output.push(val)}
+            }, this);
+
+            return output;
+        },
+
+        $remove$: function(match$, ctx_) {
+            var output  =  _.create(Object.getPrototypeOf(this));
+            var matched = false;
+
+            this._.each(function(val, i, arr, delta) {
+                if(!matched && match$.call(ctx_, val, i, arr, delta)) {matched = true}
+                else {output.push(val)}
+            }, this);
+
+            return output;
+        },
+
         removeAll: function(__values) {
             var args = arguments;
 
             this._.eachRight(function(val, i) { // eachRight is a little bit faster
-                if(~Array.prototype.indexOf.call(args, val)) {this.splice(i, 1)}
+                if(~args._.indexOf(val)) {this.splice(i, 1)}
             }, this);
 
             return this;
@@ -182,17 +209,17 @@ constructWrapper(Array, 'arr', {
             return this;
         },
         $removeAll: function(__values) {
-            var output = [];
+            var output = _.create(Object.getPrototypeOf(this));
             var args   = arguments;
 
             this._.each(function(val) {
-                if(!~Array.prototype.indexOf.call(args, val)) {output.push(val)}
+                if(!~args._.indexOf(val)) {output.push(val)}
             }, this);
 
             return output;
         },
         $removeAll$: function(match$, ctx_) {
-            var output = [];
+            var output = _.create(Object.getPrototypeOf(this));
 
             this._.each(function(val, i, arr, delta) {
                 if(!match$.call(ctx_, val, i, arr, delta)) {output.push(val)}
@@ -201,17 +228,36 @@ constructWrapper(Array, 'arr', {
             return output;
         },
 
+        select: function(__values) {
+            var args = arguments;
+            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+        },
+
+        select$: function(match$, ctx_) {
+            var matched = false;
+            return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+        },
+
+        $select: function(__values) {
+            var args = arguments;
+            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+        },
+
+        $select$: function(match$, ctx_) {
+            var matched = false;
+            return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+        },
 
         selectAll: function(__values) {
             var args = arguments;
-            return this._.removeAll$(function(val) {return !~Array.prototype.indexOf.call(args, val)});
+            return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
         },
         selectAll$: function(match$, ctx_) {
             return this._.removeAll$(_.fnc.not(match$), ctx_);
         },
         $selectAll: function(__values) {
             var args = arguments;
-            return this._.$removeAll$(function(val) {return !~Array.prototype.indexOf.call(args, val)});
+            return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
         },
         $selectAll$: function(match$, ctx_) {
             return this._.$removeAll$(_.fnc.not(match$), ctx_);
@@ -273,11 +319,11 @@ constructWrapper(Array, 'arr', {
          */
         $diff: function(arr)
         {
-            return this._.$selectAll(function(val) {return !arr._.has(val)});
+            return this._.$remove.apply(this, arr);
         },
         diff: function(arr)
         {
-            return this._.removeAll.apply(this, arr); // FIXME technically this should be remove
+            return this._.remove.apply(this, arr);
         },
         /**
          * Mutator: Creates a multidimensional array. The dimensions come from the array itself
@@ -514,9 +560,7 @@ constructWrapper(Array, 'arr', {
          * @return {Array}     - this for chaining
          */
         intersect: function(arr) {
-            return this._.selectAll(function(val) {
-                return arr._.has(val);
-            }, this);
+            return this._.select.apply(this, arr);
         },
         /**
          * Calculates the intersection for 2 or more arrays
@@ -527,9 +571,7 @@ constructWrapper(Array, 'arr', {
          * @return {Array}     - this for chaining
          */
         $intersect: function(arr) {
-            return this._.$selectAll(function(val) {
-                return arr._.has(val);
-            }, this);
+            return this._.$select.apply(this, arr);
         },
         /**
          * Checks if an array intersects an other
@@ -699,30 +741,30 @@ constructWrapper(Array, 'arr', {
         {
             return this._._edit(true, invert, function(val, i) {this.splice(i, 1);}, false, this, $value, opt_ctx);
         },
-        /**
-         * Select the first occurrence in an array
-         * @public
-         * @method Array#select
-         * @this    {Array}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Array }                     - array with the selected element
-         */
-        select: function($value, opt_ctx) {
-            return this._._rm(true, $value, opt_ctx);
-        },
-        /**
-         * Accessor: Returns the first element found by the selector function
-         * @public
-         * @method Array#$select
-         * @this    {Array}
-         * @param   {Function} $value   - selector function callback to be called on each element
-         * @param   {Object=}  opt_ctx  - optional context for the callback function
-         * @returns {any}               - the found element or undefined otherwise
-         */
-        $select: function($value, opt_ctx) {
-            return this._._cp(false, false, [], $value, opt_ctx);
-        },
+        ///**
+        // * Select the first occurrence in an array
+        // * @public
+        // * @method Array#select
+        // * @this    {Array}
+        // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+        // * @param   {Object}             opt_ctx - optional context or the function
+        // * @returns {Array }                     - array with the selected element
+        // */
+        //select: function($value, opt_ctx) {
+        //    return this._._rm(true, $value, opt_ctx);
+        //},
+        ///**
+        // * Accessor: Returns the first element found by the selector function
+        // * @public
+        // * @method Array#$select
+        // * @this    {Array}
+        // * @param   {Function} $value   - selector function callback to be called on each element
+        // * @param   {Object=}  opt_ctx  - optional context for the callback function
+        // * @returns {any}               - the found element or undefined otherwise
+        // */
+        //$select: function($value, opt_ctx) {
+        //    return this._._cp(false, false, [], $value, opt_ctx);
+        //},
         ///**
         // * Select all occurrence in an array
         // * @public

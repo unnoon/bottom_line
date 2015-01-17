@@ -18,7 +18,7 @@ constructWrapper(Object, 'obj', {
          */
         // TODO These should be expanded with frozen, extensible states etc
         clone: function clone(obj) {
-            var clone = Array.isArray(obj)? [] : Object.create(Object.getPrototypeOf(obj));
+            var clone = _.create(Object.getPrototypeOf(obj));
 
             Object.getOwnPropertyNames(obj)._.each(function(name) {
                 Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
@@ -303,16 +303,16 @@ constructWrapper(Object, 'obj', {
          * @public
          * @method Object#_each
          * @this  {Object}
-         * @param {Function} cb      - callback function to be called for each element
-         * @param {Object=}  opt_ctx - optional context
+         * @param {Function} cb   - callback function to be called for each element
+         * @param {Object=}  ctx_ - optional context
          */
-        each: function(cb, opt_ctx) {
+        each: function(cb, ctx_) {
             // FIXME this[key] will execute getter properties...!!!
             // TODO maybe a faster version using keys. I now prefer using for in  because it will not create a new array object with the keys
             for(var key in this)
             {
                 if(!this.hasOwnProperty(key)) continue;
-                if(cb.call(opt_ctx, this[key], key, this) === false) break;
+                if(cb.call(ctx_, this[key], key, this) === false) break;
             }
         },
         /**
@@ -367,6 +367,24 @@ constructWrapper(Object, 'obj', {
          * @return {any} first value that is found
          */
         find: __coll.find,
+        has: {aliases: ['contains'], value: function(value) {
+            var has = false;
+
+            this._.each(function(val) {
+                if(value === val) return !(has = true);
+            });
+
+            return has;
+        }},
+        keyOf: {aliases: ['indexOf'], value: function(value) {
+            var key = -1;
+
+            this._.each(function(val, k) {
+                if(value === val) return key = k, false;
+            });
+
+            return key;
+        }},
         /**
          * Returns an array containing the keys of an object (enumerable properties))
          * @public
@@ -533,7 +551,7 @@ constructWrapper(Object, 'obj', {
          * @param   {Object}             opt_ctx - optional context or the function
          * @returns {Object }                    - NEW object remove the element
          */
-        $without: function($value, opt_ctx) {
+        $remove: function($value, opt_ctx) {
             return this._._cp(false, true, {}, $value, opt_ctx);
         },
         /**

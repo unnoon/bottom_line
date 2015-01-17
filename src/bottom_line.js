@@ -186,6 +186,12 @@
      *  'Global' methods
      */
 
+    extend(_, {
+        create: function(proto) {
+            return (proto === Array.prototype) ? [] : Object.create(proto);
+        }
+    });
+
     /* @include shims.js */
     /* @include coll.js */
     /* @include obj.js  */

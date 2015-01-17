@@ -418,7 +418,6 @@ describe("Array", function() {
 
 				expect(arr1._.$diff(arr2)).to.eql([1, 3]);
 				expect(arr1).to.eql([1, 2, 3]);
-				expect(arr1).to.equal(arr1);
 			});
 		});
 
@@ -751,17 +750,17 @@ describe("Array", function() {
 				expect(arr).to.eql([1]);
 			});
 
-			xit("select multiple elements", function() {
+			it("select multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.select([1, 2])).to.eql([1, 2]);
+				expect(arr._.select(1, 2)).to.eql([1, 2]);
 				expect(arr).to.eql([1, 2]);
 			});
 
 			it("select by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.select(function(elm) {
+				expect(arr._.select$(function(elm) {
 					return elm === 2;
 				})).to.eql([2]);
 				expect(arr).to.eql([2]);
@@ -777,17 +776,17 @@ describe("Array", function() {
 				expect(arr).to.equal(arr);
 			});
 
-			xit("$select multiple elements", function() {
+			it("$select multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select([1, 2])).to.eql([1, 2]);
+				expect(arr._.$select(1, 2)).to.eql([1, 2]);
 				expect(arr).to.equal(arr);
 			});
 
 			it("$select by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select(function(elm) {
+				expect(arr._.$select$(function(elm) {
 					return elm === 2;
 				})).to.eql([2]);
 				expect(arr).to.equal(arr);
@@ -1032,21 +1031,21 @@ describe("Array", function() {
 			it("$remove one element", function() {
 				var arr = [1, 2, 3];
 
-				expect(arr._.$without(2)).to.eql([1, 3]);
+				expect(arr._.$remove(2)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3]);
 			});
 
-			xit("$remove multiple values", function() {
+			it("$remove multiple values", function() {
 				var arr = [1, 2, 3, 4];
 
-				expect(arr._.$without([2,4])).to.eql([1, 3]);
+				expect(arr._.$remove(2,4)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 4]);
 			});
 
 			it("$remove function", function() {
 				var arr = ['a', 'b', 'c', 'bb'];
 
-				expect(arr._.$without(function(val) {
+				expect(arr._.$remove$(function(val) {
 					return val._.startsWith('b');
 				})).to.eql(['a', 'c', 'bb']);
 				expect(arr).to.eql(['a', 'b', 'c', 'bb']);

@@ -8,12 +8,21 @@
         var arr = [1, 2, 3];
 
         function argTest() {
-            arguments[0] = 'kabouter';
-            console.log(arr[0]);
+//            arguments[0] = 'kabouter';
+//            console.log(arr[0]);
+//
+//            delete arguments[0];
+//
+//            console.log(arr[0]);
 
-            delete arguments[0];
+            for(var key in arguments)
+            {
+                console.log(arguments[key])
+            }
 
-            console.log(arr[0]);
+
+            var a = {"foo":"bar", "3": "3", "2":"2", "1":"1", "blabla":"tralala"};
+            for(var i in a) { console.log(a[i]) }
         }
 
         argTest.apply(null, arr);
