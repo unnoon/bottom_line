@@ -40,8 +40,8 @@
         var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
         var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return       chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return stack[index]}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return         chains}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
@@ -302,13 +302,12 @@
              * @return  {Object}  clone - the cloned object
              */
             // TODO These should be expanded with frozen, extensible states etc
-            // FIXME WHOAAA this breaks with a nested obj._.descriptor... that's scary. Needs debugging
             clone: function clone(obj) {
                 var clone = _.create(obj._.proto());
                 var names = obj._.names();
     
                 names._.each(function(name) {
-                    clone._.define(name, obj._.descriptor(name._.decapitalize()));
+                    clone._.define(name, obj._.descriptor(name));
                 });
     
                 return clone;
