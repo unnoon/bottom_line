@@ -141,13 +141,13 @@
                     if(obj.hasOwnProperty(prop)) // overwrite
                     {
                         if(!overwrite)                             return; // continue
-                        if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object" ;
+                        if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it" ;
                         if(settings.log)                           console[settings.log]('overwriting existing property: '+prop);
                     }
                     else if(prop in obj) // override
                     {
                         if(!override)                             return; // continue
-                        if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object" ;
+                        if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it" ;
                         if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
                     }
 
