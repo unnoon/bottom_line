@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>arguments</title>
+    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
+    <script>
+        console.assert(NaN === NaN, 'NaN is not equal to NaN');
+
+        var str = "sdfsdf";
+
+        console.assert(str instanceof String, 'string primitive is NOT instanceof String');
+
+        strObject.apply(str);
+
+
+        function strObject() {
+            console.assert(!(this instanceof String), 'applied string is instanceof String');
+        }
+
+        function aap(arg1, arg2) {
+            arg2 = 6;
+
+            console.assert(!(arguments[1] === 6), 'Changing parameters will actually change arguments. They are coupled');
+        }
+
+        aap(666, {monkey:'gorilla'});
+
+        function aap2(arg1, arg2) {
+            arguments[1] = 6;
+
+            console.assert(!(arg2 === 6), 'Vice versA. Changing arguments will change parameters. They are coupled');
+        }
+
+        aap2(666, {monkey:'gorilla'});
+
+
+    </script>
+</head>
+<body>
+</body>
+</html>
