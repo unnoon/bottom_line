@@ -262,29 +262,6 @@ constructWrapper(Array, 'arr', {
         $selectAll$: function(match$, ctx_) {
             return this._.$removeAll$(_.fnc.not(match$), ctx_);
         },
-
-
-        //_edit: function(all, invert, onmatch, reverse, target, $value, ctx_)
-        //{
-        //    var first = !all, normal = !invert;
-        //    var array, match, finish = false;
-        //
-        //    var cb = (typeof($value) === 'function')? 	$value                                   :
-        //        (array = _.is.array($value))? 		function(val) {return $value._.has(val)} : // TODO decode if we should remove the array option
-        //            (_.typeOf($value) === 'arguments') ? function() {console.log('ARGUMENTS given')} :
-        //                function(val) {return val === $value};
-        //
-        //    // note the reverse check should be fixed when this is also implemented for strings
-        //    this._['each'+(reverse?'Right':'')](function(val, i, _this, delta) {
-        //        match = cb.call(ctx_, val, i, _this, delta);
-        //        // remove normal or inverted match
-        //        if(match === normal || finish) onmatch.call(target, val, i, _this, delta);
-        //        // if first and the first match is made check if we are done
-        //        if(first && match && !finish) return finish = array? !$value._.remove(val).length : true, !(normal && finish);
-        //    }, this);
-        //
-        //    return target;
-        //},
         /**
          * Removes the occurrences from an array
          * @private
@@ -610,11 +587,11 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array#max
          * @this    {Array<number>|Array<any>}
-         * @param   {Function} opt_compare - optional function to determine the the max in case of non-numeric array
+         * @param   {Function} compare$_ - optional function to determine the the max in case of non-numeric array
          * @returns {number|any} - maximum number or element in the array
          */
-        max: function(opt_compare) {
-            if(opt_compare === undefined)
+        max: function(compare$_) {
+            if(compare$_ === undefined)
             {
                 return Math.max.apply(null, this);
             }
@@ -623,7 +600,7 @@ constructWrapper(Array, 'arr', {
                 var max = this[0];
 
                 this._.each(function(elm) {
-                    max = opt_compare(elm, max) > 0? elm : max;
+                    max = compare$_(elm, max) > 0? elm : max;
                 });
 
                 return max;
@@ -634,11 +611,11 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array#min
          * @this    {Array<number>|Array<any>}
-         * @param   {Function=} opt_compare - optional compare function
+         * @param   {Function=} compare$_ - optional compare function
          * @returns {number|any} - minimum element in the array
          */
-        min: function(opt_compare) {
-            if(opt_compare === undefined)
+        min: function(compare$_) {
+            if(compare$_ === undefined)
             {
                 return Math.min.apply(null, this);
             }
@@ -647,7 +624,7 @@ constructWrapper(Array, 'arr', {
                 var min = this[0];
 
                 this._.each(function(elm) {
-                    min = opt_compare(elm, min) < 0? elm : min;
+                    min = compare$_(elm, min) < 0? elm : min;
                 });
 
                 return min;
@@ -659,12 +636,12 @@ constructWrapper(Array, 'arr', {
          * @method Array#modify
          * @this    {Array}
          * @param   {Function} modifier - function that modifies the array members
-         * @param   {Object=}  opt_ctx  - optional context for the modifier function
+         * @param   {Object=}  ctx_  - optional context for the modifier function
          * @returns {Array}             - the modified array
          */
-        modify: function(modifier, opt_ctx) {
+        modify: function(modifier, ctx_) {
             this._.each(function(val, i) {
-                this[i] = modifier.call(opt_ctx, val, i, this);
+                this[i] = modifier.call(ctx_, val, i, this);
             }, this);
 
             return this;
@@ -974,28 +951,56 @@ constructWrapper(Array, 'arr', {
         /**
          * Remove elements based on index
          * @public
-         * @method Array#withoutKeys
+         * @method Array#del
          * @this   {Array}
-         * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=} to_ctx_ - to index to delete to | or the context for the function
-         * @return {Array}   this   - mutated array for chaining
+         * @param  {...number} __keys - indices SORTED
+         * @return {Array}       this - mutated array for chaining
          */
-        withoutKeys: function($index, to_ctx_)
+        del: function(__keys)
         {
-            return this._._del(false, $index, to_ctx_);
+            arguments._.eachRight(function(key) {
+                this.splice(key, 1);
+            }, this);
+
+            return this;
         },
         /**
          * Remove elements based on index
          * @public
-         * @method Array#$withoutKeys
+         * @method Array#$del
          * @this   {Array}
-         * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
+         * @param  {number|Array|Function} match$ - singular index, a from index, an array of indices or a function specifying specific indexes
+         * @param  {number=} ctx_ - to index to delete to | or the context for the function
          * @return {Array}   this   - mutated array for chaining
          */
-        $withoutKeys: function($index, opt_to_ctx)
+        del$: function(match$, ctx_)
         {
-            return this._._cpKeys(true, [], $index, opt_to_ctx);
+            this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
+                if(match$.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
+            }, this);
+
+            return this;
+        },
+        $del: function(__keys)
+        {
+            var args   = arguments;
+            var output = _.create(Object.getPrototypeOf(this));
+
+            this._.each(function(val, i) { // eachRight is a little bit faster
+                if(args._.not.has(i)) {output.push(val)}
+            }, this);
+
+            return output;
+        },
+        $del$: function(match$, ctx_)
+        {
+            var output = _.create(Object.getPrototypeOf(this));
+
+            this._.each(function(val, i, arr, delta) { // eachRight is a little bit faster
+                if(!match$.call(ctx_, i, arr, delta)) {output.push(val)}
+            }, this);
+
+            return output;
         }
     }
 });

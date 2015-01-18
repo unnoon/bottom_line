@@ -316,6 +316,29 @@ constructWrapper(Object, 'obj', {
             }
         },
         /**
+         * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         * each is eachlastic in the sense that one can add and delete elements at the current index
+         * @private
+         * @method Arguments#_eachRight
+         * @this  {Array}
+         * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
+         * @param {function} cb       - callback function to be called for each element
+         * @param {Object=}  ctx_  - optional context for the callback function
+         * @return {Array}            - this array for chaining
+         */
+        eachRight: function(cb, ctx_) {
+            var step = 1;
+            var from = this.length-1, to = -1;
+
+            for(var i = from; i > to; i -= step)
+            {
+                if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
+                if(cb.call(ctx_, this[i], i, this) === false) break;
+            }
+
+            return this;
+        },
+        /**
          * Edits the key value pairs of an object
          * @private
          * @method Object#__edit

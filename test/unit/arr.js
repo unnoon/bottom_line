@@ -1113,87 +1113,87 @@ describe("Array", function() {
 			});
 		});
 
-		describe("withoutKeys", function() {
+		describe("del", function() {
 
-			it("withoutKeys one index", function() {
+			it("del one index", function() {
 				var arr = [1, 2, 3];
 
-				arr._.withoutKeys(1);
+				arr._.del(1);
 
 				expect(arr).to.deep.equal([1, 3]);
 			});
 
-			it("withoutKeys from to index", function() {
+			xit("del from to index", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				arr._.withoutKeys(1, 3);
+				arr._.del(1, 3);
 
 				expect(arr).to.deep.equal([1, 5]);
 			});
 
-			it("withoutKeys from to index out of bounds", function() {
+			xit("del from to index out of bounds", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				arr._.withoutKeys(1, 6);
+				arr._.del(1, 6);
 
 				expect(arr).to.deep.equal([1]);
 			});
 
-			it("withoutKeys indexes with function", function() {
+			it("del indexes with function", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				arr._.withoutKeys(function(i) {
+				arr._.del$(function(i) {
 					return i % 2 === 0;
 				});
 
 				expect(arr).to.eql([2, 4]);
 			});
 
-			it("withoutKeys indexes within array", function() {
+			it("del indexes within array", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				arr._.withoutKeys([0, 3, 4]);
+				arr._.del(0, 3, 4);
 
 				expect(arr).to.eql([2, 3]);
 			});
 		});
 
-		describe("$withoutKeys", function() {
+		describe("$del", function() {
 
-			it("withoutKeys one index", function() {
+			it("del one index", function() {
 				var arr = [1, 2, 3];
 
-				expect(arr._.$withoutKeys(1)).to.deep.equal([1, 3]);
+				expect(arr._.$del(1)).to.deep.equal([1, 3]);
 				expect(arr).to.deep.equal([1, 2, 3]);
 			});
 
-			it("$withoutKeys from to index", function() {
+			xit("$del from to index", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$withoutKeys(1, 3)).to.deep.equal([1, 5]);
+				expect(arr._.$del(1, 3)).to.deep.equal([1, 5]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
-			it("withoutKeys from to index out of bounds", function() {
+			xit("del from to index out of bounds", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$withoutKeys(1, 6)).to.deep.equal([1]);
+				expect(arr._.$del(1, 6)).to.deep.equal([1]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
-			it("withoutKeys indexes with function", function() {
+			it("del indexes with function", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$withoutKeys(function(i) {
+				expect(arr._.$del$(function(i) {
 					return i % 2 === 0;
 				})).to.eql([2, 4]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
-			it("withoutKeys indexes within array", function() {
+			it("del indexes within array", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$withoutKeys([0, 3, 4])).to.eql([2, 3]);
+				expect(arr._.$del(0, 3, 4)).to.eql([2, 3]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 		});

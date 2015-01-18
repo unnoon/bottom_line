@@ -10,13 +10,13 @@
 
 //            var clone = _.clone(obj);
 
-            var wt = obj._.$withoutKeys('y');
+            var wt = obj._.$del('y');
 
 
             console.log(wt._.toString());
 //            console.log(clone._.toString());
 
-//            expect(obj._.$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+//            expect(obj._.$del('y')).to.deep.equal({x: 1,z: 3});
 //            expect(obj).to.eql({x: 1,y: 2,z: 3})
     </script>
 </head>

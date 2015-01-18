@@ -477,47 +477,47 @@ describe("Object", function() {
             });
         });        
         
-		describe("withoutKeys", function() {
+		describe("del", function() {
 
-			it("withoutKeys", function() {
+			it("del", function() {
 				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj._.withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+				expect(obj._.del('y')).to.deep.equal({x: 1,z: 3});
 			});
 
-			it("withoutKeys an array of elements", function() {
+			it("del an array of elements", function() {
 				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj._.withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
+				expect(obj._.del(['x', 'z'])).to.deep.equal({y: 2});
 			});
 
-			it("withoutKeys based on function", function() {
+			it("del based on function", function() {
 				var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-				expect(obj._.withoutKeys(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+				expect(obj._.del(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
 
-        describe("$withoutKeys", function() {
+        describe("$del", function() {
 
-            it("$withoutKeys", function() {
+            it("$del", function() {
                 var obj = {x: 1,y: 2,z: 3};
 
-                expect(obj._.$withoutKeys('y')).to.deep.equal({x: 1,z: 3});
+                expect(obj._.$del('y')).to.deep.equal({x: 1,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,z: 3})
             });
 
-            it("$withoutKeys an array of elements", function() {
+            it("$del an array of elements", function() {
                 var obj = {x: 1,y: 2,z: 3};
 
-                expect(obj._.$withoutKeys(['x', 'z'])).to.deep.equal({y: 2});
+                expect(obj._.$del(['x', 'z'])).to.deep.equal({y: 2});
                 expect(obj).to.eql({x: 1,y: 2,z: 3})
             });
 
-            it("$withoutKeys based on function", function() {
+            it("$del based on function", function() {
                 var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-                expect(obj._.$withoutKeys(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+                expect(obj._.$del(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
             });
         });
