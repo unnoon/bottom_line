@@ -17,6 +17,9 @@
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
 }(this, function() {
+    var stack = [];
+    var index = 0;
+
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
 	 * Also all static properties will be available on this object
@@ -25,8 +28,6 @@
 	 */
     // TODO this should be a function where we can wrap for example arguments and apply an array function to it
 	var _ = {
-        // TODO investigate if this can give errors other per type values are possible. But this is a good way to check if this will give any problems (asynxhronous stuff...)
-        value: null, // wrapped value
         not: {} // object to hold negative functions
     };
 
@@ -39,14 +40,14 @@
         var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
         var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return chains},  enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return _.value}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return       chains}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper.chains,  'value', {get: function() {return stack[index]}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {return _.value = this, methods}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return methods}, enumerable: false, configurable: false});
         }
 
         wrapStatics(wrapper, key, module);
@@ -71,10 +72,10 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)}}}, module.prototype);
-        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return  fn.apply(_.value, arguments)._.chain}}}, module.prototype);
-        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(_.value, arguments)._.chain}}}, module.prototype);
+        extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
+        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
     }
 
     /**

@@ -23,8 +23,7 @@ constructWrapper(Object, 'obj', {
             var names = obj._.names();
 
             names._.each(function(name) {
-                var pd = obj._.descriptor(name);
-                clone._.define(name, pd);
+                clone._.define(name, obj._.descriptor(name._.decapitalize()));
             });
 
             return clone;

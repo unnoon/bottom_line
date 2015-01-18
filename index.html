@@ -6,13 +6,28 @@
 
         <script src="dist/bottom_line.js"></script>
         <script>
-            var obj = {a:1,b:2,c:3};
+//            clone: function clone(obj) {
+//                var clone = _.create(obj._.proto());
+//                var names = obj._.names();
+//
+//                names._.each(function(name) {
+//                    clone._.define(name, obj._.descriptor(name));
+//                });
+//
+//                return clone;
+//            }
+//
+//            var clone = _.clone([1, 2, 3]);
+//            console.log(clone._.toString());
 
-            for(var key in obj)
-            {
-                if(key == 'b') delete obj[key];
-                console.log(obj[key]);
-            }
+
+            var arr1 = [1];
+            var arr2 = [4];
+
+            var appended = arr1._.$append(arr2);
+
+            console.log(appended);
+
         </script>
     </head>
     <body>
