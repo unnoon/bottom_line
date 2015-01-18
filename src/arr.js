@@ -171,25 +171,6 @@ constructWrapper(Array, 'arr', {
             return output;
         },
         /**
-         * Removes 1st values from an array
-         * @public
-         * @method Array:_.arr.remove
-         * @this       {Array}
-         * @param     {...any} __values - values to remove
-         * @return     {Array}     this - mutated array for chaining
-         */
-        remove: function(__values) {
-            var args = arguments;
-            var index;
-
-            this._.each(function(val, i) {
-                index = args._.indexOf(val);
-                if(~index) {this.splice(i, 1); return !!Array.prototype.splice.call(args, index, 1).length}
-            }, this);
-
-            return this;
-        },
-        /**
          * Removes 1st value from an array based on a match function
          * @public
          * @method Array:_.arr.remove$

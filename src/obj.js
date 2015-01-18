@@ -273,6 +273,41 @@ constructWrapper(Object, 'obj', {
             return Object.defineProperty(this, prop, descriptor)
         },
         /**
+         * Remove elements based on index
+         * @public
+         * @method Object:_.arr.del
+         * @this       {Object}
+         * @param  {...number} __keys - indices SORTED
+         * @return     {Array}   this - mutated array for chaining
+         */
+        del: function(__keys)
+        {
+            arguments._.eachRight(function(key) {
+                delete this[key];
+            }, this);
+
+            return this;
+        },
+        /**
+         * Removes 1st values from an array
+         * @public
+         * @method Array:_.arr.remove
+         * @this       {Array}
+         * @param     {...any} ___values - values to remove
+         * @return     {Array}      this - mutated array for chaining
+         */
+        remove: function(___values) {
+            var args = arguments;
+            var index;
+
+            this._.each(function(val, i) {
+                index = args._.indexOf(val);
+                if(~index) {this._.del(i); return !!args._.del(index).length}
+            }, this);
+
+            return this;
+        },
+        /**
          * Copies keys to an array
          * @public
          * @method Object#_define
@@ -553,18 +588,18 @@ constructWrapper(Object, 'obj', {
 
             return values;
         },
-        /**
-         * Removes the first occurrence in an object
-         * @public
-         * @method Object#_without
-         * @this    {Object}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Array }                     - The array remove the element
-         */
-        remove: function($value, opt_ctx) {
-            return this._._rm(false, false, $value, opt_ctx);
-        },
+        ///**
+        // * Removes the first occurrence in an object
+        // * @public
+        // * @method Object#_without
+        // * @this    {Object}
+        // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+        // * @param   {Object}             opt_ctx - optional context or the function
+        // * @returns {Array }                     - The array remove the element
+        // */
+        //remove: function($value, opt_ctx) {
+        //    return this._._rm(false, false, $value, opt_ctx);
+        //},
         /**
          * Removes the first occurrence in an array
          * @public

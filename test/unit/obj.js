@@ -380,7 +380,7 @@ describe("Object", function() {
 			it("remove multiple values", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 2};
 
-				obj._.remove([2,3]);
+				obj._.remove(2,3);
 
 				expect(obj).to.eql({x: 1,t: 2});
 			});
