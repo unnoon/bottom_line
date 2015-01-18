@@ -17,13 +17,12 @@ constructWrapper(Object, 'obj', {
          * @return  {Object}  clone - the cloned object
          */
         // TODO These should be expanded with frozen, extensible states etc
-        // FIXME WHOAAA this breaks with a nested obj._.descriptor... that's scary. Needs debugging
         clone: function clone(obj) {
             var clone = _.create(obj._.proto());
             var names = obj._.names();
 
             names._.each(function(name) {
-                clone._.define(name, obj._.descriptor(name._.decapitalize()));
+                clone._.define(name, obj._.descriptor(name));
             });
 
             return clone;
