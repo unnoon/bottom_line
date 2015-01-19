@@ -120,10 +120,10 @@ describe("Extensions", function() {
 				expect(6 instanceof Number).to.be.false;
 				expect(new String('str') instanceof String).to.be.true;
 				expect('str' instanceof String).to.be.false; // works only on objects
-				expect([] instanceof Array).to.be.true; // counter intuitive
+				expect([] instanceof Array).to.be.true;
 				expect({} instanceof Object).to.be.true;
 				expect(function(){} instanceof Function).to.be.true;
-				expect(null instanceof Object).to.be.false; // counter intuitive. Although only objects can have the value null...
+				expect(null instanceof Object).to.be.false; // counter intuitive because it contradicts typeof
 				expect(undefined instanceof Object).to.be.false;
 			});
 

@@ -34,7 +34,23 @@
 
         aap2(666, {monkey:'gorilla'});
 
+        var a = {"foo":"bar", "3": "3", "2":"2", "1":"1"};
 
+        console.assert(Object.getOwnPropertyNames(a)[0] === 'foo', 'if we add numeric value to an object the get promoted to the front. Instead of insertion order');
+
+        // objects can have any character names
+        var weirdObj = {
+            54353453: 666,
+            ' 345353$%#$%#$%#': 666
+        };
+
+        console.assert(false, "Objects can have all numeric values or when placed between '' any unicode character");
+
+        console.assert(!(typeof(NaN) === 'number'), 'typeof NaN is a number');
+        console.assert(!(typeof(new String('str')) === 'object'), 'typeof String object is object');
+        console.assert(!(typeof([]) === 'object'), 'typeof [] is object & not array');
+        console.assert(!(typeof(null) === 'object' ), 'typeof null is object');
+        console.assert(null instanceof Object, 'however it is not an instance of object');
     </script>
 </head>
 <body>
