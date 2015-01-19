@@ -299,11 +299,12 @@ constructWrapper(Object, 'obj', {
          */
         remove: function(___values) {
             var args = arguments;
+            var len  = arguments.length;
             var index;
 
             this._.each(function(val, i) {
                 index = args._.indexOf(val);
-                if(~index) {this._.del(i); return !!args._.del(index).length}
+                if(~index) {this._.del(i); delete args[index]; return --len > 0}
             }, this);
 
             return this;
