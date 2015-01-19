@@ -18,6 +18,6 @@
     "grunt-jsdoc": "latest",
     "grunt-contrib-uglify": "latest",
     "grunt-preprocess": "latest",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "latest"
   }
 }
