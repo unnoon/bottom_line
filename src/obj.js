@@ -290,12 +290,67 @@ constructWrapper(Object, 'obj', {
             return this;
         },
         /**
-         * Removes 1st values from an array
+         * Remove elements based on index
          * @public
-         * @method Array:_.arr.remove
+         * @method Array:_.arr.del$
+         * @this   {Array}
+         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
+         * @param  {Object=}                     ctx_   - optional context for the match$ function
+         * @return {Array}                       this   - mutated array for chaining
+         */
+        del$: function(match$, ctx_)
+        {
+            this._.each(function(val, key, obj) {
+                if(match$.call(ctx_, key, obj)) {delete this[key]}
+            }, this);
+
+            return this;
+        },
+        /**
+         * Creates a new array without the specified indices
+         * @public
+         * @method Array:_.arr.$del
          * @this       {Array}
-         * @param     {...any} ___values - values to remove
-         * @return     {Array}      this - mutated array for chaining
+         * @param  {...number} __keys - indices SORTED
+         * @return     {Array}   this - new array without the specified indices
+         */
+        $del: function(__keys)
+        {
+            var args   = arguments;
+            var output = _.create(this._.proto());
+
+            this._.each(function(val, key) { // eachRight is a little bit faster
+                if(args._.not.has(key)) {output._._add(val, key)}
+            }, this);
+
+            return output;
+        },
+        /**
+         * Creates a new array without the specified indices
+         * @public
+         * @method Array:_.arr.$del$
+         * @this   {Array}
+         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
+         * @param  {Object=}                     ctx_   - optional context for the match$ function
+         * @return {Array}                       this   - new array without the specified indices
+         */
+        $del$: function(match$, ctx_)
+        {
+            var output = _.create(this._.proto());
+
+            this._.each(function(val, key, obj, delta) { // eachRight is a little bit faster
+                if(!match$.call(ctx_, key, obj, delta)) {output._._add(val, key)}
+            }, this);
+
+            return output;
+        },
+        /**
+         * Removes 1st values from an object|array
+         * @public
+         * @method Object:_.obj.remove
+         * @this   {Object|Array}
+         * @param  {...any}       ___values - values to remove
+         * @return {Object|Array} this      - mutated array for chaining
          */
         remove: function(___values) {
             var args = arguments;
@@ -306,6 +361,181 @@ constructWrapper(Object, 'obj', {
                 index = args._.indexOf(val);
                 if(~index) {this._.del(i); delete args[index]; return --len > 0}
             }, this);
+
+            return this;
+        },
+        /**
+         * Removes 1st value from an object|array based on a match function
+         * @public
+         * @method Array:_.obj.remove$
+         * @this   {Array}
+         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
+         * @param  {Object=}                          ctx_   - optional context for the match$ function
+         * @return {Array}                            this   - mutated array for chaining
+         */
+        remove$: function(match$, ctx_) {
+            this._.each(function(val, i, arr, delta) {
+                if(match$.call(ctx_, val, i, arr, delta)) {this._.del(i); return false}
+            }, this);
+
+            return this;
+        },
+        /**
+         * Creates new array without the specified 1st values
+         * @public
+         * @method Object:_.obj.$remove
+         * @this   {Object|Array}
+         * @param  {...any} __values - values to remove
+         * @return {Array}  output   - new array without the values
+         */
+        $remove: function(__values) {
+            var output = _.create(this._.proto());
+            var args   = arguments;
+            var index;
+
+            this._.each(function(val, key) {
+                index = args._.indexOf(val);
+                if(~index) {delete args[index]}
+                else       {output._._add(val, key)}
+            }, this);
+
+            return output;
+        },
+        /**
+         * Creates a new object|array without 1st value based on a match function
+         * @public
+         * @method Object:_.obj.$remove$
+         * @this   {Array}
+         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
+         * @param  {Object=}                          ctx_   - optional context for the match$ function
+         * @return {Array}                            output - new array without the value specified
+         */
+        $remove$: function(match$, ctx_) {
+            var output  =  _.create(this._.proto());
+            var matched = false;
+
+            this._.each(function(val, key, obj, delta) {
+                if(!matched && match$.call(ctx_, val, key, obj, delta)) {matched = true}
+                else                                                    {output._._add(val, key)}
+            }, this);
+
+            return output;
+        },
+        /**
+         * Removes all specified values from an array
+         * @public
+         * @method Array:_.arr.removeAll
+         * @this       {Array}
+         * @param     {...any} __values - values to remove
+         * @return     {Array}     this - mutated array for chaining
+         */
+        removeAll: function(__values) {
+            var args = arguments;
+
+            this._.each(function(val, key) {
+                if(args._.has(val)) {delete this[key]}
+            }, this);
+
+            return this;
+        },
+        /**
+         * Removes all values from an array based on a match function
+         * @public
+         * @method Array:_.arr.removeAll$
+         * @this   {Array}
+         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match$ function
+         * @return {Array}                             this  - mutated array for chaining
+         */
+        removeAll$: function(match$, ctx_) {
+            this._.each(function(val, key, obj) { // eachRight is a little bit faster
+                if(match$.call(ctx_, val, key, obj)) {delete this[key]}
+            }, this);
+
+            return this;
+        },
+
+        /**
+         * Creates new array without all specified values
+         * @public
+         * @method Array:_.arr.$removeAll
+         * @this       {Array}
+         * @param     {...any} __values - values to remove
+         * @return     {Array}   output - new array without the values
+         */
+        $removeAll: function(__values) {
+            var output = _.create(this._.proto());
+            var args   = arguments;
+
+            this._.each(function(val, key) {
+                if(args._.not.has(val)) {output._._add(val, key)}
+            }, this);
+
+            return output;
+        },
+        /**
+         * Creates a new array without all value specified by the match function
+         * @public
+         * @method Array:_.arr.$removeAll$
+         * @this   {Array}
+         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match$ function
+         * @return {Array}                           output  - new array without the value specified
+         */
+        $removeAll$: function(match$, ctx_) {
+            var output = _.create(this._.proto());
+
+            this._.each(function(val, key, obj, delta) {
+                if(!match$.call(ctx_, val, key, obj, delta)) {output._._add(val, key)} // key is ignored in case of array
+            }, this);
+
+            return output;
+        },
+        select: function(__values) {
+            var args = arguments;
+            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+        },
+
+        select$: function(match$, ctx_) {
+            var matched = false;
+            return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+        },
+
+        $select: function(__values) {
+            var args = arguments;
+            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+        },
+
+        $select$: function(match$, ctx_) {
+            var matched = false;
+            return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+        },
+
+        selectAll: function(__values) {
+            var args = arguments;
+            return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
+        },
+        selectAll$: function(match$, ctx_) {
+            return this._.removeAll$(_.fnc.not(match$), ctx_);
+        },
+        $selectAll: function(__values) {
+            var args = arguments;
+            return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
+        },
+        $selectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
+            return this._.$removeAll$(_.fnc.not(match$), ctx_);
+        }},
+
+        /**
+         * Singular push function to solve problems with differences between objects & arrays
+         * @public
+         * @method Array:_.arr._push
+         * @this    {Array}
+         * @param  {...any}  val - value to push
+         * @return  {Array} this - this for chaining
+         */
+        _add: function(val, key) {
+            this[key] = val;
 
             return this;
         },
@@ -344,8 +574,6 @@ constructWrapper(Object, 'obj', {
          * @param {Object=}  ctx_ - optional context
          */
         each: function(cb, ctx_) {
-            // FIXME this[key] will execute getter properties...!!!
-            // TODO maybe a faster version using keys. I now prefer using for in  because it will not create a new array object with the keys
             for(var key in this)
             {
                 if(!this.hasOwnProperty(key)) continue;
@@ -591,53 +819,29 @@ constructWrapper(Object, 'obj', {
             return values;
         },
         ///**
-        // * Removes the first occurrence in an object
+        // * Removes the all occurrence in an array
         // * @public
-        // * @method Object#_without
+        // * @method Array#_withoutAll
         // * @this    {Object}
         // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
         // * @param   {Object}             opt_ctx - optional context or the function
-        // * @returns {Array }                     - The array remove the element
+        // * @returns {Object}                      - The array remove the element
         // */
-        //remove: function($value, opt_ctx) {
-        //    return this._._rm(false, false, $value, opt_ctx);
+        //removeAll: function($value, opt_ctx) {
+        //    return this._._rm(true, false, $value, opt_ctx);
         //},
-        /**
-         * Removes the first occurrence in an array
-         * @public
-         * @method Array#_$remove
-         * @this    {Object}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object }                    - NEW object remove the element
-         */
-        $remove: function($value, opt_ctx) {
-            return this._._cp(false, true, {}, $value, opt_ctx);
-        },
-        /**
-         * Removes the all occurrence in an array
-         * @public
-         * @method Array#_withoutAll
-         * @this    {Object}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object}                      - The array remove the element
-         */
-        removeAll: function($value, opt_ctx) {
-            return this._._rm(true, false, $value, opt_ctx);
-        },
-        /**
-         * Removes the all occurrence in an array
-         * @public
-         * @method Array#_$withoutAll
-         * @this    {Object}
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context or the function
-         * @returns {Object}                      - NEW array remove the element
-         */
-        $removeAll: function($value, opt_ctx) {
-            return this._._cp(true, true, [], $value, opt_ctx);
-        },
+        ///**
+        // * Removes the all occurrence in an array
+        // * @public
+        // * @method Array#_$withoutAll
+        // * @this    {Object}
+        // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
+        // * @param   {Object}             opt_ctx - optional context or the function
+        // * @returns {Object}                      - NEW array remove the element
+        // */
+        //$removeAll: function($value, opt_ctx) {
+        //    return this._._cp(true, true, [], $value, opt_ctx);
+        //},
         /**
          * Remove elements based on index
          * @public

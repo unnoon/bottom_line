@@ -388,7 +388,7 @@ describe("Object", function() {
 			it("remove function", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-				obj._.remove(function(val) {
+				obj._.remove$(function(val) {
 					return val > 2;
 				});
 
@@ -408,14 +408,14 @@ describe("Object", function() {
             it("$remove multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$remove([2, 1])).to.eql({z: 3,t: 2});
+                expect(obj._.$remove(2, 1)).to.eql({z: 3,t: 2});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$remove function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.$remove(function(val) {
+                expect(obj._.$remove$(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a', z: 'bb',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
@@ -435,7 +435,7 @@ describe("Object", function() {
             it("removeAll multiple values", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
 
-                obj._.removeAll([2,3]);
+                obj._.removeAll(2,3);
 
                 expect(obj).to.eql({x: 1});
             });
@@ -443,7 +443,7 @@ describe("Object", function() {
             it("removeAll function", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-                obj._.removeAll(function(val) {
+                obj._.removeAll$(function(val) {
                     return val > 2;
                 });
 
@@ -463,14 +463,14 @@ describe("Object", function() {
             it("$removeAll multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.$removeAll([2, 1])).to.eql({z: 3});
+                expect(obj._.$removeAll(2, 1)).to.eql({z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
             it("$removeAll function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.$removeAll(function(val) {
+                expect(obj._.$removeAll$(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
@@ -488,13 +488,13 @@ describe("Object", function() {
 			it("del an array of elements", function() {
 				var obj = {x: 1,y: 2,z: 3};
 
-				expect(obj._.del(['x', 'z'])).to.deep.equal({y: 2});
+				expect(obj._.del('x', 'z')).to.deep.equal({y: 2});
 			});
 
 			it("del based on function", function() {
 				var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-				expect(obj._.del(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+				expect(obj._.del$(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
 
@@ -510,14 +510,14 @@ describe("Object", function() {
             it("$del an array of elements", function() {
                 var obj = {x: 1,y: 2,z: 3};
 
-                expect(obj._.$del(['x', 'z'])).to.deep.equal({y: 2});
+                expect(obj._.$del('x', 'z')).to.deep.equal({y: 2});
                 expect(obj).to.eql({x: 1,y: 2,z: 3})
             });
 
             it("$del based on function", function() {
                 var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-                expect(obj._.$del(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+                expect(obj._.$del$(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
             });
         });

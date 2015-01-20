@@ -8,9 +8,6 @@ constructWrapper(Array, 'arr', {
      * @memberOf module:_
      */
     static: {
-        _utils: {
-            remove: function(i) {}
-        },
         /**
          * Concats arrays into a new array
          * @public
@@ -133,101 +130,6 @@ constructWrapper(Array, 'arr', {
             return this;
         },
         /**
-         * Creates a new array without the specified indices
-         * @public
-         * @method Array:_.arr.$del
-         * @this       {Array}
-         * @param  {...number} __keys - indices SORTED
-         * @return     {Array}   this - new array without the specified indices
-         */
-        $del: function(__keys)
-        {
-            var args   = arguments;
-            var output = _.create(Object.getPrototypeOf(this));
-
-            this._.each(function(val, i) { // eachRight is a little bit faster
-                if(args._.not.has(i)) {output.push(val)}
-            }, this);
-
-            return output;
-        },
-        /**
-         * Creates a new array without the specified indices
-         * @public
-         * @method Array:_.arr.$del$
-         * @this   {Array}
-         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-         * @param  {Object=}                     ctx_   - optional context for the match$ function
-         * @return {Array}                       this   - new array without the specified indices
-         */
-        $del$: function(match$, ctx_)
-        {
-            var output = _.create(Object.getPrototypeOf(this));
-
-            this._.each(function(val, i, arr, delta) { // eachRight is a little bit faster
-                if(!match$.call(ctx_, i, arr, delta)) {output.push(val)}
-            }, this);
-
-            return output;
-        },
-        /**
-         * Removes 1st value from an array based on a match function
-         * @public
-         * @method Array:_.arr.remove$
-         * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
-         * @return {Array}                             this  - mutated array for chaining
-         */
-        remove$: function(match$, ctx_) {
-            this._.each(function(val, i, arr, delta) {
-                if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1); return false}
-            }, this);
-
-            return this;
-        },
-        /**
-         * Creates new array without the specified 1st values
-         * @public
-         * @method Array:_.arr.$remove
-         * @this       {Array}
-         * @param     {...any} __values - values to remove
-         * @return     {Array}   output - new array without the values
-         */
-        $remove: function(__values) {
-            var output = _.create(Object.getPrototypeOf(this));
-            var args   = arguments;
-            var index;
-
-            this._.each(function(val) {
-                index = args._.indexOf(val);
-                if(~index) {Array.prototype.splice.call(args, index, 1)}
-                else       {output.push(val)}
-            }, this);
-
-            return output;
-        },
-        /**
-         * Creates a new array without 1st value based on a match function
-         * @public
-         * @method Array:_.arr.$remove$
-         * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
-         * @return {Array}                           output  - new array without the value specified
-         */
-        $remove$: function(match$, ctx_) {
-            var output  =  _.create(Object.getPrototypeOf(this));
-            var matched = false;
-
-            this._.each(function(val, i, arr, delta) {
-                if(!matched && match$.call(ctx_, val, i, arr, delta)) {matched = true}
-                else {output.push(val)}
-            }, this);
-
-            return output;
-        },
-        /**
          * Removes all specified values from an array
          * @public
          * @method Array:_.arr.removeAll
@@ -260,77 +162,7 @@ constructWrapper(Array, 'arr', {
 
             return this;
         },
-        /**
-         * Creates new array without all specified values
-         * @public
-         * @method Array:_.arr.$removeAll
-         * @this       {Array}
-         * @param     {...any} __values - values to remove
-         * @return     {Array}   output - new array without the values
-         */
-        $removeAll: function(__values) {
-            var output = _.create(Object.getPrototypeOf(this));
-            var args   = arguments;
 
-            this._.each(function(val) {
-                if(!~args._.indexOf(val)) {output.push(val)}
-            }, this);
-
-            return output;
-        },
-        /**
-         * Creates a new array without all value specified by the match function
-         * @public
-         * @method Array:_.arr.$removeAll$
-         * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
-         * @return {Array}                           output  - new array without the value specified
-         */
-        $removeAll$: function(match$, ctx_) {
-            var output = _.create(Object.getPrototypeOf(this));
-
-            this._.each(function(val, i, arr, delta) {
-                if(!match$.call(ctx_, val, i, arr, delta)) {output.push(val)}
-            }, this);
-
-            return output;
-        },
-
-        select: function(__values) {
-            var args = arguments;
-            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
-        },
-
-        select$: function(match$, ctx_) {
-            var matched = false;
-            return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
-        },
-
-        $select: function(__values) {
-            var args = arguments;
-            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
-        },
-
-        $select$: function(match$, ctx_) {
-            var matched = false;
-            return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
-        },
-
-        selectAll: function(__values) {
-            var args = arguments;
-            return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
-        },
-        selectAll$: function(match$, ctx_) {
-            return this._.removeAll$(_.fnc.not(match$), ctx_);
-        },
-        $selectAll: function(__values) {
-            var args = arguments;
-            return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
-        },
-        $selectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
-            return this._.$removeAll$(_.fnc.not(match$), ctx_);
-        }},
         /**
          * Difference between 2 arrays
          * @public
@@ -678,6 +510,19 @@ constructWrapper(Array, 'arr', {
          */
         push: function(___args) {
             this.push.apply(this, arguments);
+
+            return this;
+        },
+        /**
+         * Singular push function to solve problems with differences between objects & arrays
+         * @public
+         * @method Array:_.arr._push
+         * @this    {Array}
+         * @param  {...any}  val - value to push
+         * @return  {Array} this - this for chaining
+         */
+        _add: function(val) {
+            this.push(val);
 
             return this;
         },
