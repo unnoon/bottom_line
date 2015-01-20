@@ -115,150 +115,17 @@ constructWrapper(Object, 'obj', {
      */
     prototype: {
         /**
-         * Copies the occurrences from an array to an new object
-         * @private
-         * @method Object#__cp
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Object}                     - new array with the copied elements
-         */
-        _cp: function(all, invert, target, $value, opt_ctx)
-        {
-            return this._._edit(all, invert, function(val, key, obj) {
-                Object.defineProperty(this, key, Object.getOwnPropertyDescriptor(obj, key)); // TODO maybe add a nice function to do stuff like this
-            }, false, target, $value, opt_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Object#__cpKeys
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Object}                      - new array with the copied elements
-         */
-        _cpKeys: function(invert, target, $value, opt_to_ctx)
-        {
-            return this._._editKeys(invert, function(key, _this) {this[key] = _this[key];}, false, target, $value, opt_to_ctx);
-        },
-        /**
-         * Copies a value to an array
+         * Singular push function to solve problems with differences between objects & arrays
          * @public
-         * @method Object#_copy
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated array for chaining
+         * @method Array:_.arr._push
+         * @this    {Array}
+         * @param  {...any}  val - value to push
+         * @return  {Array} this - this for chaining
          */
-        copy: function(to, $value, opt_ctx)
-        {
-            return this._._cp(false, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies all similar values to an array
-         * @public
-         * @method Object#_copy$
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated array for chaining
-         */
-        copyAll: function(to, $value, opt_ctx)
-        {
-            return this._._cp(true, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies keys to an array
-         * @public
-         * @method Object#_copyKeys
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated array for chaining
-         */
-        copyKeys: function(to, $index, opt_to_ctx)
-        {
-            return this._._cpKeys(false, to, $index, opt_to_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Object#__cut
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Object}                      - new array with the copied elements
-         */
-        _cut: function(all, invert, target, $value, opt_ctx)
-        {
-            return this._._edit(all, invert, function(val, key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
-        },
-        /**
-         * Copies the occurrences from an array to an new array
-         * @private
-         * @method Object#__cutKeys
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Object}                      - new array with the copied elements
-         */
-        _cutKeys: function(invert, target, $value, opt_ctx)
-        {
-            return this._._editKeys(invert, function(key, _this) {this[key] = _this[key]; delete _this[key]}, false, target, $value, opt_ctx);
-        },
-        /**
-         * Cut a value to an array
-         * @public
-         * @method Object#_cut
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated array for chaining
-         */
-        cut: function(to, $value, opt_ctx)
-        {
-            return this._._cut(false, false, to, $value, opt_ctx);
-        },
-        /**
-         * Cut all similar values to an array
-         * @public
-         * @method Object#_cutAll
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated array for chaining
-         */
-        cutAll: function(to, $value, opt_ctx)
-        {
-            return this._._cut(true, false, to, $value, opt_ctx);
-        },
-        /**
-         * Copies keys to an array
-         * @public
-         * @method Object#_cutKeys
-         * @this   {Object}
-         * @param  {Array}                 to         - array to copy to
-         * @param  {number|Array|Function} $index     - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=}               opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}                 this       - mutated object for chaining
-         */
-        cutKeys: function(to, $index, opt_to_ctx)
-        {
-            return this._._cutKeys(false, to, $index, opt_to_ctx);
+        _add: function(val, key) {
+            this[key] = val;
+
+            return this;
         },
         /**
          * Copies keys to an array
@@ -343,6 +210,112 @@ constructWrapper(Object, 'obj', {
             }, this);
 
             return output;
+        },
+        /**
+         * Copies keys to an array
+         * @public
+         * @method Object#_define
+         * @this   {Object}
+         * @param  {string}       prop - the property name
+         * @return {Object} descriptor - descriptor object
+         */
+        descriptor: function(prop)
+        {
+            return Object.getOwnPropertyDescriptor(this, prop)
+        },
+        /**
+         * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         * @public
+         * @method Object#_each
+         * @this  {Object}
+         * @param {Function} cb   - callback function to be called for each element
+         * @param {Object=}  ctx_ - optional context
+         */
+        each: function(cb, ctx_) {
+            for(var key in this)
+            {
+                if(!this.hasOwnProperty(key)) continue;
+                if(cb.call(ctx_, this[key], key, this) === false) break;
+            }
+        },
+        /**
+         * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         * each is eachlastic in the sense that one can add and delete elements at the current index
+         * @private
+         * @method Arguments#_eachRight
+         * @this  {Array}
+         * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
+         * @param {function} cb       - callback function to be called for each element
+         * @param {Object=}  ctx_  - optional context for the callback function
+         * @return {Array}            - this array for chaining
+         */
+        eachRight: function(cb, ctx_) {
+            var step = 1;
+            var from = this.length-1, to = -1;
+
+            for(var i = from; i > to; i -= step)
+            {
+                if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
+                if(cb.call(ctx_, this[i], i, this) === false) break;
+            }
+
+            return this;
+        },
+        /**
+         * Filters
+         * @public
+         * @method Object#_filter
+         * @this   {Object}
+         * @param  {Function} cb      - callback function to be called for each element
+         * @param  {Object=}  opt_ctx - optional context
+         * @return {Array} array containing the filtered values
+         */
+        filter: function(cb, opt_ctx) {
+            var filtered = [];
+
+            this._.each(function(elm) {
+                if(cb.call(opt_ctx, elm)) filtered.push(elm);
+            });
+
+            return filtered;
+        },
+        /**
+         * Finds first element that is picked by the callback function
+         * @public
+         * @method Object#_find
+         * @this   {Object}
+         * @param  {Function} cb      - callback function to be called for each element
+         * @param  {Object=}  opt_ctx - optional context
+         * @return {any} first value that is found
+         */
+        find: __coll.find,
+        has: {aliases: ['contains'], value: function(value) {
+            var has = false;
+
+            this._.each(function(val) {
+                if(value === val) return !(has = true);
+            });
+
+            return has;
+        }},
+        keyOf: {aliases: ['indexOf'], value: function(value) {
+            var key = -1;
+
+            this._.each(function(val, k) {
+                if(value === val) return key = k, false;
+            });
+
+            return key;
+        }},
+        /**
+         * Returns an array containing the keys of an object (enumerable properties))
+         * @public
+         * @method Object#_keys
+         * @this   {Object}
+         * @return {Array} keys of the object
+         */
+        keys: function() {
+            return Object.keys(this);
         },
         /**
          * Removes 1st values from an object|array
@@ -491,6 +464,7 @@ constructWrapper(Object, 'obj', {
 
             return output;
         },
+
         select: function(__values) {
             var args = arguments;
             return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
@@ -525,164 +499,6 @@ constructWrapper(Object, 'obj', {
         $selectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
             return this._.$removeAll$(_.fnc.not(match$), ctx_);
         }},
-
-        /**
-         * Singular push function to solve problems with differences between objects & arrays
-         * @public
-         * @method Array:_.arr._push
-         * @this    {Array}
-         * @param  {...any}  val - value to push
-         * @return  {Array} this - this for chaining
-         */
-        _add: function(val, key) {
-            this[key] = val;
-
-            return this;
-        },
-        /**
-         * Copies keys to an array
-         * @public
-         * @method Object#_define
-         * @this   {Object}
-         * @param  {string}       prop - the property name
-         * @return {Object} descriptor - descriptor object
-         */
-        descriptor: function(prop)
-        {
-            return Object.getOwnPropertyDescriptor(this, prop)
-        },
-        /**
-         * Removes the occurrences from an object
-         * @private
-         * @method Object#__del
-         * @this    {Object}
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Object}                      - The array remove the element
-         */
-        _del: function(invert, $index, opt_to_ctx)
-        {
-            return this._._editKeys(invert, function(key) {delete this[key]}, false, this, $index, opt_to_ctx);
-        },
-        /**
-         * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-         * @public
-         * @method Object#_each
-         * @this  {Object}
-         * @param {Function} cb   - callback function to be called for each element
-         * @param {Object=}  ctx_ - optional context
-         */
-        each: function(cb, ctx_) {
-            for(var key in this)
-            {
-                if(!this.hasOwnProperty(key)) continue;
-                if(cb.call(ctx_, this[key], key, this) === false) break;
-            }
-        },
-        /**
-         * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-         * each is eachlastic in the sense that one can add and delete elements at the current index
-         * @private
-         * @method Arguments#_eachRight
-         * @this  {Array}
-         * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
-         * @param {function} cb       - callback function to be called for each element
-         * @param {Object=}  ctx_  - optional context for the callback function
-         * @return {Array}            - this array for chaining
-         */
-        eachRight: function(cb, ctx_) {
-            var step = 1;
-            var from = this.length-1, to = -1;
-
-            for(var i = from; i > to; i -= step)
-            {
-                if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                if(cb.call(ctx_, this[i], i, this) === false) break;
-            }
-
-            return this;
-        },
-        /**
-         * Edits the key value pairs of an object
-         * @private
-         * @method Object#__edit
-         * @this    {Array}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - new array with the copied elements
-         */
-        _edit: __coll._edit,
-        /**
-         * Edits an object based on keys
-         * @private
-         * @method Array#__editKeys
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $index  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_to_ctx - optional context for the function
-         * @returns {Object}                      - new array with the copied elements
-         */
-        _editKeys: __coll._editKeys,
-        /**
-         * Filters
-         * @public
-         * @method Object#_filter
-         * @this   {Object}
-         * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
-         * @return {Array} array containing the filtered values
-         */
-        filter: function(cb, opt_ctx) {
-            var filtered = [];
-
-            this._.each(function(elm) {
-                if(cb.call(opt_ctx, elm)) filtered.push(elm);
-            });
-
-            return filtered;
-        },
-        /**
-         * Finds first element that is picked by the callback function
-         * @public
-         * @method Object#_find
-         * @this   {Object}
-         * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
-         * @return {any} first value that is found
-         */
-        find: __coll.find,
-        has: {aliases: ['contains'], value: function(value) {
-            var has = false;
-
-            this._.each(function(val) {
-                if(value === val) return !(has = true);
-            });
-
-            return has;
-        }},
-        keyOf: {aliases: ['indexOf'], value: function(value) {
-            var key = -1;
-
-            this._.each(function(val, k) {
-                if(value === val) return key = k, false;
-            });
-
-            return key;
-        }},
-        /**
-         * Returns an array containing the keys of an object (enumerable properties))
-         * @public
-         * @method Object#_keys
-         * @this   {Object}
-         * @return {Array} keys of the object
-         */
-        keys: function() {
-            return Object.keys(this);
-        },
         /**
          * Returns the number of own properties on an object
          * @public
@@ -748,38 +564,6 @@ constructWrapper(Object, 'obj', {
 
             return this;
         },
-        // TODO proper implementation
-//			/**
-//			 * Proxies all functions of an object (including those from the prototype in a certain context.
-//			 * @public
-//			 * @method Object#_proxy
-//			 * @param   {Object} obj - object containing the functions to be proxied
-//			 * @param   {Object} ctx - context to proxy the functions in
-//			 * @returns {Object} obj - the object containing the proxied versions of the functions
-//			 */
-//			proxy: function(obj, ctx) {
-//				for(var prop in obj)
-//				{
-//					if(typeof(obj[prop]) === 'function') obj[prop] = obj[prop].bind(ctx);
-//				}
-//
-//				return obj;
-//			},
-        /**
-         * Removes the occurrences from an object based on value
-         * @public
-         * @method Object#_rm
-         * @this    {Object}
-         * @param   {boolean}            all     - Boolean indicating if we should remove the first occurrence only
-         * @param   {boolean}            invert  - Boolean indicating if we should invert the condition
-         * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-         * @param   {Object}             opt_ctx - optional context for the function
-         * @returns {Array}                      - The array remove the element
-         */
-        _rm: function(all, invert, $value, opt_ctx)
-        {
-            return this._._edit(all, invert, function(val, key) {delete this[key]}, all, this, $value, opt_ctx);
-        },
         /**
          * Better to string version
          * @public
@@ -817,56 +601,6 @@ constructWrapper(Object, 'obj', {
             });
 
             return values;
-        },
-        ///**
-        // * Removes the all occurrence in an array
-        // * @public
-        // * @method Array#_withoutAll
-        // * @this    {Object}
-        // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-        // * @param   {Object}             opt_ctx - optional context or the function
-        // * @returns {Object}                      - The array remove the element
-        // */
-        //removeAll: function($value, opt_ctx) {
-        //    return this._._rm(true, false, $value, opt_ctx);
-        //},
-        ///**
-        // * Removes the all occurrence in an array
-        // * @public
-        // * @method Array#_$withoutAll
-        // * @this    {Object}
-        // * @param   {any|Array|Function} $value  - Element to be deleted | Array of element | or a function
-        // * @param   {Object}             opt_ctx - optional context or the function
-        // * @returns {Object}                      - NEW array remove the element
-        // */
-        //$removeAll: function($value, opt_ctx) {
-        //    return this._._cp(true, true, [], $value, opt_ctx);
-        //},
-        /**
-         * Remove elements based on index
-         * @public
-         * @method Object#_withoutKeys
-         * @this   {Object}
-         * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}   this   - mutated array for chaining
-         */
-        withoutKeys: function($index, opt_to_ctx)
-        {
-            return this._._del(false, $index, opt_to_ctx);
-        },
-        /**
-         * Remove elements based on index
-         * @public
-         * @method Object#_$withoutKeys
-         * @this   {Object}
-         * @param  {number|Array|Function} $index - singular index, a from index, an array of indices or a function specifying specific indexes
-         * @param  {number=} opt_to_ctx - to index to delete to | or the context for the function
-         * @return {Object}   this   - mutated array for chaining
-         */
-        $withoutKeys: function($index, opt_to_ctx)
-        {
-            return this._._cpKeys(true, [], $index, opt_to_ctx);
         }
     }
 });

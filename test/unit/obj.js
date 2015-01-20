@@ -522,7 +522,7 @@ describe("Object", function() {
             });
         });
         
-        describe("copy", function() {
+        xdescribe("copy", function() {
 
             it("copy value", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
@@ -546,7 +546,7 @@ describe("Object", function() {
             });
         });
 
-        describe("copyAll", function() {
+        xdescribe("copyAll", function() {
 
             it("copyAll value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
@@ -570,7 +570,7 @@ describe("Object", function() {
             });
         });
 
-        describe("copyKeys", function() {
+        xdescribe("copyKeys", function() {
 
             it("copyKeys value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
@@ -594,7 +594,7 @@ describe("Object", function() {
             });
         });
 
-        describe("cut", function() {
+        xdescribe("cut", function() {
     
             it("cut value", function() {
                 var obj1 = {x: 1,y: 2,z: 3};
@@ -621,7 +621,7 @@ describe("Object", function() {
             });
         });
 
-        describe("cutAll", function() {
+        xdescribe("cutAll", function() {
 
             it("cutAll value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
@@ -648,7 +648,7 @@ describe("Object", function() {
             });
         });
 
-        describe("cutKeys", function() {
+        xdescribe("cutKeys", function() {
 
             it("cutKeys value", function() {
                 var obj1 = {x: 1,y: 2,z: 3, t:2};
