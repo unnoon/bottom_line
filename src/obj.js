@@ -467,7 +467,7 @@ constructWrapper(Object, 'obj', {
 
         select: function(__values) {
             var args = arguments;
-            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
 
         select$: function(match$, ctx_) {
@@ -477,7 +477,7 @@ constructWrapper(Object, 'obj', {
 
         $select: function(__values) {
             var args = arguments;
-            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) Array.prototype.splice.call(args, index, 1); return !~index});
+            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
 
         $select$: function(match$, ctx_) {
