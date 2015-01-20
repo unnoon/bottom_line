@@ -304,16 +304,6 @@ constructWrapper(Array, 'arr', {
             return this;
         },
         /**
-         * Finds first element that is picked by the callback function
-         * @public
-         * @method Array:_.arr.find
-         * @this   {Array}
-         * @param  {Function} cb   - callback function to be called for each element
-         * @param  {Object=}  ctx_ - optional context
-         * @return {any}           - first value that is found
-         */
-        find: __coll.find,
-        /**
          * Get/sets: the first element of an array
          * @public
          * @method Array:_.arr.first

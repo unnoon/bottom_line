@@ -281,14 +281,21 @@ constructWrapper(Object, 'obj', {
         },
         /**
          * Finds first element that is picked by the callback function
-         * @public
-         * @method Object#_find
-         * @this   {Object}
+         * @private
+         * @this   {Array}
          * @param  {Function} cb      - callback function to be called for each element
          * @param  {Object=}  opt_ctx - optional context
          * @return {any} first value that is found
          */
-        find: __coll.find,
+        find: function(cb, opt_ctx) {
+            var found;
+
+            this._.each(function(elm) {
+                if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
+            });
+
+            return found;
+        },
         has: {aliases: ['contains'], value: function(value) {
             var has = false;
 

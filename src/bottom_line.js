@@ -194,7 +194,6 @@
     });
 
     /* @include shims.js */
-    /* @include coll.js */
     /* @include obj.js  */
     /* @include arr.js  */
     /* @include str.js  */

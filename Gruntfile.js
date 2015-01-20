@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 		uglify: {
 			my_target: {
 				files: {
-					'dist/bottom_line.min.js': ['src/bottom_line.js']
+					'dist/bottom_line.min.js': ['dist/bottom_line.js']
 				}
 			}
 		},
