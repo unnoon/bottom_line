@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 		},
 		jsdoc : {
 			dist : {
-				src: ['src/bottom_line.js'],
+				src: ['dist/bottom_line.js'],
 				options: {
 					destination: 'doc'
 				}
