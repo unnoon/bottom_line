@@ -1,3 +1,5 @@
+todo prefill the bottomline object with settings
+
 define all collective stuff on object
 an iterator function that does something x times. short for: for(var i = 0; i < max; i++)
 
