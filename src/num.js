@@ -63,15 +63,17 @@ constructWrapper(Number, 'num', {
      */
     prototype: {
         /**
-         * Getter: returns the sign of a number
+         * Gets or sets the sign of a number
          * @public
          * @method Number#sign
          * @returns {number} - sign of the number: -1, 0, 1
          */
-        get sign() { // TODO this should be a normal function so we can also set the sign (this can be annoying otherwise)
-            return this > 0?  1 :
-                   this < 0? -1 :
-                              0 ;
+        sign: function(sign) {
+            if(sign === undefined) return this > 0?  1 :
+                                          this < 0? -1 :
+                                                     0 ;
+
+            return sign*Math.abs(this);
         },
         /**
          * Getter: indicator if the the number is even
