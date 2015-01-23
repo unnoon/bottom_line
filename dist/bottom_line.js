@@ -638,7 +638,7 @@
              * @method Array:_.arr.$removeAll
              * @this       {Array}
              * @param     {...any} ___values - values to remove
-             * @return     {Array}   output - new array without the values
+             * @return     {Array}    output - new array without the values
              */
             $removeAll: function(___values) {
                 var output = _.create(this._.proto());
@@ -726,9 +726,9 @@
              * @method Object#names
              * @return {Array} keys of the object
              */
-            names: function() {
+            names: {aliases: ['keysAll'], value:function() {
                 return Object.getOwnPropertyNames(this);
-            },
+            }},
             /**
              * Shortcut for hasOwnProperty
              * @public
@@ -1335,6 +1335,17 @@
              */
             random: function() {
                 return this[_.int.random(0, this.length - 1)];
+            },
+            /**
+             * Removes one occurrence of of an element from an array
+             * @public
+             * @method Array:_.arr.random
+             * @this   {any}   - elm
+             * @return {Array} - this for chaining
+             */
+            rm: function(elm) {
+                this.splice(this.indexOf(elm), 1);
+                return this;
             },
             /**
              * Retrieves and sets the size of an array

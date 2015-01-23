@@ -527,6 +527,17 @@ constructWrapper(Array, 'arr', {
             return this[_.int.random(0, this.length - 1)];
         },
         /**
+         * Removes one occurrence of of an element from an array
+         * @public
+         * @method Array:_.arr.random
+         * @this   {any}   - elm
+         * @return {Array} - this for chaining
+         */
+        rm: function(elm) {
+            this.splice(this.indexOf(elm), 1);
+            return this;
+        },
+        /**
          * Retrieves and sets the size of an array
          * @public
          * @method Array:_.arr.size

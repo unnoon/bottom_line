@@ -438,7 +438,7 @@ constructWrapper(Object, 'obj', {
          * @method Array:_.arr.$removeAll
          * @this       {Array}
          * @param     {...any} ___values - values to remove
-         * @return     {Array}   output - new array without the values
+         * @return     {Array}    output - new array without the values
          */
         $removeAll: function(___values) {
             var output = _.create(this._.proto());
@@ -526,9 +526,9 @@ constructWrapper(Object, 'obj', {
          * @method Object#names
          * @return {Array} keys of the object
          */
-        names: function() {
+        names: {aliases: ['keysAll'], value:function() {
             return Object.getOwnPropertyNames(this);
-        },
+        }},
         /**
          * Shortcut for hasOwnProperty
          * @public
