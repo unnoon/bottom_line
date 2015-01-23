@@ -36,18 +36,20 @@
     {
         var wrapper = {not:{}};
 
-        // create instance and chain object including not wrapper
-        var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
-        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
+        wrapper.methods = {}; // add methods unwrapped so we can use them with apply
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return         chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
+        // create instance and chain object including not wrapper
+        var _methods = wrapper._methods = (key === 'obj') ? {not:{}} : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
+        var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
+
+        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return methods}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return _methods}, enumerable: false, configurable: false});
         }
 
         wrapStatics(wrapper, key, module);
@@ -72,10 +74,12 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
-        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
+        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+
+        extend(wrapper.methods, {enumerable: false}, module.prototype);
     }
 
     /**
@@ -184,7 +188,7 @@
         int: function(num) {return num|0}
     };
     /**
-     *  'Global' methods
+     *  'Global' _methods
      */
 
     extend(_, {
@@ -341,10 +345,10 @@
              * @public
              * @method Object:_.arr.del
              * @this       {Object}
-             * @param  {...number} __keys - indices SORTED
+             * @param  {...number} ___keys - indices SORTED
              * @return     {Array}   this - mutated array for chaining
              */
-            del: function(__keys)
+            del: function(___keys)
             {
                 arguments._.eachRight(function(key) {
                     delete this[key];
@@ -374,10 +378,10 @@
              * @public
              * @method Array:_.arr.$del
              * @this       {Array}
-             * @param  {...number} __keys - indices SORTED
-             * @return     {Array}   this - new array without the specified indices
+             * @param  {...number} ___keys - keys
+             * @return     {Array}    this - new array without the specified indices
              */
-            $del: function(__keys)
+            $del: function(___keys)
             {
                 var args   = arguments;
                 var output = _.create(this._.proto());
@@ -435,25 +439,22 @@
                 }
             },
             /**
-             * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-             * each is eachlastic in the sense that one can add and delete elements at the current index
-             * @private
-             * @method Arguments#_eachRight
-             * @this  {Array}
-             * @param {number=}  step     - step for the iteration. In case this is a negative value it will do a reverse iteration
-             * @param {function} cb       - callback function to be called for each element
+             * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             * @public
+             * @method Object#eachRight
+             * @this  {Object}
+             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+             * @param {function} cb    - callback function to be called for each element
              * @param {Object=}  ctx_  - optional context for the callback function
-             * @return {Array}            - this array for chaining
+             * @return {Array}         - this array for chaining
              */
-            eachRight: function(cb, ctx_) {
-                var step = 1;
-                var from = this.length-1, to = -1;
+            eachRight: function(step_, cb, ctx_) {
+                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
+                if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle argumens. TODO fast access to the _.arr.methods
     
-                for(var i = from; i > to; i -= step)
-                {
-                    if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                    if(cb.call(ctx_, this[i], i, this) === false) break;
-                }
+                this._.keys()._.eachRight(function(key) {
+                    return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
+                }, this);
     
                 return this;
             },
@@ -561,10 +562,10 @@
              * @public
              * @method Object:_.obj.$remove
              * @this   {Object|Array}
-             * @param  {...any} __values - values to remove
-             * @return {Array}  output   - new array without the values
+             * @param  {...any} ___values - values to remove
+             * @return {Array}  output    - new array without the values
              */
-            $remove: function(__values) {
+            $remove: function(___values) {
                 var output = _.create(this._.proto());
                 var args   = arguments;
                 var index;
@@ -602,10 +603,10 @@
              * @public
              * @method Array:_.arr.removeAll
              * @this       {Array}
-             * @param     {...any} __values - values to remove
+             * @param     {...any} ___values - values to remove
              * @return     {Array}     this - mutated array for chaining
              */
-            removeAll: function(__values) {
+            removeAll: function(___values) {
                 var args = arguments;
     
                 this._.each(function(val, key) {
@@ -636,10 +637,10 @@
              * @public
              * @method Array:_.arr.$removeAll
              * @this       {Array}
-             * @param     {...any} __values - values to remove
+             * @param     {...any} ___values - values to remove
              * @return     {Array}   output - new array without the values
              */
-            $removeAll: function(__values) {
+            $removeAll: function(___values) {
                 var output = _.create(this._.proto());
                 var args   = arguments;
     
@@ -668,7 +669,7 @@
                 return output;
             },
     
-            select: function(__values) {
+            select: function(___values) {
                 var args = arguments;
                 return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
@@ -678,7 +679,7 @@
                 return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
-            $select: function(__values) {
+            $select: function(___values) {
                 var args = arguments;
                 return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
@@ -688,14 +689,14 @@
                 return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
-            selectAll: function(__values) {
+            selectAll: function(___values) {
                 var args = arguments;
                 return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
             },
             selectAll$: function(match$, ctx_) {
                 return this._.removeAll$(_.fnc.not(match$), ctx_);
             },
-            $selectAll: function(__values) {
+            $selectAll: function(___values) {
                 var args = arguments;
                 return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
             },
@@ -822,10 +823,10 @@
              * @public
              * @static
              * @method module:_.arr.concat
-             * @param {...Array} __arrays - arrays to concat
+             * @param {...Array} ___arrays - arrays to concat
              * @returns  {Array}          - the concatenated array
              */
-            concat: function(__arrays) {
+            concat: function(___arrays) {
                 return Array.prototype.concat.apply([], arguments);
             }
         },
@@ -838,10 +839,10 @@
              * @public
              * @method module:_.arr.append
              * @this       {Array}
-             * @param   {...Array} __arrays - arrays to be appended
-             * @returns    {Array}     this - this appended with the arrays
+             * @param   {...Array} ___arrays - arrays to be appended
+             * @returns    {Array}      this - this appended with the arrays
              */
-            append: function(__arrays) {
+            append: function(___arrays) {
                 var start;
     
                 arguments._.each(function(arr) {
@@ -865,10 +866,10 @@
              * @public
              * @method module:_.arr.$append
              * @this       {Array}
-             * @param   {...Array} __arrays - arrays to be appended
+             * @param   {...Array} ___arrays - arrays to be appended
              * @returns    {Array}          - The new array that is the result of appending
              */
-            $append: function(__arrays) {
+            $append: function(___arrays) {
                 return _.clone(this)._.append.apply(this, arguments);
             },
             /**
@@ -910,10 +911,10 @@
              * @public
              * @method Array:_.arr.del
              * @this       {Array}
-             * @param  {...number} __keys - indices SORTED
+             * @param  {...number} ___keys - indices SORTED
              * @return     {Array}   this - mutated array for chaining
              */
-            del: function(__keys)
+            del: function(___keys)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
@@ -943,10 +944,10 @@
              * @public
              * @method Array:_.arr.removeAll
              * @this       {Array}
-             * @param     {...any} __values - values to remove
+             * @param     {...any} ___values - values to remove
              * @return     {Array}     this - mutated array for chaining
              */
-            removeAll: function(__values) {
+            removeAll: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster

@@ -14,7 +14,6 @@
     "karma-coverage": "latest",
     "karma-chrome-launcher": "latest",
     "karma-phantomjs-launcher": "latest",
-    "benchmark": "latest",
     "grunt-jsdoc": "latest",
     "grunt-contrib-uglify": "latest",
     "grunt-preprocess": "latest",

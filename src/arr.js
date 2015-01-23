@@ -13,10 +13,10 @@ constructWrapper(Array, 'arr', {
          * @public
          * @static
          * @method module:_.arr.concat
-         * @param {...Array} __arrays - arrays to concat
+         * @param {...Array} ___arrays - arrays to concat
          * @returns  {Array}          - the concatenated array
          */
-        concat: function(__arrays) {
+        concat: function(___arrays) {
             return Array.prototype.concat.apply([], arguments);
         }
     },
@@ -29,10 +29,10 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method module:_.arr.append
          * @this       {Array}
-         * @param   {...Array} __arrays - arrays to be appended
-         * @returns    {Array}     this - this appended with the arrays
+         * @param   {...Array} ___arrays - arrays to be appended
+         * @returns    {Array}      this - this appended with the arrays
          */
-        append: function(__arrays) {
+        append: function(___arrays) {
             var start;
 
             arguments._.each(function(arr) {
@@ -56,10 +56,10 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method module:_.arr.$append
          * @this       {Array}
-         * @param   {...Array} __arrays - arrays to be appended
+         * @param   {...Array} ___arrays - arrays to be appended
          * @returns    {Array}          - The new array that is the result of appending
          */
-        $append: function(__arrays) {
+        $append: function(___arrays) {
             return _.clone(this)._.append.apply(this, arguments);
         },
         /**
@@ -101,10 +101,10 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array:_.arr.del
          * @this       {Array}
-         * @param  {...number} __keys - indices SORTED
+         * @param  {...number} ___keys - indices SORTED
          * @return     {Array}   this - mutated array for chaining
          */
-        del: function(__keys)
+        del: function(___keys)
         {
             arguments._.eachRight(function(key) {
                 this.splice(key, 1);
@@ -134,10 +134,10 @@ constructWrapper(Array, 'arr', {
          * @public
          * @method Array:_.arr.removeAll
          * @this       {Array}
-         * @param     {...any} __values - values to remove
+         * @param     {...any} ___values - values to remove
          * @return     {Array}     this - mutated array for chaining
          */
-        removeAll: function(__values) {
+        removeAll: function(___values) {
             var args = arguments;
 
             this._.eachRight(function(val, i) { // eachRight is a little bit faster

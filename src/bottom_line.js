@@ -36,18 +36,20 @@
     {
         var wrapper = {not:{}};
 
-        // create instance and chain object including not wrapper
-        var methods = wrapper.methods = (key === 'obj') ? {not:{}} : Object.create(_.obj.methods, {not:{value:Object.create(_.obj.methods.not)}}); // inherit from object. // stores non-chainable use methods
-        var chains  = wrapper.chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj.chains,  {not:{value:Object.create(_.obj.chains.not)}});  // inherit from object.  // stores chainable use methods
+        wrapper.methods = {}; // add methods unwrapped so we can use them with apply
 
-        Object.defineProperty(wrapper.methods, 'chain', {get: function() {return         chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper.chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
+        // create instance and chain object including not wrapper
+        var _methods = wrapper._methods = (key === 'obj') ? {not:{}} : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
+        var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
+
+        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return methods}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return _methods}, enumerable: false, configurable: false});
         }
 
         wrapStatics(wrapper, key, module);
@@ -72,10 +74,12 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper.methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper.methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper.chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
-        extend(wrapper.chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
+        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+
+        extend(wrapper.methods, {enumerable: false}, module.prototype);
     }
 
     /**
@@ -184,7 +188,7 @@
         int: function(num) {return num|0}
     };
     /**
-     *  'Global' methods
+     *  'Global' _methods
      */
 
     extend(_, {
