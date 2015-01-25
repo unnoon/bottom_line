@@ -9,24 +9,22 @@
 'use strict';
 !function(root, bottom_line) {
     var environments = true;
-    var requirejs = typeof(define) === 'function'  && !!define.amd;
-    var nodejs    = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
+    var requirejs    = typeof(define) === 'function'  && !!define.amd;
+    var nodejs       = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
 
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
 }(this, function() {
-    var stack = [];
-    var index = 0;
+    var stack = []; // stack holding all wrapped objects accessed from ._
+    var index = 0;  // current index int he stack
 
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
-	 * Also all static properties will be available on this object
 	 *
-	 * @module _
+	 * @namespace _
 	 */
-    // TODO this should be a function where we can wrap for example arguments and apply an array function to it
 	var _ = {
         not: {} // object to hold negative functions
     };
@@ -58,7 +56,6 @@
         _[key] = wrapper; // add wrapper to the bottom_line object
     }
 
-    // wrap functions for chaining
     function wrapStatics(wrapper, key, module)
     {
         if(!module.static) return;
@@ -74,9 +71,9 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module.prototype);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module.prototype);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module.prototype);
         extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
 
         extend(wrapper.methods, {enumerable: false}, module.prototype);
@@ -86,20 +83,20 @@
      * Extends an object with function/properties from a module object
      * @public
      * @static
-     * @method module:_.obj.extend
+     * @method _.extend
      * @param   {Object}  obj          - object to be extended
      * @param   {Object=} settings_    - optional settings/default descriptor
-     *      {boolean} [enumerable]     - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-     *      {boolean} [configurable]   - boolean indicating if all properties should be configurable. can be overwritten on a config level
-     *      {boolean} [writable]       - boolean indicating if all properties should be writable. can be overwritten on a config level
+     *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *      {boolean} [override=true]  - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean} [overwrite=true] - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {boolean=} override=true   - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
+     *      {boolean=} overwrite=true  - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
      *
-     *      {string}  [log]            - console log level for overwrites&overrides
-     *      {boolean} [validate=false] - validate overwrites & overrides should be set to true in the config
+     *      {string=}  log             - console log level for overwrites&overrides
+     *      {boolean=} validate=false  - validate overwrites & overrides should be set to true in the config
 
-     *      {function}[modifier]       - modifier function to apply on all functions.
+     *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
      */
@@ -164,7 +161,6 @@
         return obj;
     }
 
-    // is object
     // is should be static so we can also apply it to null & undefined
     _.is = {
         array: Array.isArray
@@ -192,6 +188,14 @@
      */
 
     extend(_, {
+        /**
+         * creates an object based on a prototype
+         * @static
+         * @public
+         * @method _.create
+         * @param  {Object} proto - prototype to base the object on
+         * @return {Object}       - new object based on prototype
+         */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
         }

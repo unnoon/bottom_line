@@ -15,7 +15,7 @@ constructWrapper(null, 'int', {
          * @param   {number} int - integer to measure the length
          * @returns {number} - length of the integer
          */
-        len: function(int) {
+        length: function(int) {
             return int? 1+ _.log10(int)|0 : 1;
 //				return (int+'').length;
         },

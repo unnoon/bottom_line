@@ -250,7 +250,7 @@ constructWrapper(Object, 'obj', {
          */
         eachRight: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
-            if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle argumens. TODO fast access to the _.arr.methods
+            if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             this._.keys()._.eachRight(function(key) {
                 return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
@@ -261,7 +261,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Filters
          * @public
-         * @method Object#_filter
+         * @method Object#filter
          * @this   {Object}
          * @param  {Function} cb      - callback function to be called for each element
          * @param  {Object=}  opt_ctx - optional context
@@ -280,15 +280,15 @@ constructWrapper(Object, 'obj', {
          * Finds first element that is picked by the callback function
          * @private
          * @this   {Array}
-         * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
+         * @param  {Function} cb   - callback function to be called for each element
+         * @param  {Object=}  ctx_ - optional context
          * @return {any} first value that is found
          */
-        find: function(cb, opt_ctx) {
+        find: function(cb, ctx_) {
             var found;
 
             this._.each(function(elm) {
-                if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
+                if(cb.call(ctx_, elm)) return found = elm, false; // break iteration
             });
 
             return found;

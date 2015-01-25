@@ -1,20 +1,15 @@
-/**
- * Array
- */
 constructWrapper(Array, 'arr', {
     /**
-     *
      * @namespace arr
-     * @memberOf module:_
      */
     static: {
         /**
-         * Concats arrays into a new array
+         * Concatenates arrays into a new array
          * @public
          * @static
-         * @method module:_.arr.concat
+         * @method arr.concat
          * @param {...Array} ___arrays - arrays to concat
-         * @returns  {Array}          - the concatenated array
+         * @returns  {Array}           - the concatenated array
          */
         concat: function(___arrays) {
             return Array.prototype.concat.apply([], arguments);
@@ -25,10 +20,9 @@ constructWrapper(Array, 'arr', {
      */
     prototype: {
         /**
-         * Append an array to the current array. Takes inot account broken arrays
+         * Append one or more arrays to the current array. Takes into account broken arrays
          * @public
-         * @method module:_.arr.append
-         * @this       {Array}
+         * @method   arr#append
          * @param   {...Array} ___arrays - arrays to be appended
          * @returns    {Array}      this - this appended with the arrays
          */
@@ -52,20 +46,19 @@ constructWrapper(Array, 'arr', {
             return this;
         },
         /**
-         * Append an array to the current array. The result is a new array
+         * Append one or more arrays to the current array into a new array
          * @public
-         * @method module:_.arr.$append
-         * @this       {Array}
+         * @method   arr#$append
          * @param   {...Array} ___arrays - arrays to be appended
-         * @returns    {Array}          - The new array that is the result of appending
+         * @returns    {Array}           - The new array that is the result of appending
          */
         $append: function(___arrays) {
-            return _.clone(this)._.append.apply(this, arguments);
+            return _.clone(this)._.append.apply(null, arguments); // we can use a null context here since it will get the value from the stack
         },
         /**
          * Returns the average of a number based array
          * @public
-         * @method module:_.arr.avg
+         * @method   arr#avg
          * @this    {Array<number>}
          * @returns {number} - Average of the numbers in the array
          */
@@ -77,7 +70,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes al falsey values from an array
          * @public
-         * @method module:_.arr.compact
+         * @method  arr#compact
          * @this   {Array}
          * @return {Array} this - mutated array for chaining
          */
@@ -88,7 +81,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes all falsey values from an array into a new array
          * @public
-         * @method module:_.arr.$compact
+         * @method  arr#$compact
          * @this   {Array}
          * @return {Array} this - new array instance without falsey values
          */
@@ -99,12 +92,12 @@ constructWrapper(Array, 'arr', {
         /**
          * Remove elements based on index
          * @public
-         * @method Array:_.arr.del
+         * @method arr#del
          * @this       {Array}
-         * @param  {...number} ___keys - indices SORTED
-         * @return     {Array}   this - mutated array for chaining
+         * @param  {...number} ___indices - indices SORTED
+         * @return     {Array}       this - mutated array for chaining
          */
-        del: function(___keys)
+        del: function(___indices)
         {
             arguments._.eachRight(function(key) {
                 this.splice(key, 1);
@@ -115,8 +108,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Remove elements based on index
          * @public
-         * @method Array:_.arr.del$
-         * @this   {Array}
+         * @method  arr#del$
          * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match$ function
          * @return {Array}                       this   - mutated array for chaining
@@ -132,10 +124,9 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes all specified values from an array
          * @public
-         * @method Array:_.arr.removeAll
-         * @this       {Array}
-         * @param     {...any} ___values - values to remove
-         * @return     {Array}     this - mutated array for chaining
+         * @method  arr#removeAll
+         * @param  {...any} ___values - values to remove
+         * @return {Array}       this - mutated array for chaining
          */
         removeAll: function(___values) {
             var args = arguments;
@@ -149,7 +140,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes all values from an array based on a match function
          * @public
-         * @method Array:_.arr.removeAll$
+         * @method  arr#removeAll$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -164,35 +155,38 @@ constructWrapper(Array, 'arr', {
         },
 
         /**
-         * Difference between 2 arrays
+         * Difference between the current and other arrays
          * @public
-         * @method Array:_.arr.diff
-         * @this     {Array}
-         * @param    {Array}  arr - array to subtract from this
-         * @returns  {Array} this - array mutated by difference
+         * @method   arr#diff
+         * @param   {...Array} ___arrays - arrays to subtract from this
+         * @returns {Array}         this - array mutated by difference
          */
-         // TODO difference between multiple arrays
-        diff: function(arr)
+        diff: function(___arrays)
         {
-            return this._.remove.apply(this, arr);
+            arguments._.each(function(arr) {
+                return this._.remove.apply(this, arr);
+            }, this);
+
+            return this
         },
         /**
-         * Returns the difference between 2 arrays in a new array
+         * Returns the difference between the current and multiple other arrays in a new array
          * @public
-         * @method Array:_.arr.$diff
-         * @this     {Array}
-         * @param    {Array} arr - array to subtract from this
-         * @returns  {Array}     - new array containing the difference
+         * @method   arr#$diff
+         * @param   {...Array} ___arrays - array to subtract from this
+         * @returns {Array}              - new array containing the difference
          */
-        $diff: function(arr)
+        $diff: function(___arrays)
         {
-            return this._.$remove.apply(this, arr);
+            if(arguments.length === 1) {return this._.$remove.apply(this, ___arrays)}
+
+            return _.clone(this)._.diff.apply(null, arguments); // we can use a null context here since it will get the value from the stack
         },
         /**
          * Creates a multidimensional array. The dimensions come from the array itself
          * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
-         * @method Array:_.arr.dimit
+         * @method arr#dimit
          * @this   {Array}
          * @param  {any|function=} init_ - initial value for the array. Can be either a value or a function specifying the value
          * @param  {Object}        ctx_  - optional context for the init function
@@ -223,7 +217,7 @@ constructWrapper(Array, 'arr', {
          * Creates a multidimensional array. The dimensions come from the array itself
          * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
-         * @method Array:_.arr.$dimit
+         * @method arr#$dimit
          * @this   {Array}
          * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
          * @param  {Object}        ctx_  - optional context for the init function
@@ -253,17 +247,13 @@ constructWrapper(Array, 'arr', {
         /**
          * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          * each is eachlastic in the sense that one can add and delete elements at the current index
-         * @private
-         * @method Array:_.arr.each
-         * @this   {Array}
+         * @public
+         * @method arr#each
          * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
          * @param  {function} cb    - callback function to be called for each element
          * @param  {Object=}  ctx_  - optional context for the callback function
-         * @return {boolean}        - the result for the halting condition of the callback function.
-         * 							  false means iteration was broken prematurely.
-         * 							  This information can passed on in nested loops for multi-dimensional arrays
+         * @return {Array}          - this for chaining
          */
-        // TODO think of what each should return object itself or boolean indicating if the loop was broken
         each: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
@@ -273,17 +263,16 @@ constructWrapper(Array, 'arr', {
             for(var i = from; i < to; i += step_)
             {
                 if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                if(cb.call(ctx_, this[i], i, this, delta) === false) return false; // return result of the callback function
+                if(cb.call(ctx_, this[i], i, this, delta) === false) break;
                 if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
             }
 
-            return true;
+            return this;
         },
         /**
          * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-         * each is eachlastic in the sense that one can add and delete elements at the current index
-         * @private
-         * @method Array:_.arr._eachRight
+         * @public
+         * @method arr#eachRight
          * @this   {Array}
          * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
          * @param  {function} cb    - callback function to be called for each element
@@ -306,8 +295,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Get/sets: the first element of an array
          * @public
-         * @method Array:_.arr.first
-         * @this   {Array}
+         * @method arr#first
          * @param  {any=}      val_ - value to set on the first element. if no value is given the first element is returned
          * @return {any|Array}      - first element of the array or the array itself
          */
@@ -321,8 +309,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Flattens a 2 dimensional array
          * @public
-         * @method Array:_.arr.flatten
-         * @this    {Array}
+         * @method   arr#flatten
          * @returns {Array} - this for chaining
          */
         // TODO multi dimensional flattening
@@ -332,10 +319,9 @@ constructWrapper(Array, 'arr', {
             }, this)
         },
         /**
-         * Flattens a 2 dimensional array
+         * Flattens a 2 dimensional array into a new array
          * @public
-         * @method Array:_.arr.$flatten
-         * @this    {Array}
+         * @method arr#$flatten
          * @returns {Array} - new flattened version of the array
          */
         $flatten: function() {
@@ -344,8 +330,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Check is an array contains a certain value
          * @public
-         * @method Array:_.arr.has
-         * @this    {Array}
+         * @method   arr#has
          * @param   {Object}  elm - element to check membership of
          * @returns {boolean}     - boolean indicating if the array contains the element
          */
@@ -355,7 +340,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Inserts an element in a specific location in an array
          * @public
-         * @method Array:_.arr.insert
+         * @method   arr#insert
          * @this    {Array}
          * @param   {Object}  elm - element to check membership of
          * @param   {number}    i - position to insert the element
@@ -368,8 +353,7 @@ constructWrapper(Array, 'arr', {
          * Calculates the intersection for 2 or more arrays
          * NOTE assumes the arrays do not contain duplicate values
          * @public
-         * @method Array:_.arr.intersect
-         * @this   {Array}
+         * @method arr#intersect
          * @param  {Array} arr - 2 or more arrays
          * @return {Array}     - this for chaining
          */
@@ -379,7 +363,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Calculates the intersection for 2 or more arrays
          * @public
-         * @method Array:_.arr.$intersect
+         * @method arr#$intersect
          * @this   {Array}
          * @param  {Array} arr - 2 or more arrays
          * @return {Array}     - this for chaining
@@ -390,7 +374,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Checks if an array intersects an other
          * @public
-         * @method Array:_.arr.intersects
+         * @method arr#intersects
          * @this    {Array}
          * @param   {Array}  arr - array to check intersection with
          * @returns {boolean}    - boolean indicating if the 2 arrays intersect
@@ -407,7 +391,7 @@ constructWrapper(Array, 'arr', {
         /**
          * gets/sets the last element of an array
          * @public
-         * @method Array:_.arr.last
+         * @method arr#last
          * @this    {Array}
          * @param   {any}      val_ - Value to be set as the last element. If no value is given the last value is returned
          * @returns {any|Array}     - last element of the array or this for chaiing
@@ -422,7 +406,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Returns the maximum value of an array with numbers
          * @public
-         * @method Array:_.arr.max
+         * @method arr#max
          * @this    {Array<number>|Array<any>}
          * @param   {function}   compare$_ - optional function to determine the the max in case of non-numeric array
          * @returns {number|any}           - maximum number or element in the array
@@ -443,7 +427,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Returns the minimum value of an array with numbers
          * @public
-         * @method Array:_.arr.min
+         * @method arr#min
          * @this    {Array<number>|Array<any>}
          * @param   {Function=} compare$_ - optional compare function
          * @returns {number|any} - minimum element in the array
@@ -464,7 +448,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Modifies the members of an array according to a certain function
          * @public
-         * @method Array:_.arr.modify
+         * @method arr#modify
          * @this    {Array}
          * @param   {Function} modifier$  - function that modifies the array members
          * @param   {Object=}       ctx_  - optional context for the modifier function
@@ -480,7 +464,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Copies and modifies the members of an array according to a certain function
          * @public
-         * @method Array:_.arr.$modify
+         * @method arr#$modify
          * @this    {Array}
          * @param   {Function} modifier$ - function that modifies the array members
          * @param   {Object=}       ctx_ - optional context for the modifier function
@@ -493,7 +477,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Chainable version of push
          * @public
-         * @method Array:_.arr.push
+         * @method arr#push
          * @this    {Array}
          * @param  {...any} ___args - one or more elements to add to an array
          * @return  {Array}    this - this for chaining
@@ -505,11 +489,10 @@ constructWrapper(Array, 'arr', {
         },
         /**
          * Singular push function to solve problems with differences between objects & arrays
-         * @public
-         * @method Array:_.arr._push
-         * @this    {Array}
-         * @param  {...any}  val - value to push
-         * @return  {Array} this - this for chaining
+         * @private
+         * @method  arr#_add
+         * @param  {any}   val  - value to push
+         * @return {Array} this - this for chaining
          */
         _add: function(val) {
             this.push(val);
@@ -519,7 +502,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Returns a random element from the array
          * @public
-         * @method Array:_.arr.random
+         * @method arr#random
          * @this   {Array}
          * @return {any} - random element from the array
          */
@@ -529,7 +512,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes one occurrence of of an element from an array
          * @public
-         * @method Array:_.arr.random
+         * @method arr#random
          * @this   {any}   - elm
          * @return {Array} - this for chaining
          */
@@ -540,7 +523,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Retrieves and sets the size of an array
          * @public
-         * @method Array:_.arr.size
+         * @method arr#size
          * @this    {Array}
          * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
          * @returns {number|Array} - the length of the array or the array itself
@@ -555,7 +538,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Returns the sum of all numbers in a number array
          * @public
-         * @method Array:_.arr.sum
+         * @method arr#sum
          * @this    {Array<number>}
          * @returns {number} - sum of the  number array
          */
@@ -567,7 +550,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Better to string version
          * @public
-         * @method Array:_.arr.toString
+         * @method arr#toString
          * @this    {Array}
          * @returns {string} - string representation of the array
          */
@@ -585,7 +568,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Calculates the union for 2 arrays
          * @public
-         * @method Array:_.arr.unify
+         * @method arr#unify
          * @this   {Array}
          * @param  {Array} arr  - array to unify
          * @return {Array} this - unified with the other
@@ -596,7 +579,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Calculates the union for 2 arrays into an new array
          * @public
-         * @method Array:_.arr.$unify
+         * @method arr#$unify
          * @this   {Array}
          * @param  {Array} arr - array to unify
          * @return {Array}     - new array containing the unification
@@ -609,7 +592,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Removes duplicate values in an array
          * @public
-         * @method Array:_.arr.unique
+         * @method arr#unique
          * @this    {Array}
          * @returns {Array} - new array without duplicates
          */
@@ -626,7 +609,7 @@ constructWrapper(Array, 'arr', {
         /**
          * Accessor: Returns a new version of the array without duplicates
          * @public
-         * @method Array:_.arr.$unique
+         * @method arr#$unique
          * @this    {Array}
          * @returns {Array} - new array remove duplicates
          */

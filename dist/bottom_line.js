@@ -9,24 +9,22 @@
 'use strict';
 !function(root, bottom_line) {
     var environments = true;
-    var requirejs = typeof(define) === 'function'  && !!define.amd;
-    var nodejs    = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
+    var requirejs    = typeof(define) === 'function'  && !!define.amd;
+    var nodejs       = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
 
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
     default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
 }(this, function() {
-    var stack = [];
-    var index = 0;
+    var stack = []; // stack holding all wrapped objects accessed from ._
+    var index = 0;  // current index int he stack
 
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
-	 * Also all static properties will be available on this object
 	 *
-	 * @module _
+	 * @namespace _
 	 */
-    // TODO this should be a function where we can wrap for example arguments and apply an array function to it
 	var _ = {
         not: {} // object to hold negative functions
     };
@@ -58,7 +56,6 @@
         _[key] = wrapper; // add wrapper to the bottom_line object
     }
 
-    // wrap functions for chaining
     function wrapStatics(wrapper, key, module)
     {
         if(!module.static) return;
@@ -74,9 +71,9 @@
     {
         if(!module.prototype) return;
 
-        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}}, module.prototype);
-        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module.prototype);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module.prototype);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module.prototype);
         extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
 
         extend(wrapper.methods, {enumerable: false}, module.prototype);
@@ -86,20 +83,20 @@
      * Extends an object with function/properties from a module object
      * @public
      * @static
-     * @method module:_.obj.extend
+     * @method _.extend
      * @param   {Object}  obj          - object to be extended
      * @param   {Object=} settings_    - optional settings/default descriptor
-     *      {boolean} [enumerable]     - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-     *      {boolean} [configurable]   - boolean indicating if all properties should be configurable. can be overwritten on a config level
-     *      {boolean} [writable]       - boolean indicating if all properties should be writable. can be overwritten on a config level
+     *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *      {boolean} [override=true]  - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean} [overwrite=true] - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {boolean=} override=true   - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
+     *      {boolean=} overwrite=true  - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
      *
-     *      {string}  [log]            - console log level for overwrites&overrides
-     *      {boolean} [validate=false] - validate overwrites & overrides should be set to true in the config
+     *      {string=}  log             - console log level for overwrites&overrides
+     *      {boolean=} validate=false  - validate overwrites & overrides should be set to true in the config
 
-     *      {function}[modifier]       - modifier function to apply on all functions.
+     *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
      */
@@ -164,7 +161,6 @@
         return obj;
     }
 
-    // is object
     // is should be static so we can also apply it to null & undefined
     _.is = {
         array: Array.isArray
@@ -192,6 +188,14 @@
      */
 
     extend(_, {
+        /**
+         * creates an object based on a prototype
+         * @static
+         * @public
+         * @method _.create
+         * @param  {Object} proto - prototype to base the object on
+         * @return {Object}       - new object based on prototype
+         */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
         }
@@ -450,7 +454,7 @@
              */
             eachRight: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
-                if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle argumens. TODO fast access to the _.arr.methods
+                if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 this._.keys()._.eachRight(function(key) {
                     return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
@@ -461,7 +465,7 @@
             /**
              * Filters
              * @public
-             * @method Object#_filter
+             * @method Object#filter
              * @this   {Object}
              * @param  {Function} cb      - callback function to be called for each element
              * @param  {Object=}  opt_ctx - optional context
@@ -480,15 +484,15 @@
              * Finds first element that is picked by the callback function
              * @private
              * @this   {Array}
-             * @param  {Function} cb      - callback function to be called for each element
-             * @param  {Object=}  opt_ctx - optional context
+             * @param  {Function} cb   - callback function to be called for each element
+             * @param  {Object=}  ctx_ - optional context
              * @return {any} first value that is found
              */
-            find: function(cb, opt_ctx) {
+            find: function(cb, ctx_) {
                 var found;
     
                 this._.each(function(elm) {
-                    if(cb.call(opt_ctx, elm)) return found = elm, false; // break iteration
+                    if(cb.call(ctx_, elm)) return found = elm, false; // break iteration
                 });
     
                 return found;
@@ -808,23 +812,18 @@
             }
         }
     });
-    /**
-     * Array
-     */
     constructWrapper(Array, 'arr', {
         /**
-         *
          * @namespace arr
-         * @memberOf module:_
          */
         static: {
             /**
-             * Concats arrays into a new array
+             * Concatenates arrays into a new array
              * @public
              * @static
-             * @method module:_.arr.concat
+             * @method arr.concat
              * @param {...Array} ___arrays - arrays to concat
-             * @returns  {Array}          - the concatenated array
+             * @returns  {Array}           - the concatenated array
              */
             concat: function(___arrays) {
                 return Array.prototype.concat.apply([], arguments);
@@ -835,10 +834,9 @@
          */
         prototype: {
             /**
-             * Append an array to the current array. Takes inot account broken arrays
+             * Append one or more arrays to the current array. Takes into account broken arrays
              * @public
-             * @method module:_.arr.append
-             * @this       {Array}
+             * @method   arr#append
              * @param   {...Array} ___arrays - arrays to be appended
              * @returns    {Array}      this - this appended with the arrays
              */
@@ -862,20 +860,19 @@
                 return this;
             },
             /**
-             * Append an array to the current array. The result is a new array
+             * Append one or more arrays to the current array into a new array
              * @public
-             * @method module:_.arr.$append
-             * @this       {Array}
+             * @method   arr#$append
              * @param   {...Array} ___arrays - arrays to be appended
-             * @returns    {Array}          - The new array that is the result of appending
+             * @returns    {Array}           - The new array that is the result of appending
              */
             $append: function(___arrays) {
-                return _.clone(this)._.append.apply(this, arguments);
+                return _.clone(this)._.append.apply(null, arguments); // we can use a null context here since it will get the value from the stack
             },
             /**
              * Returns the average of a number based array
              * @public
-             * @method module:_.arr.avg
+             * @method   arr#avg
              * @this    {Array<number>}
              * @returns {number} - Average of the numbers in the array
              */
@@ -887,7 +884,7 @@
             /**
              * Removes al falsey values from an array
              * @public
-             * @method module:_.arr.compact
+             * @method  arr#compact
              * @this   {Array}
              * @return {Array} this - mutated array for chaining
              */
@@ -898,7 +895,7 @@
             /**
              * Removes all falsey values from an array into a new array
              * @public
-             * @method module:_.arr.$compact
+             * @method  arr#$compact
              * @this   {Array}
              * @return {Array} this - new array instance without falsey values
              */
@@ -909,12 +906,12 @@
             /**
              * Remove elements based on index
              * @public
-             * @method Array:_.arr.del
+             * @method arr#del
              * @this       {Array}
-             * @param  {...number} ___keys - indices SORTED
-             * @return     {Array}   this - mutated array for chaining
+             * @param  {...number} ___indices - indices SORTED
+             * @return     {Array}       this - mutated array for chaining
              */
-            del: function(___keys)
+            del: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
@@ -925,8 +922,7 @@
             /**
              * Remove elements based on index
              * @public
-             * @method Array:_.arr.del$
-             * @this   {Array}
+             * @method  arr#del$
              * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match$ function
              * @return {Array}                       this   - mutated array for chaining
@@ -942,10 +938,9 @@
             /**
              * Removes all specified values from an array
              * @public
-             * @method Array:_.arr.removeAll
-             * @this       {Array}
-             * @param     {...any} ___values - values to remove
-             * @return     {Array}     this - mutated array for chaining
+             * @method  arr#removeAll
+             * @param  {...any} ___values - values to remove
+             * @return {Array}       this - mutated array for chaining
              */
             removeAll: function(___values) {
                 var args = arguments;
@@ -959,7 +954,7 @@
             /**
              * Removes all values from an array based on a match function
              * @public
-             * @method Array:_.arr.removeAll$
+             * @method  arr#removeAll$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -974,35 +969,38 @@
             },
     
             /**
-             * Difference between 2 arrays
+             * Difference between the current and other arrays
              * @public
-             * @method Array:_.arr.diff
-             * @this     {Array}
-             * @param    {Array}  arr - array to subtract from this
-             * @returns  {Array} this - array mutated by difference
+             * @method   arr#diff
+             * @param   {...Array} ___arrays - arrays to subtract from this
+             * @returns {Array}         this - array mutated by difference
              */
-             // TODO difference between multiple arrays
-            diff: function(arr)
+            diff: function(___arrays)
             {
-                return this._.remove.apply(this, arr);
+                arguments._.each(function(arr) {
+                    return this._.remove.apply(this, arr);
+                }, this);
+    
+                return this
             },
             /**
-             * Returns the difference between 2 arrays in a new array
+             * Returns the difference between the current and multiple other arrays in a new array
              * @public
-             * @method Array:_.arr.$diff
-             * @this     {Array}
-             * @param    {Array} arr - array to subtract from this
-             * @returns  {Array}     - new array containing the difference
+             * @method   arr#$diff
+             * @param   {...Array} ___arrays - array to subtract from this
+             * @returns {Array}              - new array containing the difference
              */
-            $diff: function(arr)
+            $diff: function(___arrays)
             {
-                return this._.$remove.apply(this, arr);
+                if(arguments.length === 1) {return this._.$remove.apply(this, ___arrays)}
+    
+                return _.clone(this)._.diff.apply(null, arguments); // we can use a null context here since it will get the value from the stack
             },
             /**
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method Array:_.arr.dimit
+             * @method arr#dimit
              * @this   {Array}
              * @param  {any|function=} init_ - initial value for the array. Can be either a value or a function specifying the value
              * @param  {Object}        ctx_  - optional context for the init function
@@ -1033,7 +1031,7 @@
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method Array:_.arr.$dimit
+             * @method arr#$dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
              * @param  {Object}        ctx_  - optional context for the init function
@@ -1063,17 +1061,13 @@
             /**
              * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * each is eachlastic in the sense that one can add and delete elements at the current index
-             * @private
-             * @method Array:_.arr.each
-             * @this   {Array}
+             * @public
+             * @method arr#each
              * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb    - callback function to be called for each element
              * @param  {Object=}  ctx_  - optional context for the callback function
-             * @return {boolean}        - the result for the halting condition of the callback function.
-             * 							  false means iteration was broken prematurely.
-             * 							  This information can passed on in nested loops for multi-dimensional arrays
+             * @return {Array}          - this for chaining
              */
-            // TODO think of what each should return object itself or boolean indicating if the loop was broken
             each: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
@@ -1083,17 +1077,16 @@
                 for(var i = from; i < to; i += step_)
                 {
                     if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                    if(cb.call(ctx_, this[i], i, this, delta) === false) return false; // return result of the callback function
+                    if(cb.call(ctx_, this[i], i, this, delta) === false) break;
                     if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
                 }
     
-                return true;
+                return this;
             },
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
-             * each is eachlastic in the sense that one can add and delete elements at the current index
-             * @private
-             * @method Array:_.arr._eachRight
+             * @public
+             * @method arr#eachRight
              * @this   {Array}
              * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb    - callback function to be called for each element
@@ -1116,8 +1109,7 @@
             /**
              * Get/sets: the first element of an array
              * @public
-             * @method Array:_.arr.first
-             * @this   {Array}
+             * @method arr#first
              * @param  {any=}      val_ - value to set on the first element. if no value is given the first element is returned
              * @return {any|Array}      - first element of the array or the array itself
              */
@@ -1131,8 +1123,7 @@
             /**
              * Flattens a 2 dimensional array
              * @public
-             * @method Array:_.arr.flatten
-             * @this    {Array}
+             * @method   arr#flatten
              * @returns {Array} - this for chaining
              */
             // TODO multi dimensional flattening
@@ -1142,10 +1133,9 @@
                 }, this)
             },
             /**
-             * Flattens a 2 dimensional array
+             * Flattens a 2 dimensional array into a new array
              * @public
-             * @method Array:_.arr.$flatten
-             * @this    {Array}
+             * @method arr#$flatten
              * @returns {Array} - new flattened version of the array
              */
             $flatten: function() {
@@ -1154,8 +1144,7 @@
             /**
              * Check is an array contains a certain value
              * @public
-             * @method Array:_.arr.has
-             * @this    {Array}
+             * @method   arr#has
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
@@ -1165,7 +1154,7 @@
             /**
              * Inserts an element in a specific location in an array
              * @public
-             * @method Array:_.arr.insert
+             * @method   arr#insert
              * @this    {Array}
              * @param   {Object}  elm - element to check membership of
              * @param   {number}    i - position to insert the element
@@ -1178,8 +1167,7 @@
              * Calculates the intersection for 2 or more arrays
              * NOTE assumes the arrays do not contain duplicate values
              * @public
-             * @method Array:_.arr.intersect
-             * @this   {Array}
+             * @method arr#intersect
              * @param  {Array} arr - 2 or more arrays
              * @return {Array}     - this for chaining
              */
@@ -1189,7 +1177,7 @@
             /**
              * Calculates the intersection for 2 or more arrays
              * @public
-             * @method Array:_.arr.$intersect
+             * @method arr#$intersect
              * @this   {Array}
              * @param  {Array} arr - 2 or more arrays
              * @return {Array}     - this for chaining
@@ -1200,7 +1188,7 @@
             /**
              * Checks if an array intersects an other
              * @public
-             * @method Array:_.arr.intersects
+             * @method arr#intersects
              * @this    {Array}
              * @param   {Array}  arr - array to check intersection with
              * @returns {boolean}    - boolean indicating if the 2 arrays intersect
@@ -1217,7 +1205,7 @@
             /**
              * gets/sets the last element of an array
              * @public
-             * @method Array:_.arr.last
+             * @method arr#last
              * @this    {Array}
              * @param   {any}      val_ - Value to be set as the last element. If no value is given the last value is returned
              * @returns {any|Array}     - last element of the array or this for chaiing
@@ -1232,7 +1220,7 @@
             /**
              * Returns the maximum value of an array with numbers
              * @public
-             * @method Array:_.arr.max
+             * @method arr#max
              * @this    {Array<number>|Array<any>}
              * @param   {function}   compare$_ - optional function to determine the the max in case of non-numeric array
              * @returns {number|any}           - maximum number or element in the array
@@ -1253,7 +1241,7 @@
             /**
              * Returns the minimum value of an array with numbers
              * @public
-             * @method Array:_.arr.min
+             * @method arr#min
              * @this    {Array<number>|Array<any>}
              * @param   {Function=} compare$_ - optional compare function
              * @returns {number|any} - minimum element in the array
@@ -1274,7 +1262,7 @@
             /**
              * Modifies the members of an array according to a certain function
              * @public
-             * @method Array:_.arr.modify
+             * @method arr#modify
              * @this    {Array}
              * @param   {Function} modifier$  - function that modifies the array members
              * @param   {Object=}       ctx_  - optional context for the modifier function
@@ -1290,7 +1278,7 @@
             /**
              * Copies and modifies the members of an array according to a certain function
              * @public
-             * @method Array:_.arr.$modify
+             * @method arr#$modify
              * @this    {Array}
              * @param   {Function} modifier$ - function that modifies the array members
              * @param   {Object=}       ctx_ - optional context for the modifier function
@@ -1303,7 +1291,7 @@
             /**
              * Chainable version of push
              * @public
-             * @method Array:_.arr.push
+             * @method arr#push
              * @this    {Array}
              * @param  {...any} ___args - one or more elements to add to an array
              * @return  {Array}    this - this for chaining
@@ -1315,11 +1303,10 @@
             },
             /**
              * Singular push function to solve problems with differences between objects & arrays
-             * @public
-             * @method Array:_.arr._push
-             * @this    {Array}
-             * @param  {...any}  val - value to push
-             * @return  {Array} this - this for chaining
+             * @private
+             * @method  arr#_add
+             * @param  {any}   val  - value to push
+             * @return {Array} this - this for chaining
              */
             _add: function(val) {
                 this.push(val);
@@ -1329,7 +1316,7 @@
             /**
              * Returns a random element from the array
              * @public
-             * @method Array:_.arr.random
+             * @method arr#random
              * @this   {Array}
              * @return {any} - random element from the array
              */
@@ -1339,7 +1326,7 @@
             /**
              * Removes one occurrence of of an element from an array
              * @public
-             * @method Array:_.arr.random
+             * @method arr#random
              * @this   {any}   - elm
              * @return {Array} - this for chaining
              */
@@ -1350,7 +1337,7 @@
             /**
              * Retrieves and sets the size of an array
              * @public
-             * @method Array:_.arr.size
+             * @method arr#size
              * @this    {Array}
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
@@ -1365,7 +1352,7 @@
             /**
              * Returns the sum of all numbers in a number array
              * @public
-             * @method Array:_.arr.sum
+             * @method arr#sum
              * @this    {Array<number>}
              * @returns {number} - sum of the  number array
              */
@@ -1377,7 +1364,7 @@
             /**
              * Better to string version
              * @public
-             * @method Array:_.arr.toString
+             * @method arr#toString
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
@@ -1395,7 +1382,7 @@
             /**
              * Calculates the union for 2 arrays
              * @public
-             * @method Array:_.arr.unify
+             * @method arr#unify
              * @this   {Array}
              * @param  {Array} arr  - array to unify
              * @return {Array} this - unified with the other
@@ -1406,7 +1393,7 @@
             /**
              * Calculates the union for 2 arrays into an new array
              * @public
-             * @method Array:_.arr.$unify
+             * @method arr#$unify
              * @this   {Array}
              * @param  {Array} arr - array to unify
              * @return {Array}     - new array containing the unification
@@ -1419,7 +1406,7 @@
             /**
              * Removes duplicate values in an array
              * @public
-             * @method Array:_.arr.unique
+             * @method arr#unique
              * @this    {Array}
              * @returns {Array} - new array without duplicates
              */
@@ -1436,7 +1423,7 @@
             /**
              * Accessor: Returns a new version of the array without duplicates
              * @public
-             * @method Array:_.arr.$unique
+             * @method arr#$unique
              * @this    {Array}
              * @returns {Array} - new array remove duplicates
              */
@@ -1630,20 +1617,15 @@
             }
         }
     });
-    
-    /**
-     * Number
-     */
     constructWrapper(Number, 'num', {
         /**
          * @namespace num
-         * @memberOf module:_
          */
         static: {
             /**
              * Checks if an object is a number
              * @public
-             * @method module:_.num.isNumber
+             * @method   num.isNumber
              * @param   {any} num - object to check the number for
              * @returns {boolean} - indicating if it is a number
              */
@@ -1654,7 +1636,7 @@
              * Returns a random numer between the min and max value, or between 0 & 1) if no arguments are given.
              * In case a singular argument is given iy will return the bound between 0 and this value
              * @public
-             * @method module:_.num.random
+             * @method   num.random
              * @param   {number=} min_max_ - optional lower or upper bound
              * @param   {number=} max_min_ - optional lower or upper bound
              * @returns {number} - random number in between
@@ -1672,7 +1654,7 @@
              * Rebounds a number between 2 values. Handy for number ranges that are continuous
              * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
              * @public
-             * @method module:_.num.rebound
+             * @method   num.rebound
              * @param   {number}   num - number value
              * @returns {function}     - function to add the range
              */
@@ -1690,14 +1672,11 @@
                 }
             }
         },
-        /**
-         * @class Number
-         */
         prototype: {
             /**
              * Gets or sets the sign of a number
              * @public
-             * @method Number#sign
+             * @method   num#sign
              * @returns {number} - sign of the number: -1, 0, 1
              */
             sign: function(sign) {
@@ -1710,7 +1689,7 @@
             /**
              * Getter: indicator if the the number is even
              * @public
-             * @method Number#even
+             * @method   num#even
              * @returns {boolean} - indicating if the number is even
              */
             get even() {
@@ -1719,7 +1698,7 @@
             /**
              * Getter: indicator if the the number is odd
              * @public
-             * @method Number#odd
+             * @method   num#odd
              * @returns {boolean} - indicating if the number is odd
              */
             get odd() {
@@ -1728,7 +1707,7 @@
             /**
              * Getter: parity for a number 0: even and 1: for odd
              * @public
-             * @method Number#parity
+             * @method   num#parity
              * @returns {number} - parity of the number
              */
             get parity() {
@@ -1737,7 +1716,7 @@
             /**
              * Power of a number
              * @public
-             * @method Number#pow
+             * @method   num#pow
              * @param   {number}  exponent - the exponent
              * @returns {number}           - the powered number
              */
@@ -1747,7 +1726,7 @@
             /**
              * Checks if a number is between to values
              * @public
-             * @method Number#between
+             * @method   num#between
              * @param   {number}  min - minimum value
              * @param   {number}  max - maximum value
              * @returns {boolean}     - boolean indicating if the value lies between the two values
@@ -1758,7 +1737,7 @@
             /**
              * Bounds a number between 2 values
              * @public
-             * @method Number#bound
+             * @method   num#bound
              * @param   {number}  min - minimum value
              * @param   {number}  max - maximum value
              * @returns {boolean}     - bounded version of the number that falls between the 2 values
@@ -1770,7 +1749,7 @@
              * Rebounds a number between 2 values. Handy for number ranges that are continuous
              * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
              * @public
-             * @method Number#rebound
+             * @method   num#rebound
              * @param   {number}   num - number value
              * @returns {function}     - function to add the range
              */
@@ -1781,13 +1760,12 @@
             /**
              * Better to string version
              * @public
-             * @method Number#toString
-             * @this    {Number}
+             * @method   num#toString
              * @returns {string} - string representation of the number
              */
             toString: function()
             {
-                return this+'';
+                return this.toString()
             }
         }
     });
@@ -2152,7 +2130,7 @@
              * @param   {number} int - integer to measure the length
              * @returns {number} - length of the integer
              */
-            len: function(int) {
+            length: function(int) {
                 return int? 1+ _.log10(int)|0 : 1;
     //				return (int+'').length;
             },

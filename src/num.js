@@ -1,17 +1,12 @@
-
-/**
- * Number
- */
 constructWrapper(Number, 'num', {
     /**
      * @namespace num
-     * @memberOf module:_
      */
     static: {
         /**
          * Checks if an object is a number
          * @public
-         * @method module:_.num.isNumber
+         * @method   num.isNumber
          * @param   {any} num - object to check the number for
          * @returns {boolean} - indicating if it is a number
          */
@@ -22,7 +17,7 @@ constructWrapper(Number, 'num', {
          * Returns a random numer between the min and max value, or between 0 & 1) if no arguments are given.
          * In case a singular argument is given iy will return the bound between 0 and this value
          * @public
-         * @method module:_.num.random
+         * @method   num.random
          * @param   {number=} min_max_ - optional lower or upper bound
          * @param   {number=} max_min_ - optional lower or upper bound
          * @returns {number} - random number in between
@@ -40,7 +35,7 @@ constructWrapper(Number, 'num', {
          * Rebounds a number between 2 values. Handy for number ranges that are continuous
          * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
          * @public
-         * @method module:_.num.rebound
+         * @method   num.rebound
          * @param   {number}   num - number value
          * @returns {function}     - function to add the range
          */
@@ -58,14 +53,11 @@ constructWrapper(Number, 'num', {
             }
         }
     },
-    /**
-     * @class Number
-     */
     prototype: {
         /**
          * Gets or sets the sign of a number
          * @public
-         * @method Number#sign
+         * @method   num#sign
          * @returns {number} - sign of the number: -1, 0, 1
          */
         sign: function(sign) {
@@ -78,7 +70,7 @@ constructWrapper(Number, 'num', {
         /**
          * Getter: indicator if the the number is even
          * @public
-         * @method Number#even
+         * @method   num#even
          * @returns {boolean} - indicating if the number is even
          */
         get even() {
@@ -87,7 +79,7 @@ constructWrapper(Number, 'num', {
         /**
          * Getter: indicator if the the number is odd
          * @public
-         * @method Number#odd
+         * @method   num#odd
          * @returns {boolean} - indicating if the number is odd
          */
         get odd() {
@@ -96,7 +88,7 @@ constructWrapper(Number, 'num', {
         /**
          * Getter: parity for a number 0: even and 1: for odd
          * @public
-         * @method Number#parity
+         * @method   num#parity
          * @returns {number} - parity of the number
          */
         get parity() {
@@ -105,7 +97,7 @@ constructWrapper(Number, 'num', {
         /**
          * Power of a number
          * @public
-         * @method Number#pow
+         * @method   num#pow
          * @param   {number}  exponent - the exponent
          * @returns {number}           - the powered number
          */
@@ -115,7 +107,7 @@ constructWrapper(Number, 'num', {
         /**
          * Checks if a number is between to values
          * @public
-         * @method Number#between
+         * @method   num#between
          * @param   {number}  min - minimum value
          * @param   {number}  max - maximum value
          * @returns {boolean}     - boolean indicating if the value lies between the two values
@@ -126,7 +118,7 @@ constructWrapper(Number, 'num', {
         /**
          * Bounds a number between 2 values
          * @public
-         * @method Number#bound
+         * @method   num#bound
          * @param   {number}  min - minimum value
          * @param   {number}  max - maximum value
          * @returns {boolean}     - bounded version of the number that falls between the 2 values
@@ -138,7 +130,7 @@ constructWrapper(Number, 'num', {
          * Rebounds a number between 2 values. Handy for number ranges that are continuous
          * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
          * @public
-         * @method Number#rebound
+         * @method   num#rebound
          * @param   {number}   num - number value
          * @returns {function}     - function to add the range
          */
@@ -149,13 +141,12 @@ constructWrapper(Number, 'num', {
         /**
          * Better to string version
          * @public
-         * @method Number#toString
-         * @this    {Number}
+         * @method   num#toString
          * @returns {string} - string representation of the number
          */
         toString: function()
         {
-            return this+'';
+            return this.toString()
         }
     }
 });

@@ -28,20 +28,20 @@ describe("Integer", function() {
 		describe("int length", function() {
 
 			it("int length", function() {
-				expect(_.int.len(0)).to.eql(1);
-				expect(_.int.len(5)).to.eql(1);
-				expect(_.int.len(6)).to.eql(1);
-				expect(_.int.len(9)).to.eql(1);
-				expect(_.int.len(10)).to.eql(2);
-				expect(_.int.len(50)).to.eql(2);
-				expect(_.int.len(51)).to.eql(2);
-				expect(_.int.len(99)).to.eql(2);
-				expect(_.int.len(100)).to.eql(3);
-				expect(_.int.len(500)).to.eql(3);
-				expect(_.int.len(501)).to.eql(3);
-				expect(_.int.len(999)).to.eql(3);
-				expect(_.int.len(6424615)).to.eql(7);
-				expect(_.int.len(999554329)).to.eql(9);
+				expect(_.int.length(0)).to.eql(1);
+				expect(_.int.length(5)).to.eql(1);
+				expect(_.int.length(6)).to.eql(1);
+				expect(_.int.length(9)).to.eql(1);
+				expect(_.int.length(10)).to.eql(2);
+				expect(_.int.length(50)).to.eql(2);
+				expect(_.int.length(51)).to.eql(2);
+				expect(_.int.length(99)).to.eql(2);
+				expect(_.int.length(100)).to.eql(3);
+				expect(_.int.length(500)).to.eql(3);
+				expect(_.int.length(501)).to.eql(3);
+				expect(_.int.length(999)).to.eql(3);
+				expect(_.int.length(6424615)).to.eql(7);
+				expect(_.int.length(999554329)).to.eql(9);
 			});
 		});
 
