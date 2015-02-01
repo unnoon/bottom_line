@@ -240,13 +240,10 @@
              * @return  {Object}  clone - the cloned object
              */
             cloneDeep: function cloneDeep(obj) {
-                var names;
-    
-                try       { names = obj._.names(); } // this is ugly add a is primitive & is object function
-                catch (e) { return obj }
+                if(_.obj.isPrimitive(obj)) return obj;
     
                 var clone = _.create(obj._.proto());
-                names._.each(function (name) {
+                obj._.names()._.each(function (name) {
                     var pd = obj._.descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
                     clone._.define(name, pd);
@@ -290,6 +287,26 @@
                 return prop !== undefined;
             },
             /**
+             * Checks if an object is an primitive
+             * @public
+             * @static
+             * @method obj.isPrimitive
+             * @param   {Object} obj - object to classify
+             * @returns {boolean}    - boolean indicating if the object is a primitive
+             */
+            isPrimitive: function(obj) {
+                var type = typeof(obj);
+    
+                switch(type)
+                {
+                    case 'object'   :
+                    case 'function' :
+                        return obj === null;
+                    default :
+                        return true
+                }
+            },
+            /**
              * Checks is a property is undefined
              * @public
              * @static
@@ -310,6 +327,17 @@
              */
             typeOf: function(obj) {
                 return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+            },
+            /**
+             * Static version of _.names returns an empty array in case of null or undefined
+             * @public
+             * @static
+             * @method obj.names
+             * @param   {Object} obj - object tot check the type from
+             * @returns {string}     - type of the object
+             */
+            names: function(obj) {
+                return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
             }
         },
         /**
@@ -1197,7 +1225,7 @@
                 var intersects = false;
     
                 this._.each(function(val) {
-                    if(arr._.has(val)) {return intersects = true, false}
+                    if(arr._.has(val)) {return !(intersects = true)}
                 });
     
                 return intersects;

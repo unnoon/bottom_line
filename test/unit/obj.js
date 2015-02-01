@@ -167,6 +167,7 @@ describe("Object", function() {
 				expect(_.typeOf(function(){})).to.eql('function');
 				expect(_.typeOf(null)).to.eql('null');
 				expect(_.typeOf(undefined)).to.eql('undefined');
+                expect(_.typeOf(new String('s'))).to.eql('string');
 			});
 
 			it("custom types: named constructor", function() {

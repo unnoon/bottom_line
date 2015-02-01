@@ -383,7 +383,7 @@ constructWrapper(Array, 'arr', {
             var intersects = false;
 
             this._.each(function(val) {
-                if(arr._.has(val)) {return intersects = true, false}
+                if(arr._.has(val)) {return !(intersects = true)}
             });
 
             return intersects;
