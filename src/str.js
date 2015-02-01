@@ -1,64 +1,56 @@
-
-/**
- * String
- */
 constructWrapper(String, 'str', {
     /**
      * @namespace str
-     * @memberOf module:_
-     */
-    /**
-     * @class String
      */
     prototype: {
         /**
          * Returns the rest of the string after a certain substring (1st occurrence)
          * @public
-         * @method String#after
+         * @method str#after
          * @param   {string} substr - substring to identify the return string
          * @returns {string}        - new string containing the string after the given substring
          */
         after: function(substr) {
             var index = this.indexOf(substr);
-            return (~index)? this.slice(index + substr.length) : this;
+            return (~index)? this.slice(index + substr.length) : this.valueOf();
         },
         /**
          * Returns the rest of the string after a certain substring (last occurrence)
          * @public
-         * @method String#afterLast
+         * @method str#afterLast
          * @param   {string} substr - substring to identify the return string
          * @returns {string}         - new string containing the string after the given substring
          */
         afterLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (~index)? this.slice(index + substr.length) : this;
+            return (~index)? this.slice(index + substr.length) : this.valueOf();
         },
         /**
          * Returns the rest of the string before a certain substring (1st occurrence)
          * @public
-         * @method String#before
+         * @method str#before
          * @param   {string} substr - substring to identify the return string
          * @returns {string}         - new string containing the string before the given substring
          */
         before: function(substr) {
             var index = this.indexOf(substr);
-            return (~index)? this.slice(0, index) : this;
+            return (~index)? this.slice(0, index) : this.valueOf();
         },
         /**
          * Returns the rest of the string before a certain substring (last occurrence)
          * @public
-         * @method String#beforeLast
+         * @method str#beforeLast
          * @param   {string} substr - substring to identify the return string
          * @returns {string}         - new string containing the string before the given substring
          */
         beforeLast: function(substr) {
             var index = this.lastIndexOf(substr);
-            return (~index)? this.slice(0, index) : this;
+            return (~index)? this.slice(0, index) : this.valueOf();
         },
         /**
          * Returns the string between a prefix && post substring
          * @public
-         * @method String#between
+         * @method str#between
          * @param   {string} pre_substr  - substring to identify the return string
          * @param   {string} post_substr - substring to identify the return string
          * @returns {string}             - new string containing the string before the given substring
@@ -69,25 +61,25 @@ constructWrapper(String, 'str', {
         /**
          * Capitalize the first character of a string
          * @public
-         * @method String#capitalize
+         * @method str#capitalize
          * @returns {string} - the capitalized string
          */
         capitalize: function() {
-            return this[0]? this[0].toUpperCase() + this.slice(1): this;
+            return this[0]? this[0].toUpperCase() + this.slice(1): this.valueOf();
         },
         /**
          * Decapitalize the first character of a string
          * @public
-         * @method String#decapitalize
+         * @method str#decapitalize
          * @returns {string} - the decapitalized string
          */
         decapitalize: function() {
-            return this[0]? this[0].toLowerCase() + this.slice(1): this;
+            return this[0]? this[0].toLowerCase() + this.slice(1): this.valueOf();
         },
         /**
          * Checks if the string ends with a certain substr
          * @public
-         * @method String#endsWith
+         * @method str#endsWith
          * @param   {string}  substr - substring to check for
          * @returns {boolean}        - boolean indicating if the string ends with the given substring
          */
@@ -97,7 +89,7 @@ constructWrapper(String, 'str', {
         /**
          * Checks if the string contains a certain substring
          * @public
-         * @method String#has
+         * @method str#has
          * @param   {string}  substr - substring to check for
          * @returns {boolean}        - boolean indicating if the string contains the substring
          */
@@ -107,7 +99,7 @@ constructWrapper(String, 'str', {
         /**
          * Inserts a substring in a string
          * @public
-         * @method String#insert
+         * @method str#insert
          * @param   {string}  substr - substring to insert
          * @param   {number}  i      - index to insert the substring (can be a negative value as well)
          * @returns {string}         - new string with the substring inserted
@@ -118,7 +110,7 @@ constructWrapper(String, 'str', {
         /**
          * Checks if a string is all lowercase
          * @public
-         * @method String#isLowerCase
+         * @method str#isLowerCase
          * @returns {boolean} - Boolean indicating if the string is lowercase
          */
         isLowerCase: function() {
@@ -127,7 +119,7 @@ constructWrapper(String, 'str', {
         /**
          * Checks if a string is all uppercase
          * @public
-         * @method String#isUpperCase
+         * @method str#isUpperCase
          * @returns {boolean} - Boolean indicating if the string is uppercase
          */
         isUpperCase: function() {
@@ -136,7 +128,7 @@ constructWrapper(String, 'str', {
         /**
          * getter: the last character of a string
          * @public
-         * @method String#last
+         * @method str#last
          * @returns {string} - the last character of the string
          */
         get last() {
@@ -145,7 +137,7 @@ constructWrapper(String, 'str', {
         /**
          * Splice for string. NOTE string are immutable so this function will return a NEW string
          * @public
-         * @method String#splice
+         * @method str#splice
          * @param   {number}  i       - index to start (can be a negative value as well)
          * @param   {string}  howMany - number of characters to apply
          * @param   {string}  substr  - substring to insert
@@ -157,7 +149,7 @@ constructWrapper(String, 'str', {
         /**
          * Checks if the string starts with a certain substr
          * @public
-         * @method String#startsWith
+         * @method str#startsWith
          * @param   {string}  substr - substring to check for
          * @returns {boolean}        - boolean indicating if the string starts with the given substring
          */
@@ -167,13 +159,13 @@ constructWrapper(String, 'str', {
         /**
          * Better to string version
          * @public
-         * @method String#toString
+         * @method str#toString
          * @this    {string}
          * @returns {string} - string representation of the object
          */
         toString: function()
         {
-            return this;
+            return this.toString();
         }
     }
 });

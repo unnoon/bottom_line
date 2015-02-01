@@ -1,16 +1,12 @@
-/**
- * Math
- */
 constructWrapper(Math, 'math', {
     /**
      * @namespace math
-     * @memberOf module:_
      */
     static: {
         /**
          * Return true based on a certain probability based on a number between 0 & 1;
          * @public
-         * @method module:_.byProb
+         * @method math.byProb
          * @param   {number}  p - probability to return true
          * @returns {boolean}   - true or false based on the probability
          */
@@ -20,7 +16,7 @@ constructWrapper(Math, 'math', {
         /**
          * Return the distance between 2 points in Euclidean space
          * @public
-         * @method module:_.distance
+         * @method math.distance
          * @param   {number}  x1 - x position for point1
          * @param   {number}  y1 - y position for point1
          * @param   {number}  x2 - x position for point2
@@ -33,7 +29,7 @@ constructWrapper(Math, 'math', {
         /**
          * Return the squared distance between 2 points in Euclidean space
          * @public
-         * @method module:_.distanceSquared
+         * @method math.distanceSquared
          * @param   {number}  x1 - x position for point1
          * @param   {number}  y1 - y position for point1
          * @param   {number}  x2 - x position for point2
@@ -46,7 +42,7 @@ constructWrapper(Math, 'math', {
         /**
          * Calculates the angle between a the y-axis and a line through a point x, y calculated clockwise (slope)
          * @public
-         * @method module:_.angle
+         * @method math.angle
          * @param   {number}  x -
          * @param   {number}  y -
          * @returns {number} - angle in degrees
@@ -57,7 +53,7 @@ constructWrapper(Math, 'math', {
         /**
          * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
          * @public
-         * @method module:_.angle
+         * @method math.angle
          * @param   {number}  x -
          * @param   {number}  y -
          * @returns {number} - angle in degrees
@@ -68,7 +64,7 @@ constructWrapper(Math, 'math', {
         /**
          * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
          * @public
-         * @method module:_.angle
+         * @method math.angle
          * @param   {number}  angle - angle in degrees
          * @returns {number} - angle in degrees
          */
@@ -78,7 +74,7 @@ constructWrapper(Math, 'math', {
         /**
          * Convert degrees to radians.
          *
-         * @method module:_.deg2Rad
+         * @method math.deg2Rad
          * @param {number} degrees
          * @returns {number} radians
          */
@@ -92,7 +88,7 @@ constructWrapper(Math, 'math', {
         /**
          * Decimal log function
          * @public
-         * @method module:_.log10
+         * @method math.log10
          * @param   {number} val - value to get the log10 from
          * @returns {number}     - angle in degrees
          */
@@ -102,7 +98,7 @@ constructWrapper(Math, 'math', {
         /**
          * Convert radians to degrees
          *
-         * @method module:_.rad2Deg
+         * @method math.rad2Deg
          * @param {number} radians
          * @returns {number} degrees
          */
@@ -118,7 +114,7 @@ constructWrapper(Math, 'math', {
          * See http://jsperf.com/math-s-min-max-vs-homemade/5
          * Borrowed from phaser
          *
-         * @method module:_.maxmore
+         * @method math.maxmore
          * @return {number} The highest value from those given.
          */
         maxmore: function ()
@@ -139,7 +135,7 @@ constructWrapper(Math, 'math', {
          * See http://jsperf.com/math-s-min-max-vs-homemade/5
          * Borrowed from phaser
          *
-         * @method module:_.minmore
+         * @method math.minmore
          * @return {number} The lowest value from those given.
          */
         minmore: function () {

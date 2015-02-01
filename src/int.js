@@ -17,13 +17,13 @@ constructWrapper(null, 'int', {
          * Returns the length of an integer
          * @public
          * @method int.length
-         * @param   {number} int    - integer to measure the length
-         * @param   {string} format - format for the lead zero's for example '0000'
-         * @returns {string}        - string with leading zero's
+         * @param   {number}        int           - integer to measure the length
+         * @param   {string|number} format_length - format for the lead zero's for example '0000'
+         * @returns {string}                      - string with leading zero's
          */
         // TODO cap to max value
-        leadZeros: function(int, format) {
-            var length = format.length;
+        leadZeros: function(int, format_length) {
+            var length = (typeof(format_length) === 'string') ? format_length.length : format_length;
 
             return (int/Math.pow(10, length)).toFixed(length).substr(2);
         },

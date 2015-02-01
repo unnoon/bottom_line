@@ -15,9 +15,6 @@ constructWrapper(Array, 'arr', {
             return Array.prototype.concat.apply([], arguments);
         }
     },
-    /**
-     * @class Array
-     */
     prototype: {
         /**
          * Append one or more arrays to the current array. Takes into account broken arrays

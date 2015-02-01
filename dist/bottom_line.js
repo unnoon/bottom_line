@@ -208,26 +208,23 @@
             return this.toString().match(/^function\s?([^\s(]*)/)[1];
         }
     });
-    /**
-     * Object
-     */
     constructWrapper(Object, 'obj', {
         /**
          * @namespace obj
-         * @memberOf module:_
          */
         static: {
-            // TODO object reduce function
             /**
              * Clones an object
              * @public
              * @static
-             * @method module:_.obj.clone
+             * @method obj.clone
              * @param   {Object}  obj   - object to be cloned
              * @return  {Object}  clone - the cloned object
              */
             // TODO These should be expanded with frozen, extensible states etc
             clone: function clone(obj) {
+                if(_.obj.isPrimitive(obj)) return obj;
+    
                 var clone = _.create(obj._.proto());
                 var names = obj._.names();
     
@@ -241,7 +238,7 @@
              * Clones an object
              * @public
              * @static
-             * @method module:_.obj.cloneDeep
+             * @method obj.cloneDeep
              * @param   {Object}  obj   - object to be cloned
              * @return  {Object}  clone - the cloned object
              */
@@ -256,25 +253,11 @@
                 });
                 return clone;
             },
-            /**""
-             * Empties an object remove destroying the object itself
-             * @public
-             * @static
-             * @method module:_.obj.empty
-             * @return  {Object}  this - for chaining
-             */
-            empty: function() {
-                this.each(function(prop) {
-                    delete this[prop];
-                }, this);
-    
-                return this
-            },
             /**
              * Extends an object with function/properties from a module object
              * @public
              * @static
-             * @method module:_.obj.extend
+             * @method obj.extend
              * @param   {Object}  obj          - object to be extended
              * @param   {Object=} settings_ - optional settings/default descriptor
              * @param   {Object}  module       - object containing functions/properties to extend the object with
@@ -285,7 +268,7 @@
              * Checks is a property is defined
              * @public
              * @static
-             * @method module:_.obj.isDefined
+             * @method obj.isDefined
              * @param   {Object} prop - property to check
              * @returns {boolean}     - indication of the property definition
              */
@@ -316,7 +299,7 @@
              * Checks is a property is undefined
              * @public
              * @static
-             * @method module:_.obj.isUndefined
+             * @method obj.isUndefined
              * @param   {Object} prop - property to check
              * @returns {boolean}     - indication of the property definition
              */
@@ -327,7 +310,7 @@
              * Returns the type of an object. Better suited then the one from js itself
              * @public
              * @static
-             * @method module:_.obj.typeof
+             * @method obj.typeof
              * @param   {Object} obj - object tot check the type from
              * @returns {string} - type of the object
              */
@@ -346,16 +329,11 @@
                 return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
             }
         },
-        /**
-         * Extension of the native Object class prototype
-         *
-         * @class Object
-         */
         prototype: {
             /**
              * Singular push function to solve problems with differences between objects & arrays
              * @public
-             * @method Array:_.arr._push
+             * @method obj#_add
              * @this    {Array}
              * @param  {...any}  val - value to push
              * @return  {Array} this - this for chaining
@@ -368,7 +346,7 @@
             /**
              * Copies keys to an array
              * @public
-             * @method Object#_define
+             * @method obj#define
              * @this   {Object}
              * @param  {string}       prop - the property name
              * @param  {Object} descriptor - descriptor object
@@ -381,7 +359,7 @@
             /**
              * Remove elements based on index
              * @public
-             * @method Object:_.arr.del
+             * @method obj#del
              * @this       {Object}
              * @param  {...number} ___keys - indices SORTED
              * @return     {Array}   this - mutated array for chaining
@@ -397,7 +375,7 @@
             /**
              * Remove elements based on index
              * @public
-             * @method Array:_.arr.del$
+             * @method obj#del$
              * @this   {Array}
              * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match$ function
@@ -414,7 +392,7 @@
             /**
              * Creates a new array without the specified indices
              * @public
-             * @method Array:_.arr.$del
+             * @method obj#$del
              * @this       {Array}
              * @param  {...number} ___keys - keys
              * @return     {Array}    this - new array without the specified indices
@@ -433,7 +411,7 @@
             /**
              * Creates a new array without the specified indices
              * @public
-             * @method Array:_.arr.$del$
+             * @method obj#$del$
              * @this   {Array}
              * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match$ function
@@ -452,7 +430,7 @@
             /**
              * Copies keys to an array
              * @public
-             * @method Object#_define
+             * @method obj#define
              * @this   {Object}
              * @param  {string}       prop - the property name
              * @return {Object} descriptor - descriptor object
@@ -464,7 +442,7 @@
             /**
              * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * @public
-             * @method Object#_each
+             * @method obj#each
              * @this  {Object}
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
@@ -479,7 +457,7 @@
             /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * @public
-             * @method Object#eachRight
+             * @method obj#eachRight
              * @this  {Object}
              * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
              * @param {function} cb    - callback function to be called for each element
@@ -499,7 +477,7 @@
             /**
              * Filters
              * @public
-             * @method Object#filter
+             * @method obj#filter
              * @this   {Object}
              * @param  {Function} cb      - callback function to be called for each element
              * @param  {Object=}  opt_ctx - optional context
@@ -517,7 +495,6 @@
             /**
              * Finds first element that is picked by the callback function
              * @private
-             * @this   {Array}
              * @param  {Function} cb   - callback function to be called for each element
              * @param  {Object=}  ctx_ - optional context
              * @return {any} first value that is found
@@ -552,7 +529,7 @@
             /**
              * Returns an array containing the keys of an object (enumerable properties))
              * @public
-             * @method Object#_keys
+             * @method obj#keys
              * @this   {Object}
              * @return {Array} keys of the object
              */
@@ -562,7 +539,7 @@
             /**
              * Removes 1st values from an object|array
              * @public
-             * @method Object:_.obj.remove
+             * @method obj#remove
              * @this   {Object|Array}
              * @param  {...any}       ___values - values to remove
              * @return {Object|Array} this      - mutated array for chaining
@@ -582,7 +559,7 @@
             /**
              * Removes 1st value from an object|array based on a match function
              * @public
-             * @method Array:_.obj.remove$
+             * @method obj#remove$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                          ctx_   - optional context for the match$ function
@@ -598,7 +575,7 @@
             /**
              * Creates new array without the specified 1st values
              * @public
-             * @method Object:_.obj.$remove
+             * @method obj#$remove
              * @this   {Object|Array}
              * @param  {...any} ___values - values to remove
              * @return {Array}  output    - new array without the values
@@ -619,7 +596,7 @@
             /**
              * Creates a new object|array without 1st value based on a match function
              * @public
-             * @method Object:_.obj.$remove$
+             * @method obj#$remove$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                          ctx_   - optional context for the match$ function
@@ -639,7 +616,7 @@
             /**
              * Removes all specified values from an array
              * @public
-             * @method Array:_.arr.removeAll
+             * @method obj#removeAll
              * @this       {Array}
              * @param     {...any} ___values - values to remove
              * @return     {Array}     this - mutated array for chaining
@@ -656,7 +633,7 @@
             /**
              * Removes all values from an array based on a match function
              * @public
-             * @method Array:_.arr.removeAll$
+             * @method obj#removeAll$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -673,7 +650,7 @@
             /**
              * Creates new array without all specified values
              * @public
-             * @method Array:_.arr.$removeAll
+             * @method obj#$removeAll
              * @this       {Array}
              * @param     {...any} ___values - values to remove
              * @return     {Array}    output - new array without the values
@@ -691,7 +668,7 @@
             /**
              * Creates a new array without all value specified by the match function
              * @public
-             * @method Array:_.arr.$removeAll$
+             * @method obj#$removeAll$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -744,7 +721,7 @@
             /**
              * Returns the number of own properties on an object
              * @public
-             * @method Object#_size
+             * @method obj#size
              * @this   {Object}
              * @return {number} the 'length' of the object
              */
@@ -761,7 +738,7 @@
             /**
              * Returns an array containing the names of an object (includes non-enumerable properties)
              * @public
-             * @method Object#names
+             * @method obj#names
              * @return {Array} keys of the object
              */
             names: {aliases: ['keysAll'], value:function() {
@@ -770,14 +747,14 @@
             /**
              * Shortcut for hasOwnProperty
              * @public
-             * @method Object#owns
+             * @method obj#owns
              * @return {boolean} boolean indicating ownership
              */
             owns: Object.prototype.hasOwnProperty,
             /**
              * Returns an array containing the keys & values of an object (enumerable properties)
              * @public
-             * @method Object#_pairs
+             * @method obj#pairs
              * @this   {Object}
              * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
              */
@@ -794,7 +771,7 @@
              * Sets/gets the prototype of an object
              * NOTE setting a prototype using __proto__ is non standard use at your own risk!
              * @public
-             * @method Object#_proto
+             * @method obj#proto
              * @this   {Object}
              * @param   {Array}  proto      - the prototype to be set
              * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
@@ -809,7 +786,7 @@
             /**
              * Better to string version
              * @public
-             * @method Object#_toString
+             * @method obj#toString
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
@@ -831,7 +808,7 @@
             /**
              * Returns an array containing the values of an object (enumerable properties)
              * @public
-             * @method Object#_values
+             * @method obj#values
              * @this   {Object}
              * @return {Array} values of the object
              */
@@ -863,9 +840,6 @@
                 return Array.prototype.concat.apply([], arguments);
             }
         },
-        /**
-         * @class Array
-         */
         prototype: {
             /**
              * Append one or more arrays to the current array. Takes into account broken arrays
@@ -1472,23 +1446,15 @@
             }
         }
     });
-    
-    /**
-     * String
-     */
     constructWrapper(String, 'str', {
         /**
          * @namespace str
-         * @memberOf module:_
-         */
-        /**
-         * @class String
          */
         prototype: {
             /**
              * Returns the rest of the string after a certain substring (1st occurrence)
              * @public
-             * @method String#after
+             * @method str#after
              * @param   {string} substr - substring to identify the return string
              * @returns {string}        - new string containing the string after the given substring
              */
@@ -1499,7 +1465,7 @@
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
              * @public
-             * @method String#afterLast
+             * @method str#afterLast
              * @param   {string} substr - substring to identify the return string
              * @returns {string}         - new string containing the string after the given substring
              */
@@ -1510,7 +1476,7 @@
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
              * @public
-             * @method String#before
+             * @method str#before
              * @param   {string} substr - substring to identify the return string
              * @returns {string}         - new string containing the string before the given substring
              */
@@ -1521,7 +1487,7 @@
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
              * @public
-             * @method String#beforeLast
+             * @method str#beforeLast
              * @param   {string} substr - substring to identify the return string
              * @returns {string}         - new string containing the string before the given substring
              */
@@ -1532,7 +1498,7 @@
             /**
              * Returns the string between a prefix && post substring
              * @public
-             * @method String#between
+             * @method str#between
              * @param   {string} pre_substr  - substring to identify the return string
              * @param   {string} post_substr - substring to identify the return string
              * @returns {string}             - new string containing the string before the given substring
@@ -1543,7 +1509,7 @@
             /**
              * Capitalize the first character of a string
              * @public
-             * @method String#capitalize
+             * @method str#capitalize
              * @returns {string} - the capitalized string
              */
             capitalize: function() {
@@ -1552,7 +1518,7 @@
             /**
              * Decapitalize the first character of a string
              * @public
-             * @method String#decapitalize
+             * @method str#decapitalize
              * @returns {string} - the decapitalized string
              */
             decapitalize: function() {
@@ -1561,7 +1527,7 @@
             /**
              * Checks if the string ends with a certain substr
              * @public
-             * @method String#endsWith
+             * @method str#endsWith
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string ends with the given substring
              */
@@ -1571,7 +1537,7 @@
             /**
              * Checks if the string contains a certain substring
              * @public
-             * @method String#has
+             * @method str#has
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
@@ -1581,7 +1547,7 @@
             /**
              * Inserts a substring in a string
              * @public
-             * @method String#insert
+             * @method str#insert
              * @param   {string}  substr - substring to insert
              * @param   {number}  i      - index to insert the substring (can be a negative value as well)
              * @returns {string}         - new string with the substring inserted
@@ -1592,7 +1558,7 @@
             /**
              * Checks if a string is all lowercase
              * @public
-             * @method String#isLowerCase
+             * @method str#isLowerCase
              * @returns {boolean} - Boolean indicating if the string is lowercase
              */
             isLowerCase: function() {
@@ -1601,7 +1567,7 @@
             /**
              * Checks if a string is all uppercase
              * @public
-             * @method String#isUpperCase
+             * @method str#isUpperCase
              * @returns {boolean} - Boolean indicating if the string is uppercase
              */
             isUpperCase: function() {
@@ -1610,7 +1576,7 @@
             /**
              * getter: the last character of a string
              * @public
-             * @method String#last
+             * @method str#last
              * @returns {string} - the last character of the string
              */
             get last() {
@@ -1619,7 +1585,7 @@
             /**
              * Splice for string. NOTE string are immutable so this function will return a NEW string
              * @public
-             * @method String#splice
+             * @method str#splice
              * @param   {number}  i       - index to start (can be a negative value as well)
              * @param   {string}  howMany - number of characters to apply
              * @param   {string}  substr  - substring to insert
@@ -1631,7 +1597,7 @@
             /**
              * Checks if the string starts with a certain substr
              * @public
-             * @method String#startsWith
+             * @method str#startsWith
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string starts with the given substring
              */
@@ -1641,7 +1607,7 @@
             /**
              * Better to string version
              * @public
-             * @method String#toString
+             * @method str#toString
              * @this    {string}
              * @returns {string} - string representation of the object
              */
@@ -1692,7 +1658,8 @@
              * @param   {number}   num - number value
              * @returns {function}     - function to add the range
              */
-            rebound: function(num) { // TODO (negative) testcases
+            rebound: function(num)
+            {
                 /**
                  * Rebounds a number between 2 values. For continuous number ranges
                  * @public
@@ -1713,7 +1680,8 @@
              * @method   num#sign
              * @returns {number} - sign of the number: -1, 0, 1
              */
-            sign: function(sign) {
+            sign: function(sign)
+            {
                 if(sign === undefined) return this > 0?  1 :
                                               this < 0? -1 :
                                                          0 ;
@@ -1726,7 +1694,8 @@
              * @method   num#even
              * @returns {boolean} - indicating if the number is even
              */
-            get even() {
+            get even()
+            {
                 return !(this & 1);
             },
             /**
@@ -1735,7 +1704,8 @@
              * @method   num#odd
              * @returns {boolean} - indicating if the number is odd
              */
-            get odd() {
+            get odd()
+            {
                 return !!(this & 1);
             },
             /**
@@ -1744,7 +1714,8 @@
              * @method   num#parity
              * @returns {number} - parity of the number
              */
-            get parity() {
+            get parity()
+            {
                 return this & 1;
             },
             /**
@@ -1754,7 +1725,8 @@
              * @param   {number}  exponent - the exponent
              * @returns {number}           - the powered number
              */
-            pow: function(exponent) {
+            pow: function(exponent)
+            {
                 return Math.pow(this, exponent)
             },
             /**
@@ -1765,7 +1737,8 @@
              * @param   {number}  max - maximum value
              * @returns {boolean}     - boolean indicating if the value lies between the two values
              */
-            between: function(min, max) {
+            between: function(min, max)
+            {
                 return min <= this && this <= max; // this is correct when saying between the endpoints should be included when saying from to the end point "to" is excluded well for mathematicians that is
             },
             /**
@@ -1776,9 +1749,10 @@
              * @param   {number}  max - maximum value
              * @returns {boolean}     - bounded version of the number that falls between the 2 values
              */
-            bound: function(min, max) {
+            bound: {aliases:['clamp'], value:function(min, max)
+            {
                 return Math.min(Math.max(this, min), max);
-            },
+            }},
             /**
              * Rebounds a number between 2 values. Handy for number ranges that are continuous
              * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
@@ -1837,7 +1811,6 @@
                 return function() {
                     var max  = argsMax + arguments.length - partials;
                     var tmp;
-                    arguments.length = max; // set the new length of arguments
     
                     for(var i = max-1, arg = arguments.length-1; i >= 0; i--)
                     {
@@ -1847,10 +1820,11 @@
                         else
                         {
                             tmp = arguments[arg--]; // we need an intermediate variable here otherwise the arg is undefined on setting
-                            arguments[i] = val;
+                            arguments[i] = tmp;
                         }
                     }
     
+                    arguments.length = max; // set the new length of arguments
                     return fnc.apply(ctx_, arguments);
                 }
             },
@@ -1918,19 +1892,15 @@
             }
         }
     });
-    /**
-     * Math
-     */
     constructWrapper(Math, 'math', {
         /**
          * @namespace math
-         * @memberOf module:_
          */
         static: {
             /**
              * Return true based on a certain probability based on a number between 0 & 1;
              * @public
-             * @method module:_.byProb
+             * @method math.byProb
              * @param   {number}  p - probability to return true
              * @returns {boolean}   - true or false based on the probability
              */
@@ -1940,7 +1910,7 @@
             /**
              * Return the distance between 2 points in Euclidean space
              * @public
-             * @method module:_.distance
+             * @method math.distance
              * @param   {number}  x1 - x position for point1
              * @param   {number}  y1 - y position for point1
              * @param   {number}  x2 - x position for point2
@@ -1953,7 +1923,7 @@
             /**
              * Return the squared distance between 2 points in Euclidean space
              * @public
-             * @method module:_.distanceSquared
+             * @method math.distanceSquared
              * @param   {number}  x1 - x position for point1
              * @param   {number}  y1 - y position for point1
              * @param   {number}  x2 - x position for point2
@@ -1966,7 +1936,7 @@
             /**
              * Calculates the angle between a the y-axis and a line through a point x, y calculated clockwise (slope)
              * @public
-             * @method module:_.angle
+             * @method math.angle
              * @param   {number}  x -
              * @param   {number}  y -
              * @returns {number} - angle in degrees
@@ -1977,7 +1947,7 @@
             /**
              * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
              * @public
-             * @method module:_.angle
+             * @method math.angle
              * @param   {number}  x -
              * @param   {number}  y -
              * @returns {number} - angle in degrees
@@ -1988,7 +1958,7 @@
             /**
              * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
              * @public
-             * @method module:_.angle
+             * @method math.angle
              * @param   {number}  angle - angle in degrees
              * @returns {number} - angle in degrees
              */
@@ -1998,7 +1968,7 @@
             /**
              * Convert degrees to radians.
              *
-             * @method module:_.deg2Rad
+             * @method math.deg2Rad
              * @param {number} degrees
              * @returns {number} radians
              */
@@ -2012,7 +1982,7 @@
             /**
              * Decimal log function
              * @public
-             * @method module:_.log10
+             * @method math.log10
              * @param   {number} val - value to get the log10 from
              * @returns {number}     - angle in degrees
              */
@@ -2022,7 +1992,7 @@
             /**
              * Convert radians to degrees
              *
-             * @method module:_.rad2Deg
+             * @method math.rad2Deg
              * @param {number} radians
              * @returns {number} degrees
              */
@@ -2038,7 +2008,7 @@
              * See http://jsperf.com/math-s-min-max-vs-homemade/5
              * Borrowed from phaser
              *
-             * @method module:_.maxmore
+             * @method math.maxmore
              * @return {number} The highest value from those given.
              */
             maxmore: function ()
@@ -2059,7 +2029,7 @@
              * See http://jsperf.com/math-s-min-max-vs-homemade/5
              * Borrowed from phaser
              *
-             * @method module:_.minmore
+             * @method math.minmore
              * @return {number} The lowest value from those given.
              */
             minmore: function () {
@@ -2076,10 +2046,6 @@
             }
         }
     });
-    /**
-     * Integer
-     * // TODO check if we can do something with signed arrays
-     */
     constructWrapper(null, 'int', {
         /**
          * @namespace int
@@ -2099,13 +2065,13 @@
              * Returns the length of an integer
              * @public
              * @method int.length
-             * @param   {number} int    - integer to measure the length
-             * @param   {string} format - format for the lead zero's for example '0000'
-             * @returns {string}        - string with leading zero's
+             * @param   {number}        int           - integer to measure the length
+             * @param   {string|number} format_length - format for the lead zero's for example '0000'
+             * @returns {string}                      - string with leading zero's
              */
             // TODO cap to max value
-            leadZeros: function(int, format) {
-                var length = format.length;
+            leadZeros: function(int, format_length) {
+                var length = (typeof(format_length) === 'string') ? format_length.length : format_length;
     
                 return (int/Math.pow(10, length)).toFixed(length).substr(2);
             },
@@ -2131,7 +2097,7 @@
              */
             rebound: function(int) {
                 /**
-                 * Rebounds a number between 2 values. Handy for arrays that are continuous
+                 * Range function return by rebound
                  * @private
                  * @param   {number}  min - minimum value
                  * @param   {number}  max - maximum value

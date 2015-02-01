@@ -32,7 +32,6 @@ constructWrapper(Function, 'fnc', {
             return function() {
                 var max  = argsMax + arguments.length - partials;
                 var tmp;
-                arguments.length = max; // set the new length of arguments
 
                 for(var i = max-1, arg = arguments.length-1; i >= 0; i--)
                 {
@@ -42,10 +41,11 @@ constructWrapper(Function, 'fnc', {
                     else
                     {
                         tmp = arguments[arg--]; // we need an intermediate variable here otherwise the arg is undefined on setting
-                        arguments[i] = val;
+                        arguments[i] = tmp;
                     }
                 }
 
+                arguments.length = max; // set the new length of arguments
                 return fnc.apply(ctx_, arguments);
             }
         },

@@ -1,23 +1,20 @@
-/**
- * Object
- */
 constructWrapper(Object, 'obj', {
     /**
      * @namespace obj
-     * @memberOf module:_
      */
     static: {
-        // TODO object reduce function
         /**
          * Clones an object
          * @public
          * @static
-         * @method module:_.obj.clone
+         * @method obj.clone
          * @param   {Object}  obj   - object to be cloned
          * @return  {Object}  clone - the cloned object
          */
         // TODO These should be expanded with frozen, extensible states etc
         clone: function clone(obj) {
+            if(_.obj.isPrimitive(obj)) return obj;
+
             var clone = _.create(obj._.proto());
             var names = obj._.names();
 
@@ -31,7 +28,7 @@ constructWrapper(Object, 'obj', {
          * Clones an object
          * @public
          * @static
-         * @method module:_.obj.cloneDeep
+         * @method obj.cloneDeep
          * @param   {Object}  obj   - object to be cloned
          * @return  {Object}  clone - the cloned object
          */
@@ -46,25 +43,11 @@ constructWrapper(Object, 'obj', {
             });
             return clone;
         },
-        /**""
-         * Empties an object remove destroying the object itself
-         * @public
-         * @static
-         * @method module:_.obj.empty
-         * @return  {Object}  this - for chaining
-         */
-        empty: function() {
-            this.each(function(prop) {
-                delete this[prop];
-            }, this);
-
-            return this
-        },
         /**
          * Extends an object with function/properties from a module object
          * @public
          * @static
-         * @method module:_.obj.extend
+         * @method obj.extend
          * @param   {Object}  obj          - object to be extended
          * @param   {Object=} settings_ - optional settings/default descriptor
          * @param   {Object}  module       - object containing functions/properties to extend the object with
@@ -75,7 +58,7 @@ constructWrapper(Object, 'obj', {
          * Checks is a property is defined
          * @public
          * @static
-         * @method module:_.obj.isDefined
+         * @method obj.isDefined
          * @param   {Object} prop - property to check
          * @returns {boolean}     - indication of the property definition
          */
@@ -106,7 +89,7 @@ constructWrapper(Object, 'obj', {
          * Checks is a property is undefined
          * @public
          * @static
-         * @method module:_.obj.isUndefined
+         * @method obj.isUndefined
          * @param   {Object} prop - property to check
          * @returns {boolean}     - indication of the property definition
          */
@@ -117,7 +100,7 @@ constructWrapper(Object, 'obj', {
          * Returns the type of an object. Better suited then the one from js itself
          * @public
          * @static
-         * @method module:_.obj.typeof
+         * @method obj.typeof
          * @param   {Object} obj - object tot check the type from
          * @returns {string} - type of the object
          */
@@ -136,16 +119,11 @@ constructWrapper(Object, 'obj', {
             return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
         }
     },
-    /**
-     * Extension of the native Object class prototype
-     *
-     * @class Object
-     */
     prototype: {
         /**
          * Singular push function to solve problems with differences between objects & arrays
          * @public
-         * @method Array:_.arr._push
+         * @method obj#_add
          * @this    {Array}
          * @param  {...any}  val - value to push
          * @return  {Array} this - this for chaining
@@ -158,7 +136,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Copies keys to an array
          * @public
-         * @method Object#_define
+         * @method obj#define
          * @this   {Object}
          * @param  {string}       prop - the property name
          * @param  {Object} descriptor - descriptor object
@@ -171,7 +149,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Remove elements based on index
          * @public
-         * @method Object:_.arr.del
+         * @method obj#del
          * @this       {Object}
          * @param  {...number} ___keys - indices SORTED
          * @return     {Array}   this - mutated array for chaining
@@ -187,7 +165,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Remove elements based on index
          * @public
-         * @method Array:_.arr.del$
+         * @method obj#del$
          * @this   {Array}
          * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match$ function
@@ -204,7 +182,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without the specified indices
          * @public
-         * @method Array:_.arr.$del
+         * @method obj#$del
          * @this       {Array}
          * @param  {...number} ___keys - keys
          * @return     {Array}    this - new array without the specified indices
@@ -223,7 +201,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without the specified indices
          * @public
-         * @method Array:_.arr.$del$
+         * @method obj#$del$
          * @this   {Array}
          * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match$ function
@@ -242,7 +220,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Copies keys to an array
          * @public
-         * @method Object#_define
+         * @method obj#define
          * @this   {Object}
          * @param  {string}       prop - the property name
          * @return {Object} descriptor - descriptor object
@@ -254,7 +232,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          * @public
-         * @method Object#_each
+         * @method obj#each
          * @this  {Object}
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
@@ -269,7 +247,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          * @public
-         * @method Object#eachRight
+         * @method obj#eachRight
          * @this  {Object}
          * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
          * @param {function} cb    - callback function to be called for each element
@@ -289,7 +267,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Filters
          * @public
-         * @method Object#filter
+         * @method obj#filter
          * @this   {Object}
          * @param  {Function} cb      - callback function to be called for each element
          * @param  {Object=}  opt_ctx - optional context
@@ -307,7 +285,6 @@ constructWrapper(Object, 'obj', {
         /**
          * Finds first element that is picked by the callback function
          * @private
-         * @this   {Array}
          * @param  {Function} cb   - callback function to be called for each element
          * @param  {Object=}  ctx_ - optional context
          * @return {any} first value that is found
@@ -342,7 +319,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Returns an array containing the keys of an object (enumerable properties))
          * @public
-         * @method Object#_keys
+         * @method obj#keys
          * @this   {Object}
          * @return {Array} keys of the object
          */
@@ -352,7 +329,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Removes 1st values from an object|array
          * @public
-         * @method Object:_.obj.remove
+         * @method obj#remove
          * @this   {Object|Array}
          * @param  {...any}       ___values - values to remove
          * @return {Object|Array} this      - mutated array for chaining
@@ -372,7 +349,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Removes 1st value from an object|array based on a match function
          * @public
-         * @method Array:_.obj.remove$
+         * @method obj#remove$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                          ctx_   - optional context for the match$ function
@@ -388,7 +365,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates new array without the specified 1st values
          * @public
-         * @method Object:_.obj.$remove
+         * @method obj#$remove
          * @this   {Object|Array}
          * @param  {...any} ___values - values to remove
          * @return {Array}  output    - new array without the values
@@ -409,7 +386,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new object|array without 1st value based on a match function
          * @public
-         * @method Object:_.obj.$remove$
+         * @method obj#$remove$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                          ctx_   - optional context for the match$ function
@@ -429,7 +406,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Removes all specified values from an array
          * @public
-         * @method Array:_.arr.removeAll
+         * @method obj#removeAll
          * @this       {Array}
          * @param     {...any} ___values - values to remove
          * @return     {Array}     this - mutated array for chaining
@@ -446,7 +423,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Removes all values from an array based on a match function
          * @public
-         * @method Array:_.arr.removeAll$
+         * @method obj#removeAll$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -463,7 +440,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates new array without all specified values
          * @public
-         * @method Array:_.arr.$removeAll
+         * @method obj#$removeAll
          * @this       {Array}
          * @param     {...any} ___values - values to remove
          * @return     {Array}    output - new array without the values
@@ -481,7 +458,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without all value specified by the match function
          * @public
-         * @method Array:_.arr.$removeAll$
+         * @method obj#$removeAll$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match$ function
@@ -534,7 +511,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Returns the number of own properties on an object
          * @public
-         * @method Object#_size
+         * @method obj#size
          * @this   {Object}
          * @return {number} the 'length' of the object
          */
@@ -551,7 +528,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Returns an array containing the names of an object (includes non-enumerable properties)
          * @public
-         * @method Object#names
+         * @method obj#names
          * @return {Array} keys of the object
          */
         names: {aliases: ['keysAll'], value:function() {
@@ -560,14 +537,14 @@ constructWrapper(Object, 'obj', {
         /**
          * Shortcut for hasOwnProperty
          * @public
-         * @method Object#owns
+         * @method obj#owns
          * @return {boolean} boolean indicating ownership
          */
         owns: Object.prototype.hasOwnProperty,
         /**
          * Returns an array containing the keys & values of an object (enumerable properties)
          * @public
-         * @method Object#_pairs
+         * @method obj#pairs
          * @this   {Object}
          * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
          */
@@ -584,7 +561,7 @@ constructWrapper(Object, 'obj', {
          * Sets/gets the prototype of an object
          * NOTE setting a prototype using __proto__ is non standard use at your own risk!
          * @public
-         * @method Object#_proto
+         * @method obj#proto
          * @this   {Object}
          * @param   {Array}  proto      - the prototype to be set
          * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
@@ -599,7 +576,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Better to string version
          * @public
-         * @method Object#_toString
+         * @method obj#toString
          * @this    {Object}
          * @returns {string} - string representation of the object
          */
@@ -621,7 +598,7 @@ constructWrapper(Object, 'obj', {
         /**
          * Returns an array containing the values of an object (enumerable properties)
          * @public
-         * @method Object#_values
+         * @method obj#values
          * @this   {Object}
          * @return {Array} values of the object
          */

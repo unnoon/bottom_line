@@ -39,7 +39,8 @@ constructWrapper(Number, 'num', {
          * @param   {number}   num - number value
          * @returns {function}     - function to add the range
          */
-        rebound: function(num) { // TODO (negative) testcases
+        rebound: function(num)
+        {
             /**
              * Rebounds a number between 2 values. For continuous number ranges
              * @public
@@ -60,7 +61,8 @@ constructWrapper(Number, 'num', {
          * @method   num#sign
          * @returns {number} - sign of the number: -1, 0, 1
          */
-        sign: function(sign) {
+        sign: function(sign)
+        {
             if(sign === undefined) return this > 0?  1 :
                                           this < 0? -1 :
                                                      0 ;
@@ -73,7 +75,8 @@ constructWrapper(Number, 'num', {
          * @method   num#even
          * @returns {boolean} - indicating if the number is even
          */
-        get even() {
+        get even()
+        {
             return !(this & 1);
         },
         /**
@@ -82,7 +85,8 @@ constructWrapper(Number, 'num', {
          * @method   num#odd
          * @returns {boolean} - indicating if the number is odd
          */
-        get odd() {
+        get odd()
+        {
             return !!(this & 1);
         },
         /**
@@ -91,7 +95,8 @@ constructWrapper(Number, 'num', {
          * @method   num#parity
          * @returns {number} - parity of the number
          */
-        get parity() {
+        get parity()
+        {
             return this & 1;
         },
         /**
@@ -101,7 +106,8 @@ constructWrapper(Number, 'num', {
          * @param   {number}  exponent - the exponent
          * @returns {number}           - the powered number
          */
-        pow: function(exponent) {
+        pow: function(exponent)
+        {
             return Math.pow(this, exponent)
         },
         /**
@@ -112,7 +118,8 @@ constructWrapper(Number, 'num', {
          * @param   {number}  max - maximum value
          * @returns {boolean}     - boolean indicating if the value lies between the two values
          */
-        between: function(min, max) {
+        between: function(min, max)
+        {
             return min <= this && this <= max; // this is correct when saying between the endpoints should be included when saying from to the end point "to" is excluded well for mathematicians that is
         },
         /**
@@ -123,9 +130,10 @@ constructWrapper(Number, 'num', {
          * @param   {number}  max - maximum value
          * @returns {boolean}     - bounded version of the number that falls between the 2 values
          */
-        bound: function(min, max) {
+        bound: {aliases:['clamp'], value:function(min, max)
+        {
             return Math.min(Math.max(this, min), max);
-        },
+        }},
         /**
          * Rebounds a number between 2 values. Handy for number ranges that are continuous
          * Curried version: for example - __num.rebound(4.6)(-5.8, 7.98)
