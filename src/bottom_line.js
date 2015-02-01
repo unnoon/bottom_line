@@ -63,6 +63,8 @@
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
+        if(key !== 'obj') return;
+
         extend(_,     {enumerable: false, overwrite: false}, module.static);
         extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }

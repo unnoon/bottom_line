@@ -9,7 +9,7 @@ describe("Function", function() {
 					return num1*num2;
 				}
 
-				var multiply6 = _.bind(6, multiply);
+				var multiply6 = _.fnc.bind(6, multiply);
 
 				expect(multiply6(6)).to.equal(36);
 			});

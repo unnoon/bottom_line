@@ -63,6 +63,8 @@
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
+        if(key !== 'obj') return;
+
         extend(_,     {enumerable: false, overwrite: false}, module.static);
         extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }
@@ -1460,7 +1462,7 @@
              */
             after: function(substr) {
                 var index = this.indexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this;
+                return (~index)? this.slice(index + substr.length) : this.valueOf();
             },
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
@@ -1471,7 +1473,7 @@
              */
             afterLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this;
+                return (~index)? this.slice(index + substr.length) : this.valueOf();
             },
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
@@ -1482,7 +1484,7 @@
              */
             before: function(substr) {
                 var index = this.indexOf(substr);
-                return (~index)? this.slice(0, index) : this;
+                return (~index)? this.slice(0, index) : this.valueOf();
             },
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
@@ -1493,7 +1495,7 @@
              */
             beforeLast: function(substr) {
                 var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(0, index) : this;
+                return (~index)? this.slice(0, index) : this.valueOf();
             },
             /**
              * Returns the string between a prefix && post substring
@@ -1513,7 +1515,7 @@
              * @returns {string} - the capitalized string
              */
             capitalize: function() {
-                return this[0]? this[0].toUpperCase() + this.slice(1): this;
+                return this[0]? this[0].toUpperCase() + this.slice(1): this.valueOf();
             },
             /**
              * Decapitalize the first character of a string
@@ -1522,7 +1524,7 @@
              * @returns {string} - the decapitalized string
              */
             decapitalize: function() {
-                return this[0]? this[0].toLowerCase() + this.slice(1): this;
+                return this[0]? this[0].toLowerCase() + this.slice(1): this.valueOf();
             },
             /**
              * Checks if the string ends with a certain substr
@@ -1613,7 +1615,7 @@
              */
             toString: function()
             {
-                return this;
+                return this.toString();
             }
         }
     });
@@ -1942,7 +1944,7 @@
              * @returns {number} - angle in degrees
              */
             angle: function(x, y) {
-                return (_.rad2Deg(Math.atan2(x, -y))+360)%360;
+                return (_.math.rad2Deg(Math.atan2(x, -y))+360)%360;
             },
             /**
              * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
@@ -1953,7 +1955,7 @@
              * @returns {number} - angle in degrees
              */
             angleSloped: function(x, y) {
-                return (90-_.rad2Deg(Math.atan2(x, -y))+360)%360;
+                return (90-_.math.rad2Deg(Math.atan2(x, -y))+360)%360;
             },
             /**
              * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)

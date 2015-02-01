@@ -48,7 +48,7 @@ constructWrapper(Math, 'math', {
          * @returns {number} - angle in degrees
          */
         angle: function(x, y) {
-            return (_.rad2Deg(Math.atan2(x, -y))+360)%360;
+            return (_.math.rad2Deg(Math.atan2(x, -y))+360)%360;
         },
         /**
          * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
@@ -59,7 +59,7 @@ constructWrapper(Math, 'math', {
          * @returns {number} - angle in degrees
          */
         angleSloped: function(x, y) {
-            return (90-_.rad2Deg(Math.atan2(x, -y))+360)%360;
+            return (90-_.math.rad2Deg(Math.atan2(x, -y))+360)%360;
         },
         /**
          * Calculates the angle between a the x-axis and a line through a point x, y calculated counter-clockwise (slope)
