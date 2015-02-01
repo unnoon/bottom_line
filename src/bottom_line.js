@@ -18,7 +18,7 @@
     default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
 }(this, function() {
     var stack = []; // stack holding all wrapped objects accessed from ._
-    var index = 0;  // current index int he stack
+    var index = 0;  // current index in the stack
 
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -198,7 +198,8 @@
          */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
-        }
+        },
+        extend: extend
     });
 
     /* @include shims.js */

@@ -43,3 +43,23 @@ remove(fnc, ctx_)         // remove values based on a function
 select
 pick/choose/favor
 
+        /**
+         * Mixin properties on a class. It is assumed this function is called inside the constructor
+         * @public
+         * @method module:_.fnc.mixin
+         * @param {Function}        child - child
+         * @param {Function|Array} mixins - array or sinlge mixin classes
+         */
+        mixin: function(child, mixins) {
+
+            child._mixin = function(mixin) {
+                return mixin.prototype;
+            };
+
+            mixins._.each(function(mixin) {
+                // copy static fucntions
+                _.extend(child, mixin);
+                // copy prototype functions
+                _.extend(child.prototype, mixin.prototype);
+            });
+        },

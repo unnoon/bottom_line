@@ -6,23 +6,15 @@
 
         <script src="dist/bottom_line.js"></script>
         <script>
-            var arr1 = [1, 2, 3];
-            var arr2 = [2, 5];
+            function multiply(num1, num2) {
+                return num1*num2;
+            }
 
-            var diff = arr1._.diff(arr2);
+            var multiply6 = _.bind(6, multiply);
 
-            console.log(diff._.toString());
+            var result = multiply6(6);
 
-
-            arr1._.each(function(arr) {
-                arr._.each(function(elm) {
-
-
-                    return broken = elm < 666;
-                });
-
-                return broken;
-            })
+            console.log(result);
         </script>
     </head>
     <body>

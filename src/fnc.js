@@ -1,153 +1,97 @@
-
-// FIXME textcases and complete adaptation to static methods
 constructWrapper(Function, 'fnc', {
     /**
      * @namespace fnc
-     * @memberOf module:_
      */
     static: {
         /**
-         * Delays a function by a given number of milliseconds
-         * Use bind to prefill args and set context: fnc.bind(this, 'arg1', 'arg2').callAfter(10);
+         * Static version of bind. Implements partial in case an argument is undefined
          * @public
-         * @method module:_.fnc.callAfter
-         * @param {number} delay   - optional arguments
-         * @param {number} cb      - callback function to call after the delay
-         * @param {number} opt_ctx - optional arguments
+         * @static
+         * @method fnc.bind
+         * @param   {...any=}  ___args_ - arguments to prefill
+         * @param   {function}    fnc   - function to bind
+         * @param   {object=}     ctx_  - optional context
+         * @returns {function}          - bootstrapped version of the function
          */
-        callAfter: function (delay, cb, opt_ctx) {
-            setTimeout(function() {
-                cb.call(opt_ctx)
-            }, delay);
+        bind: function(___args_, fnc, ctx_)
+        {
+            if(arguments.length <= 2
+            && typeof(arguments[0]) === 'function'
+            && typeof(arguments[1]) !== 'function')
+            {
+                return fnc.bind(ctx_)
+            }
+
+            // if ___args_ are given return a partial
+            var args     = arguments;
+            var argsMax  = args.length-(typeof(args[args.length-1]) === 'function' ? 1 : 2);
+            var partials = 0;
+
+            args._.each(function(arg) {if(arg === undefined) partials++});
+
+            return function() {
+                var max  = argsMax + arguments.length - partials;
+                var tmp;
+                arguments.length = max; // set the new length of arguments
+
+                for(var i = max-1, arg = arguments.length-1; i >= 0; i--)
+                {
+                    if(args[i] !== undefined && i < argsMax) {
+                        arguments[i] = args[i]
+                    }
+                    else
+                    {
+                        tmp = arguments[arg--]; // we need an intermediate variable here otherwise the arg is undefined on setting
+                        arguments[i] = val;
+                    }
+                }
+
+                return fnc.apply(ctx_, arguments);
+            }
         },
         /**
          * Defers some methods so they'll get set to the end of the stack
          * @public
-         * @method module:_.fnc.defer
-         * @param {number} cb      - callback function to call after the delay
-         * @param {number} opt_ctx - optional context
+         * @method fnc.defer
+         * @param {number} cb   - callback function to call after the delay
+         * @param {number} ctx_ - optional context
          */
-        defer: function (cb, opt_ctx) {
+        defer: function (cb, ctx_) {
             setTimeout(function() {
-                cb.call(opt_ctx)
+                cb.call(ctx_)
             }, 0);
         },
         /**
-         * Memoization function
+         * Delays a function by a given number of milliseconds
          * @public
-         * @method module:_.fnc.memoize
-         * @param {number}   delay   - optional arguments
+         * @static
+         * @method fnc.delay
+         * @param {number} ms   - delay in milliseconds
+         * @param {number} cb   - callback function to call after the delay
+         * @param {number} ctx_ - optional context for the callback
          */
-        memoize: function(ctx)
-        {
-            // TODO
-        },
-        /**
-         * Creates a partial version of the function that can be partially prefilled/bootstrapped with arguments use undefined to leave blank
-         * @public
-         * @method module:_.fnc.partial
-         * @param   {...any}   var_args - arguments to prefill/bootstrap. Use undefined to identify custom input
-         * @returns {function}          - partial version of the function
-         */
-        partial: function (var_args, fnc) {
-            var args = arguments;
-
-            return function() {
-                for(var i = 0, arg = 0; i < args.length && arg < arguments.length; i++)
-                {
-                    if(args[i] === undefined)
-                    {
-                        args[i] = arguments[arg++];
-                    }
-                }
-                return fnc.apply(this, args);
-            }
-        },
-        /**
-         * Similar to bind but only prefills the arguments not the context
-         * @public
-         * @method module:_.fnc.strap
-         * @param   {...any}   var_args - arguments to prefill
-         * @param   {Function} fnc      - function to strap
-         * @returns {Function}          - bootstrapped version of the function
-         */
-        // TODO add partial support
-        strap: function(var_args, fnc) {
-            var args = _.to.array(arguments); // convert to array
-
-            fnc = args.pop();
-
-            return fnc.bind.apply(fnc, [null]._.append(args));
-        },
-        /**
-         * Similar to bind but only prefills the arguments not the context
-         * @public
-         * @method module:_.fnc.bind
-         * @param   {...any}   var_args - arguments to prefill
-         * @param   {Function} fnc      - function to strap
-         * @returns {Function}          - bootstrapped version of the function
-         */
-        // TODO add partial support
-        bind: function(ctx, var_args, fnc) {
-            var args = _.arr(arguments); // convert to array
-
-            fnc = args.pop();
-
-            return fnc.bind.apply(fnc, args)
-        },
+        delay: {aliases: ['callAfter'], value: function (ms, cb, ctx_) {
+            setTimeout(function() {
+                cb.call(ctx_)
+            }, ms);
+        }},
         /**
          * Super simple inheritance function
          * @public
-         * @method module:_.fnc.inherit
-         * @param   {Function} child  - child
-         * @param   {Function} parent - parent to inherit from
+         * @method fnc.inherit
+         * @param {function} child  - child
+         * @param {function} parent - parent to inherit from
+         * @param {string}   super_ - name for the object name storing the super prototype. default '_super'
          */
-        inherit: function(child, parent) {
+        inherit: function(child, parent, super_) {
             child.prototype = Object.create(parent.prototype);
             child.prototype.constructor = child;
-            child._super = parent.prototype;
-        },
-        /**
-         * Mixin properties on a class. It is assumed this function is called inside the constructor
-         * @public
-         * @method module:_.fnc.mixin
-         * @param {Function}        child - child
-         * @param {Function|Array} mixins - array or sinlge mixin classes
-         */
-        mixin: function(child, mixins) {
-
-            child._mixin = function(mixin) {
-                return mixin.prototype;
-            };
-
-            mixins._.each(function(mixin) {
-                // copy static fucntions
-                _.extend(child, mixin);
-                // copy prototype functions
-                _.extend(child.prototype, mixin.prototype);
-            });
-        },
-        /**
-         * Nests functions together.
-         * @public
-         * @method module:_.fnc.nest
-         * @param {Array|Function} $arr_fnc - an array of functions or a single function in case of supplying
-         * @param {...Function}    var_args - one or multiple functions
-         */
-        nest: function($arr_fnc, var_args) {
-            var fns = (var_args === undefined)? $arr_fnc : arguments;
-
-            return function() {
-                for(var i = 0, max = fns.length; i < max; i++)
-                {
-                    fns[i].apply(this, arguments);
-                }
-            }
+            child[super_ || '_super'] = parent.prototype;
         },
         /**
          * returns a negated form of a function
          * @public
-         * @method module:_.fnc.not
+         * @method fnc.not
          * @param  {function} fnc - an array of functions or a single function in case of supplying
          * @return {function} negated form of the function
          */
@@ -158,29 +102,14 @@ constructWrapper(Function, 'fnc', {
     prototype:
     {
         /**
-         * Better to string version
+         * toString wrapper for bottom_line
          * @public
-         * @method Function#toString
-         * @this    {Function}
-         * @returns {string} - string representation of the object
+         * @method fnc#toString
+         * @returns {string} - string representation of the function
          */
         toString: function()
         {
             return this.toString();
-        },
-        /**
-         * Returns the name of a function if it is an unnamed function it returns an empty string ''
-         * NOTE avoid using this function as on older browsers name property is not defined and is shimmed
-         * @public
-         * @method Function#name
-         * @this    {Function}
-         * @returns {string} - the name of the function
-         */
-        // FIXME a better solution is to shim the name property in case it is not defined. In that case we we can use a simpler function
-        get name()
-        {
-            if(_.isDefined(Function.prototype.name)) return this.name;
-            else return this.toString().match(/^function\s?([^\s(]*)/)[1];
         }
     }
 });
