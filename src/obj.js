@@ -560,16 +560,17 @@ constructWrapper(Object, 'obj', {
         /**
          * Sets/gets the prototype of an object
          * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+         *
          * @public
          * @method obj#proto
-         * @this   {Object}
-         * @param   {Array}  proto      - the prototype to be set
-         * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
+         *
+         * @param   {Array}        proto - the prototype to be set
+         * @returns {Array|Object} this  - the prototype of the object or the object itself for chaining
          */
         proto: function(proto) {
             if(proto === undefined) return Object.getPrototypeOf(this);
 
-            this._._proto__ = proto;
+            this.__proto__ = proto;
 
             return this;
         },
