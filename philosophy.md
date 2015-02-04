@@ -1,4 +1,4 @@
-if I'm gonna do a module loader make sure it can load condtionally
+if I'm gonna do a module loader make sure it can load condtionally. and can load stuff in series as well
 
 remove all internal function and move them to some utils object. For speed improvements
 
