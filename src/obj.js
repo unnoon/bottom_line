@@ -66,6 +66,23 @@ constructWrapper(Object, 'obj', {
             return prop !== undefined;
         },
         /**
+         * Checks if an object is empty
+         * @public
+         * @static
+         * @method obj.isEmpty
+         * @param   {Object}  obj - object tot check the void
+         * @returns {boolean}     - boolean indicating if the object is empty
+         */
+        isEmpty: function (obj)
+        {
+            var key;
+
+            for (key in obj) {
+                return false;
+            }
+            return true;
+        },
+        /**
          * Checks if an object is an primitive
          * @public
          * @static
