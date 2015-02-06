@@ -16,7 +16,9 @@ module.exports = function(grunt) {
 			dist : {
 				src: ['dist/bottom_line.js'],
 				options: {
-					destination: 'docs'
+					destination: 'docs',
+                    template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
+                    configure : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json"
 				}
 			}
 		},

@@ -792,16 +792,29 @@
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
-            toString: function()
+            toString: function(visited_)
             {
                 var output = '';
+                var val;
+                var obj;
     
                 for(var key in this)
                 {
                     if(this.hasOwnProperty(key))
-                    {   // TODO add punctuation mark if the key holds a string
-                        // TODO add proper formatting
-                        output += (output? ', ' : '{') + key + ': ' + (this[key]? this[key]._.toString() : this[key]);
+                    {
+                        obj = this[key];
+    
+                        if(_.isPrimitive(obj))      {val = obj}
+                        else
+                        {
+                            if(!visited_)           {visited_ = [this]}
+    
+                            if(visited_._.has(obj)) {val = '[circular ref]'}
+                            else                    {visited_.push(obj); val = obj._.toString(visited_)}
+                        }
+    
+                        // TODO punctuation for strings & proper formatting
+                        output += (output? ', ' : '{') + key + ': ' + val
                     }
                 }
     

@@ -86,16 +86,6 @@ constructWrapper(Math, 'math', {
             };
         }(),
         /**
-         * Decimal log function
-         * @public
-         * @method math.log10
-         * @param   {number} val - value to get the log10 from
-         * @returns {number}     - angle in degrees
-         */
-        log10: function(val) {
-            return Math.log(val)/Math.LN10;
-        },
-        /**
          * Convert radians to degrees
          *
          * @method math.rad2Deg

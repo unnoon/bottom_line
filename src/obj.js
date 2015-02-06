@@ -70,7 +70,7 @@ constructWrapper(Object, 'obj', {
          * @public
          * @static
          * @method obj.isEmpty
-         * @param   {Object}  obj - object tot check the void
+         * @param   {Object}  obj - object to check the void
          * @returns {boolean}     - boolean indicating if the object is empty
          */
         isEmpty: function (obj)
@@ -604,21 +604,21 @@ constructWrapper(Object, 'obj', {
             var val;
             var obj;
 
-            if(!visited_) visited_ = [this];
-
             for(var key in this)
             {
                 if(this.hasOwnProperty(key))
                 {
                     obj = this[key];
 
-                    if(!_.isPrimitive(obj))
-                    {
-                        if(visited_._has(obj)) {val = '[circular ref]'}
-                        else                   {visited_.push(obj); val = obj._toString(visited_)}
-                    }
+                    if(_.isPrimitive(obj))      {val = obj}
                     else
-                        val = obj;
+                    {
+                        if(!visited_)           {visited_ = [this]}
+
+                        if(visited_._.has(obj)) {val = '[[circular ref]]'}
+                        else                    {visited_.push(obj); val = obj._.toString(visited_)}
+                    }
+
                     // TODO punctuation for strings & proper formatting
                     output += (output? ', ' : '{') + key + ': ' + val
                 }
