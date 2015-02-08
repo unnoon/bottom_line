@@ -205,9 +205,28 @@
     });
 
     _.extend(Function.prototype, {overwrite: false}, {
+        /**
+         * Returns the name of a function
+         * @public
+         * @method Function#name
+         * @returns {string} - name of the functino
+         */
         name: function()
         {
             return this.toString().match(/^function\s?([^\s(]*)/)[1];
+        }
+    });
+    
+    _.extend(Math, {overwrite: false}, {
+        /**
+         * Decimal log function
+         * @public
+         * @method Math.log10
+         * @param   {number} val - value to get the log10 from
+         * @returns {number}     - angle in degrees
+         */
+        log10: function(val) {
+            return Math.log(val)/Math.LN10;
         }
     });
     constructWrapper(Object, 'obj', {
@@ -276,6 +295,23 @@
              */
             isDefined: function(prop) {
                 return prop !== undefined;
+            },
+            /**
+             * Checks if an object is empty
+             * @public
+             * @static
+             * @method obj.isEmpty
+             * @param   {Object}  obj - object to check the void
+             * @returns {boolean}     - boolean indicating if the object is empty
+             */
+            isEmpty: function (obj)
+            {
+                var key;
+    
+                for (key in obj) {
+                    return false;
+                }
+                return true;
             },
             /**
              * Checks if an object is an primitive
@@ -772,16 +808,17 @@
             /**
              * Sets/gets the prototype of an object
              * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+             *
              * @public
              * @method obj#proto
-             * @this   {Object}
-             * @param   {Array}  proto      - the prototype to be set
-             * @returns {Array|Object} this - the prototype of the object or the object itself for chaining
+             *
+             * @param   {Array}        proto - the prototype to be set
+             * @returns {Array|Object} this  - the prototype of the object or the object itself for chaining
              */
             proto: function(proto) {
                 if(proto === undefined) return Object.getPrototypeOf(this);
     
-                this._._proto__ = proto;
+                this.__proto__ = proto;
     
                 return this;
             },
@@ -809,7 +846,7 @@
                         {
                             if(!visited_)           {visited_ = [this]}
     
-                            if(visited_._.has(obj)) {val = '[circular ref]'}
+                            if(visited_._.has(obj)) {val = '[[circular ref]]'}
                             else                    {visited_.push(obj); val = obj._.toString(visited_)}
                         }
     
@@ -1995,16 +2032,6 @@
                 };
             }(),
             /**
-             * Decimal log function
-             * @public
-             * @method math.log10
-             * @param   {number} val - value to get the log10 from
-             * @returns {number}     - angle in degrees
-             */
-            log10: function(val) {
-                return Math.log(val)/Math.LN10;
-            },
-            /**
              * Convert radians to degrees
              *
              * @method math.rad2Deg
@@ -2023,10 +2050,10 @@
              * See http://jsperf.com/math-s-min-max-vs-homemade/5
              * Borrowed from phaser
              *
-             * @method math.maxmore
+             * @method math.max$
              * @return {number} The highest value from those given.
              */
-            maxmore: function ()
+            max$: function (num1, num2, ___more_)
             {
                 for (var i = 1, max = 0, len = arguments.length; i < len; i++)
                 {
@@ -2044,10 +2071,10 @@
              * See http://jsperf.com/math-s-min-max-vs-homemade/5
              * Borrowed from phaser
              *
-             * @method math.minmore
+             * @method math.min$
              * @return {number} The lowest value from those given.
              */
-            minmore: function () {
+            min$: function () {
     
                 for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
                 {
@@ -2074,7 +2101,7 @@
              * @returns {number} - length of the integer
              */
             length: function(int) {
-                return int? 1+ _.math.log10(int)|0 : 1;
+                return int? 1+ Math.log10(int)|0 : 1;
             },
             /**
              * Returns the length of an integer
@@ -2084,9 +2111,11 @@
              * @param   {string|number} format_length - format for the lead zero's for example '0000'
              * @returns {string}                      - string with leading zero's
              */
-            // TODO cap to max value
-            leadZeros: function(int, format_length) {
+            leadZeros: function(int, format_length)
+            {
                 var length = (typeof(format_length) === 'string') ? format_length.length : format_length;
+    
+                int = (_.int.length(int) > length) ? Math.pow(10, length)-1 : int;
     
                 return (int/Math.pow(10, length)).toFixed(length).substr(2);
             },

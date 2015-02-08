@@ -10,7 +10,11 @@
                 return num1*num2;
             }
 
-            var multiply6 = _.bind(6, multiply);
+            function Multiply(num1, num2) {
+                return num1*num2;
+            }
+
+            var multiply6 = _.fnc.bind(6, multiply);
 
             var result = multiply6(6);
 

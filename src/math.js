@@ -104,10 +104,10 @@ constructWrapper(Math, 'math', {
          * See http://jsperf.com/math-s-min-max-vs-homemade/5
          * Borrowed from phaser
          *
-         * @method math.maxmore
+         * @method math.max$
          * @return {number} The highest value from those given.
          */
-        maxmore: function ()
+        max$: function (num1, num2, ___more_)
         {
             for (var i = 1, max = 0, len = arguments.length; i < len; i++)
             {
@@ -125,10 +125,10 @@ constructWrapper(Math, 'math', {
          * See http://jsperf.com/math-s-min-max-vs-homemade/5
          * Borrowed from phaser
          *
-         * @method math.minmore
+         * @method math.min$
          * @return {number} The lowest value from those given.
          */
-        minmore: function () {
+        min$: function () {
 
             for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
             {

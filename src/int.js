@@ -11,7 +11,7 @@ constructWrapper(null, 'int', {
          * @returns {number} - length of the integer
          */
         length: function(int) {
-            return int? 1+ _.math.log10(int)|0 : 1;
+            return int? 1+ Math.log10(int)|0 : 1;
         },
         /**
          * Returns the length of an integer
@@ -21,9 +21,11 @@ constructWrapper(null, 'int', {
          * @param   {string|number} format_length - format for the lead zero's for example '0000'
          * @returns {string}                      - string with leading zero's
          */
-        // TODO cap to max value
-        leadZeros: function(int, format_length) {
+        leadZeros: function(int, format_length)
+        {
             var length = (typeof(format_length) === 'string') ? format_length.length : format_length;
+
+            int = (_.int.length(int) > length) ? Math.pow(10, length)-1 : int;
 
             return (int/Math.pow(10, length)).toFixed(length).substr(2);
         },

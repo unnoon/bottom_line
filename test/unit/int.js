@@ -56,7 +56,10 @@ describe("Integer", function() {
 				expect(_.int.leadZeros(50, 3)).to.eql('050');
 				expect(_.int.leadZeros(51, 10)).to.eql('0000000051');
 				expect(_.int.leadZeros(99, 7)).to.eql('0000099');
-				expect(_.int.leadZeros(100, 2)).to.eql('00');
+				expect(_.int.leadZeros(100, 2)).to.eql('99');
+
+                expect(_.int.leadZeros(100, '00')).to.eql('99');
+                expect(_.int.leadZeros(99, '0000000')).to.eql('0000099');
 
 			});
 		});

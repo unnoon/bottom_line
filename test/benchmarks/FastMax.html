@@ -2,10 +2,18 @@
 <html>
 <head>
     <title>Fast max</title>
-    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
     <script src="../../src/bottom_line.js"></script>
     <!--<script src="../../src/bottom_line.old.js"></script>-->
     <script>
+        function maxCombined(num1, num2)
+        {
+            if(arguments.length === 2) {return (num1 > num2)? num1 : num2}
+            else
+            {
+                maxHomeMade.apply(null, arguments);
+            }
+        };
 
         function maxHomeMade()
         {
@@ -24,10 +32,15 @@
             return (num1 > num2)? num1 : num2;
         }
 
+
         var suite = new Benchmark.Suite;
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
+            .add('maxCombined', function() {
+                maxCombined(0.45,  45.56);
+                maxCombined(45.56, 0.45);
+            })
             .add('Math.max', function() {
                 Math.max(0.45,  45.56);
                 Math.max(45.56, 0.45);
@@ -48,7 +61,7 @@
                 console.log('Fastest is ' + this.filter('fastest').pluck('name'));
             })
             // run async
-            .run({ 'async': true });
+            .run({ 'async': false });
     </script>
 </head>
 <body>
