@@ -1,4 +1,4 @@
-constructWrapper(Array, 'arr', {
+construct('arr', {native:Array}, {
     /**
      * @namespace arr
      */

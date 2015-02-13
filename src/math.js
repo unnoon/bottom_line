@@ -1,4 +1,4 @@
-constructWrapper(Math, 'math', {
+construct('math', {native:Math, base:true}, {
     /**
      * @namespace math
      */
@@ -101,13 +101,11 @@ constructWrapper(Math, 'math', {
         }(),
         /**
          * Significantly faster version of Math.max if there are more then 2+x elements
-         * See http://jsperf.com/math-s-min-max-vs-homemade/5
-         * Borrowed from phaser
          *
          * @method math.max$
          * @return {number} The highest value from those given.
          */
-        max: function ()
+        maxm: function ()
         {
             for (var i = 1, max = 0, len = arguments.length; i < len; i++)
             {
@@ -122,13 +120,11 @@ constructWrapper(Math, 'math', {
 
         /**
          * Significantly faster version of Math.min if there are more then 2+x elements
-         * See http://jsperf.com/math-s-min-max-vs-homemade/5
-         * Borrowed from phaser
          *
          * @method math.min$
          * @return {number} The lowest value from those given.
          */
-        min: function () {
+        minm: function () {
 
             for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
             {

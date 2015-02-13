@@ -30,10 +30,15 @@
     };
 
     // wrap functions for chaining
-    function constructWrapper(obj, key, module)
+    function construct(key, settings_, module)
     {
-        var wrapper = {not:{}};
+        var settings = module && settings_ || {};
+        var module   = module || settings_;
+        var obj      = settings.native;
 
+        var wrapper = settings.base? clone(settings.native) : {};
+
+        wrapper.not     = {};
         wrapper.methods = {}; // add methods unwrapped so we can use them with apply
 
         // create instance and chain object including not wrapper
@@ -81,6 +86,16 @@
         extend(wrapper.methods, {enumerable: false}, module.prototype);
     }
 
+    // simple cloning function
+    function clone(obj) {
+        var clone = Object.create(Object.getPrototypeOf(obj));
+
+        Object.getOwnPropertyNames(obj).forEach(function(name) {
+            Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
+        });
+
+        return clone;
+    }
     /**
      * Extends an object with function/properties from a module object
      * @public
@@ -210,8 +225,8 @@
     /* @include str.js  */
     /* @include num.js  */
     /* @include fnc.js  */
-    /* @include math.js */
     /* @include int.js  */
+    /* @include math.js */
 
 	return _
 });

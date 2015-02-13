@@ -1,4 +1,4 @@
-constructWrapper(null, 'int', {
+construct('int', {
     /**
      * @namespace int
      */

@@ -1,4 +1,4 @@
-constructWrapper(Object, 'obj', {
+construct('obj', {native:Object}, {
     /**
      * @namespace obj
      */

@@ -1,4 +1,4 @@
-constructWrapper(Number, 'num', {
+construct('num', {native:Number}, {
     /**
      * @namespace num
      */

@@ -1,4 +1,4 @@
-constructWrapper(Function, 'fnc', {
+construct('fnc', {native:Function}, {
     /**
      * @namespace fnc
      */

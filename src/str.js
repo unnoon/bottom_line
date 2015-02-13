@@ -1,4 +1,4 @@
-constructWrapper(String, 'str', {
+construct('str', {native:String}, {
     /**
      * @namespace str
      */
