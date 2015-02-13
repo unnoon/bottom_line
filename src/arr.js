@@ -45,11 +45,11 @@ constructWrapper(Array, 'arr', {
         /**
          * Append one or more arrays to the current array into a new array
          * @public
-         * @method   arr#$append
+         * @method   arr#Append
          * @param   {...Array} ___arrays - arrays to be appended
          * @returns    {Array}           - The new array that is the result of appending
          */
-        $append: function(___arrays) {
+        Append: function(___arrays) {
             return _.clone(this)._.append.apply(null, arguments); // we can use a null context here since it will get the value from the stack
         },
         /**
@@ -73,18 +73,18 @@ constructWrapper(Array, 'arr', {
          */
         compact: function()
         {
-            return this._.removeAll$(function(val) {return !val});
+            return this._.removeAll(function(val) {return !val});
         },
         /**
          * Removes all falsey values from an array into a new array
          * @public
-         * @method  arr#$compact
+         * @method  arr#Compact
          * @this   {Array}
          * @return {Array} this - new array instance without falsey values
          */
-        $compact: function()
+        Compact: function()
         {
-            return this._.$removeAll$(function(val) {return !val});
+            return this._.RemoveAll$(function(val) {return !val});
         },
         /**
          * Remove elements based on index
@@ -169,13 +169,13 @@ constructWrapper(Array, 'arr', {
         /**
          * Returns the difference between the current and multiple other arrays in a new array
          * @public
-         * @method   arr#$diff
+         * @method   arr#Diff
          * @param   {...Array} ___arrays - array to subtract from this
          * @returns {Array}              - new array containing the difference
          */
-        $diff: function(___arrays)
+        Diff: function(___arrays)
         {
-            if(arguments.length === 1) {return this._.$remove.apply(this, ___arrays)}
+            if(arguments.length === 1) {return this._.Remove.apply(this, ___arrays)}
 
             return _.clone(this)._.diff.apply(null, arguments); // we can use a null context here since it will get the value from the stack
         },
@@ -214,13 +214,13 @@ constructWrapper(Array, 'arr', {
          * Creates a multidimensional array. The dimensions come from the array itself
          * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
-         * @method arr#$dimit
+         * @method arr#Dimit
          * @this   {Array}
          * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
          * @param  {Object}        ctx_  - optional context for the init function
          * @return {Array}               - this initialized multi-dimensional array
          */
-        $dimit: function(init_, ctx_)
+        Dimit: function(init_, ctx_)
         {
             var dimensions = this;
             var arr        = new Array(dimensions[0]);
@@ -318,10 +318,10 @@ constructWrapper(Array, 'arr', {
         /**
          * Flattens a 2 dimensional array into a new array
          * @public
-         * @method arr#$flatten
+         * @method arr#Flatten
          * @returns {Array} - new flattened version of the array
          */
-        $flatten: function() {
+        Flatten: function() {
             return this.concat.apply([], this);
         },
         /**
@@ -360,13 +360,13 @@ constructWrapper(Array, 'arr', {
         /**
          * Calculates the intersection for 2 or more arrays
          * @public
-         * @method arr#$intersect
+         * @method arr#Intersect
          * @this   {Array}
          * @param  {Array} arr - 2 or more arrays
          * @return {Array}     - this for chaining
          */
-        $intersect: function(arr) {
-            return this._.$select.apply(this, arr);
+        Intersect: function(arr) {
+            return this._.Select.apply(this, arr);
         },
         /**
          * Checks if an array intersects an other
@@ -461,13 +461,13 @@ constructWrapper(Array, 'arr', {
         /**
          * Copies and modifies the members of an array according to a certain function
          * @public
-         * @method arr#$modify
+         * @method arr#Modify
          * @this    {Array}
          * @param   {Function} modifier$ - function that modifies the array members
          * @param   {Object=}       ctx_ - optional context for the modifier function
          * @returns {Array}              - the modified array
          */
-        $modify: function(modifier$, ctx_)
+        Modify: function(modifier$, ctx_)
         {
             return _.clone(this)._.modify(modifier$, ctx_);
         },
@@ -576,13 +576,13 @@ constructWrapper(Array, 'arr', {
         /**
          * Calculates the union for 2 arrays into an new array
          * @public
-         * @method arr#$unify
+         * @method arr#Unify
          * @this   {Array}
          * @param  {Array} arr - array to unify
          * @return {Array}     - new array containing the unification
          */
-        $unify: function(arr) {
-            var app = this._.$append(arr);
+        Unify: function(arr) {
+            var app = this._.Append(arr);
 
             return app._.unique();
         },
@@ -606,11 +606,11 @@ constructWrapper(Array, 'arr', {
         /**
          * Accessor: Returns a new version of the array without duplicates
          * @public
-         * @method arr#$unique
+         * @method arr#Unique
          * @this    {Array}
          * @returns {Array} - new array remove duplicates
          */
-        $unique: function() {
+        Unique: function() {
             var unique = [];
 
             this._.each(function(val) {

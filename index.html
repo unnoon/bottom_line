@@ -6,19 +6,9 @@
 
         <script src="dist/bottom_line.js"></script>
         <script>
-            function multiply(num1, num2) {
-                return num1*num2;
-            }
+            var arr1 = [0, 1, '', false, 2, null, undefined, 3, NaN];
 
-            function Multiply(num1, num2) {
-                return num1*num2;
-            }
-
-            var multiply6 = _.fnc.bind(6, multiply);
-
-            var result = multiply6(6);
-
-            console.log(result);
+            var result = arr1._.Compact();
         </script>
     </head>
     <body>

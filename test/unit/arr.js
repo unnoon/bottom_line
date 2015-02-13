@@ -153,18 +153,18 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$append", function() {
+		describe("Append", function() {
 
-			it("$append an array", function() {
+			it("Append an array", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [4, 5, 6];
 
-				expect(arr1._.$append(arr2)).to.eql([1, 2, 3, 4, 5, 6]);
+				expect(arr1._.Append(arr2)).to.eql([1, 2, 3, 4, 5, 6]);
 				expect(arr1).to.eql([1, 2, 3]);
 				expect(arr2).to.eql([4, 5, 6]);
 			});
 
-			it("$append an broken front array", function() {
+			it("Append an broken front array", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [];
 
@@ -175,7 +175,7 @@ describe("Array", function() {
 				testArr[4] = 5;
 				testArr[5] = 6;
 
-				expect(arr1._.$append(arr2)).to.eql(testArr);
+				expect(arr1._.Append(arr2)).to.eql(testArr);
 				expect(arr1).to.eql([1, 2, 3]);
 			});
 			// no further as this basically uses clone and the normal append
@@ -219,12 +219,12 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$compact", function() {
+		describe("Compact", function() {
 
-			it("$compact array", function() {
+			it("Compact array", function() {
 				var arr1 = [0, 1, '', false, 2, null, undefined, 3, NaN];
 
-				expect(arr1._.$compact()).to.eql([1, 2, 3]);
+				expect(arr1._.Compact()).to.eql([1, 2, 3]);
 				// we cannot normally compare because NaN === NaN fails...
 				expect(arr1[0]).to.eql(0);
 				expect(arr1[1]).to.eql(1);
@@ -239,7 +239,7 @@ describe("Array", function() {
 
 
 			it("compact empty array", function() {
-				expect([]._.$compact()).to.eql([]);
+				expect([]._.Compact()).to.eql([]);
 			});
 		});
 
@@ -410,13 +410,13 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$diff", function() {
+		describe("Diff", function() {
 
 			it("simple difference", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [2, 5];
 
-				expect(arr1._.$diff(arr2)).to.eql([1, 3]);
+				expect(arr1._.Diff(arr2)).to.eql([1, 3]);
 				expect(arr1).to.eql([1, 2, 3]);
 			});
 		});
@@ -598,12 +598,12 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$flatten", function() {
+		describe("Flatten", function() {
 
 			it("1-dimensional flatten", function() {
 				var arr1 = [[1, 2], 3, [4, 5]];
 
-				expect(arr1._.$flatten()).to.eql([1, 2, 3, 4, 5]);
+				expect(arr1._.Flatten()).to.eql([1, 2, 3, 4, 5]);
 				expect(arr1).to.eql([[1, 2], 3, [4, 5]]);
 			});
 		});
@@ -677,13 +677,13 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$intersect", function() {
+		describe("Intersect", function() {
 
 			it("$intersection simple", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [2, 3, 4, 5];
 
-				expect(arr1._.$intersect(arr2)).to.eql([2, 3]);
+				expect(arr1._.Intersect(arr2)).to.eql([2, 3]);
 				expect(arr1).to.eql([1, 2, 3]);
 				expect(arr1).to.equal(arr1);
 			});
@@ -692,7 +692,7 @@ describe("Array", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [4, 5];
 
-				expect(arr1._.$intersect(arr2)).to.eql([]);
+				expect(arr1._.Intersect(arr2)).to.eql([]);
 				expect(arr1).to.eql([1, 2, 3]);
 				expect(arr1).to.equal(arr1);
 			});
@@ -728,12 +728,12 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$modify", function() {
+		describe("Modify", function() {
 
-			it("$modify ", function() {
+			it("Modify ", function() {
 				var arr = [1, 2, 3];
 
-				expect(arr._.$modify(function(val) {
+				expect(arr._.Modify(function(val) {
 					return val + 'x';
 				})).to.eql(['1x', '2x', '3x']);
 				expect(arr).to.eql([1, 2, 3]);
@@ -767,26 +767,26 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$select by value", function() {
+		describe("Select by value", function() {
 
-			it("$select one element", function() {
+			it("Select one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$select(1)).to.eql([1]);
+				expect(arr._.Select(1)).to.eql([1]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$select multiple elements", function() {
+			it("Select multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select(1, 2)).to.eql([1, 2]);
+				expect(arr._.Select(1, 2)).to.eql([1, 2]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$select by function", function() {
+			it("Select by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$select$(function(elm) {
+				expect(arr._.Select$(function(elm) {
 					return elm === 2;
 				})).to.eql([2]);
 				expect(arr).to.equal(arr);
@@ -819,28 +819,28 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$selectAll by value", function() {
+		describe("SelectAll by value", function() {
 
-			it("$selectAll one element", function() {
+			it("SelectAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$selectAll(1)).to.eql([1, 1]);
+				expect(arr._.SelectAll(1)).to.eql([1, 1]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 				expect(arr).to.equal(arr);
 			});
 
-			xit("$selectAll multiple elements", function() {
+			xit("SelectAll multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll(1, 2)).to.eql([1, 2, 1, 2]);
+				expect(arr._.SelectAll(1, 2)).to.eql([1, 2, 1, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
 				expect(arr).to.equal(arr);
 			});
 
-			it("$selectAll by function", function() {
+			it("SelectAll by function", function() {
 				var arr = [1, 2, 1, 3, 2];
 
-				expect(arr._.$selectAll$(function(elm) {
+				expect(arr._.SelectAll$(function(elm) {
 					return elm === 2;
 				})).to.eql([2, 2]);
 				expect(arr).to.eql([1, 2, 1, 3, 2]);
@@ -965,13 +965,13 @@ describe("Array", function() {
 			});
 		});
         // FIXME
-		xdescribe("$unify", function() {
+		xdescribe("Unify", function() {
 
 			it("simple union", function() {
 				var arr1 = [1, 2, 3];
 				var arr2 = [2, 3, 4, 5];
 
-				expect(arr1._.$unify(arr2)).to.eql([1, 2, 3, 4, 5]);
+				expect(arr1._.Unify(arr2)).to.eql([1, 2, 3, 4, 5]);
 				expect(arr1).to.eql([1, 2, 3]);
 				expect(arr1).to.equal(arr1);
 			});
@@ -986,12 +986,12 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$unique", function() {
+		describe("Unique", function() {
 
-			it("simple $unique", function() {
+			it("simple Unique", function() {
 				var arr1 = [1, 2, 1, 2, 3];
 
-				expect(arr1._.$unique()).to.eql([1, 2, 3]);
+				expect(arr1._.Unique()).to.eql([1, 2, 3]);
 				expect(arr1).to.eql([1, 2, 1, 2, 3]);
 				expect(arr1).to.equal(arr1);
 			});
@@ -1026,26 +1026,26 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$remove by value", function() {
+		describe("Remove by value", function() {
 
-			it("$remove one element", function() {
+			it("Remove one element", function() {
 				var arr = [1, 2, 3];
 
-				expect(arr._.$remove(2)).to.eql([1, 3]);
+				expect(arr._.Remove(2)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3]);
 			});
 
-			it("$remove multiple values", function() {
+			it("Remove multiple values", function() {
 				var arr = [1, 2, 3, 4];
 
-				expect(arr._.$remove(2,4)).to.eql([1, 3]);
+				expect(arr._.Remove(2,4)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 4]);
 			});
 
-			it("$remove function", function() {
+			it("Remove function", function() {
 				var arr = ['a', 'b', 'c', 'bb'];
 
-				expect(arr._.$remove$(function(val) {
+				expect(arr._.Remove$(function(val) {
 					return val._.startsWith('b');
 				})).to.eql(['a', 'c', 'bb']);
 				expect(arr).to.eql(['a', 'b', 'c', 'bb']);
@@ -1089,26 +1089,26 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$removeAll by value", function() {
+		describe("RemoveAll by value", function() {
 
-			it("$removeAll one element", function() {
+			it("RemoveAll one element", function() {
 				var arr = [1, 2, 1, 3];
 
-				expect(arr._.$removeAll(1)).to.eql([2, 3]);
+				expect(arr._.RemoveAll(1)).to.eql([2, 3]);
 				expect(arr).to.eql([1, 2, 1, 3]);
 			});
 
-			it("$removeAll multiple values", function() {
+			it("RemoveAll multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
-				expect(arr._.$removeAll(2,4)).to.eql([1, 3]);
+				expect(arr._.RemoveAll(2,4)).to.eql([1, 3]);
 				expect(arr).to.eql([1, 2, 3, 2, 4, 4]);
 			});
 
-			it("$removeAll multiple function", function() {
+			it("RemoveAll multiple function", function() {
 				var arr = ['a', 'b', 'c', 'bb', 'bb'];
 
-				expect(arr._.$removeAll$(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
+				expect(arr._.RemoveAll$(function(val) {return val._.startsWith('b')})).to.eql(['a', 'c']);
 				expect(arr).to.eql(['a', 'b', 'c', 'bb', 'bb']);
 			});
 		});
@@ -1158,33 +1158,33 @@ describe("Array", function() {
 			});
 		});
 
-		describe("$del", function() {
+		describe("Del", function() {
 
 			it("del one index", function() {
 				var arr = [1, 2, 3];
 
-				expect(arr._.$del(1)).to.deep.equal([1, 3]);
+				expect(arr._.Del(1)).to.deep.equal([1, 3]);
 				expect(arr).to.deep.equal([1, 2, 3]);
 			});
 
-			xit("$del from to index", function() {
+			xit("Del from to index", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$del(1, 3)).to.deep.equal([1, 5]);
+				expect(arr._.Del(1, 3)).to.deep.equal([1, 5]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
 			xit("del from to index out of bounds", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$del(1, 6)).to.deep.equal([1]);
+				expect(arr._.Del(1, 6)).to.deep.equal([1]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
 			it("del indexes with function", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$del$(function(i) {
+				expect(arr._.Del$(function(i) {
 					return i % 2 === 0;
 				})).to.eql([2, 4]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
@@ -1193,7 +1193,7 @@ describe("Array", function() {
 			it("del indexes within array", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.$del(0, 3, 4)).to.eql([2, 3]);
+				expect(arr._.Del(0, 3, 4)).to.eql([2, 3]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 		});

@@ -430,12 +430,12 @@
             /**
              * Creates a new array without the specified indices
              * @public
-             * @method obj#$del
+             * @method obj#Del
              * @this       {Array}
              * @param  {...number} ___keys - keys
              * @return     {Array}    this - new array without the specified indices
              */
-            $del: function(___keys)
+            Del: function(___keys)
             {
                 var args   = arguments;
                 var output = _.create(this._.proto());
@@ -449,13 +449,13 @@
             /**
              * Creates a new array without the specified indices
              * @public
-             * @method obj#$del$
+             * @method obj#Del$
              * @this   {Array}
              * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match$ function
              * @return {Array}                       this   - new array without the specified indices
              */
-            $del$: function(match$, ctx_)
+            Del$: function(match$, ctx_)
             {
                 var output = _.create(this._.proto());
     
@@ -613,12 +613,12 @@
             /**
              * Creates new array without the specified 1st values
              * @public
-             * @method obj#$remove
+             * @method obj#Remove
              * @this   {Object|Array}
              * @param  {...any} ___values - values to remove
              * @return {Array}  output    - new array without the values
              */
-            $remove: function(___values) {
+            Remove: function(___values) {
                 var output = _.create(this._.proto());
                 var args   = arguments;
                 var index;
@@ -634,13 +634,13 @@
             /**
              * Creates a new object|array without 1st value based on a match function
              * @public
-             * @method obj#$remove$
+             * @method obj#Remove$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                          ctx_   - optional context for the match$ function
              * @return {Array}                            output - new array without the value specified
              */
-            $remove$: function(match$, ctx_) {
+            Remove$: function(match$, ctx_) {
                 var output  =  _.create(this._.proto());
                 var matched = false;
     
@@ -688,12 +688,12 @@
             /**
              * Creates new array without all specified values
              * @public
-             * @method obj#$removeAll
+             * @method obj#RemoveAll
              * @this       {Array}
              * @param     {...any} ___values - values to remove
              * @return     {Array}    output - new array without the values
              */
-            $removeAll: function(___values) {
+            RemoveAll: function(___values) {
                 var output = _.create(this._.proto());
                 var args   = arguments;
     
@@ -706,13 +706,13 @@
             /**
              * Creates a new array without all value specified by the match function
              * @public
-             * @method obj#$removeAll$
+             * @method obj#RemoveAll$
              * @this   {Array}
              * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match$ function
              * @return {Array}                           output  - new array without the value specified
              */
-            $removeAll$: function(match$, ctx_) {
+            RemoveAll$: function(match$, ctx_) {
                 var output = _.create(this._.proto());
     
                 this._.each(function(val, key, obj, delta) {
@@ -732,14 +732,14 @@
                 return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
-            $select: function(___values) {
+            Select: function(___values) {
                 var args = arguments;
-                return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+                return this._.RemoveAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
     
-            $select$: function(match$, ctx_) {
+            Select$: function(match$, ctx_) {
                 var matched = false;
-                return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+                return this._.RemoveAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
             selectAll: function(___values) {
@@ -749,12 +749,12 @@
             selectAll$: function(match$, ctx_) {
                 return this._.removeAll$(_.fnc.not(match$), ctx_);
             },
-            $selectAll: function(___values) {
+            SelectAll: function(___values) {
                 var args = arguments;
-                return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
+                return this._.RemoveAll$(function(val) {return !~args._.indexOf(val)});
             },
-            $selectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
-                return this._.$removeAll$(_.fnc.not(match$), ctx_);
+            SelectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
+                return this._.RemoveAll$(_.fnc.not(match$), ctx_);
             }},
             /**
              * Returns the number of own properties on an object
@@ -922,11 +922,11 @@
             /**
              * Append one or more arrays to the current array into a new array
              * @public
-             * @method   arr#$append
+             * @method   arr#Append
              * @param   {...Array} ___arrays - arrays to be appended
              * @returns    {Array}           - The new array that is the result of appending
              */
-            $append: function(___arrays) {
+            Append: function(___arrays) {
                 return _.clone(this)._.append.apply(null, arguments); // we can use a null context here since it will get the value from the stack
             },
             /**
@@ -950,18 +950,18 @@
              */
             compact: function()
             {
-                return this._.removeAll$(function(val) {return !val});
+                return this._.removeAll(function(val) {return !val});
             },
             /**
              * Removes all falsey values from an array into a new array
              * @public
-             * @method  arr#$compact
+             * @method  arr#Compact
              * @this   {Array}
              * @return {Array} this - new array instance without falsey values
              */
-            $compact: function()
+            Compact: function()
             {
-                return this._.$removeAll$(function(val) {return !val});
+                return this._.RemoveAll$(function(val) {return !val});
             },
             /**
              * Remove elements based on index
@@ -1046,13 +1046,13 @@
             /**
              * Returns the difference between the current and multiple other arrays in a new array
              * @public
-             * @method   arr#$diff
+             * @method   arr#Diff
              * @param   {...Array} ___arrays - array to subtract from this
              * @returns {Array}              - new array containing the difference
              */
-            $diff: function(___arrays)
+            Diff: function(___arrays)
             {
-                if(arguments.length === 1) {return this._.$remove.apply(this, ___arrays)}
+                if(arguments.length === 1) {return this._.Remove.apply(this, ___arrays)}
     
                 return _.clone(this)._.diff.apply(null, arguments); // we can use a null context here since it will get the value from the stack
             },
@@ -1091,13 +1091,13 @@
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method arr#$dimit
+             * @method arr#Dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
              * @param  {Object}        ctx_  - optional context for the init function
              * @return {Array}               - this initialized multi-dimensional array
              */
-            $dimit: function(init_, ctx_)
+            Dimit: function(init_, ctx_)
             {
                 var dimensions = this;
                 var arr        = new Array(dimensions[0]);
@@ -1195,10 +1195,10 @@
             /**
              * Flattens a 2 dimensional array into a new array
              * @public
-             * @method arr#$flatten
+             * @method arr#Flatten
              * @returns {Array} - new flattened version of the array
              */
-            $flatten: function() {
+            Flatten: function() {
                 return this.concat.apply([], this);
             },
             /**
@@ -1237,13 +1237,13 @@
             /**
              * Calculates the intersection for 2 or more arrays
              * @public
-             * @method arr#$intersect
+             * @method arr#Intersect
              * @this   {Array}
              * @param  {Array} arr - 2 or more arrays
              * @return {Array}     - this for chaining
              */
-            $intersect: function(arr) {
-                return this._.$select.apply(this, arr);
+            Intersect: function(arr) {
+                return this._.Select.apply(this, arr);
             },
             /**
              * Checks if an array intersects an other
@@ -1338,13 +1338,13 @@
             /**
              * Copies and modifies the members of an array according to a certain function
              * @public
-             * @method arr#$modify
+             * @method arr#Modify
              * @this    {Array}
              * @param   {Function} modifier$ - function that modifies the array members
              * @param   {Object=}       ctx_ - optional context for the modifier function
              * @returns {Array}              - the modified array
              */
-            $modify: function(modifier$, ctx_)
+            Modify: function(modifier$, ctx_)
             {
                 return _.clone(this)._.modify(modifier$, ctx_);
             },
@@ -1453,13 +1453,13 @@
             /**
              * Calculates the union for 2 arrays into an new array
              * @public
-             * @method arr#$unify
+             * @method arr#Unify
              * @this   {Array}
              * @param  {Array} arr - array to unify
              * @return {Array}     - new array containing the unification
              */
-            $unify: function(arr) {
-                var app = this._.$append(arr);
+            Unify: function(arr) {
+                var app = this._.Append(arr);
     
                 return app._.unique();
             },
@@ -1483,11 +1483,11 @@
             /**
              * Accessor: Returns a new version of the array without duplicates
              * @public
-             * @method arr#$unique
+             * @method arr#Unique
              * @this    {Array}
              * @returns {Array} - new array remove duplicates
              */
-            $unique: function() {
+            Unique: function() {
                 var unique = [];
     
                 this._.each(function(val) {
@@ -2053,7 +2053,7 @@
              * @method math.max$
              * @return {number} The highest value from those given.
              */
-            max$: function (num1, num2, ___more_)
+            max: function ()
             {
                 for (var i = 1, max = 0, len = arguments.length; i < len; i++)
                 {
@@ -2074,7 +2074,7 @@
              * @method math.min$
              * @return {number} The lowest value from those given.
              */
-            min$: function () {
+            min: function () {
     
                 for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
                 {

@@ -199,12 +199,12 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without the specified indices
          * @public
-         * @method obj#$del
+         * @method obj#Del
          * @this       {Array}
          * @param  {...number} ___keys - keys
          * @return     {Array}    this - new array without the specified indices
          */
-        $del: function(___keys)
+        Del: function(___keys)
         {
             var args   = arguments;
             var output = _.create(this._.proto());
@@ -218,13 +218,13 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without the specified indices
          * @public
-         * @method obj#$del$
+         * @method obj#Del$
          * @this   {Array}
          * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match$ function
          * @return {Array}                       this   - new array without the specified indices
          */
-        $del$: function(match$, ctx_)
+        Del$: function(match$, ctx_)
         {
             var output = _.create(this._.proto());
 
@@ -382,12 +382,12 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates new array without the specified 1st values
          * @public
-         * @method obj#$remove
+         * @method obj#Remove
          * @this   {Object|Array}
          * @param  {...any} ___values - values to remove
          * @return {Array}  output    - new array without the values
          */
-        $remove: function(___values) {
+        Remove: function(___values) {
             var output = _.create(this._.proto());
             var args   = arguments;
             var index;
@@ -403,13 +403,13 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new object|array without 1st value based on a match function
          * @public
-         * @method obj#$remove$
+         * @method obj#Remove$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                          ctx_   - optional context for the match$ function
          * @return {Array}                            output - new array without the value specified
          */
-        $remove$: function(match$, ctx_) {
+        Remove$: function(match$, ctx_) {
             var output  =  _.create(this._.proto());
             var matched = false;
 
@@ -457,12 +457,12 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates new array without all specified values
          * @public
-         * @method obj#$removeAll
+         * @method obj#RemoveAll
          * @this       {Array}
          * @param     {...any} ___values - values to remove
          * @return     {Array}    output - new array without the values
          */
-        $removeAll: function(___values) {
+        RemoveAll: function(___values) {
             var output = _.create(this._.proto());
             var args   = arguments;
 
@@ -475,13 +475,13 @@ constructWrapper(Object, 'obj', {
         /**
          * Creates a new array without all value specified by the match function
          * @public
-         * @method obj#$removeAll$
+         * @method obj#RemoveAll$
          * @this   {Array}
          * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match$ function
          * @return {Array}                           output  - new array without the value specified
          */
-        $removeAll$: function(match$, ctx_) {
+        RemoveAll$: function(match$, ctx_) {
             var output = _.create(this._.proto());
 
             this._.each(function(val, key, obj, delta) {
@@ -501,14 +501,14 @@ constructWrapper(Object, 'obj', {
             return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
 
-        $select: function(___values) {
+        Select: function(___values) {
             var args = arguments;
-            return this._.$removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+            return this._.RemoveAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
 
-        $select$: function(match$, ctx_) {
+        Select$: function(match$, ctx_) {
             var matched = false;
-            return this._.$removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+            return this._.RemoveAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
 
         selectAll: function(___values) {
@@ -518,12 +518,12 @@ constructWrapper(Object, 'obj', {
         selectAll$: function(match$, ctx_) {
             return this._.removeAll$(_.fnc.not(match$), ctx_);
         },
-        $selectAll: function(___values) {
+        SelectAll: function(___values) {
             var args = arguments;
-            return this._.$removeAll$(function(val) {return !~args._.indexOf(val)});
+            return this._.RemoveAll$(function(val) {return !~args._.indexOf(val)});
         },
-        $selectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
-            return this._.$removeAll$(_.fnc.not(match$), ctx_);
+        SelectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
+            return this._.RemoveAll$(_.fnc.not(match$), ctx_);
         }},
         /**
          * Returns the number of own properties on an object

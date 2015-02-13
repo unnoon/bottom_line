@@ -107,7 +107,7 @@ constructWrapper(Math, 'math', {
          * @method math.max$
          * @return {number} The highest value from those given.
          */
-        max$: function (num1, num2, ___more_)
+        max: function ()
         {
             for (var i = 1, max = 0, len = arguments.length; i < len; i++)
             {
@@ -128,7 +128,7 @@ constructWrapper(Math, 'math', {
          * @method math.min$
          * @return {number} The lowest value from those given.
          */
-        min$: function () {
+        min: function () {
 
             for (var i = 1 , min = 0, len = arguments.length; i < len; i++)
             {

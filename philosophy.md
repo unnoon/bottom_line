@@ -29,10 +29,10 @@ copy: function(to, $value, opt_ctx) this._._cp(false, false, to, $value, opt_ctx
 cut:  function(to, $value, opt_ctx) this._._cut(false, false, to, $value, opt_ctx);
 
 select:  this._._rm(false, true, $value, opt_ctx);
-$select: this._._cp(false, false, [], $value, opt_ctx);
+Select: this._._cp(false, false, [], $value, opt_ctx);
 
 remove:  this._._rm(false, false, $value, opt_ctx);
-$remove: this._._cp(false, true, [], $value, opt_ctx);
+Remove: this._._cp(false, true, [], $value, opt_ctx);
 
 - mixed arrays???
 
