@@ -73,7 +73,7 @@ constructWrapper(Array, 'arr', {
          */
         compact: function()
         {
-            return this._.removeAll(function(val) {return !val});
+            return this._.removeAll$(function(val) {return !val});
         },
         /**
          * Removes all falsey values from an array into a new array
