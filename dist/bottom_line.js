@@ -1867,7 +1867,7 @@
                 {
                     return fnc.bind(ctx_)
                 }
-    
+                // TODO don't return a partial in case no undefined arguments are given
                 // if ___args_ are given return a partial
                 var args     = arguments;
                 var argsMax  = args.length-(typeof(args[args.length-1]) === 'function' ? 1 : 2);
@@ -1927,7 +1927,7 @@
              * @method fnc.inherit
              * @param {function} child  - child
              * @param {function} parent - parent to inherit from
-             * @param {string}   super_ - name for the object name storing the super prototype. default '_super'
+             * @param {string=}   super_ - name for the object name storing the super prototype. default '_super'
              */
             inherit: function(child, parent, super_) {
                 child.prototype = Object.create(parent.prototype);
