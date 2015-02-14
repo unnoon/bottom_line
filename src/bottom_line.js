@@ -58,7 +58,10 @@
         wrapStatics(wrapper, key, module);
         wrapPrototype(wrapper, key, module);
 
-        _[key] = wrapper; // add wrapper to the bottom_line object
+        if(settings.global !== false)
+            _[key] = wrapper; // add wrapper to the bottom_line object
+
+        return wrapper;
     }
 
     function wrapStatics(wrapper, key, module)
