@@ -1,4 +1,13 @@
-if I'm gonna do a module loader make sure it can load condtionally. and can load stuff in series as well
+
+Module loader::
+Serial loading
+Parallel loading
+Circular reference detecting
+Conditional loading
+
+Manager::
+Class that manages multiple objects that exists at the SAME time
+
 
 remove all internal function and move them to some utils object. For speed improvements
 
