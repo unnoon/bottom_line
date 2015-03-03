@@ -7,6 +7,9 @@ Conditional loading
 Manager::
 Class that manages multiple objects that exists at the SAME time
 
+Helper::
+Static?/Singleton class
+
 Mixins::
 -add initialization support for mixins
 
