@@ -389,7 +389,7 @@ describe("Object", function() {
 			it("remove function", function() {
 				var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-				obj._.remove$(function(val) {
+				obj._.removeFn(function(val) {
 					return val > 2;
 				});
 
@@ -416,35 +416,35 @@ describe("Object", function() {
             it("Remove function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.Remove$(function(val) {
+                expect(obj._.RemoveFn(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a', z: 'bb',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
             });
         });
 
-        describe("removeAll", function() {
+        describe("remove$", function() {
 
-            it("removeAll by value", function() {
+            it("remove$ by value", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2};
 
-                obj._.removeAll(2);
+                obj._.remove$(2);
 
                 expect(obj).to.eql({x: 1,z: 3});
             });
 
-            it("removeAll multiple values", function() {
+            it("remove$ multiple values", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 2, p:3};
 
-                obj._.removeAll(2,3);
+                obj._.remove$(2,3);
 
                 expect(obj).to.eql({x: 1});
             });
 
-            it("removeAll function", function() {
+            it("remove$ function", function() {
                 var obj = {x: 1,y: 2,z: 3,t: 666 };
 
-                obj._.removeAll$(function(val) {
+                obj._.remove$Fn(function(val) {
                     return val > 2;
                 });
 
@@ -452,26 +452,26 @@ describe("Object", function() {
             });
         });
 
-        describe("RemoveAll", function() {
+        describe("Remove$", function() {
 
-            it("RemoveAll one element", function() {
+            it("Remove$ one element", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.RemoveAll(2)).to.eql({ x: 1,z: 3});
+                expect(obj._.Remove$(2)).to.eql({ x: 1,z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("RemoveAll multiple values", function() {
+            it("Remove$ multiple values", function() {
                 var obj = { x: 1,y: 2,z: 3,t: 2};
 
-                expect(obj._.RemoveAll(2, 1)).to.eql({z: 3});
+                expect(obj._.Remove$(2, 1)).to.eql({z: 3});
                 expect(obj).to.eql({ x: 1,y: 2,z: 3,t: 2});
             });
 
-            it("RemoveAll function", function() {
+            it("Remove$ function", function() {
                 var obj = {x: 'a',y: 'b', z: 'bb',t: 't'};
 
-                expect(obj._.RemoveAll$(function(val) {
+                expect(obj._.Remove$Fn(function(val) {
                     return val._.startsWith('b');
                 })).to.eql({x: 'a',t: 't'});
                 expect(obj).to.eql({x: 'a',y: 'b', z: 'bb',t: 't'});
@@ -495,7 +495,7 @@ describe("Object", function() {
 			it("del based on function", function() {
 				var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-				expect(obj._.del$(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+				expect(obj._.delFn(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
 			});
 		});
 
@@ -518,7 +518,7 @@ describe("Object", function() {
             it("Del based on function", function() {
                 var obj = {x: 1,y: 2,xy: 4,z: 3};
 
-                expect(obj._.Del$(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
+                expect(obj._.DelFn(function(key) {return key._.startsWith('x')})).to.deep.equal({y: 2,z: 3});
                 expect(obj).to.eql({x: 1,y: 2,xy: 4,z: 3})
             });
         });

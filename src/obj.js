@@ -182,16 +182,16 @@ construct('obj', {native:Object}, {
         /**
          * Remove elements based on index
          * @public
-         * @method obj#del$
+         * @method obj#delFn
          * @this   {Array}
-         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-         * @param  {Object=}                     ctx_   - optional context for the match$ function
+         * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+         * @param  {Object=}                     ctx_   - optional context for the match function
          * @return {Array}                       this   - mutated array for chaining
          */
-        del$: function(match$, ctx_)
+        delFn: function(match, ctx_)
         {
             this._.each(function(val, key, obj) {
-                if(match$.call(ctx_, key, obj)) {delete this[key]}
+                if(match.call(ctx_, key, obj)) {delete this[key]}
             }, this);
 
             return this;
@@ -218,18 +218,18 @@ construct('obj', {native:Object}, {
         /**
          * Creates a new array without the specified indices
          * @public
-         * @method obj#Del$
+         * @method obj#DelFn
          * @this   {Array}
-         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-         * @param  {Object=}                     ctx_   - optional context for the match$ function
+         * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+         * @param  {Object=}                     ctx_   - optional context for the match function
          * @return {Array}                       this   - new array without the specified indices
          */
-        Del$: function(match$, ctx_)
+        DelFn: function(match, ctx_)
         {
             var output = _.create(this._.proto());
 
             this._.each(function(val, key, obj, delta) { // eachRight is a little bit faster
-                if(!match$.call(ctx_, key, obj, delta)) {output._._add(val, key)}
+                if(!match.call(ctx_, key, obj, delta)) {output._._add(val, key)}
             }, this);
 
             return output;
@@ -366,15 +366,15 @@ construct('obj', {native:Object}, {
         /**
          * Removes 1st value from an object|array based on a match function
          * @public
-         * @method obj#remove$
+         * @method obj#removeFn
          * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                          ctx_   - optional context for the match$ function
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+         * @param  {Object=}                          ctx_   - optional context for the match function
          * @return {Array}                            this   - mutated array for chaining
          */
-        remove$: function(match$, ctx_) {
+        removeFn: function(match, ctx_) {
             this._.each(function(val, i, arr, delta) {
-                if(match$.call(ctx_, val, i, arr, delta)) {this._.del(i); return false}
+                if(match.call(ctx_, val, i, arr, delta)) {this._.del(i); return false}
             }, this);
 
             return this;
@@ -403,18 +403,18 @@ construct('obj', {native:Object}, {
         /**
          * Creates a new object|array without 1st value based on a match function
          * @public
-         * @method obj#Remove$
+         * @method obj#RemoveFn
          * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                          ctx_   - optional context for the match$ function
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+         * @param  {Object=}                          ctx_   - optional context for the match function
          * @return {Array}                            output - new array without the value specified
          */
-        Remove$: function(match$, ctx_) {
+        RemoveFn: function(match, ctx_) {
             var output  =  _.create(this._.proto());
             var matched = false;
 
             this._.each(function(val, key, obj, delta) {
-                if(!matched && match$.call(ctx_, val, key, obj, delta)) {matched = true}
+                if(!matched && match.call(ctx_, val, key, obj, delta)) {matched = true}
                 else                                                    {output._._add(val, key)}
             }, this);
 
@@ -423,12 +423,12 @@ construct('obj', {native:Object}, {
         /**
          * Removes all specified values from an array
          * @public
-         * @method obj#removeAll
+         * @method obj#remove$
          * @this       {Array}
          * @param     {...any} ___values - values to remove
          * @return     {Array}     this - mutated array for chaining
          */
-        removeAll: function(___values) {
+        remove$: function(___values) {
             var args = arguments;
 
             this._.each(function(val, key) {
@@ -440,15 +440,15 @@ construct('obj', {native:Object}, {
         /**
          * Removes all values from an array based on a match function
          * @public
-         * @method obj#removeAll$
+         * @method obj#remove$Fn
          * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match function
          * @return {Array}                             this  - mutated array for chaining
          */
-        removeAll$: function(match$, ctx_) {
+        remove$Fn: function(match, ctx_) {
             this._.each(function(val, key, obj) { // eachRight is a little bit faster
-                if(match$.call(ctx_, val, key, obj)) {delete this[key]}
+                if(match.call(ctx_, val, key, obj)) {delete this[key]}
             }, this);
 
             return this;
@@ -457,12 +457,12 @@ construct('obj', {native:Object}, {
         /**
          * Creates new array without all specified values
          * @public
-         * @method obj#RemoveAll
+         * @method obj#Remove$
          * @this       {Array}
          * @param     {...any} ___values - values to remove
          * @return     {Array}    output - new array without the values
          */
-        RemoveAll: function(___values) {
+        Remove$: function(___values) {
             var output = _.create(this._.proto());
             var args   = arguments;
 
@@ -475,17 +475,17 @@ construct('obj', {native:Object}, {
         /**
          * Creates a new array without all value specified by the match function
          * @public
-         * @method obj#RemoveAll$
+         * @method obj#Remove$Fn
          * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match function
          * @return {Array}                           output  - new array without the value specified
          */
-        RemoveAll$: function(match$, ctx_) {
+        Remove$Fn: function(match, ctx_) {
             var output = _.create(this._.proto());
 
             this._.each(function(val, key, obj, delta) {
-                if(!match$.call(ctx_, val, key, obj, delta)) {output._._add(val, key)} // key is ignored in case of array
+                if(!match.call(ctx_, val, key, obj, delta)) {output._._add(val, key)} // key is ignored in case of array
             }, this);
 
             return output;
@@ -493,37 +493,37 @@ construct('obj', {native:Object}, {
 
         select: function(___values) {
             var args = arguments;
-            return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+            return this._.remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
 
-        select$: function(match$, ctx_) {
+        selectFn: function(match, ctx_) {
             var matched = false;
-            return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+            return this._.remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
 
         Select: function(___values) {
             var args = arguments;
-            return this._.RemoveAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+            return this._.Remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
 
-        Select$: function(match$, ctx_) {
+        SelectFn: function(match, ctx_) {
             var matched = false;
-            return this._.RemoveAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+            return this._.Remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
 
-        selectAll: function(___values) {
+        select$: function(___values) {
             var args = arguments;
-            return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
+            return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
-        selectAll$: function(match$, ctx_) {
-            return this._.removeAll$(_.fnc.not(match$), ctx_);
+        select$Fn: function(match, ctx_) {
+            return this._.remove$Fn(_.fnc.not(match), ctx_);
         },
-        SelectAll: function(___values) {
+        Select$: function(___values) {
             var args = arguments;
-            return this._.RemoveAll$(function(val) {return !~args._.indexOf(val)});
+            return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
-        SelectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
-            return this._.RemoveAll$(_.fnc.not(match$), ctx_);
+        Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
+            return this._.Remove$Fn(_.fnc.not(match), ctx_);
         }},
         /**
          * Returns the number of own properties on an object
@@ -548,7 +548,7 @@ construct('obj', {native:Object}, {
          * @method obj#names
          * @return {Array} keys of the object
          */
-        names: {aliases: ['keysAll'], value:function() {
+        names: {aliases: ['keys$'], value:function() {
             return Object.getOwnPropertyNames(this);
         }},
         /**

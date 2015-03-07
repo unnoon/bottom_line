@@ -51,7 +51,7 @@ let all collection classes inherit from object!
 2 types of arguments values or a function. for simplicity only offer multiple arguments or a function and no array input. An array input can be simulated by using .apply
 Also it would rule out more dimensional arrays...
 
-In theory rm could be simulated with an cut function remove a to target. However deleting in reverse order is faster in case we do a a removeAll.
+In theory rm could be simulated with an cut function remove a to target. However deleting in reverse order is faster in case we do a a remove$.
 Because the number of items that need to be arranged in the back gets smaller.
 
 hmmmzz maybe I can't even do functions as arrays can hold funtions as well. We need to do something smart here... maybe arrays as input is not such a bad idea after all

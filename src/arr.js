@@ -73,7 +73,7 @@ construct('arr', {native:Array}, {
          */
         compact: function()
         {
-            return this._.removeAll$(function(val) {return !val});
+            return this._.remove$Fn(function(val) {return !val});
         },
         /**
          * Removes all falsey values from an array into a new array
@@ -84,7 +84,7 @@ construct('arr', {native:Array}, {
          */
         Compact: function()
         {
-            return this._.RemoveAll$(function(val) {return !val});
+            return this._.Remove$Fn(function(val) {return !val});
         },
         /**
          * Remove elements based on index
@@ -105,15 +105,15 @@ construct('arr', {native:Array}, {
         /**
          * Remove elements based on index
          * @public
-         * @method  arr#del$
-         * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-         * @param  {Object=}                     ctx_   - optional context for the match$ function
+         * @method  arr#delFn
+         * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+         * @param  {Object=}                     ctx_   - optional context for the match function
          * @return {Array}                       this   - mutated array for chaining
          */
-        del$: function(match$, ctx_)
+        delFn: function(match, ctx_)
         {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                if(match$.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
+                if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
             }, this);
 
             return this;
@@ -121,11 +121,11 @@ construct('arr', {native:Array}, {
         /**
          * Removes all specified values from an array
          * @public
-         * @method  arr#removeAll
+         * @method  arr#remove$
          * @param  {...any} ___values - values to remove
          * @return {Array}       this - mutated array for chaining
          */
-        removeAll: function(___values) {
+        remove$: function(___values) {
             var args = arguments;
 
             this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -137,15 +137,15 @@ construct('arr', {native:Array}, {
         /**
          * Removes all values from an array based on a match function
          * @public
-         * @method  arr#removeAll$
+         * @method  arr#remove$Fn
          * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match$ function
+         * @param  {function(val, index, arr, delta)} match  - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match function
          * @return {Array}                             this  - mutated array for chaining
          */
-        removeAll$: function(match$, ctx_) {
+        remove$Fn: function(match, ctx_) {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
+                if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
             }, this);
 
             return this;
@@ -181,7 +181,7 @@ construct('arr', {native:Array}, {
         },
         /**
          * Creates a multidimensional array. The dimensions come from the array itself
-         * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+         * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
          * @method arr#dimit
          * @this   {Array}
@@ -405,17 +405,17 @@ construct('arr', {native:Array}, {
          * @public
          * @method arr#max
          * @this    {Array<number>|Array<any>}
-         * @param   {function}   compare$_ - optional function to determine the the max in case of non-numeric array
+         * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
          * @returns {number|any}           - maximum number or element in the array
          */
-        max: function(compare$_) {
-            if(compare$_ === undefined) {return Math.max.apply(null, this)}
+        max: function(compareFn_) {
+            if(compareFn_ === undefined) {return Math.max.apply(null, this)}
             else
             {
                 var max = this[0];
 
                 this._.each(function(elm) {
-                    if(compare$_(elm, max) > 0) max = elm;
+                    if(compareFn_(elm, max) > 0) max = elm;
                 });
 
                 return max;
@@ -426,17 +426,17 @@ construct('arr', {native:Array}, {
          * @public
          * @method arr#min
          * @this    {Array<number>|Array<any>}
-         * @param   {Function=} compare$_ - optional compare function
+         * @param   {Function=} compareFn_ - optional compare function
          * @returns {number|any} - minimum element in the array
          */
-        min: function(compare$_) {
-            if(compare$_ === undefined) {return Math.min.apply(null, this)}
+        min: function(compareFn_) {
+            if(compareFn_ === undefined) {return Math.min.apply(null, this)}
             else
             {
                 var min = this[0];
 
                 this._.each(function(elm) {
-                    if(compare$_(elm, min) < 0) max = elm;
+                    if(compareFn_(elm, min) < 0) max = elm;
                 });
 
                 return min;
@@ -447,13 +447,13 @@ construct('arr', {native:Array}, {
          * @public
          * @method arr#modify
          * @this    {Array}
-         * @param   {Function} modifier$  - function that modifies the array members
+         * @param   {Function} modifier  - function that modifies the array members
          * @param   {Object=}       ctx_  - optional context for the modifier function
          * @returns {Array}               - the modified array
          */
-        modify: function(modifier$, ctx_) {
+        modify: function(modifier, ctx_) {
             this._.each(function(val, i) {
-                this[i] = modifier$.call(ctx_, val, i, this);
+                this[i] = modifier.call(ctx_, val, i, this);
             }, this);
 
             return this;
@@ -463,13 +463,13 @@ construct('arr', {native:Array}, {
          * @public
          * @method arr#Modify
          * @this    {Array}
-         * @param   {Function} modifier$ - function that modifies the array members
+         * @param   {Function} modifier - function that modifies the array members
          * @param   {Object=}       ctx_ - optional context for the modifier function
          * @returns {Array}              - the modified array
          */
-        Modify: function(modifier$, ctx_)
+        Modify: function(modifier, ctx_)
         {
-            return _.clone(this)._.modify(modifier$, ctx_);
+            return _.clone(this)._.modify(modifier, ctx_);
         },
         /**
          * Chainable version of push

@@ -219,7 +219,21 @@
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
         },
-        extend: extend
+        extend: extend,
+        /**
+         * repeats a function x times. The repeater value is passed to the function
+         *
+         * @param {number}   times - the number of times the function is to be repeated
+         * @param {Function} cb    - callback function to be repeated
+         * @param {Object}   ctx_  - optional context for the callback
+         */
+        repeat: function(times, cb, ctx_)
+        {
+            for(var i = 0; i < times; i++)
+            {
+                cb.call(ctx_, i);
+            }
+        }
     });
 
     _.extend(Function.prototype, {overwrite: false}, {
@@ -431,16 +445,16 @@
             /**
              * Remove elements based on index
              * @public
-             * @method obj#del$
+             * @method obj#delFn
              * @this   {Array}
-             * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-             * @param  {Object=}                     ctx_   - optional context for the match$ function
+             * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+             * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            del$: function(match$, ctx_)
+            delFn: function(match, ctx_)
             {
                 this._.each(function(val, key, obj) {
-                    if(match$.call(ctx_, key, obj)) {delete this[key]}
+                    if(match.call(ctx_, key, obj)) {delete this[key]}
                 }, this);
     
                 return this;
@@ -467,18 +481,18 @@
             /**
              * Creates a new array without the specified indices
              * @public
-             * @method obj#Del$
+             * @method obj#DelFn
              * @this   {Array}
-             * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-             * @param  {Object=}                     ctx_   - optional context for the match$ function
+             * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+             * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - new array without the specified indices
              */
-            Del$: function(match$, ctx_)
+            DelFn: function(match, ctx_)
             {
                 var output = _.create(this._.proto());
     
                 this._.each(function(val, key, obj, delta) { // eachRight is a little bit faster
-                    if(!match$.call(ctx_, key, obj, delta)) {output._._add(val, key)}
+                    if(!match.call(ctx_, key, obj, delta)) {output._._add(val, key)}
                 }, this);
     
                 return output;
@@ -615,15 +629,15 @@
             /**
              * Removes 1st value from an object|array based on a match function
              * @public
-             * @method obj#remove$
+             * @method obj#removeFn
              * @this   {Array}
-             * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-             * @param  {Object=}                          ctx_   - optional context for the match$ function
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+             * @param  {Object=}                          ctx_   - optional context for the match function
              * @return {Array}                            this   - mutated array for chaining
              */
-            remove$: function(match$, ctx_) {
+            removeFn: function(match, ctx_) {
                 this._.each(function(val, i, arr, delta) {
-                    if(match$.call(ctx_, val, i, arr, delta)) {this._.del(i); return false}
+                    if(match.call(ctx_, val, i, arr, delta)) {this._.del(i); return false}
                 }, this);
     
                 return this;
@@ -652,18 +666,18 @@
             /**
              * Creates a new object|array without 1st value based on a match function
              * @public
-             * @method obj#Remove$
+             * @method obj#RemoveFn
              * @this   {Array}
-             * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-             * @param  {Object=}                          ctx_   - optional context for the match$ function
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+             * @param  {Object=}                          ctx_   - optional context for the match function
              * @return {Array}                            output - new array without the value specified
              */
-            Remove$: function(match$, ctx_) {
+            RemoveFn: function(match, ctx_) {
                 var output  =  _.create(this._.proto());
                 var matched = false;
     
                 this._.each(function(val, key, obj, delta) {
-                    if(!matched && match$.call(ctx_, val, key, obj, delta)) {matched = true}
+                    if(!matched && match.call(ctx_, val, key, obj, delta)) {matched = true}
                     else                                                    {output._._add(val, key)}
                 }, this);
     
@@ -672,12 +686,12 @@
             /**
              * Removes all specified values from an array
              * @public
-             * @method obj#removeAll
+             * @method obj#remove$
              * @this       {Array}
              * @param     {...any} ___values - values to remove
              * @return     {Array}     this - mutated array for chaining
              */
-            removeAll: function(___values) {
+            remove$: function(___values) {
                 var args = arguments;
     
                 this._.each(function(val, key) {
@@ -689,15 +703,15 @@
             /**
              * Removes all values from an array based on a match function
              * @public
-             * @method obj#removeAll$
+             * @method obj#remove$Fn
              * @this   {Array}
-             * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-             * @param  {Object=}                            ctx_ - optional context for the match$ function
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+             * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            removeAll$: function(match$, ctx_) {
+            remove$Fn: function(match, ctx_) {
                 this._.each(function(val, key, obj) { // eachRight is a little bit faster
-                    if(match$.call(ctx_, val, key, obj)) {delete this[key]}
+                    if(match.call(ctx_, val, key, obj)) {delete this[key]}
                 }, this);
     
                 return this;
@@ -706,12 +720,12 @@
             /**
              * Creates new array without all specified values
              * @public
-             * @method obj#RemoveAll
+             * @method obj#Remove$
              * @this       {Array}
              * @param     {...any} ___values - values to remove
              * @return     {Array}    output - new array without the values
              */
-            RemoveAll: function(___values) {
+            Remove$: function(___values) {
                 var output = _.create(this._.proto());
                 var args   = arguments;
     
@@ -724,17 +738,17 @@
             /**
              * Creates a new array without all value specified by the match function
              * @public
-             * @method obj#RemoveAll$
+             * @method obj#Remove$Fn
              * @this   {Array}
-             * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-             * @param  {Object=}                            ctx_ - optional context for the match$ function
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
+             * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                           output  - new array without the value specified
              */
-            RemoveAll$: function(match$, ctx_) {
+            Remove$Fn: function(match, ctx_) {
                 var output = _.create(this._.proto());
     
                 this._.each(function(val, key, obj, delta) {
-                    if(!match$.call(ctx_, val, key, obj, delta)) {output._._add(val, key)} // key is ignored in case of array
+                    if(!match.call(ctx_, val, key, obj, delta)) {output._._add(val, key)} // key is ignored in case of array
                 }, this);
     
                 return output;
@@ -742,37 +756,37 @@
     
             select: function(___values) {
                 var args = arguments;
-                return this._.removeAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+                return this._.remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
     
-            select$: function(match$, ctx_) {
+            selectFn: function(match, ctx_) {
                 var matched = false;
-                return this._.removeAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+                return this._.remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
             Select: function(___values) {
                 var args = arguments;
-                return this._.RemoveAll$(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
+                return this._.Remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
     
-            Select$: function(match$, ctx_) {
+            SelectFn: function(match, ctx_) {
                 var matched = false;
-                return this._.RemoveAll$(function() {return (match$.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
+                return this._.Remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
     
-            selectAll: function(___values) {
+            select$: function(___values) {
                 var args = arguments;
-                return this._.removeAll$(function(val) {return !~args._.indexOf(val)});
+                return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
-            selectAll$: function(match$, ctx_) {
-                return this._.removeAll$(_.fnc.not(match$), ctx_);
+            select$Fn: function(match, ctx_) {
+                return this._.remove$Fn(_.fnc.not(match), ctx_);
             },
-            SelectAll: function(___values) {
+            Select$: function(___values) {
                 var args = arguments;
-                return this._.RemoveAll$(function(val) {return !~args._.indexOf(val)});
+                return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
-            SelectAll$: {aliases: ['findAll'], value: function(match$, ctx_) {
-                return this._.RemoveAll$(_.fnc.not(match$), ctx_);
+            Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
+                return this._.Remove$Fn(_.fnc.not(match), ctx_);
             }},
             /**
              * Returns the number of own properties on an object
@@ -797,7 +811,7 @@
              * @method obj#names
              * @return {Array} keys of the object
              */
-            names: {aliases: ['keysAll'], value:function() {
+            names: {aliases: ['keys$'], value:function() {
                 return Object.getOwnPropertyNames(this);
             }},
             /**
@@ -968,7 +982,7 @@
              */
             compact: function()
             {
-                return this._.removeAll$(function(val) {return !val});
+                return this._.remove$Fn(function(val) {return !val});
             },
             /**
              * Removes all falsey values from an array into a new array
@@ -979,7 +993,7 @@
              */
             Compact: function()
             {
-                return this._.RemoveAll$(function(val) {return !val});
+                return this._.Remove$Fn(function(val) {return !val});
             },
             /**
              * Remove elements based on index
@@ -1000,15 +1014,15 @@
             /**
              * Remove elements based on index
              * @public
-             * @method  arr#del$
-             * @param  {function(index, arr, delta)} match$ - function specifying the indices to delete
-             * @param  {Object=}                     ctx_   - optional context for the match$ function
+             * @method  arr#delFn
+             * @param  {function(index, arr, delta)} match - function specifying the indices to delete
+             * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            del$: function(match$, ctx_)
+            delFn: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                    if(match$.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
+                    if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
@@ -1016,11 +1030,11 @@
             /**
              * Removes all specified values from an array
              * @public
-             * @method  arr#removeAll
+             * @method  arr#remove$
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            removeAll: function(___values) {
+            remove$: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1032,15 +1046,15 @@
             /**
              * Removes all values from an array based on a match function
              * @public
-             * @method  arr#removeAll$
+             * @method  arr#remove$Fn
              * @this   {Array}
-             * @param  {function(val, index, arr, delta)} match$ - function specifying the value to delete
-             * @param  {Object=}                            ctx_ - optional context for the match$ function
+             * @param  {function(val, index, arr, delta)} match  - function specifying the value to delete
+             * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            removeAll$: function(match$, ctx_) {
+            remove$Fn: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                    if(match$.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
+                    if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
@@ -1076,7 +1090,7 @@
             },
             /**
              * Creates a multidimensional array. The dimensions come from the array itself
-             * i.e. [3, 6].$.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
+             * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
              * @method arr#dimit
              * @this   {Array}
@@ -1300,17 +1314,17 @@
              * @public
              * @method arr#max
              * @this    {Array<number>|Array<any>}
-             * @param   {function}   compare$_ - optional function to determine the the max in case of non-numeric array
+             * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
              * @returns {number|any}           - maximum number or element in the array
              */
-            max: function(compare$_) {
-                if(compare$_ === undefined) {return Math.max.apply(null, this)}
+            max: function(compareFn_) {
+                if(compareFn_ === undefined) {return Math.max.apply(null, this)}
                 else
                 {
                     var max = this[0];
     
                     this._.each(function(elm) {
-                        if(compare$_(elm, max) > 0) max = elm;
+                        if(compareFn_(elm, max) > 0) max = elm;
                     });
     
                     return max;
@@ -1321,17 +1335,17 @@
              * @public
              * @method arr#min
              * @this    {Array<number>|Array<any>}
-             * @param   {Function=} compare$_ - optional compare function
+             * @param   {Function=} compareFn_ - optional compare function
              * @returns {number|any} - minimum element in the array
              */
-            min: function(compare$_) {
-                if(compare$_ === undefined) {return Math.min.apply(null, this)}
+            min: function(compareFn_) {
+                if(compareFn_ === undefined) {return Math.min.apply(null, this)}
                 else
                 {
                     var min = this[0];
     
                     this._.each(function(elm) {
-                        if(compare$_(elm, min) < 0) max = elm;
+                        if(compareFn_(elm, min) < 0) max = elm;
                     });
     
                     return min;
@@ -1342,13 +1356,13 @@
              * @public
              * @method arr#modify
              * @this    {Array}
-             * @param   {Function} modifier$  - function that modifies the array members
+             * @param   {Function} modifier  - function that modifies the array members
              * @param   {Object=}       ctx_  - optional context for the modifier function
              * @returns {Array}               - the modified array
              */
-            modify: function(modifier$, ctx_) {
+            modify: function(modifier, ctx_) {
                 this._.each(function(val, i) {
-                    this[i] = modifier$.call(ctx_, val, i, this);
+                    this[i] = modifier.call(ctx_, val, i, this);
                 }, this);
     
                 return this;
@@ -1358,13 +1372,13 @@
              * @public
              * @method arr#Modify
              * @this    {Array}
-             * @param   {Function} modifier$ - function that modifies the array members
+             * @param   {Function} modifier - function that modifies the array members
              * @param   {Object=}       ctx_ - optional context for the modifier function
              * @returns {Array}              - the modified array
              */
-            Modify: function(modifier$, ctx_)
+            Modify: function(modifier, ctx_)
             {
-                return _.clone(this)._.modify(modifier$, ctx_);
+                return _.clone(this)._.modify(modifier, ctx_);
             },
             /**
              * Chainable version of push
@@ -2111,7 +2125,7 @@
                 /**
                  * Convert degrees to radians.
                  *
-                 * @method math.deg2Rad
+                 * @method math.rad.convert
                  * @param {number} degrees
                  * @returns {number} radians
                  */
