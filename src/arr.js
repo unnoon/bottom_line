@@ -509,7 +509,7 @@ construct('arr', {native:Array}, {
         /**
          * Removes one occurrence of of an element from an array
          * @public
-         * @method arr#random
+         * @method arr#rm
          * @this   {any}   - elm
          * @return {Array} - this for chaining
          */

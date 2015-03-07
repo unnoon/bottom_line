@@ -222,7 +222,9 @@
         extend: extend,
         /**
          * repeats a function x times. The repeater value is passed to the function
-         *
+         * @static
+         * @public
+         * @method _.repeat
          * @param {number}   times - the number of times the function is to be repeated
          * @param {Function} cb    - callback function to be repeated
          * @param {Object}   ctx_  - optional context for the callback
