@@ -142,6 +142,16 @@
 
                     if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
                     if(config.exec)  descriptor.value = config.value(obj);
+                    if(config.wrap)
+                    {
+                        var fnw = obj[prop];
+                        if(typeof(fnw) === 'function')
+                        {
+                            descriptor.value = (function(fnw, fnc) {
+                                return function() {fnw.apply(this, arguments); fnc.apply(this, arguments)}
+                            })(fnw, descriptor.value)
+                        }
+                    }
                 }
 
                 descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
