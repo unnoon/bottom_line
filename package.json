@@ -17,6 +17,8 @@
     "grunt-jsdoc": "latest",
     "grunt-contrib-uglify": "latest",
     "grunt-preprocess": "latest",
-    "grunt-contrib-watch": "latest"
+    "grunt-contrib-watch": "latest",
+    "grunt-bump": "latest",
+    "grunt-contrib-clean": "latest"
   }
 }

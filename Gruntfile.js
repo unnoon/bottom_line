@@ -3,6 +3,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-preprocess');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-bump');
 
 	grunt.initConfig({
 		uglify: {
@@ -41,8 +43,13 @@ module.exports = function(grunt) {
 					spawn: false
 				}
 			}
-		}
+		},
+        clean: {
+            docs: ['docs']
+        }
 	});
+
+    grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
 
     grunt.registerTask('default', ['preprocess']);
 };
