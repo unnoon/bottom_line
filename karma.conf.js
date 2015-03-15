@@ -20,7 +20,7 @@ module.exports = function (config) {
 			// source files, that you wanna generate coverage for
 			// do not include tests or libraries
 			// (these files will be instrumented by Istanbul)
-            '/dist/bottom_line.js': ['coverage']
+            'dist/bottom_line.js': ['coverage']
 		},
 
 //		// optionally, configure the reporter
@@ -58,7 +58,7 @@ module.exports = function (config) {
 		// - PhantomJS
 		// - IE (only Windows)
 		browsers      : ['Chrome'],
-//		browsers      : ['PhantomJS'],
+		//browsers      : ['PhantomJS'],
 
 		// If browser does not capture in given timeout [ms], kill it
 		captureTimeout: 60000,

@@ -97,6 +97,22 @@ construct('fnc', {native:Function}, {
          */
         not: function(fnc) {
             return function() { return !fnc.apply(this, arguments)}
+        },
+        /**
+         * repeats a function x times. The repeater value is passed to the function
+         * @static
+         * @public
+         * @method _.repeat
+         * @param {number}   times - the number of times the function is to be repeated
+         * @param {Function} cb    - callback function to be repeated
+         * @param {Object}   ctx_  - optional context for the callback
+         */
+        repeat: function(times, cb, ctx_)
+        {
+            for(var i = 0; i < times; i++)
+            {
+                cb.call(ctx_, i);
+            }
         }
     },
     prototype:

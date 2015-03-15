@@ -436,7 +436,7 @@ construct('arr', {native:Array}, {
                 var min = this[0];
 
                 this._.each(function(elm) {
-                    if(compareFn_(elm, min) < 0) max = elm;
+                    if(compareFn_(elm, min) < 0) min = elm;
                 });
 
                 return min;

@@ -71,8 +71,8 @@
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
-        if(key !== 'obj') return;
-
+        if(key !== 'obj' && key !== 'fnc') return;
+        // add static obj & fnc functions to the global _ object
         extend(_,     {enumerable: false, overwrite: false}, module.static);
         extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }
@@ -142,6 +142,16 @@
 
                     if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
                     if(config.exec)  descriptor.value = config.value(obj);
+                    if(config.wrap)
+                    {
+                        var fnw = obj[prop];
+                        if(typeof(fnw) === 'function')
+                        {
+                            descriptor.value = (function(fnw, fnc) {
+                                return function() {fnw.apply(this, arguments); fnc.apply(this, arguments)}
+                            })(fnw, descriptor.value)
+                        }
+                    }
                 }
 
                 descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
@@ -218,27 +228,10 @@
          */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
-        },
-        extend: extend,
-        /**
-         * repeats a function x times. The repeater value is passed to the function
-         * @static
-         * @public
-         * @method _.repeat
-         * @param {number}   times - the number of times the function is to be repeated
-         * @param {Function} cb    - callback function to be repeated
-         * @param {Object}   ctx_  - optional context for the callback
-         */
-        repeat: function(times, cb, ctx_)
-        {
-            for(var i = 0; i < times; i++)
-            {
-                cb.call(ctx_, i);
-            }
         }
     });
 
-    _.extend(Function.prototype, {overwrite: false}, {
+    extend(Function.prototype, {overwrite: false}, {
         /**
          * Returns the name of a function
          * @public
@@ -251,7 +244,7 @@
         }
     });
     
-    _.extend(Math, {overwrite: false}, {
+    extend(Math, {overwrite: false}, {
         /**
          * Decimal log function
          * @public
@@ -1347,7 +1340,7 @@
                     var min = this[0];
     
                     this._.each(function(elm) {
-                        if(compareFn_(elm, min) < 0) max = elm;
+                        if(compareFn_(elm, min) < 0) min = elm;
                     });
     
                     return min;
@@ -1962,6 +1955,22 @@
              */
             not: function(fnc) {
                 return function() { return !fnc.apply(this, arguments)}
+            },
+            /**
+             * repeats a function x times. The repeater value is passed to the function
+             * @static
+             * @public
+             * @method _.repeat
+             * @param {number}   times - the number of times the function is to be repeated
+             * @param {Function} cb    - callback function to be repeated
+             * @param {Object}   ctx_  - optional context for the callback
+             */
+            repeat: function(times, cb, ctx_)
+            {
+                for(var i = 0; i < times; i++)
+                {
+                    cb.call(ctx_, i);
+                }
             }
         },
         prototype:

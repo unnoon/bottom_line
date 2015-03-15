@@ -71,8 +71,8 @@
         extend(wrapper,     {enumerable: false}, module.static);
         extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
 
-        if(key !== 'obj') return;
-
+        if(key !== 'obj' && key !== 'fnc') return;
+        // add static obj & fnc functions to the global _ object
         extend(_,     {enumerable: false, overwrite: false}, module.static);
         extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
     }
@@ -228,23 +228,6 @@
          */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
-        },
-        extend: extend,
-        /**
-         * repeats a function x times. The repeater value is passed to the function
-         * @static
-         * @public
-         * @method _.repeat
-         * @param {number}   times - the number of times the function is to be repeated
-         * @param {Function} cb    - callback function to be repeated
-         * @param {Object}   ctx_  - optional context for the callback
-         */
-        repeat: function(times, cb, ctx_)
-        {
-            for(var i = 0; i < times; i++)
-            {
-                cb.call(ctx_, i);
-            }
         }
     });
 
