@@ -44,6 +44,17 @@ construct('obj', {native:Object}, {
             return clone;
         },
         /**
+         * creates an object based on a prototype
+         * @static
+         * @public
+         * @method _.create
+         * @param  {Object} proto - prototype to base the object on
+         * @return {Object}       - new object based on prototype
+         */
+        create: function(proto) {
+            return (proto === Array.prototype) ? [] : Object.create(proto);
+        },
+        /**
          * Extends an object with function/properties from a module object
          * @public
          * @static
