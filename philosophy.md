@@ -12,11 +12,12 @@ Static?/Singleton class
 
 Mixins::
 -add initialization support for mixins
+-solve different arguments problems with init/construct in different parents (some arguments converter that can be used in multiple locations)
 
 
-
-
-
+Game engine::
+- possibility to add different actions to one object. i.e. tweens, sound, vibrate etc
+- make the visual node the highest acting one
 
 
 
