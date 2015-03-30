@@ -193,7 +193,8 @@
 
     // is should be static so we can also apply it to null & undefined
     _.is = {
-        array: Array.isArray
+        array: Array.isArray,
+        string: function(obj) {return _.typeOf(obj) === 'string'}
     };
     // convertor functions
     _.to = {

@@ -193,7 +193,8 @@
 
     // is should be static so we can also apply it to null & undefined
     _.is = {
-        array: Array.isArray
+        array: Array.isArray,
+        string: function(obj) {return _.typeOf(obj) === 'string'}
     };
     // convertor functions
     _.to = {
@@ -1415,11 +1416,22 @@
              * Removes one occurrence of of an element from an array
              * @public
              * @method arr#rm
-             * @this   {any}   - elm
+             * @param  {any}   - elm
              * @return {Array} - this for chaining
              */
             rm: function(elm) {
                 this.splice(this.indexOf(elm), 1);
+                return this;
+            },
+            /**
+             * Shuffles an array
+             * @public
+             * @method arr#shuffle
+             * @return {Array} - this for chaining
+             */
+            shuffle: function()
+            {
+                for(var j, x, i = this.length; i; j = Math.floor(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
                 return this;
             },
             /**
@@ -1946,6 +1958,26 @@
                 child.prototype = Object.create(parent.prototype);
                 child.prototype.constructor = child;
                 child[super_ || '_super'] = parent.prototype;
+            },
+            /**
+             * Mixin properties on a class. It is assumed this function is called inside the constructor
+             * @public
+             * @method module:_.fnc.mixin
+             * @param {Function}        child - child
+             * @param {Function|Array} mixins - array or sinlge mixin classes
+             */
+            mixin: function(child, mixins) {
+    
+                child._mixin = function(mixin) {
+                    return mixin.prototype;
+                };
+    
+                mixins._.each(function(mixin) {
+                    // copy static fucntions
+                    _.extend(child, mixin);
+                    // copy prototype functions
+                    _.extend(child.prototype, mixin.prototype);
+                });
             },
             /**
              * returns a negated form of a function

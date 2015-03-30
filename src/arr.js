@@ -510,11 +510,22 @@ construct('arr', {native:Array}, {
          * Removes one occurrence of of an element from an array
          * @public
          * @method arr#rm
-         * @this   {any}   - elm
+         * @param  {any}   - elm
          * @return {Array} - this for chaining
          */
         rm: function(elm) {
             this.splice(this.indexOf(elm), 1);
+            return this;
+        },
+        /**
+         * Shuffles an array
+         * @public
+         * @method arr#shuffle
+         * @return {Array} - this for chaining
+         */
+        shuffle: function()
+        {
+            for(var j, x, i = this.length; i; j = Math.floor(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
             return this;
         },
         /**
