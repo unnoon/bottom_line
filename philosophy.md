@@ -2,7 +2,7 @@ Module loader::
 Serial loading
 Parallel loading
 Circular reference detecting
-Conditional loading
+Conditional loading (yep/nope)
 
 Manager::
 Class that manages multiple objects that exists at the SAME time
@@ -18,13 +18,6 @@ Mixins::
 Game engine::
 - possibility to add different actions to one object. i.e. tweens, sound, vibrate etc
 - make the visual node the highest acting one
-
-
-
-
-tralalala lalala lala
-lalala
-sjowww he
 
 
 
