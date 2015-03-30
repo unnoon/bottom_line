@@ -27,8 +27,6 @@ Game engine::
 
 
 
-
-
 remove all internal function and move them to some utils object. For speed improvements
 
 todo prefill the bottomline object with settings
