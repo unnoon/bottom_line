@@ -111,11 +111,11 @@ construct('fnc', {native:Function}, {
         /**
          * returns a negated form of a function
          * @public
-         * @method fnc.not
+         * @method fnc.negate
          * @param  {function} fnc - an array of functions or a single function in case of supplying
          * @return {function} negated form of the function
          */
-        not: function(fnc) {
+        negate: function(fnc) {
             return function() { return !fnc.apply(this, arguments)}
         },
         /**

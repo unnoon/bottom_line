@@ -111,9 +111,9 @@
      *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
      *      {boolean=} override=true   - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean=} overwrite=true  - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {boolean=} overwrite=false - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
      *
-     *      {string=}  log             - console log level for overwrites&overrides
+     *      {string=}  log             - console log level for violations of the global settings false settings for override & overwrite. log|warn|error|throw
      *      {boolean=} validate=false  - validate overwrites & overrides should be set to true in the config
 
      *      {function=}modifier        - modifier function to apply on all functions.
@@ -124,8 +124,8 @@
         var settings = module && settings_ || {};
         var module   = module || settings_;
 
-        settings.override  = settings.override  !== false; // default = true
-        settings.overwrite = settings.overwrite !== false; // default = true
+        settings.override  =   settings.override  !== false; // default = true
+        settings.overwrite = !!settings.overwrite; // default = false
 
         for(var prop in module)
         {   if(module.hasOwnProperty(prop))
@@ -172,15 +172,21 @@
                 names.forEach(function(prop) {
                     if(obj.hasOwnProperty(prop)) // overwrite
                     {
-                        if(!overwrite)                             return; // continue
-                        if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it" ;
-                        if(settings.log)                           console[settings.log]('overwriting existing property: '+prop);
+                        if(settings.log && !settings.overwrite && config.overwrite === undefined) // overwrite is fale
+                        {
+                            if(settings.log === 'throw') {throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it";}
+                            else                         {console[settings.log]('overwriting existing property: '+prop)}
+                        }
+                        if(!overwrite) return; // continue
                     }
                     else if(prop in obj) // override
                     {
-                        if(!override)                             return; // continue
-                        if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it" ;
-                        if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
+                        if(settings.log && !settings.override && config.override === undefined)
+                        {
+                            if(settings.log === 'throw') {throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it"}
+                            else                         {console[settings.log]('overriding existing property: '+prop)}
+                        }
+                        if(!override) return; // continue
                     }
 
                     Object.defineProperty(obj, prop, descriptor)

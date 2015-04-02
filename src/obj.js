@@ -527,14 +527,14 @@ construct('obj', {native:Object}, {
             return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
         select$Fn: function(match, ctx_) {
-            return this._.remove$Fn(_.fnc.not(match), ctx_);
+            return this._.remove$Fn(_.fnc.negate(match), ctx_);
         },
         Select$: function(___values) {
             var args = arguments;
             return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
         Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
-            return this._.Remove$Fn(_.fnc.not(match), ctx_);
+            return this._.Remove$Fn(_.fnc.negate(match), ctx_);
         }},
         /**
          * Returns the number of own properties on an object
