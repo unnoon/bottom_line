@@ -105,93 +105,98 @@
      * @static
      * @method _.extend
      * @param   {Object}  obj          - object to be extended
-     * @param   {Object=} settings_    - optional settings/default descriptor
+     * @param   {Object=} _settings_    - optional settings/default descriptor
      *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
      *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *      {boolean=} override=true   - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean=} overwrite=false - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {boolean=} override=true   - boolean indicating if properties should be overridden
+     *      {boolean=} overwrite=true  - boolean indicating if properties should be overwritten
      *
-     *      {string=}  log             - console log level for violations of the global settings false settings for override & overwrite. log|warn|error|throw
-     *      {boolean=} validate=false  - validate overwrites & overrides should be set to true in the config
-
+     *      {string=} onoverwrite=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *      {string=} onoverride=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *
      *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
      */
-    function extend(obj, settings_, module) {
-        var settings = module && settings_ || {};
-        var module   = module || settings_;
+    function extend(obj, _settings_, module) {
+        var settings = module && _settings_ || {};
+        var module   = module || _settings_;
 
-        settings.override  =   settings.override  !== false; // default = true
-        settings.overwrite = !!settings.overwrite; // default = false
+        settings.override    = settings.override  !== false; // default is true
+        settings.overwrite   = settings.overwrite !== false; // default is true
+        settings.onoverwrite = settings.onoverwrite || 'warn';
+        settings.onoverride  = settings.onoverride  || 'warn';
 
         for(var prop in module)
-        {   if(module.hasOwnProperty(prop))
+        {   if(!module.hasOwnProperty(prop)) continue;
+
+            var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
+            var encapsulator = !!(descriptor.get || descriptor.set);
+            var config       = {};
+
+            // special property specific config
+            if(!encapsulator && module[prop].hasOwnProperty('value'))
             {
-                var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
-                var encapsulator = !!(descriptor.get || descriptor.set);
-                var config       = {};
+                config           = module[prop];
+                descriptor.value = config.value;
 
-                // special property specific config
-                if(!encapsulator && module[prop].hasOwnProperty('value'))
+                if(config.clone) descriptor.value = clone(config.value); // clone deep maybe?
+                if(config.exec)  descriptor.value = config.value(obj);
+                if(config.wrap)
                 {
-                    config           = module[prop];
-                    descriptor.value = config.value;
-
-                    if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
-                    if(config.exec)  descriptor.value = config.value(obj);
-                    if(config.wrap)
+                    var fnw = obj[prop];
+                    if(typeof(fnw) === 'function')
                     {
-                        var fnw = obj[prop];
-                        if(typeof(fnw) === 'function')
-                        {
-                            descriptor.value = (function(fnw, fnc) {
-                                return function() {fnw.apply(this, arguments); fnc.apply(this, arguments)}
-                            })(fnw, descriptor.value)
-                        }
+                        descriptor.value = (function(fnw, fnc) {
+                            return function() {fnw.apply(this, arguments); return fnc.apply(this, arguments)}
+                        })(fnw, descriptor.value)
                     }
                 }
-
-                descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
-                descriptor.configurable = (config.configurable !== undefined) ? config.configurable : (settings.configurable !== undefined) ? settings.configurable : descriptor.configurable;
-                descriptor.writable     = (config.writable     !== undefined) ? config.writable     : (settings.writable     !== undefined) ? settings.writable     : descriptor.writable;
-                // getters & setters don't have a writable option
-                if(encapsulator) delete descriptor.writable;
-
-                if(settings.modifier && typeof(descriptor.value) === 'function') {
-                    descriptor.value = settings.modifier(descriptor.value);
-                }
-
-                var override  = (config.override  !== undefined) ? config.override  : settings.override;
-                var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite;
-
-                var names = (config.aliases || []).concat(prop); // this is not super nice
-
-                names.forEach(function(prop) {
-                    if(obj.hasOwnProperty(prop)) // overwrite
-                    {
-                        if(settings.log && !settings.overwrite && config.overwrite === undefined) // overwrite is fale
-                        {
-                            if(settings.log === 'throw') {throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it";}
-                            else                         {console[settings.log]('overwriting existing property: '+prop)}
-                        }
-                        if(!overwrite) return; // continue
-                    }
-                    else if(prop in obj) // override
-                    {
-                        if(settings.log && !settings.override && config.override === undefined)
-                        {
-                            if(settings.log === 'throw') {throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it"}
-                            else                         {console[settings.log]('overriding existing property: '+prop)}
-                        }
-                        if(!override) return; // continue
-                    }
-
-                    Object.defineProperty(obj, prop, descriptor)
-                });
             }
+            // create the final settings object
+            var finalSettings = clone(settings);
+            for(var conf in config)
+            {   if (!config.hasOwnProperty(conf)) continue;
+
+                finalSettings[conf] = config;
+            }
+
+            descriptor.enumerable   = (finalSettings.enumerable     !== undefined)? finalSettings.enumerable    : descriptor.enumerable;
+            descriptor.configurable = (finalSettings.configurable   !== undefined)? finalSettings.configurable  : descriptor.configurable;
+            descriptor.writable     = (finalSettings.writable       !== undefined)? finalSettings.writable      : descriptor.writable;
+            // getters & setters don't have a writable option
+            if(encapsulator) delete descriptor.writable;
+
+            if(finalSettings.modifier && typeof(descriptor.value) === 'function') {
+                descriptor.value = finalSettings.modifier(descriptor.value);
+            }
+
+            var names = (config.aliases || []).concat(prop); // this is not super nice
+
+            names.forEach(function(prop) {
+                if(obj.hasOwnProperty(prop)) // overwrite
+                {
+                    if(finalSettings.onoverwrite && finalSettings.onoverwrite !== 'ignore')
+                    {
+                        if(finalSettings.onoverwrite === 'throw') {throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it";}
+                        else                                      {console[finalSettings.onoverwrite]('overwriting existing property: '+prop)}
+                    }
+                    if(!finalSettings.overwrite) return;
+                }
+                else if(prop in obj) // override
+                {   // TODO check super
+                    if(finalSettings.onoverride && finalSettings.onoverride !== 'ignore')
+                    {
+                        if(finalSettings.onoverride === 'throw') {throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it"}
+                        else                                     {console[finalSettings.onoverride]('overriding existing property: '+prop)}
+                    }
+                    if(!finalSettings.override) return;
+                }
+
+                Object.defineProperty(obj, prop, descriptor)
+            });
         }
 
         return obj;
@@ -199,8 +204,14 @@
 
     // is should be static so we can also apply it to null & undefined
     _.is = {
-        array: Array.isArray,
-        string: function(obj) {return _.typeOf(obj) === 'string'}
+        arguments:  function(obj) {return _.typeOf(obj) === 'arguments'},
+        array:      Array.isArray,
+        function:   function(obj) {return typeof(obj) === 'function'},
+        null:       function(obj) {return obj === null},
+        number:     function(obj) {return _.typeOf(obj) === 'number'},
+        object:     function(obj) {return _.typeOf(obj) === 'object'},
+        string:     function(obj) {return _.typeOf(obj) === 'string'},
+        undefined:  function(obj) {return obj === undefined}
     };
     // convertor functions
     _.to = {
