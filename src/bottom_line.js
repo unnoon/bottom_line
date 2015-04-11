@@ -30,10 +30,10 @@
     };
 
     // wrap functions for chaining
-    function construct(key, settings_, module)
+    function construct(key, _settings_, module)
     {
-        var settings = module && settings_ || {};
-        var module   = module || settings_;
+        var settings = module && _settings_ || {};
+        var module   = module || _settings_;
         var obj      = settings.native;
 
         var wrapper = settings.base? clone(settings.native) : {};
