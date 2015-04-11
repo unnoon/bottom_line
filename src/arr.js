@@ -94,14 +94,14 @@ construct('arr', {native:Array}, {
          * @param  {...number} ___indices - indices SORTED
          * @return     {Array}       this - mutated array for chaining
          */
-        del: function(___indices)
+        del: {overrideaction: 'ignore', value: function(___indices)
         {
             arguments._.eachRight(function(key) {
                 this.splice(key, 1);
             }, this);
 
             return this;
-        },
+        }},
         /**
          * Remove elements based on index
          * @public
@@ -110,14 +110,14 @@ construct('arr', {native:Array}, {
          * @param  {Object=}                     ctx_   - optional context for the match function
          * @return {Array}                       this   - mutated array for chaining
          */
-        delFn: function(match, ctx_)
+        delFn: {overrideaction: 'ignore', value: function(match, ctx_)
         {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
             }, this);
 
             return this;
-        },
+        }},
         /**
          * Removes all specified values from an array
          * @public
@@ -125,7 +125,7 @@ construct('arr', {native:Array}, {
          * @param  {...any} ___values - values to remove
          * @return {Array}       this - mutated array for chaining
          */
-        remove$: function(___values) {
+        remove$: {overrideaction: 'ignore', value: function(___values) {
             var args = arguments;
 
             this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -133,7 +133,7 @@ construct('arr', {native:Array}, {
             }, this);
 
             return this;
-        },
+        }},
         /**
          * Removes all values from an array based on a match function
          * @public
@@ -143,13 +143,13 @@ construct('arr', {native:Array}, {
          * @param  {Object=}                            ctx_ - optional context for the match function
          * @return {Array}                             this  - mutated array for chaining
          */
-        remove$Fn: function(match, ctx_) {
+        remove$Fn: {overrideaction: 'ignore', value: function(match, ctx_) {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
             }, this);
 
             return this;
-        },
+        }},
 
         /**
          * Difference between the current and other arrays
@@ -251,7 +251,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}  ctx_  - optional context for the callback function
          * @return {Array}          - this for chaining
          */
-        each: function(step_, cb, ctx_) {
+        each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = 0, to = this.length;
@@ -265,7 +265,7 @@ construct('arr', {native:Array}, {
             }
 
             return this;
-        },
+        }},
         /**
          * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          * @public
@@ -276,7 +276,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}  ctx_  - optional context for the callback function
          * @return {Array}          - this array for chaining
          */
-        eachRight: function(step_, cb, ctx_) {
+        eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = this.length-1, to = -1;
@@ -288,7 +288,7 @@ construct('arr', {native:Array}, {
             }
 
             return this;
-        },
+        }},
         /**
          * Get/sets: the first element of an array
          * @public
@@ -331,7 +331,7 @@ construct('arr', {native:Array}, {
          * @param   {Object}  elm - element to check membership of
          * @returns {boolean}     - boolean indicating if the array contains the element
          */
-        has: {aliases: ['contains'], value: function(elm) {
+        has: {aliases: ['contains'], overrideaction: 'ignore', value: function(elm) {
             return this.indexOf(elm) > -1;
         }},
         /**
@@ -491,11 +491,11 @@ construct('arr', {native:Array}, {
          * @param  {any}   val  - value to push
          * @return {Array} this - this for chaining
          */
-        _add: function(val) {
+        _add: {overrideaction: 'ignore', value: function(val) {
             this.push(val);
 
             return this;
-        },
+        }},
         /**
          * Returns a random element from the array
          * @public
@@ -536,13 +536,13 @@ construct('arr', {native:Array}, {
          * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
          * @returns {number|Array} - the length of the array or the array itself
          */
-        size: function(size_) {
+        size: {overrideaction: 'ignore', value: function(size_) {
             if(size_ === undefined) return this.length;
 
             this.length = size_;
 
             return this;
-        },
+        }},
         /**
          * Returns the sum of all numbers in a number array
          * @public
@@ -562,7 +562,7 @@ construct('arr', {native:Array}, {
          * @this    {Array}
          * @returns {string} - string representation of the array
          */
-        toString: function()
+        toString: {overrideaction: 'ignore', value: function()
         {
             var output = '[';
 
@@ -572,7 +572,7 @@ construct('arr', {native:Array}, {
             }
 
             return output + ']';
-        },
+        }},
         /**
          * Calculates the union for 2 arrays
          * @public

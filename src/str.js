@@ -93,9 +93,9 @@ construct('str', {native:String}, {
          * @param   {string}  substr - substring to check for
          * @returns {boolean}        - boolean indicating if the string contains the substring
          */
-        has: function(substr) {
+        has: {overrideaction: 'ignore', value: function(substr) {
             return !!~this.indexOf(substr);
-        },
+        }},
         /**
          * Inserts a substring in a string
          * @public
@@ -163,9 +163,9 @@ construct('str', {native:String}, {
          * @this    {string}
          * @returns {string} - string representation of the object
          */
-        toString: function()
+        toString: {overrideaction: 'ignore', value: function()
         {
             return this.toString();
-        }
+        }}
     }
 });

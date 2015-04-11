@@ -113,8 +113,8 @@
      *      {boolean=} override=true   - boolean indicating if properties should be overridden
      *      {boolean=} overwrite=true  - boolean indicating if properties should be overwritten
      *
-     *      {string=} onoverwrite=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-     *      {string=} onoverride=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
      *
      *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
@@ -124,10 +124,10 @@
         var settings = module && _settings_ || {};
         var module   = module || _settings_;
 
-        settings.override    = settings.override  !== false; // default is true
-        settings.overwrite   = settings.overwrite !== false; // default is true
-        settings.onoverwrite = settings.onoverwrite || 'warn';
-        settings.onoverride  = settings.onoverride  || 'warn';
+        settings.override        = settings.override  !== false; // default is true
+        settings.overwrite       = settings.overwrite !== false; // default is true
+        settings.overwriteaction = settings.overwriteaction || 'warn';
+        settings.overrideaction  = settings.overrideaction  || 'warn';
 
         for(var prop in module)
         {   if(!module.hasOwnProperty(prop)) continue;
@@ -146,13 +146,18 @@
                 if(config.exec)  descriptor.value = config.value(obj);
                 if(config.wrap)
                 {
-                    var fnw = obj[prop];
-                    if(typeof(fnw) === 'function')
-                    {
-                        descriptor.value = (function(fnw, fnc) {
-                            return function() {fnw.apply(this, arguments); return fnc.apply(this, arguments)}
-                        })(fnw, descriptor.value)
-                    }
+                    /**
+                     * wraps 2 functions into 1. Return the result of the second function given
+                     *
+                     * @param {Function} fnc1 - function to be wrapped
+                     * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
+                     * @returns {Function} - the wrapping function
+                     */
+                    var wrap = function(fnc1, fnc2) {
+                        return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
+                    };
+                    // wrap super or override function with the module function
+                    descriptor.value = wrap(obj[prop], descriptor.value)
                 }
             }
             // create the final settings object
@@ -160,7 +165,7 @@
             for(var conf in config)
             {   if (!config.hasOwnProperty(conf)) continue;
 
-                finalSettings[conf] = config;
+                finalSettings[conf] = config[conf];
             }
 
             descriptor.enumerable   = (finalSettings.enumerable     !== undefined)? finalSettings.enumerable    : descriptor.enumerable;
@@ -176,23 +181,46 @@
             var names = (config.aliases || []).concat(prop); // this is not super nice
 
             names.forEach(function(prop) {
+                /**
+                 *
+                 * @param {string} type='override'|'overwrite'
+                 */
+                var action = function(type, conf, value) {
+                    var message;
+                    var action                = finalSettings[type+'action'];
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && (/\b_super\b/.test(value) || (typeof(value) !== 'function'));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && !/\b_super\b/.test(value) && (typeof(value) === 'function');
+
+                    if(!action || action === 'ignore' || skipOverrideAction) return; // no action required so return
+
+                    if(conf === true)
+                    {
+                        message = ((type === 'override')? 'overriding' : 'overwriting') +' existing property: '+prop+'.';
+                        if(overrideNotUsingSuper) message += ' But not calling super method.'
+                    }
+                    else
+                    {
+                        message = 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+                    }
+
+                    if(action === 'throw') {throw message}
+                    else                   {
+                        console[action](message)
+                    }
+
+                    return message
+                };
+
+
                 if(obj.hasOwnProperty(prop)) // overwrite
                 {
-                    if(finalSettings.onoverwrite && finalSettings.onoverwrite !== 'ignore')
-                    {
-                        if(finalSettings.onoverwrite === 'throw') {throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it";}
-                        else                                      {console[finalSettings.onoverwrite]('overwriting existing property: '+prop)}
-                    }
-                    if(!finalSettings.overwrite) return;
+                    action('overwrite', finalSettings.overwrite, obj[prop]);
+                    if(!finalSettings.overwrite) return; // continue
                 }
                 else if(prop in obj) // override
-                {   // TODO check super
-                    if(finalSettings.onoverride && finalSettings.onoverride !== 'ignore')
-                    {
-                        if(finalSettings.onoverride === 'throw') {throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it"}
-                        else                                     {console[finalSettings.onoverride]('overriding existing property: '+prop)}
-                    }
-                    if(!finalSettings.override) return;
+                {
+                    action('override', finalSettings.override, obj[prop]);
+                    if(!finalSettings.override) return; // continue
                 }
 
                 Object.defineProperty(obj, prop, descriptor)
@@ -229,7 +257,8 @@
                 default          : return [obj];
             }
         },
-        int: function(num) {return num|0}
+        int: function(num) {return num|0},
+        string: function(obj) {return obj._.toString()}
     };
     /**
      *  'Global' _methods

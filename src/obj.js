@@ -609,7 +609,7 @@ construct('obj', {native:Object}, {
          * @this    {Object}
          * @returns {string} - string representation of the object
          */
-        toString: function(visited_)
+        toString: {overrideaction: 'ignore', value: function(visited_)
         {
             var output = '';
             var val;
@@ -636,7 +636,7 @@ construct('obj', {native:Object}, {
             }
 
             return output + '}';
-        },
+        }},
         /**
          * Returns an array containing the values of an object (enumerable properties)
          * @public

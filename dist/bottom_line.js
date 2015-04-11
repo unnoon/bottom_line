@@ -113,8 +113,8 @@
      *      {boolean=} override=true   - boolean indicating if properties should be overridden
      *      {boolean=} overwrite=true  - boolean indicating if properties should be overwritten
      *
-     *      {string=} onoverwrite=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-     *      {string=} onoverride=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
      *
      *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
@@ -124,10 +124,10 @@
         var settings = module && _settings_ || {};
         var module   = module || _settings_;
 
-        settings.override    = settings.override  !== false; // default is true
-        settings.overwrite   = settings.overwrite !== false; // default is true
-        settings.onoverwrite = settings.onoverwrite || 'warn';
-        settings.onoverride  = settings.onoverride  || 'warn';
+        settings.override        = settings.override  !== false; // default is true
+        settings.overwrite       = settings.overwrite !== false; // default is true
+        settings.overwriteaction = settings.overwriteaction || 'warn';
+        settings.overrideaction  = settings.overrideaction  || 'warn';
 
         for(var prop in module)
         {   if(!module.hasOwnProperty(prop)) continue;
@@ -146,13 +146,18 @@
                 if(config.exec)  descriptor.value = config.value(obj);
                 if(config.wrap)
                 {
-                    var fnw = obj[prop];
-                    if(typeof(fnw) === 'function')
-                    {
-                        descriptor.value = (function(fnw, fnc) {
-                            return function() {fnw.apply(this, arguments); return fnc.apply(this, arguments)}
-                        })(fnw, descriptor.value)
-                    }
+                    /**
+                     * wraps 2 functions into 1. Return the result of the second function given
+                     *
+                     * @param {Function} fnc1 - function to be wrapped
+                     * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
+                     * @returns {Function} - the wrapping function
+                     */
+                    var wrap = function(fnc1, fnc2) {
+                        return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
+                    };
+                    // wrap super or override function with the module function
+                    descriptor.value = wrap(obj[prop], descriptor.value)
                 }
             }
             // create the final settings object
@@ -160,7 +165,7 @@
             for(var conf in config)
             {   if (!config.hasOwnProperty(conf)) continue;
 
-                finalSettings[conf] = config;
+                finalSettings[conf] = config[conf];
             }
 
             descriptor.enumerable   = (finalSettings.enumerable     !== undefined)? finalSettings.enumerable    : descriptor.enumerable;
@@ -176,23 +181,46 @@
             var names = (config.aliases || []).concat(prop); // this is not super nice
 
             names.forEach(function(prop) {
+                /**
+                 *
+                 * @param {string} type='override'|'overwrite'
+                 */
+                var action = function(type, conf, value) {
+                    var message;
+                    var action                = finalSettings[type+'action'];
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && (/\b_super\b/.test(value) || (typeof(value) !== 'function'));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && !/\b_super\b/.test(value) && (typeof(value) === 'function');
+
+                    if(!action || action === 'ignore' || skipOverrideAction) return; // no action required so return
+
+                    if(conf === true)
+                    {
+                        message = ((type === 'override')? 'overriding' : 'overwriting') +' existing property: '+prop+'.';
+                        if(overrideNotUsingSuper) message += ' But not calling super method.'
+                    }
+                    else
+                    {
+                        message = 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+                    }
+
+                    if(action === 'throw') {throw message}
+                    else                   {
+                        console[action](message)
+                    }
+
+                    return message
+                };
+
+
                 if(obj.hasOwnProperty(prop)) // overwrite
                 {
-                    if(finalSettings.onoverwrite && finalSettings.onoverwrite !== 'ignore')
-                    {
-                        if(finalSettings.onoverwrite === 'throw') {throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it";}
-                        else                                      {console[finalSettings.onoverwrite]('overwriting existing property: '+prop)}
-                    }
-                    if(!finalSettings.overwrite) return;
+                    action('overwrite', finalSettings.overwrite, obj[prop]);
+                    if(!finalSettings.overwrite) return; // continue
                 }
                 else if(prop in obj) // override
-                {   // TODO check super
-                    if(finalSettings.onoverride && finalSettings.onoverride !== 'ignore')
-                    {
-                        if(finalSettings.onoverride === 'throw') {throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it"}
-                        else                                     {console[finalSettings.onoverride]('overriding existing property: '+prop)}
-                    }
-                    if(!finalSettings.override) return;
+                {
+                    action('override', finalSettings.override, obj[prop]);
+                    if(!finalSettings.override) return; // continue
                 }
 
                 Object.defineProperty(obj, prop, descriptor)
@@ -229,7 +257,8 @@
                 default          : return [obj];
             }
         },
-        int: function(num) {return num|0}
+        int: function(num) {return num|0},
+        string: function(obj) {return obj._.toString()}
     };
     /**
      *  'Global' _methods
@@ -239,7 +268,7 @@
 
     });
 
-    extend(Function.prototype, {overwrite: false}, {
+    extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
         /**
          * Returns the name of a function
          * @public
@@ -252,7 +281,7 @@
         }
     });
     
-    extend(Math, {overwrite: false}, {
+    extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
         /**
          * Decimal log function
          * @public
@@ -875,7 +904,7 @@
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
-            toString: function(visited_)
+            toString: {overrideaction: 'ignore', value: function(visited_)
             {
                 var output = '';
                 var val;
@@ -902,7 +931,7 @@
                 }
     
                 return output + '}';
-            },
+            }},
             /**
              * Returns an array containing the values of an object (enumerable properties)
              * @public
@@ -1017,14 +1046,14 @@
              * @param  {...number} ___indices - indices SORTED
              * @return     {Array}       this - mutated array for chaining
              */
-            del: function(___indices)
+            del: {overrideaction: 'ignore', value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Remove elements based on index
              * @public
@@ -1033,14 +1062,14 @@
              * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            delFn: function(match, ctx_)
+            delFn: {overrideaction: 'ignore', value: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Removes all specified values from an array
              * @public
@@ -1048,7 +1077,7 @@
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            remove$: function(___values) {
+            remove$: {overrideaction: 'ignore', value: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1056,7 +1085,7 @@
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Removes all values from an array based on a match function
              * @public
@@ -1066,13 +1095,13 @@
              * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            remove$Fn: function(match, ctx_) {
+            remove$Fn: {overrideaction: 'ignore', value: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
-            },
+            }},
     
             /**
              * Difference between the current and other arrays
@@ -1174,7 +1203,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {Array}          - this for chaining
              */
-            each: function(step_, cb, ctx_) {
+            each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
@@ -1188,7 +1217,7 @@
                 }
     
                 return this;
-            },
+            }},
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * @public
@@ -1199,7 +1228,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {Array}          - this array for chaining
              */
-            eachRight: function(step_, cb, ctx_) {
+            eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
@@ -1211,7 +1240,7 @@
                 }
     
                 return this;
-            },
+            }},
             /**
              * Get/sets: the first element of an array
              * @public
@@ -1254,7 +1283,7 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: {aliases: ['contains'], value: function(elm) {
+            has: {aliases: ['contains'], overrideaction: 'ignore', value: function(elm) {
                 return this.indexOf(elm) > -1;
             }},
             /**
@@ -1414,11 +1443,11 @@
              * @param  {any}   val  - value to push
              * @return {Array} this - this for chaining
              */
-            _add: function(val) {
+            _add: {overrideaction: 'ignore', value: function(val) {
                 this.push(val);
     
                 return this;
-            },
+            }},
             /**
              * Returns a random element from the array
              * @public
@@ -1459,13 +1488,13 @@
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
              */
-            size: function(size_) {
+            size: {overrideaction: 'ignore', value: function(size_) {
                 if(size_ === undefined) return this.length;
     
                 this.length = size_;
     
                 return this;
-            },
+            }},
             /**
              * Returns the sum of all numbers in a number array
              * @public
@@ -1485,7 +1514,7 @@
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 var output = '[';
     
@@ -1495,7 +1524,7 @@
                 }
     
                 return output + ']';
-            },
+            }},
             /**
              * Calculates the union for 2 arrays
              * @public
@@ -1650,9 +1679,9 @@
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
-            has: function(substr) {
+            has: {overrideaction: 'ignore', value: function(substr) {
                 return !!~this.indexOf(substr);
-            },
+            }},
             /**
              * Inserts a substring in a string
              * @public
@@ -1720,10 +1749,10 @@
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString();
-            }
+            }}
         }
     });
     construct('num', {native:Number}, {
@@ -1880,10 +1909,10 @@
              * @method   num#toString
              * @returns {string} - string representation of the number
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString()
-            }
+            }}
         }
     });
     construct('fnc', {native:Function}, {
@@ -2031,10 +2060,10 @@
              * @method fnc#toString
              * @returns {string} - string representation of the function
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString();
-            }
+            }}
         }
     });
     construct('int', {

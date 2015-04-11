@@ -143,9 +143,9 @@ construct('fnc', {native:Function}, {
          * @method fnc#toString
          * @returns {string} - string representation of the function
          */
-        toString: function()
+        toString: {overrideaction: 'ignore', value: function()
         {
             return this.toString();
-        }
+        }}
     }
 });

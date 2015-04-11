@@ -1,4 +1,4 @@
-extend(Function.prototype, {overwrite: false}, {
+extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
     /**
      * Returns the name of a function
      * @public
@@ -11,7 +11,7 @@ extend(Function.prototype, {overwrite: false}, {
     }
 });
 
-extend(Math, {overwrite: false}, {
+extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
     /**
      * Decimal log function
      * @public

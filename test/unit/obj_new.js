@@ -140,9 +140,9 @@ describe("Object", function() {
             });
         });
 
-        xdescribe("extend", function() {
+        describe("extend", function() {
 
-            xit("simple extend", function() {
+            it("simple extend", function() {
                 var obj = {
                     x: 1,
                     y: 2,
