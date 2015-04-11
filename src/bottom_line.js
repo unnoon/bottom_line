@@ -195,7 +195,7 @@
 
                     if(conf === true)
                     {
-                        message = ((type === 'override')? 'overriding' : 'overwriting') +' existing property: '+prop+'.';
+                        message = ((type === 'override')? 'overriding' : 'overwriting') +' property: '+prop+'.';
                         if(overrideNotUsingSuper) message += ' But not calling super method.'
                     }
                     else
