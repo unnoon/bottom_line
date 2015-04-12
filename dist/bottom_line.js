@@ -30,10 +30,10 @@
     };
 
     // wrap functions for chaining
-    function construct(key, settings_, module)
+    function construct(key, _settings_, module)
     {
-        var settings = module && settings_ || {};
-        var module   = module || settings_;
+        var settings = module && _settings_ || {};
+        var module   = module || _settings_;
         var obj      = settings.native;
 
         var wrapper = settings.base? clone(settings.native) : {};
@@ -149,9 +149,9 @@
                     /**
                      * wraps 2 functions into 1. Return the result of the second function given
                      *
-                     * @param {Function} fnc1 - function to be wrapped
+                     * @param {Function}   fnc1 - function to be wrapped
                      * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
-                     * @returns {Function} - the wrapping function
+                     * @returns {Function}      - the wrapping function
                      */
                     var wrap = function(fnc1, fnc2) {
                         return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
@@ -182,8 +182,12 @@
 
             names.forEach(function(prop) {
                 /**
+                 * Performs action based on type, conf & value. The 'conf' parameter determines a override/overwrite warning or a a redundant warning on the model.
+                 * In case of overrides a action is only performed if the super is not called by the override function
                  *
-                 * @param {string} type='override'|'overwrite'
+                 * @param {string}  type='override'|'overwrite'
+                 * @param {boolean} conf  - true or false value for type (override or overwrite)
+                 * @param {any}     value - value in the model
                  */
                 var action = function(type, conf, value) {
                     var message;
@@ -191,11 +195,11 @@
                     var skipOverrideAction    = (type === 'override') && (conf === true) && (/\b_super\b/.test(value) || (typeof(value) !== 'function'));
                     var overrideNotUsingSuper = (type === 'override') && (conf === true) && !/\b_super\b/.test(value) && (typeof(value) === 'function');
 
-                    if(!action || action === 'ignore' || skipOverrideAction) return; // no action required so return
+                    if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
 
                     if(conf === true)
                     {
-                        message = ((type === 'override')? 'overriding' : 'overwriting') +' existing property: '+prop+'.';
+                        message = ((type === 'override')? 'overriding' : 'overwriting') +' property: '+prop+'.';
                         if(overrideNotUsingSuper) message += ' But not calling super method.'
                     }
                     else
@@ -207,8 +211,6 @@
                     else                   {
                         console[action](message)
                     }
-
-                    return message
                 };
 
 
@@ -235,6 +237,7 @@
         arguments:  function(obj) {return _.typeOf(obj) === 'arguments'},
         array:      Array.isArray,
         function:   function(obj) {return typeof(obj) === 'function'},
+        int:        function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
         null:       function(obj) {return obj === null},
         number:     function(obj) {return _.typeOf(obj) === 'number'},
         object:     function(obj) {return _.typeOf(obj) === 'object'},
@@ -257,8 +260,18 @@
                 default          : return [obj];
             }
         },
-        int: function(num) {return num|0},
-        string: function(obj) {return obj._.toString()}
+        int: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' :
+                    return obj|0;
+                case 'string' :
+                    return parseInt(obj);
+                default :
+                    return NaN
+            }
+        },
+        string: function(obj) {return obj? obj._.toString() : obj+''}
     };
     /**
      *  'Global' _methods
@@ -911,23 +924,21 @@
                 var obj;
     
                 for(var key in this)
-                {
-                    if(this.hasOwnProperty(key))
+                {   if(!this.hasOwnProperty(key)) continue;
+    
+                    obj = this[key];
+    
+                    if(_.isPrimitive(obj))      {val = obj}
+                    else
                     {
-                        obj = this[key];
+                        if(!visited_)           {visited_ = [this]}
     
-                        if(_.isPrimitive(obj))      {val = obj}
-                        else
-                        {
-                            if(!visited_)           {visited_ = [this]}
-    
-                            if(visited_._.has(obj)) {val = '[[circular ref]]'}
-                            else                    {visited_.push(obj); val = obj._.toString(visited_)}
-                        }
-    
-                        // TODO punctuation for strings & proper formatting
-                        output += (output? ', ' : '{') + key + ': ' + val
+                        if(visited_._.has(obj)) {val = '[[circular ref]]'}
+                        else                    {visited_.push(obj); val = obj._.toString(visited_)}
                     }
+    
+                    // TODO punctuation for strings & proper formatting
+                    output += (output? ', ' : '{') + key + ': ' + val
                 }
     
                 return output + '}';

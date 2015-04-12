@@ -616,23 +616,21 @@ construct('obj', {native:Object}, {
             var obj;
 
             for(var key in this)
-            {
-                if(this.hasOwnProperty(key))
+            {   if(!this.hasOwnProperty(key)) continue;
+
+                obj = this[key];
+
+                if(_.isPrimitive(obj))      {val = obj}
+                else
                 {
-                    obj = this[key];
+                    if(!visited_)           {visited_ = [this]}
 
-                    if(_.isPrimitive(obj))      {val = obj}
-                    else
-                    {
-                        if(!visited_)           {visited_ = [this]}
-
-                        if(visited_._.has(obj)) {val = '[[circular ref]]'}
-                        else                    {visited_.push(obj); val = obj._.toString(visited_)}
-                    }
-
-                    // TODO punctuation for strings & proper formatting
-                    output += (output? ', ' : '{') + key + ': ' + val
+                    if(visited_._.has(obj)) {val = '[[circular ref]]'}
+                    else                    {visited_.push(obj); val = obj._.toString(visited_)}
                 }
+
+                // TODO punctuation for strings & proper formatting
+                output += (output? ', ' : '{') + key + ': ' + val
             }
 
             return output + '}';
