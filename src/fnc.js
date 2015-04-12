@@ -13,6 +13,7 @@ construct('fnc', {native:Function}, {
          * @param   {object=}     ctx_  - optional context
          * @returns {function}          - bootstrapped version of the function
          */
+        // FIXME make __args_ an array
         bind: function(___args_, fnc, ctx_)
         {
             if(arguments.length <= 2
