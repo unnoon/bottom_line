@@ -192,8 +192,8 @@
                 var action = function(type, conf, value) {
                     var message;
                     var action                = finalSettings[type+'action'];
-                    var skipOverrideAction    = (type === 'override') && (conf === true) && (/\b_super\b/.test(value) || (typeof(value) !== 'function'));
-                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && !/\b_super\b/.test(value) && (typeof(value) === 'function');
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/\b_super\b/.test(value));
 
                     if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
 
