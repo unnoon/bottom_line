@@ -216,12 +216,12 @@
 
                 if(obj.hasOwnProperty(prop)) // overwrite
                 {
-                    action('overwrite', finalSettings.overwrite, obj[prop]);
+                    action('overwrite', finalSettings.overwrite, descriptor.value);
                     if(!finalSettings.overwrite) return; // continue
                 }
                 else if(prop in obj) // override
                 {
-                    action('override', finalSettings.override, obj[prop]);
+                    action('override', finalSettings.override, descriptor.value);
                     if(!finalSettings.override) return; // continue
                 }
 

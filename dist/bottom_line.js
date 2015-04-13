@@ -216,12 +216,12 @@
 
                 if(obj.hasOwnProperty(prop)) // overwrite
                 {
-                    action('overwrite', finalSettings.overwrite, obj[prop]);
+                    action('overwrite', finalSettings.overwrite, descriptor.value);
                     if(!finalSettings.overwrite) return; // continue
                 }
                 else if(prop in obj) // override
                 {
-                    action('override', finalSettings.override, obj[prop]);
+                    action('override', finalSettings.override, descriptor.value);
                     if(!finalSettings.override) return; // continue
                 }
 
@@ -1146,44 +1146,13 @@
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method arr#dimit
-             * @this   {Array}
-             * @param  {any|function=} init_ - initial value for the array. Can be either a value or a function specifying the value
-             * @param  {Object}        ctx_  - optional context for the init function
-             * @return {Array}               - dimensionalized array
-             */
-            dimit: function(init_, ctx_)
-            {
-                var dimensions = _.clone(this);
-                this.length    = dimensions[0];
-                var init       = (typeof(init_) === 'function')? init_ : function() {return init_};
-    
-                // add other dimensions
-                addDim(this, 0, dimensions);
-    
-                return this;
-    
-                function addDim(arr, dim, dimensions)
-                {
-                    for(var i = 0, max = dimensions[dim]; i < max; i++)
-                    {
-                        arr[i] = (dim === dimensions.length-1)? init.call(ctx_) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
-                        if(dim === dimensions.length-2 && _.isUndefined(init_)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined
-                        addDim(arr[i], dim+1, dimensions); // add another dimension
-                    }
-                }
-            },
-            /**
-             * Creates a multidimensional array. The dimensions come from the array itself
-             * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
-             * @public
              * @method arr#Dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
              * @param  {Object}        ctx_  - optional context for the init function
              * @return {Array}               - this initialized multi-dimensional array
              */
-            Dimit: function(init_, ctx_)
+            dimit: function(init_, ctx_)
             {
                 var dimensions = this;
                 var arr        = new Array(dimensions[0]);
@@ -1941,6 +1910,7 @@
              * @param   {object=}     ctx_  - optional context
              * @returns {function}          - bootstrapped version of the function
              */
+            // FIXME make __args_ an array
             bind: function(___args_, fnc, ctx_)
             {
                 if(arguments.length <= 2
