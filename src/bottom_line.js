@@ -213,7 +213,6 @@
                     }
                 };
 
-
                 if(obj.hasOwnProperty(prop)) // overwrite
                 {
                     action('overwrite', finalSettings.overwrite, descriptor.value);
