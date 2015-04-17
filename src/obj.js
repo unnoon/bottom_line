@@ -150,9 +150,9 @@ construct('obj', {native:Object}, {
     prototype: {
         /**
          * Singular push function to solve problems with differences between objects & arrays
-         * @public
+         * @private
          * @method obj#_add
-         * @this    {Array}
+         * @this    {Object}
          * @param  {...any}  val - value to push
          * @return  {Array} this - this for chaining
          */
@@ -160,6 +160,22 @@ construct('obj', {native:Object}, {
             this[key] = val;
 
             return this;
+        },
+        /**
+         * Counts the number of occurrences of an element
+         * @public
+         * @method obj#count
+         * @param   {any}   elm  - value to push
+         * @return  {number} occurrences - occurrences of the elm int he object
+         */
+        count: function(elm) {
+            var occurrences = 0;
+
+            this._.each(function(e) {
+                occurrences += e === elm; // js magic true = 1 false = 0
+            });
+
+            return occurrences;
         },
         /**
          * Copies keys to an array

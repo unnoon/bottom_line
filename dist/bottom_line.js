@@ -457,9 +457,9 @@
         prototype: {
             /**
              * Singular push function to solve problems with differences between objects & arrays
-             * @public
+             * @private
              * @method obj#_add
-             * @this    {Array}
+             * @this    {Object}
              * @param  {...any}  val - value to push
              * @return  {Array} this - this for chaining
              */
@@ -467,6 +467,22 @@
                 this[key] = val;
     
                 return this;
+            },
+            /**
+             * Counts the number of occurrences of an element
+             * @public
+             * @method obj#count
+             * @param   {any}   elm  - value to push
+             * @return  {number} occurrences - occurrences of the elm int he object
+             */
+            count: function(elm) {
+                var occurrences = 0;
+    
+                this._.each(function(e) {
+                    occurrences += e === elm; // js magic true = 1 false = 0
+                });
+    
+                return occurrences;
             },
             /**
              * Copies keys to an array
@@ -1904,42 +1920,26 @@
              * @public
              * @static
              * @method fnc.bind
-             * @param   {...any=}  ___args_ - arguments to prefill
+             * @param   {Array=}     _args_ - arguments to prefill
              * @param   {function}    fnc   - function to bind
-             * @param   {object=}     ctx_  - optional context
+             * @param   {Object=}     ctx_  - optional context
              * @returns {function}          - bootstrapped version of the function
              */
-            // FIXME make __args_ an array
-            bind: function(___args_, fnc, ctx_)
+            bind: function(_args_, fnc, ctx_)
             {
-                if(arguments.length <= 2
-                && typeof(arguments[0]) === 'function'
-                && typeof(arguments[1]) !== 'function')
-                {
-                    return fnc.bind(ctx_)
-                }
-                // TODO don't return a partial in case no undefined arguments are given
-                // if ___args_ are given return a partial
-                var args     = arguments;
-                var argsMax  = args.length-(typeof(args[args.length-1]) === 'function' ? 1 : 2);
-                var partials = 0;
+                if(_.is.function(_args_))     {return _args_.bind(fnc)}
+                if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
     
-                args._.each(function(arg) {if(arg === undefined) partials++});
+                var blanks  = _args_._.count(undefined);
+                var prefils = _args_.length;
     
                 return function() {
-                    var max  = argsMax + arguments.length - partials;
-                    var tmp;
+                    var args = arguments.length;
+                    var max  = prefils + args - blanks;
     
-                    for(var i = max-1, arg = arguments.length-1; i >= 0; i--)
+                    for(var i = max-1, arg = args-1; i >= 0; i--)
                     {
-                        if(args[i] !== undefined && i < argsMax) {
-                            arguments[i] = args[i]
-                        }
-                        else
-                        {
-                            tmp = arguments[arg--]; // we need an intermediate variable here otherwise the arg is undefined on setting
-                            arguments[i] = tmp;
-                        }
+                        arguments[i] = (_args_[i] !== undefined && i < prefils)? _args_[i] : arguments[arg--];
                     }
     
                     arguments.length = max; // set the new length of arguments
