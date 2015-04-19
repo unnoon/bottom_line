@@ -436,8 +436,8 @@ describe("Array", function() {
 				var arr = [2, 3]._.dimit();
 
 				expect(arr).to.eql([
-					[],
-					[]
+					[undefined, undefined, undefined],
+					[undefined, undefined, undefined]
 				]);
 				expect(arr.length).to.eql(2);
 				expect(arr[0].length).to.eql(3);

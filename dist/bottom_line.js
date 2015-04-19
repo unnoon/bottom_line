@@ -283,8 +283,8 @@
          * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
          * @param {string}  prop               - name of the property
          * @param {Object} descriptor          - descriptor/settings object on injection
-         *      {boolean=} static              - optional boolean indicating if the property is static
          *      {boolean}  value               - value of the property
+         *      {boolean=} static              - optional boolean indicating if the property is static
          *
          *      {boolean=} enumerable          - boolean indicating if all properties should be enumerable. can be overwritten on a config level
          *      {boolean=} configurable        - boolean indicating if all properties should be configurable. can be overwritten on a config level
@@ -1192,30 +1192,30 @@
              * @method arr#Dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
-             * @param  {Object}        ctx_  - optional context for the init function
              * @return {Array}               - this initialized multi-dimensional array
              */
-            dimit: function(init_, ctx_)
+            dimit: {aliases: ['dimensionalize'], value: function(init_)
             {
                 var dimensions = this;
                 var arr        = new Array(dimensions[0]);
-                var init       = (typeof(init_) === 'function')? init_ : function() {return init_};
+    
+                var lastDimension       = dimensions.length-1;
     
                 // add other dimensions
-                addDim(arr, 0, dimensions);
+                addDimension(arr, 0, dimensions);
     
                 return arr;
     
-                function addDim(arr, dim, dimensions)
+                function addDimension(arr, dim, dimensions)
                 {
                     for(var i = 0, max = dimensions[dim]; i < max; i++)
                     {
-                        arr[i] = (dim === dimensions.length-1)? init.call(ctx_) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
-                        if(dim === dimensions.length-2 && _.isUndefined(init_)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined don't initialize the array
-                        addDim(arr[i], dim+1, dimensions); // add another dimension
+                        arr[i] = (dim === lastDimension)? _.clone(init_) : new Array(dimensions[dim+1]);
+    
+                        addDimension(arr[i], dim+1, dimensions); // add another dimension
                     }
                 }
-            },
+            }},
             /**
              * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * each is eachlastic in the sense that one can add and delete elements at the current index
