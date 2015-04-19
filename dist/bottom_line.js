@@ -55,38 +55,38 @@
             Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return _methods}, enumerable: false, configurable: false});
         }
 
-        wrapStatics(wrapper, key, module);
-        wrapPrototype(wrapper, key, module);
-
         if(settings.global !== false)
             _[key] = wrapper; // add wrapper to the bottom_line object
+
+        wrapStatics(wrapper, module.static);
+        wrapPrototype(wrapper, module.prototype);
 
         return wrapper;
     }
 
-    function wrapStatics(wrapper, key, module)
+    function wrapStatics(wrapper, module)
     {
-        if(!module.static) return;
+        if(!module) return;
 
-        extend(wrapper,     {enumerable: false}, module.static);
-        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(wrapper,     {enumerable: false}, module);
+        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
 
-        if(key !== 'obj' && key !== 'fnc') return;
+        if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
-        extend(_,     {enumerable: false, overwrite: false}, module.static);
-        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(_,     {enumerable: false, overwrite: false}, module);
+        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
     }
 
-    function wrapPrototype(wrapper, key, module)
+    function wrapPrototype(wrapper, module)
     {
-        if(!module.prototype) return;
+        if(!module) return;
 
-        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module.prototype);
-        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module.prototype);
-        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module.prototype);
-        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
+        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
 
-        extend(wrapper.methods, {enumerable: false}, module.prototype);
+        extend(wrapper.methods, {enumerable: false}, module);
     }
 
     // simple cloning function
@@ -105,7 +105,7 @@
      * @static
      * @method _.extend
      * @param   {Object}  obj          - object to be extended
-     * @param   {Object=} _settings_    - optional settings/default descriptor
+     * @param   {Object=} _settings_   - optional settings/default descriptor
      *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
      *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
@@ -250,24 +250,26 @@
 
             switch (type)
             {
-                case 'arguments' : return Array.prototype.slice.call(obj, 0);
-                case 'object'    :
-                case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
-                case 'array'     : return obj;
-                case 'undefined' :
-                case 'null'      : return [];
-                default          : return [obj];
+                case 'arguments'                    : return Array.prototype.slice.call(obj, 0);
+                case 'object'                       : return obj._.values();
+                case 'array'                        : return obj;
+                default                             : return [];
             }
         },
         int: function(obj) {
             switch(_.typeOf(obj))
             {
-                case 'number' :
-                    return obj|0;
-                case 'string' :
-                    return parseInt(obj);
-                default :
-                    return NaN
+                case 'number' : return obj|0;
+                case 'string' : return parseInt(obj);
+                default       : return NaN
+            }
+        },
+        number: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' : return obj;
+                case 'string' : return parseFloat(obj);
+                default       : return NaN
             }
         },
         string: function(obj) {return obj? obj._.toString() : obj+''}
@@ -277,7 +279,33 @@
      */
 
     extend(_, {
+        /**
+         * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
+         * @param {string}  prop               - name of the property
+         * @param {Object} descriptor          - descriptor/settings object on injection
+         *      {boolean=} static              - optional boolean indicating if the property is static
+         *      {boolean}  value               - value of the property
+         *
+         *      {boolean=} enumerable          - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+         *      {boolean=} configurable        - boolean indicating if all properties should be configurable. can be overwritten on a config level
+         *      {boolean=} writable            - boolean indicating if all properties should be writable. can be overwritten on a config level
+         *
+         *      {boolean=} override=true       - boolean indicating if properties should be overridden
+         *      {boolean=} overwrite=true      - boolean indicating if properties should be overwritten
+         *
+         *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+         *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+         *
+         *      {function=}modifier            - modifier function to apply on all functions.
+         */
+        inject: function(obj, prop, descriptor) {
+            var module = {};
 
+            module[prop] = descriptor;
+
+            if(descriptor.static) {wrapStatics(obj, module)}
+            else                  {wrapPrototype(obj, module)}
+        }
     });
 
     extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
@@ -1927,7 +1955,7 @@
              */
             bind: function(_args_, fnc, ctx_)
             {
-                if(_.is.function(_args_))     {return _args_.bind(fnc)}
+                if(_.is.function(_args_))       {return _args_.bind(fnc)}
                 if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
     
                 var blanks  = _args_._.count(undefined);
