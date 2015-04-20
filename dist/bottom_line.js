@@ -1196,10 +1196,9 @@
              */
             dimit: {aliases: ['dimensionalize'], value: function(init_)
             {
-                var dimensions = this;
-                var arr        = new Array(dimensions[0]);
-    
-                var lastDimension       = dimensions.length-1;
+                var dimensions    = this;
+                var arr           = new Array(dimensions[0]);
+                var lastDimension = dimensions.length-1;
     
                 // add other dimensions
                 addDimension(arr, 0, dimensions);
@@ -1616,45 +1615,73 @@
              * Returns the rest of the string after a certain substring (1st occurrence)
              * @public
              * @method str#after
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}        - new string containing the string after the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string after the given substring
              */
-            after: function(substr) {
-                var index = this.indexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this.valueOf();
+            after: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.indexOf(substring);
+                    output = (~index)? output.slice(index + substring.length) : output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
              * @public
              * @method str#afterLast
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}         - new string containing the string after the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string after the given substring
              */
-            afterLast: function(substr) {
-                var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this.valueOf();
+            afterLast: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.lastIndexOf(substring);
+                    output = (~index)? output.slice(index + substring.length) : output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
              * @public
              * @method str#before
-             * @param   {string} substr - substring to identify the return string
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
              * @returns {string}         - new string containing the string before the given substring
              */
-            before: function(substr) {
-                var index = this.indexOf(substr);
-                return (~index)? this.slice(0, index) : this.valueOf();
+            before: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.indexOf(substring);
+                    output = (~index)? output.slice(0, index): output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
              * @public
              * @method str#beforeLast
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}         - new string containing the string before the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string before the given substring
              */
-            beforeLast: function(substr) {
-                var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(0, index) : this.valueOf();
+            beforeLast: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.lastIndexOf(substring);
+                    output = (~index)? output.slice(0, index): output;
+                });
+    
+                return output;
             },
             /**
              * Returns the string between a prefix && post substring
@@ -1664,8 +1691,20 @@
              * @param   {string} post_substr - substring to identify the return string
              * @returns {string}             - new string containing the string before the given substring
              */
+            // TODO handle non existence of pre or post substr
             between: function(pre_substr, post_substr) {
                 return this._.after(pre_substr)._.before(post_substr);
+            },
+            /**
+             * Returns the last string between a prefix && post substring
+             * @public
+             * @method str#between
+             * @param   {string} pre_substr  - substring to identify the return string
+             * @param   {string} post_substr - substring to identify the return string
+             * @returns {string}             - new string containing the string before the given substring
+             */
+            betweenLast: function(pre_substr, post_substr) {
+                return this._.beforeLast(post_substr)._.afterLast(pre_substr);
             },
             /**
              * Capitalize the first character of a string
