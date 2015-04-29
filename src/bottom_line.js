@@ -52,7 +52,10 @@
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return _methods}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {
+                enumerable: false, configurable: false,
+                get: function() {stack[index++] = this; return _methods},
+                set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}); // we implement a set so it is still possible to use _ as an object property
         }
 
         if(settings.global !== false)

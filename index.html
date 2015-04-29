@@ -6,9 +6,12 @@
 
         <script src="dist/bottom_line.js"></script>
         <script>
-            var arr1 = [0, 1, '', false, 2, null, undefined, 3, NaN];
+            var obj = {};
 
-            var result = arr1._.compact();
+            obj['_'] = 666;
+
+            console.log(obj._.toString());
+
         </script>
     </head>
     <body>
