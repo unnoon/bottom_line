@@ -14,6 +14,7 @@ construct('obj', {native:Object}, {
         // TODO These should be expanded with frozen, extensible states etc
         clone: function clone(obj) {
             if(_.obj.isPrimitive(obj)) return obj;
+            if(_.is.array(obj))        return obj.slice();
 
             var clone = _.create(obj._.proto());
             var names = obj._.names();
@@ -32,6 +33,7 @@ construct('obj', {native:Object}, {
          * @param   {Object}  obj   - object to be cloned
          * @return  {Object}  clone - the cloned object
          */
+        // TODO adaptation for arrays in phantomJS
         cloneDeep: function cloneDeep(obj) {
             if(_.obj.isPrimitive(obj)) return obj;
 
@@ -133,7 +135,13 @@ construct('obj', {native:Object}, {
          * @returns {string} - type of the object
          */
         typeOf: function(obj) {
-            return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+
+            switch(obj)
+            {
+                case null      : return 'null'; // null & undefined should be separate cases since for phantomJS they'll return 'domWindow'
+                case undefined : return 'undefined';
+                default        : return  Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+            }
         },
         /**
          * Static version of _.names returns an empty array in case of null or undefined
@@ -281,11 +289,20 @@ construct('obj', {native:Object}, {
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
          */
+        // TODO proper implementation for arguments. It will break on phantomJS otherwise
         each: function(cb, ctx_) {
-            for(var key in this)
+            if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
             {
-                if(!this.hasOwnProperty(key)) continue;
-                if(cb.call(ctx_, this[key], key, this) === false) break;
+                for(var key = 0; key < this.length; key++) {
+                    if (!this.hasOwnProperty(key)) continue;
+                    if (cb.call(ctx_, this[key], key, this) === false) break;
+                }
+            }
+            else {
+                for (var key in this) {
+                    if (!this.hasOwnProperty(key)) continue;
+                    if (cb.call(ctx_, this[key], key, this) === false) break;
+                }
             }
         },
         /**

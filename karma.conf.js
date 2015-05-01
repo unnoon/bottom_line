@@ -12,8 +12,10 @@ module.exports = function (config) {
 		files     : [
 			// these are only watched and served
 			{pattern: 'dist/bottom_line.js'},
+			//{pattern: 'src/test.js'},
 			// included files - tests
 			{pattern: 'test/unit/**/*.js'}
+			//{pattern: 'test/unit/javascript.js'}
 		],
 
 		preprocessors: {
@@ -59,7 +61,7 @@ module.exports = function (config) {
 		// - IE (only Windows)
 		//browsers      : ['Chrome'],
 		browsers      : ['PhantomJS'],
-		captureConsole: false,
+		//captureConsole: false,
 		// If browser does not capture in given timeout [ms], kill it
 		captureTimeout: 60000,
 

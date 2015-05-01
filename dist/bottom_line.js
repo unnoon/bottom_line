@@ -15,8 +15,8 @@
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
-}(this, function() {
+    default        : bottom_line(root)}
+}(this, function(root_) {
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
@@ -28,6 +28,8 @@
 	var _ = {
         not: {} // object to hold negative functions
     };
+
+    if(root_) root_._ = _; // TODO check for conflicts
 
     // wrap functions for chaining
     function construct(key, _settings_, module)
@@ -54,12 +56,8 @@
             // TODO check for conflicts
             Object.defineProperty(obj.prototype, '_', {
                 enumerable: false, configurable: false,
-                get: function() {
-                    stack[index++] = this; return _methods
-                },
-                set: function(val) {
-                    Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}
-                }); // we implement a set so it is still possible to use _ as an object property
+                get: function() {stack[index++] = this; return _methods},
+                set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}); // we implement a set so it is still possible to use _ as an object property
         }
 
         if(settings.global !== false)
@@ -325,6 +323,28 @@
         name: function()
         {
             return this.toString().match(/^function\s?([^\s(]*)/)[1];
+        },
+        bind: function(oThis) {
+            if (typeof this !== 'function') {
+                // closest thing possible to the ECMAScript 5
+                // internal IsCallable function
+                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+            }
+    
+            var aArgs   = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP    = function() {},
+                fBound  = function() {
+                    return fToBind.apply(this instanceof fNOP
+                            ? this
+                            : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments)));
+                };
+    
+            fNOP.prototype = this.prototype;
+            fBound.prototype = new fNOP();
+    
+            return fBound;
         }
     });
     
@@ -338,6 +358,19 @@
          */
         log10: function(val) {
             return Math.log(val)/Math.LN10;
+        }
+    });
+    
+    extend(Number, {overwrite: false, overwriteaction: 'ignore'}, {
+        /**
+         * Check for isNaN conform the ES6 specs
+         * @public
+         * @method Number.isNaN
+         * @param   {number} value - value to check is NaN for
+         * @returns {boolean}      - boolean indicating if the value is NaN
+         */
+        isNaN: function(value) {
+            return typeof value === "number" && value !== value;
         }
     });
     construct('obj', {native:Object}, {
@@ -356,6 +389,7 @@
             // TODO These should be expanded with frozen, extensible states etc
             clone: function clone(obj) {
                 if(_.obj.isPrimitive(obj)) return obj;
+                if(_.is.array(obj))        return obj.slice();
     
                 var clone = _.create(obj._.proto());
                 var names = obj._.names();
@@ -374,6 +408,7 @@
              * @param   {Object}  obj   - object to be cloned
              * @return  {Object}  clone - the cloned object
              */
+            // TODO adaptation for arrays in phantomJS
             cloneDeep: function cloneDeep(obj) {
                 if(_.obj.isPrimitive(obj)) return obj;
     
@@ -475,7 +510,13 @@
              * @returns {string} - type of the object
              */
             typeOf: function(obj) {
-                return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+    
+                switch(obj)
+                {
+                    case null      : return 'null'; // null & undefined should be separate cases since for phantomJS they'll return 'domWindow'
+                    case undefined : return 'undefined';
+                    default        : return  Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+                }
             },
             /**
              * Static version of _.names returns an empty array in case of null or undefined
@@ -623,11 +664,20 @@
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
              */
+            // TODO proper implementation for arguments. It will break on phantomJS otherwise
             each: function(cb, ctx_) {
-                for(var key in this)
+                if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
                 {
-                    if(!this.hasOwnProperty(key)) continue;
-                    if(cb.call(ctx_, this[key], key, this) === false) break;
+                    for(var key = 0; key < this.length; key++) {
+                        if (!this.hasOwnProperty(key)) continue;
+                        if (cb.call(ctx_, this[key], key, this) === false) break;
+                    }
+                }
+                else {
+                    for (var key in this) {
+                        if (!this.hasOwnProperty(key)) continue;
+                        if (cb.call(ctx_, this[key], key, this) === false) break;
+                    }
                 }
             },
             /**

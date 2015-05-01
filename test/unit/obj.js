@@ -158,15 +158,15 @@ describe("Object", function() {
 		describe("typeof", function() {
 
 			it("javascript types", function() {
-				expect(_.typeOf(6)).to.eql('number');
-				expect(_.typeOf(NaN)).to.eql('number');
-				expect(_.typeOf(Infinity)).to.eql('number');
-				expect(_.typeOf('s')).to.eql('string');
-				expect(_.typeOf([])).to.eql('array');
-				expect(_.typeOf({})).to.eql('object');
-				expect(_.typeOf(function(){})).to.eql('function');
-				expect(_.typeOf(null)).to.eql('null');
-				expect(_.typeOf(undefined)).to.eql('undefined');
+                expect(_.typeOf(6)).to.eql('number');
+                expect(_.typeOf(NaN)).to.eql('number');
+                expect(_.typeOf(Infinity)).to.eql('number');
+                expect(_.typeOf('s')).to.eql('string');
+                expect(_.typeOf([])).to.eql('array');
+                expect(_.typeOf({})).to.eql('object');
+                expect(_.typeOf(function(){})).to.eql('function');
+                expect(_.typeOf(null)).to.eql('null');
+                expect(_.typeOf(undefined)).to.eql('undefined');
                 expect(_.typeOf(new String('s'))).to.eql('string');
 			});
 

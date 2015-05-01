@@ -15,8 +15,8 @@
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
-}(this, function() {
+    default        : bottom_line(root)}
+}(this, function(root_) {
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
@@ -28,6 +28,8 @@
 	var _ = {
         not: {} // object to hold negative functions
     };
+
+    if(root_) root_._ = _; // TODO check for conflicts
 
     // wrap functions for chaining
     function construct(key, _settings_, module)
