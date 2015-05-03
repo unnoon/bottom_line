@@ -306,7 +306,7 @@ construct('obj', {native:Object}, {
          * @return {Array}         - this array for chaining
          */
         eachRight: function(step_, cb, ctx_) {
-            if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
+            if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
             if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             this._.keys()._.eachRight(function(key) {

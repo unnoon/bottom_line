@@ -664,23 +664,11 @@
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
              */
-            // TODO proper implementation for arguments. It will break on phantomJS otherwise
             each: function(cb, ctx_) {
-                //if(_.typeOf(this) === 'arguments') {console.log('args!!')}
-    
-                //if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
-                //{
-                //    for(var key = 0; key < this.length; key++) {
-                //        if (!this.hasOwnProperty(key)) continue;
-                //        if (cb.call(ctx_, this[key], key, this) === false) break;
-                //    }
-                //}
-                //else {
-                    for (var key in this) {
-                        if (!this.hasOwnProperty(key)) continue;
-                        if (cb.call(ctx_, this[key], key, this) === false) break;
-                    }
-                //}
+                for (var key in this) {
+                    if (!this.hasOwnProperty(key)) continue;
+                    if (cb.call(ctx_, this[key], key, this) === false) break;
+                }
             },
             /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -693,7 +681,7 @@
              * @return {Array}         - this array for chaining
              */
             eachRight: function(step_, cb, ctx_) {
-                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
+                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
                 if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 this._.keys()._.eachRight(function(key) {
