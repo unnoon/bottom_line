@@ -63,7 +63,7 @@
         if(settings.global !== false)
             _[key] = wrapper; // add wrapper to the bottom_line object
 
-        wrapStatics(wrapper, module.static);
+        wrapStatics(wrapper,   module.static);
         wrapPrototype(wrapper, module.prototype);
 
         return wrapper;
@@ -666,19 +666,21 @@
              */
             // TODO proper implementation for arguments. It will break on phantomJS otherwise
             each: function(cb, ctx_) {
-                if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
-                {
-                    for(var key = 0; key < this.length; key++) {
-                        if (!this.hasOwnProperty(key)) continue;
-                        if (cb.call(ctx_, this[key], key, this) === false) break;
-                    }
-                }
-                else {
+                //if(_.typeOf(this) === 'arguments') {console.log('args!!')}
+    
+                //if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
+                //{
+                //    for(var key = 0; key < this.length; key++) {
+                //        if (!this.hasOwnProperty(key)) continue;
+                //        if (cb.call(ctx_, this[key], key, this) === false) break;
+                //    }
+                //}
+                //else {
                     for (var key in this) {
                         if (!this.hasOwnProperty(key)) continue;
                         if (cb.call(ctx_, this[key], key, this) === false) break;
                     }
-                }
+                //}
             },
             /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration

@@ -289,20 +289,10 @@ construct('obj', {native:Object}, {
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
          */
-        // TODO proper implementation for arguments. It will break on phantomJS otherwise
         each: function(cb, ctx_) {
-            if(this.hasOwnProperty('length')) // we need to distinguish here because for example phantomJS will not let us use for in on arguments
-            {
-                for(var key = 0; key < this.length; key++) {
-                    if (!this.hasOwnProperty(key)) continue;
-                    if (cb.call(ctx_, this[key], key, this) === false) break;
-                }
-            }
-            else {
-                for (var key in this) {
-                    if (!this.hasOwnProperty(key)) continue;
-                    if (cb.call(ctx_, this[key], key, this) === false) break;
-                }
+            for (var key in this) {
+                if (!this.hasOwnProperty(key)) continue;
+                if (cb.call(ctx_, this[key], key, this) === false) break;
             }
         },
         /**

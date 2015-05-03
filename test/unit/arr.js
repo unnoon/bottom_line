@@ -965,7 +965,7 @@ describe("Array", function() {
 			});
 		});
         // FIXME
-		xdescribe("Unify", function() {
+		describe("Unify", function() {
 
 			it("simple union", function() {
 				var arr1 = [1, 2, 3];

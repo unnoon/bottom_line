@@ -51,7 +51,7 @@ describe("Object", function() {
 
         });
 
-        xdescribe("safe chaining", function() {
+        describe("safe chaining", function() {
 
             it("simple simple", function() {
                 var obj = {
@@ -60,16 +60,15 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj._.$chain
-                        .faux()
+                expect(obj._.chain
+                        .names()
                         .keys()
                         .value
-                ).to.eql(['x', 'y', 'z']);
+                ).to.eql(['0', '1', '2']);
             });
 
         });
-        // FIXME this is currently not possuble
-        xdescribe("safe chaining different types", function() {
+        describe("safe chaining different types", function() {
 
             it("simple safe chain", function() {
                 var obj = {
@@ -78,18 +77,16 @@ describe("Object", function() {
                     z: 3
                 };
 
-                expect(obj._.$chain
-                        .faux()
+                expect(obj._.chain
                         .keys()
                         .first()
                         .value
                 ).to.eql('x');
             });
-
         });
     });
 
-    xdescribe("static methods", function() {
+    describe("static methods", function() {
 
         describe("clone", function() {
 

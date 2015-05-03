@@ -63,7 +63,7 @@
         if(settings.global !== false)
             _[key] = wrapper; // add wrapper to the bottom_line object
 
-        wrapStatics(wrapper, module.static);
+        wrapStatics(wrapper,   module.static);
         wrapPrototype(wrapper, module.prototype);
 
         return wrapper;
