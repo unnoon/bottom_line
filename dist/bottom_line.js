@@ -236,9 +236,11 @@
         return obj;
     }
 
+    var objToString = Object.prototype.toString;
+
     // is should be static so we can also apply it to null & undefined
     _.is = {
-        arguments:  function(obj) {return _.typeOf(obj) === 'arguments'},
+        arguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
         array:      Array.isArray,
         function:   function(obj) {return typeof(obj) === 'function'},
         int:        function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
@@ -682,7 +684,7 @@
              */
             eachRight: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
-                if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+                if(_.is.arguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 this._.keys()._.eachRight(function(key) {
                     return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
