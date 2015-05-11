@@ -289,16 +289,17 @@ construct('obj', {native:Object}, {
          * @this  {Object}
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
+         * @return {Array}         - this array for chaining
          */
         each: function(cb, ctx_) {
-            if(this.length) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+            if(_.is.arguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
 
             for (var key in this) {
                 if (!this.hasOwnProperty(key)) continue;
                 if (cb.call(ctx_, this[key], key, this) === false) break;
             }
 
-            return this
+            return this;
         },
         /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -312,7 +313,7 @@ construct('obj', {native:Object}, {
          */
         eachRight: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
-            if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+            if(_.is.arguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             this._.keys()._.eachRight(function(key) {
                 return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
@@ -571,16 +572,15 @@ construct('obj', {native:Object}, {
          * @this   {Object}
          * @return {number} the 'length' of the object
          */
-        size: function() {
+        size: {aliases: ['length'], value: function() {
             var len = 0;
 
-            for(var key in this)
-            {
-                if(this._.owns(key)) len++;
-            }
+            this._.each(function() {
+                len++;
+            });
 
             return len;
-        },
+        }},
         /**
          * Returns an array containing the names of an object (includes non-enumerable properties)
          * @public
@@ -640,13 +640,9 @@ construct('obj', {native:Object}, {
         toString: {overrideaction: 'ignore', value: function(visited_)
         {
             var output = '';
-            var val;
-            var obj;
 
-            for(var key in this)
-            {   if(!this.hasOwnProperty(key)) continue;
-
-                obj = this[key];
+            this._.each(function(obj, key) {
+                var val;
 
                 if(_.isPrimitive(obj))      {val = obj}
                 else
@@ -659,7 +655,7 @@ construct('obj', {native:Object}, {
 
                 // TODO punctuation for strings & proper formatting
                 output += (output? ', ' : '{') + key + ': ' + val
-            }
+            });
 
             return output + '}';
         }},

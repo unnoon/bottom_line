@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Arguments type checking</title>
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
+    <script src="../../dist/bottom_line.js"></script>
+    <!--<script src="../../src/bottom_line.old.js"></script>-->
+    <script>
+
+        var strFn = Object.prototype.toString;
+
+        function isArguments1() {
+            return strFn.call(arguments) === '[object Arguments]';
+        }
+
+        function isArguments2() {
+            return strFn.call(arguments).indexOf('[object Arguments]') > -1;
+        }
+
+        function isArguments3() {
+            return strFn.call(arguments).indexOf('Arg') > -1;
+        }
+
+        function isArguments4() {
+            return !!~strFn.call(arguments).indexOf('Arg');
+        }
+
+        var suite = new Benchmark.Suite;
+        console.log(document.getElementsByTagName('title')[0].text+': running tests...');
+        // add tests
+        suite
+                .add('arguments1', function() {
+                    (function() {
+                        isArguments1(arguments)
+                    })('aap')
+                })
+                .add('argumnets2', function() {
+                    (function() {
+                        isArguments2(arguments)
+                    })('aap')
+                })
+                .add('argumnets3', function() {
+                    (function() {
+                        isArguments3(arguments)
+                    })('aap')
+                })
+                .add('argumnets4', function() {
+                    (function() {
+                        isArguments4(arguments)
+                    })('aap')
+                })
+            // add listeners
+                .on('cycle', function(event) {
+                    console.log(String(event.target));
+                })
+                .on('complete', function() {
+                    console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+                })
+            // run async
+                .run({ 'async': true });
+    </script>
+</head>
+<body>
+</body>
+</html>
