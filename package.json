@@ -6,6 +6,7 @@
     "type": "git",
     "url": "https://unnoon@bitbucket.org/unnoon/bottom_line._.-s.git"
   },
+  "main": "dist/bottom_line.js",
   "devDependencies": {
     "grunt": "latest",
     "karma": "latest",
