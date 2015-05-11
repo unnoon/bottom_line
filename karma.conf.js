@@ -60,7 +60,8 @@ module.exports = function (config) {
 		// - PhantomJS
 		// - IE (only Windows)
 		//browsers      : ['Chrome'],
-		browsers      : ['PhantomJS'],
+		//browsers      : ['Firefox'],
+		browsers      : ['Chrome', 'PhantomJS', 'Firefox', 'IE', 'Opera'],
 		//captureConsole: false,
 		// If browser does not capture in given timeout [ms], kill it
 		captureTimeout: 60000,
@@ -74,7 +75,9 @@ module.exports = function (config) {
 			'karma-chai-plugins',
 			'karma-coverage',
 			'karma-chrome-launcher',
-            'karma-phantomjs-launcher'
+            'karma-phantomjs-launcher',
+			'karma-firefox-launcher',
+			'karma-ie-launcher'
 		]
 	});
 };

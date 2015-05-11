@@ -104,6 +104,7 @@ construct('obj', {native:Object}, {
          * @returns {boolean}    - boolean indicating if the object is a primitive
          */
         isPrimitive: function(obj) {
+            // maybe just check for valueOF??
             var type = typeof(obj);
 
             switch(type)
@@ -290,10 +291,14 @@ construct('obj', {native:Object}, {
          * @param {Object=}  ctx_ - optional context
          */
         each: function(cb, ctx_) {
+            if(this.length) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+
             for (var key in this) {
                 if (!this.hasOwnProperty(key)) continue;
                 if (cb.call(ctx_, this[key], key, this) === false) break;
             }
+
+            return this
         },
         /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration

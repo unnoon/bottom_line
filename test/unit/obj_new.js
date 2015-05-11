@@ -46,7 +46,7 @@ describe("Object", function() {
                         .keys()
                         .first()
                         .value
-                ).to.eql('x');
+                ).to.equal('x');
             });
 
         });

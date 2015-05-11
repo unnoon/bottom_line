@@ -6,12 +6,35 @@
 
         <script src="dist/bottom_line.js"></script>
         <script>
-            var obj = {};
+            var obj = {
+                x: 1,
+                y: 2,
+                z: 3
+            };
 
-            obj['_'] = 666;
+            var value = obj._.chain
+                    .keys()
+                    .first()
+                    .value;
 
-            console.log(obj._.toString());
+            console.log(value._.toString());
 
+            var obj2 = {
+                x: 1,
+                y: 2,
+                z: 3
+            };
+
+            var keys = Object.keys(obj2);
+
+            var first  = keys._.first();
+            var sfirst = keys[0];
+
+            var value2 = obj._.chain
+                    .keys()
+                    .value;
+
+            console.log(first._.toString());
         </script>
     </head>
     <body>

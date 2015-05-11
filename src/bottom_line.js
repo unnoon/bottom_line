@@ -48,7 +48,10 @@
         var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
 
         Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper._chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {
+            var elm = stack[--index];
+            return elm.valueOf? elm.valueOf() : elm; // TODO some nicer code here. fix for firefox conversions of strings into string objects so always return the primitive value here
+        }, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
@@ -56,7 +59,10 @@
             // TODO check for conflicts
             Object.defineProperty(obj.prototype, '_', {
                 enumerable: false, configurable: false,
-                get: function() {stack[index++] = this; return _methods},
+                get: function() {
+                    stack[index++] = this;
+                    return _methods
+                },
                 set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}); // we implement a set so it is still possible to use _ as an object property
         }
 

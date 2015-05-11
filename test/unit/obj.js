@@ -348,7 +348,11 @@ describe("Object", function() {
                     obj: {xt: 666, arr: [{really: 'yes'}]}
                 };
 
-                expect(obj._.toString()).to.eql('{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}');
+				// we remove spaces to regard for differences in spacing from for example toString of functions
+				var expected = '{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}'.replace(/\s/g, '');
+				var result   = obj._.toString().replace(/\s/g, '');
+
+                expect(result).to.eql(expected);
             });
 
 			it("falsey _toString", function() {
