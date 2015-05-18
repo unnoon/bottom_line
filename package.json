@@ -1,0 +1,48 @@
+{
+  "name": "bottom_line",
+  "version": "0.0.0",
+  "description": "JS Toolbelt",
+  "main": "dist/bottom_line.js",
+  "devDependencies": {
+    "mocha": "~1.12.1",
+    "grunt": "~0.4.5",
+    "grunt-bump": "~0.3.1",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-requirejs": "~0.1.0",
+    "grunt-preprocess": "~4.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-script-launcher": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.4",
+    "karma-mocha": "~0.1.10",
+    "karma": "~0.12.31",
+    "karma-jasmine": "~0.1.3",
+    "grunt-contrib-clean": "~0.6.0",
+    "karma-coverage": "~0.3.1",
+    "karma-chai-plugins": "~0.5.0",
+    "grunt-contrib-uglify": "~0.9.1",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.8",
+    "grunt-jsdoc": "~0.5.8",
+    "grunt-contrib-watch": "~0.6.1",
+    "karma-ie-launcher": "^0.1.5"
+  },
+  "scripts": {
+    "test": "karma start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unnoon/bottom_line"
+  },
+  "keywords": [
+    "tools",
+    "utilities",
+    "toolbelt",
+    "utilitybelt"
+  ],
+  "author": "Rogier Geertzema",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unnoon/bottom_line/issues"
+  },
+  "homepage": "https://github.com/unnoon/bottom_line"
+}

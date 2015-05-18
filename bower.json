@@ -1,0 +1,28 @@
+{
+  "name": "bottom_line",
+  "version": "0.0.0",
+  "authors": [
+    "Rogier Geertzema"
+  ],
+  "description": "JS Toolbelt",
+  "main": "dist/bottom_line.js",
+  "dependencies": {},
+  "devDependencies": {
+    "benchmark": "~1.0.0"
+  },
+  "keywords": [
+    "tools",
+    "utilities",
+    "toolbelt",
+    "utilitybelt"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/unnoon/bottom_line",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    ".coverage"
+  ]
+}

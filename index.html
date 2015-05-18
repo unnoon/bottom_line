@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Just to run some custom tests</title>
+
+        <script src="dist/bottom_line.js"></script>
+        <script>
+            var obj = {
+                x: 1,
+                y: 2,
+                z: 3
+            };
+
+            var value = obj._.chain
+                    .keys()
+                    .first()
+                    .value;
+
+            console.log(value._.toString());
+
+            var obj2 = {
+                x: 1,
+                y: 2,
+                z: 3
+            };
+
+            var keys = Object.keys(obj2);
+
+            var first  = keys._.first();
+            var sfirst = keys[0];
+
+            var value2 = obj._.chain
+                    .keys()
+                    .value;
+
+            console.log(first._.toString());
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
