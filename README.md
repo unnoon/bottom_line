@@ -10,7 +10,9 @@ Javascript utility belt that takes a middle ground between sugar & underscore/lo
     bower install bottom_line
 
 ## Syntax & features
-
+```
+var foo = 'bar';
+```
 The syntax of bottom\_line is close to the 'object-oriented' style of javascript pimped-up with the bottom\_line face .\_.
 
     ```javascript
