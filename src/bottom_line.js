@@ -2,7 +2,7 @@
  * _____________bottom_line.js_____
  * Bottom_line JavaScript Library
  *
- * Copyright 2013, Rogier Geertzema
+ * Copyright 2015, Rogier Geertzema
  * Released under the MIT license
  * ________________________________
  */
