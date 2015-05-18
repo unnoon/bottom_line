@@ -13,7 +13,7 @@ Javascript utility belt that takes a middle ground between sugar & underscore/lo
 
 The syntax of bottom\_line is close to the 'object-oriented' style of javascript prefixed with the bottom\_line face .\_.
 
-    ```javascript
+    ``` javascript
     arr._.remove('elm1');
     ```
 
@@ -21,7 +21,7 @@ The syntax of bottom\_line is close to the 'object-oriented' style of javascript
 
 By default a method will mutate the object itself. A Pascal case variant is used to create a object while the original object is untouched.
 
-    ```javascript
+    ``` javascript
     arr._.remove('elm1'); // mutates arr  
           
     arr._.Remove('elm1'); // creates a new array leaving the original version untouched          
@@ -31,7 +31,7 @@ By default a method will mutate the object itself. A Pascal case variant is used
 
 Most methods come in two variants. One that accepts multiple arguments the other using a callback & optional context as input. The callback variant is postfixed with Fn
 
-    ```javascript
+    ``` javascript
     // multiple arguments
     arr._.remove('elm1', 'elm2');
     
@@ -43,7 +43,7 @@ Most methods come in two variants. One that accepts multiple arguments the other
 
 A method can be extended to apply to 'all' elements by postfixing it with $
 
-    ```javascript
+    ``` javascript
     // removes all arguments including duplicates
     arr._.remove$('elm1', 'elm2');
     
@@ -55,7 +55,7 @@ A method can be extended to apply to 'all' elements by postfixing it with $
 
 For readability every method can be negated by prefixing not.
 
-    ```javascript
+    ``` javascript
     // normal call
     arr._.has('elm1');
     
@@ -67,7 +67,7 @@ For readability every method can be negated by prefixing not.
 
 Bottom_line comes with handy string operators such as
 
-    ```javascript
+    ``` javascript
     // normal call
     ''._.after();
     
