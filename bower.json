@@ -1,9 +1,9 @@
 {
-  "name": "bottom_line.js",
-  "version": "0.1.0",
+  "name": "bottom_line",
+  "version": "0.0.1",
   "dependencies": {},
   "devDependencies": {
-    "benchmark": "*",
-    "lodash": "*"
+    "benchmark": "~1.0.0",
+    "lodash": "~3.8.0"
   }
 }

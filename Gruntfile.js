@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		uglify: {
-			my_target: {
+			dist: {
 				files: {
 					'dist/bottom_line.min.js': ['dist/bottom_line.js']
 				}
@@ -50,7 +50,7 @@ module.exports = function(grunt) {
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
-
+	grunt.registerTask('build',   ['preprocess', 'uglify', 'docs']);
     grunt.registerTask('default', ['preprocess']);
 };
 

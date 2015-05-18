@@ -10,7 +10,7 @@
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
 
-	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
 
 </head>
 
@@ -98,8 +98,8 @@
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : Object.defineProperty(root, '_', {value: bottom_line(), enumerable: true}) } // TODO check for conflicts
-}(this, function() {
+    default        : bottom_line(root)}
+}(this, function(root_) {
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
@@ -109,14 +109,18 @@
 	 * @namespace _
 	 */
 	var _ = {
+        'version': '0.0.1',
         not: {} // object to hold negative functions
     };
+    // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
+    if(root_) root_._ = _; // TODO check for conflicts
 
+    // TODO something to run methods in a different context. Apply will not work since the context will get lost when using other bottom_line functions internally
     // wrap functions for chaining
-    function construct(key, settings_, module)
+    function construct(key, _settings_, module)
     {
-        var settings = module && settings_ || {};
-        var module   = module || settings_;
+        var settings = module && _settings_ || {};
+        var module   = module || _settings_;
         var obj      = settings.native;
 
         var wrapper = settings.base? clone(settings.native) : {};
@@ -129,47 +133,56 @@
         var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
 
         Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper._chains,  'value', {get: function() {return stack[--index]}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {
+            var elm = stack[--index];
+            return elm.valueOf? elm.valueOf() : elm;
+        }, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
         {
             // extend native object with special _ 'bottom_line' access property
             // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {get: function() {stack[index++] = this; return _methods}, enumerable: false, configurable: false});
+            Object.defineProperty(obj.prototype, '_', {
+                enumerable: false, configurable: false,
+                get: function() {
+                    stack[index++] = this;
+                    return _methods
+                },
+                set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}); // we implement a set so it is still possible to use _ as an object property
         }
-
-        wrapStatics(wrapper, key, module);
-        wrapPrototype(wrapper, key, module);
 
         if(settings.global !== false)
             _[key] = wrapper; // add wrapper to the bottom_line object
 
+        wrapStatics(wrapper,   module.static);
+        wrapPrototype(wrapper, module.prototype);
+
         return wrapper;
     }
 
-    function wrapStatics(wrapper, key, module)
+    function wrapStatics(wrapper, module)
     {
-        if(!module.static) return;
+        if(!module) return;
 
-        extend(wrapper,     {enumerable: false}, module.static);
-        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(wrapper,     {enumerable: false}, module);
+        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
 
-        if(key !== 'obj' && key !== 'fnc') return;
+        if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
-        extend(_,     {enumerable: false, overwrite: false}, module.static);
-        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module.static);
+        extend(_,     {enumerable: false, overwrite: false}, module);
+        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
     }
 
-    function wrapPrototype(wrapper, key, module)
+    function wrapPrototype(wrapper, module)
     {
-        if(!module.prototype) return;
+        if(!module) return;
 
-        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module.prototype);
-        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module.prototype);
-        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module.prototype);
-        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module.prototype);
+        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
+        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
 
-        extend(wrapper.methods, {enumerable: false}, module.prototype);
+        extend(wrapper.methods, {enumerable: false}, module);
     }
 
     // simple cloning function
@@ -188,123 +201,268 @@
      * @static
      * @method _.extend
      * @param   {Object}  obj          - object to be extended
-     * @param   {Object=} settings_    - optional settings/default descriptor
+     * @param   {Object=} _settings_   - optional settings/default descriptor
      *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
      *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *      {boolean=} override=true   - boolean indicating if all properties should be overridden by default. can be overwritten on a config level
-     *      {boolean=} overwrite=true  - boolean indicating if all properties should be overwritten by default. can be overwritten on a config level
+     *      {boolean=} override=true   - boolean indicating if properties should be overridden
+     *      {boolean=} overwrite=true  - boolean indicating if properties should be overwritten
      *
-     *      {string=}  log             - console log level for overwrites&overrides
-     *      {boolean=} validate=false  - validate overwrites & overrides should be set to true in the config
-
+     *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *
      *      {function=}modifier        - modifier function to apply on all functions.
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      * @return  {Object}  obj          - the extended object
      */
-    function extend(obj, settings_, module) {
-        var settings = module && settings_ || {};
-        var module   = module || settings_;
+    function extend(obj, _settings_, module) {
+        var settings = module && _settings_ || {};
+        var module   = module || _settings_;
 
-        settings.override  = settings.override  !== false; // default = true
-        settings.overwrite = settings.overwrite !== false; // default = true
+        settings.override        = settings.override  !== false; // default is true
+        settings.overwrite       = settings.overwrite !== false; // default is true
+        settings.overwriteaction = settings.overwriteaction || 'warn';
+        settings.overrideaction  = settings.overrideaction  || 'warn';
 
         for(var prop in module)
-        {   if(module.hasOwnProperty(prop))
+        {   if(!module.hasOwnProperty(prop)) continue;
+
+            var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
+            var encapsulator = !!(descriptor.get || descriptor.set);
+            var config       = {};
+
+            // special property specific config
+            if(!encapsulator && module[prop].hasOwnProperty('value'))
             {
-                var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
-                var encapsulator = !!(descriptor.get || descriptor.set);
-                var config       = {};
+                config           = module[prop];
+                descriptor.value = config.value;
 
-                // special property specific config
-                if(!encapsulator && module[prop].hasOwnProperty('value'))
+                if(config.clone) descriptor.value = clone(config.value); // clone deep maybe?
+                if(config.exec)  descriptor.value = config.value(obj);
+                if(config.wrap)
                 {
-                    config           = module[prop];
-                    descriptor.value = config.value;
-
-                    if(config.clone) descriptor.value = _.clone(config.value); // clone deep maybe?
-                    if(config.exec)  descriptor.value = config.value(obj);
-                    if(config.wrap)
-                    {
-                        var fnw = obj[prop];
-                        if(typeof(fnw) === 'function')
-                        {
-                            descriptor.value = (function(fnw, fnc) {
-                                return function() {fnw.apply(this, arguments); fnc.apply(this, arguments)}
-                            })(fnw, descriptor.value)
-                        }
-                    }
+                    /**
+                     * wraps 2 functions into 1. Return the result of the second function given
+                     *
+                     * @param {Function}   fnc1 - function to be wrapped
+                     * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
+                     * @returns {Function}      - the wrapping function
+                     */
+                    var wrap = function(fnc1, fnc2) {
+                        return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
+                    };
+                    // wrap super or override function with the module function
+                    descriptor.value = wrap(obj[prop], descriptor.value)
                 }
-
-                descriptor.enumerable   = (config.enumerable   !== undefined) ? config.enumerable   : (settings.enumerable   !== undefined) ? settings.enumerable   : descriptor.enumerable;
-                descriptor.configurable = (config.configurable !== undefined) ? config.configurable : (settings.configurable !== undefined) ? settings.configurable : descriptor.configurable;
-                descriptor.writable     = (config.writable     !== undefined) ? config.writable     : (settings.writable     !== undefined) ? settings.writable     : descriptor.writable;
-                // getters & setters don't have a writable option
-                if(encapsulator) delete descriptor.writable;
-
-                if(settings.modifier && typeof(descriptor.value) === 'function') {
-                    descriptor.value = settings.modifier(descriptor.value);
-                }
-
-                var override  = (config.override  !== undefined) ? config.override  : settings.override;
-                var overwrite = (config.overwrite !== undefined) ? config.overwrite : settings.overwrite;
-
-                var names = (config.aliases || []).concat(prop); // this is not super nice
-
-                names.forEach(function(prop) {
-                    if(obj.hasOwnProperty(prop)) // overwrite
-                    {
-                        if(!overwrite)                             return; // continue
-                        if(settings.validate && !config.overwrite) throw "unvalidated overwrite of property: "+prop+". Please add overwrite=true to the config object if you want to overwrite it" ;
-                        if(settings.log)                           console[settings.log]('overwriting existing property: '+prop);
-                    }
-                    else if(prop in obj) // override
-                    {
-                        if(!override)                             return; // continue
-                        if(settings.validate && !config.override) throw "unvalidated override of property: "+prop+". Please add override=true to the config object if you want to override it" ;
-                        if(settings.log)                          console[settings.log]('overriding existing property: '+prop);
-                    }
-
-                    Object.defineProperty(obj, prop, descriptor)
-                });
             }
+            // create the final settings object
+            var finalSettings = clone(settings);
+            for(var conf in config)
+            {   if (!config.hasOwnProperty(conf)) continue;
+
+                finalSettings[conf] = config[conf];
+            }
+
+            descriptor.enumerable   = (finalSettings.enumerable     !== undefined)? finalSettings.enumerable    : descriptor.enumerable;
+            descriptor.configurable = (finalSettings.configurable   !== undefined)? finalSettings.configurable  : descriptor.configurable;
+            descriptor.writable     = (finalSettings.writable       !== undefined)? finalSettings.writable      : descriptor.writable;
+            // getters & setters don't have a writable option
+            if(encapsulator) delete descriptor.writable;
+
+            if(finalSettings.modifier && typeof(descriptor.value) === 'function') {
+                descriptor.value = finalSettings.modifier(descriptor.value);
+            }
+
+            var names = (config.aliases || []).concat(prop); // this is not super nice
+
+            names.forEach(function(prop) {
+                /**
+                 * Performs action based on type, conf & value. The 'conf' parameter determines a override/overwrite warning or a a redundant warning on the model.
+                 * In case of overrides a action is only performed if the super is not called by the override function
+                 *
+                 * @param {string}  type='override'|'overwrite'
+                 * @param {boolean} conf  - true or false value for type (override or overwrite)
+                 * @param {any}     value - value in the model
+                 */
+                var action = function(type, conf, value) {
+                    var message;
+                    var action                = finalSettings[type+'action'];
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/\b_super\b/.test(value));
+
+                    if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
+
+                    if(conf === true)
+                    {
+                        message = ((type === 'override')? 'overriding' : 'overwriting') +' property: '+prop+'.';
+                        if(overrideNotUsingSuper) message += ' But not calling super method.'
+                    }
+                    else
+                    {
+                        message = 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+                    }
+
+                    if(action === 'throw') {throw message}
+                    else                   {
+                        console[action](message)
+                    }
+                };
+
+                if(obj.hasOwnProperty(prop)) // overwrite
+                {
+                    action('overwrite', finalSettings.overwrite, descriptor.value);
+                    if(!finalSettings.overwrite) return; // continue
+                }
+                else if(prop in obj) // override
+                {
+                    action('override', finalSettings.override, descriptor.value);
+                    if(!finalSettings.override) return; // continue
+                }
+
+                Object.defineProperty(obj, prop, descriptor)
+            });
         }
 
         return obj;
     }
 
-    // is should be static so we can also apply it to null & undefined
-    _.is = {
-        array: Array.isArray
-    };
-    // convertor functions
-    _.to = {
-        array: function(obj) {
-            var type = _.typeOf(obj);
-
-            switch (type)
-            {
-                case 'arguments' : return Array.prototype.slice.call(obj, 0);
-                case 'object'    :
-                case 'function'  : return Object.getOwnPropertyNames(obj).map(function(key) { return {prop:key, value:obj[key]}});
-                case 'array'     : return obj;
-                case 'undefined' :
-                case 'null'      : return [];
-                default          : return [obj];
-            }
-        },
-        int: function(num) {return num|0}
-    };
+    var objToString = Object.prototype.toString;
     /**
      *  'Global' _methods
      */
 
     extend(_, {
+        /**
+         * @public
+         * @static
+         * @method _.inject
+         *
+         * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
+         * @param {string}  prop               - name of the property
+         * @param {Object} descriptor          - descriptor/settings object on injection
+         *      {boolean}  value               - value of the property
+         *      {boolean=} static              - optional boolean indicating if the property is static
+         *
+         *      {boolean=} enumerable          - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+         *      {boolean=} configurable        - boolean indicating if all properties should be configurable. can be overwritten on a config level
+         *      {boolean=} writable            - boolean indicating if all properties should be writable. can be overwritten on a config level
+         *
+         *      {boolean=} override=true       - boolean indicating if properties should be overridden
+         *      {boolean=} overwrite=true      - boolean indicating if properties should be overwritten
+         *
+         *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+         *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+         *
+         *      {function=}modifier            - modifier function to apply on all functions.
+         */
+        inject: function(obj, prop, descriptor) {
+            var module = {};
 
+            module[prop] = descriptor;
+
+            if(descriptor.static) {wrapStatics(obj, module)}
+            else                  {wrapPrototype(obj, module)}
+        },
+        isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
+        isArray:      Array.isArray,
+        /**
+         * Checks if an object is empty
+         * @public
+         * @static
+         * @method _.isEmpty
+         * @param   {Object}  obj - object to check the void
+         * @returns {boolean}     - boolean indicating if the object is empty
+         */
+        isEmpty: function (obj)
+        {
+            var key;
+
+            for (key in obj) {
+                return false;
+            }
+            return true;
+        },
+        isFunction:   function(obj) {return typeof(obj) === 'function'},
+        isInteger:    function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
+        isNull:       function(obj) {return obj === null},
+        isNumber:     function(obj) {return _.typeOf(obj) === 'number'},
+        isObject:     function(obj) {return _.typeOf(obj) === 'object'},
+        /**
+         * Checks if an object is an primitive
+         * @public
+         * @static
+         * @method _.isPrimitive
+         * @param   {Object} obj - object to classify
+         * @returns {boolean}    - boolean indicating if the object is a primitive
+         */
+        isPrimitive: function(obj) {
+            // maybe just check for valueOF??
+            var type = typeof(obj);
+
+            switch(type)
+            {
+                case 'object'   :
+                case 'function' :
+                    return obj === null;
+                default :
+                    return true
+            }
+        },
+        isString:     function(obj) {return _.typeOf(obj) === 'string'},
+        /**
+         * Checks is a property is undefined
+         * @public
+         * @static
+         * @method _.isUndefined
+         * @param   {Object} prop - property to check
+         * @returns {boolean}     - indication of the property definition
+         */
+        isUndefined: function(prop) {
+            return prop === undefined;
+        },
+        /**
+         * Checks is a property is defined
+         * @public
+         * @static
+         * @method _.isDefined
+         * @param   {Object} prop - property to check
+         * @returns {boolean}     - indication of the property definition
+         */
+        isDefined: function(prop) {
+            return prop !== undefined;
+        },
+        toArray: function(obj) {
+            var type = _.typeOf(obj);
+
+            switch (type)
+            {
+                case 'arguments'                    : return Array.prototype.slice.call(obj, 0);
+                case 'object'                       : return obj._.values();
+                case 'array'                        : return obj;
+                default                             : return [];
+            }
+        },
+        toInteger: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' : return obj|0;
+                case 'string' : return parseInt(obj);
+                default       : return NaN
+            }
+        },
+        toNumber: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' : return obj;
+                case 'string' : return parseFloat(obj);
+                default       : return NaN
+            }
+        },
+        toString: function(obj) {return obj? obj._.toString() : obj+''}
     });
 
-    extend(Function.prototype, {overwrite: false}, {
+    extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
         /**
          * Returns the name of a function
          * @public
@@ -314,10 +472,32 @@
         name: function()
         {
             return this.toString().match(/^function\s?([^\s(]*)/)[1];
+        },
+        bind: function(oThis) {
+            if (typeof this !== 'function') {
+                // closest thing possible to the ECMAScript 5
+                // internal IsCallable function
+                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+            }
+    
+            var aArgs   = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP    = function() {},
+                fBound  = function() {
+                    return fToBind.apply(this instanceof fNOP
+                            ? this
+                            : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments)));
+                };
+    
+            fNOP.prototype = this.prototype;
+            fBound.prototype = new fNOP();
+    
+            return fBound;
         }
     });
     
-    extend(Math, {overwrite: false}, {
+    extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
         /**
          * Decimal log function
          * @public
@@ -327,6 +507,19 @@
          */
         log10: function(val) {
             return Math.log(val)/Math.LN10;
+        }
+    });
+    
+    extend(Number, {overwrite: false, overwriteaction: 'ignore'}, {
+        /**
+         * Check for isNaN conform the ES6 specs
+         * @public
+         * @method Number.isNaN
+         * @param   {number} value - value to check is NaN for
+         * @returns {boolean}      - boolean indicating if the value is NaN
+         */
+        isNaN: function(value) {
+            return typeof value === "number" && value !== value;
         }
     });
     construct('obj', {native:Object}, {
@@ -344,7 +537,8 @@
              */
             // TODO These should be expanded with frozen, extensible states etc
             clone: function clone(obj) {
-                if(_.obj.isPrimitive(obj)) return obj;
+                if(_.isPrimitive(obj)) return obj;
+                if(_.isArray(obj))     return obj.slice();
     
                 var clone = _.create(obj._.proto());
                 var names = obj._.names();
@@ -363,8 +557,9 @@
              * @param   {Object}  obj   - object to be cloned
              * @return  {Object}  clone - the cloned object
              */
+            // TODO adaptation for arrays in phantomJS
             cloneDeep: function cloneDeep(obj) {
-                if(_.obj.isPrimitive(obj)) return obj;
+                if(_.isPrimitive(obj)) return obj;
     
                 var clone = _.create(obj._.proto());
                 obj._.names()._.each(function (name) {
@@ -397,65 +592,6 @@
              */
             extend: extend,
             /**
-             * Checks is a property is defined
-             * @public
-             * @static
-             * @method obj.isDefined
-             * @param   {Object} prop - property to check
-             * @returns {boolean}     - indication of the property definition
-             */
-            isDefined: function(prop) {
-                return prop !== undefined;
-            },
-            /**
-             * Checks if an object is empty
-             * @public
-             * @static
-             * @method obj.isEmpty
-             * @param   {Object}  obj - object to check the void
-             * @returns {boolean}     - boolean indicating if the object is empty
-             */
-            isEmpty: function (obj)
-            {
-                var key;
-    
-                for (key in obj) {
-                    return false;
-                }
-                return true;
-            },
-            /**
-             * Checks if an object is an primitive
-             * @public
-             * @static
-             * @method obj.isPrimitive
-             * @param   {Object} obj - object to classify
-             * @returns {boolean}    - boolean indicating if the object is a primitive
-             */
-            isPrimitive: function(obj) {
-                var type = typeof(obj);
-    
-                switch(type)
-                {
-                    case 'object'   :
-                    case 'function' :
-                        return obj === null;
-                    default :
-                        return true
-                }
-            },
-            /**
-             * Checks is a property is undefined
-             * @public
-             * @static
-             * @method obj.isUndefined
-             * @param   {Object} prop - property to check
-             * @returns {boolean}     - indication of the property definition
-             */
-            isUndefined: function(prop) {
-                return prop === undefined;
-            },
-            /**
              * Returns the type of an object. Better suited then the one from js itself
              * @public
              * @static
@@ -464,7 +600,13 @@
              * @returns {string} - type of the object
              */
             typeOf: function(obj) {
-                return Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+    
+                switch(obj)
+                {
+                    case null      : return 'null'; // null & undefined should be separate cases since for phantomJS they'll return 'domWindow'
+                    case undefined : return 'undefined';
+                    default        : return  Object.prototype.toString.call(obj)._.between('[object ', ']')._.decapitalize();
+                }
             },
             /**
              * Static version of _.names returns an empty array in case of null or undefined
@@ -481,9 +623,9 @@
         prototype: {
             /**
              * Singular push function to solve problems with differences between objects & arrays
-             * @public
+             * @private
              * @method obj#_add
-             * @this    {Array}
+             * @this    {Object}
              * @param  {...any}  val - value to push
              * @return  {Array} this - this for chaining
              */
@@ -491,6 +633,22 @@
                 this[key] = val;
     
                 return this;
+            },
+            /**
+             * Counts the number of occurrences of an element
+             * @public
+             * @method obj#count
+             * @param   {any}   elm  - value to push
+             * @return  {number} occurrences - occurrences of the elm int he object
+             */
+            count: function(elm) {
+                var occurrences = 0;
+    
+                this._.each(function(e) {
+                    occurrences += e === elm; // js magic true = 1 false = 0
+                });
+    
+                return occurrences;
             },
             /**
              * Copies keys to an array
@@ -595,13 +753,17 @@
              * @this  {Object}
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
+             * @return {Array}         - this array for chaining
              */
             each: function(cb, ctx_) {
-                for(var key in this)
-                {
-                    if(!this.hasOwnProperty(key)) continue;
-                    if(cb.call(ctx_, this[key], key, this) === false) break;
+                if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+    
+                for (var key in this) {
+                    if (!this.hasOwnProperty(key)) continue;
+                    if (cb.call(ctx_, this[key], key, this) === false) break;
                 }
+    
+                return this;
             },
             /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -614,8 +776,8 @@
              * @return {Array}         - this array for chaining
              */
             eachRight: function(step_, cb, ctx_) {
-                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
-                if(this.length) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
+                if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 this._.keys()._.eachRight(function(key) {
                     return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
@@ -858,14 +1020,14 @@
                 return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
             select$Fn: function(match, ctx_) {
-                return this._.remove$Fn(_.fnc.not(match), ctx_);
+                return this._.remove$Fn(_.fnc.negate(match), ctx_);
             },
             Select$: function(___values) {
                 var args = arguments;
                 return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
             Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
-                return this._.Remove$Fn(_.fnc.not(match), ctx_);
+                return this._.Remove$Fn(_.fnc.negate(match), ctx_);
             }},
             /**
              * Returns the number of own properties on an object
@@ -874,16 +1036,15 @@
              * @this   {Object}
              * @return {number} the 'length' of the object
              */
-            size: function() {
+            size: {aliases: ['length'], value: function() {
                 var len = 0;
     
-                for(var key in this)
-                {
-                    if(this._.owns(key)) len++;
-                }
+                this._.each(function() {
+                    len++;
+                });
     
                 return len;
-            },
+            }},
             /**
              * Returns an array containing the names of an object (includes non-enumerable properties)
              * @public
@@ -940,34 +1101,28 @@
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
-            toString: function(visited_)
+            toString: {overrideaction: 'ignore', value: function(visited_)
             {
                 var output = '';
-                var val;
-                var obj;
     
-                for(var key in this)
-                {
-                    if(this.hasOwnProperty(key))
+                this._.each(function(obj, key) {
+                    var val;
+    
+                    if(_.isPrimitive(obj))      {val = obj}
+                    else
                     {
-                        obj = this[key];
+                        if(!visited_)           {visited_ = [this]}
     
-                        if(_.isPrimitive(obj))      {val = obj}
-                        else
-                        {
-                            if(!visited_)           {visited_ = [this]}
-    
-                            if(visited_._.has(obj)) {val = '[[circular ref]]'}
-                            else                    {visited_.push(obj); val = obj._.toString(visited_)}
-                        }
-    
-                        // TODO punctuation for strings & proper formatting
-                        output += (output? ', ' : '{') + key + ': ' + val
+                        if(visited_._.has(obj)) {val = '[[circular ref]]'}
+                        else                    {visited_.push(obj); val = obj._.toString(visited_)}
                     }
-                }
+    
+                    // TODO punctuation for strings & proper formatting
+                    output += (output? ', ' : '{') + key + ': ' + val
+                });
     
                 return output + '}';
-            },
+            }},
             /**
              * Returns an array containing the values of an object (enumerable properties)
              * @public
@@ -1082,14 +1237,14 @@
              * @param  {...number} ___indices - indices SORTED
              * @return     {Array}       this - mutated array for chaining
              */
-            del: function(___indices)
+            del: {overrideaction: 'ignore', value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Remove elements based on index
              * @public
@@ -1098,14 +1253,14 @@
              * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            delFn: function(match, ctx_)
+            delFn: {overrideaction: 'ignore', value: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Removes all specified values from an array
              * @public
@@ -1113,7 +1268,7 @@
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            remove$: function(___values) {
+            remove$: {overrideaction: 'ignore', value: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1121,7 +1276,7 @@
                 }, this);
     
                 return this;
-            },
+            }},
             /**
              * Removes all values from an array based on a match function
              * @public
@@ -1131,13 +1286,13 @@
              * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            remove$Fn: function(match, ctx_) {
+            remove$Fn: {overrideaction: 'ignore', value: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
     
                 return this;
-            },
+            }},
     
             /**
              * Difference between the current and other arrays
@@ -1171,64 +1326,32 @@
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method arr#dimit
-             * @this   {Array}
-             * @param  {any|function=} init_ - initial value for the array. Can be either a value or a function specifying the value
-             * @param  {Object}        ctx_  - optional context for the init function
-             * @return {Array}               - dimensionalized array
-             */
-            dimit: function(init_, ctx_)
-            {
-                var dimensions = _.clone(this);
-                this.length    = dimensions[0];
-                var init       = (typeof(init_) === 'function')? init_ : function() {return init_};
-    
-                // add other dimensions
-                addDim(this, 0, dimensions);
-    
-                return this;
-    
-                function addDim(arr, dim, dimensions)
-                {
-                    for(var i = 0, max = dimensions[dim]; i &lt; max; i++)
-                    {
-                        arr[i] = (dim === dimensions.length-1)? init.call(ctx_) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
-                        if(dim === dimensions.length-2 && _.isUndefined(init_)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined
-                        addDim(arr[i], dim+1, dimensions); // add another dimension
-                    }
-                }
-            },
-            /**
-             * Creates a multidimensional array. The dimensions come from the array itself
-             * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
-             * @public
              * @method arr#Dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
-             * @param  {Object}        ctx_  - optional context for the init function
              * @return {Array}               - this initialized multi-dimensional array
              */
-            Dimit: function(init_, ctx_)
+            dimit: {aliases: ['dimensionalize'], value: function(init_)
             {
-                var dimensions = this;
-                var arr        = new Array(dimensions[0]);
-                var init       = (typeof(init_) === 'function')? init_ : function() {return init_};
+                var dimensions    = this;
+                var arr           = new Array(dimensions[0]);
+                var lastDimension = dimensions.length-1;
     
                 // add other dimensions
-                addDim(arr, 0, dimensions);
+                addDimension(arr, 0, dimensions);
     
                 return arr;
     
-                function addDim(arr, dim, dimensions)
+                function addDimension(arr, dim, dimensions)
                 {
                     for(var i = 0, max = dimensions[dim]; i &lt; max; i++)
                     {
-                        arr[i] = (dim === dimensions.length-1)? init.call(ctx_) : new Array(dimensions[dim+1]); // if last dimension set initial value else create a new array
-                        if(dim === dimensions.length-2 && _.isUndefined(init_)) continue; // continue if we are adding the 2nd last dimension and opt_init is undefined don't initialize the array
-                        addDim(arr[i], dim+1, dimensions); // add another dimension
+                        arr[i] = (dim === lastDimension)? _.clone(init_) : new Array(dimensions[dim+1]);
+    
+                        addDimension(arr[i], dim+1, dimensions); // add another dimension
                     }
                 }
-            },
+            }},
             /**
              * Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * each is eachlastic in the sense that one can add and delete elements at the current index
@@ -1239,7 +1362,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {Array}          - this for chaining
              */
-            each: function(step_, cb, ctx_) {
+            each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
@@ -1253,7 +1376,7 @@
                 }
     
                 return this;
-            },
+            }},
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * @public
@@ -1264,7 +1387,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {Array}          - this array for chaining
              */
-            eachRight: function(step_, cb, ctx_) {
+            eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
@@ -1276,7 +1399,7 @@
                 }
     
                 return this;
-            },
+            }},
             /**
              * Get/sets: the first element of an array
              * @public
@@ -1300,7 +1423,7 @@
             // TODO multi dimensional flattening
             flatten: function() {
                 return this._.each(function(val, i) {
-                    if(_.is.array(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
+                    if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
                 }, this)
             },
             /**
@@ -1319,7 +1442,7 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: {aliases: ['contains'], value: function(elm) {
+            has: {aliases: ['contains'], overrideaction: 'ignore', value: function(elm) {
                 return this.indexOf(elm) > -1;
             }},
             /**
@@ -1479,11 +1602,11 @@
              * @param  {any}   val  - value to push
              * @return {Array} this - this for chaining
              */
-            _add: function(val) {
+            _add: {overrideaction: 'ignore', value: function(val) {
                 this.push(val);
     
                 return this;
-            },
+            }},
             /**
              * Returns a random element from the array
              * @public
@@ -1498,11 +1621,22 @@
              * Removes one occurrence of of an element from an array
              * @public
              * @method arr#rm
-             * @this   {any}   - elm
+             * @param  {any}   - elm
              * @return {Array} - this for chaining
              */
             rm: function(elm) {
                 this.splice(this.indexOf(elm), 1);
+                return this;
+            },
+            /**
+             * Shuffles an array
+             * @public
+             * @method arr#shuffle
+             * @return {Array} - this for chaining
+             */
+            shuffle: function()
+            {
+                for(var j, x, i = this.length; i; j = Math.floor(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x);
                 return this;
             },
             /**
@@ -1513,13 +1647,13 @@
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
              */
-            size: function(size_) {
+            size: {overrideaction: 'ignore', value: function(size_) {
                 if(size_ === undefined) return this.length;
     
                 this.length = size_;
     
                 return this;
-            },
+            }},
             /**
              * Returns the sum of all numbers in a number array
              * @public
@@ -1539,7 +1673,7 @@
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 var output = '[';
     
@@ -1549,7 +1683,7 @@
                 }
     
                 return output + ']';
-            },
+            }},
             /**
              * Calculates the union for 2 arrays
              * @public
@@ -1618,45 +1752,73 @@
              * Returns the rest of the string after a certain substring (1st occurrence)
              * @public
              * @method str#after
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}        - new string containing the string after the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string after the given substring
              */
-            after: function(substr) {
-                var index = this.indexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this.valueOf();
+            after: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.indexOf(substring);
+                    output = (~index)? output.slice(index + substring.length) : output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string after a certain substring (last occurrence)
              * @public
              * @method str#afterLast
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}         - new string containing the string after the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string after the given substring
              */
-            afterLast: function(substr) {
-                var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(index + substr.length) : this.valueOf();
+            afterLast: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.lastIndexOf(substring);
+                    output = (~index)? output.slice(index + substring.length) : output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string before a certain substring (1st occurrence)
              * @public
              * @method str#before
-             * @param   {string} substr - substring to identify the return string
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
              * @returns {string}         - new string containing the string before the given substring
              */
-            before: function(substr) {
-                var index = this.indexOf(substr);
-                return (~index)? this.slice(0, index) : this.valueOf();
+            before: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.indexOf(substring);
+                    output = (~index)? output.slice(0, index): output;
+                });
+    
+                return output;
             },
             /**
              * Returns the rest of the string before a certain substring (last occurrence)
              * @public
              * @method str#beforeLast
-             * @param   {string} substr - substring to identify the return string
-             * @returns {string}         - new string containing the string before the given substring
+             * @param   {string} ___substrings - 1 or multiple substring to be checked in sequence
+             * @returns {string}               - new string containing the string before the given substring
              */
-            beforeLast: function(substr) {
-                var index = this.lastIndexOf(substr);
-                return (~index)? this.slice(0, index) : this.valueOf();
+            beforeLast: function(___substrings) {
+                var output = this.valueOf();
+                var index;
+    
+                arguments._.each(function(substring) {
+                    index  = output.lastIndexOf(substring);
+                    output = (~index)? output.slice(0, index): output;
+                });
+    
+                return output;
             },
             /**
              * Returns the string between a prefix && post substring
@@ -1666,8 +1828,20 @@
              * @param   {string} post_substr - substring to identify the return string
              * @returns {string}             - new string containing the string before the given substring
              */
+            // TODO handle non existence of pre or post substr
             between: function(pre_substr, post_substr) {
                 return this._.after(pre_substr)._.before(post_substr);
+            },
+            /**
+             * Returns the last string between a prefix && post substring
+             * @public
+             * @method str#between
+             * @param   {string} pre_substr  - substring to identify the return string
+             * @param   {string} post_substr - substring to identify the return string
+             * @returns {string}             - new string containing the string before the given substring
+             */
+            betweenLast: function(pre_substr, post_substr) {
+                return this._.beforeLast(post_substr)._.afterLast(pre_substr);
             },
             /**
              * Capitalize the first character of a string
@@ -1704,9 +1878,9 @@
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
-            has: function(substr) {
+            has: {overrideaction: 'ignore', value: function(substr) {
                 return !!~this.indexOf(substr);
-            },
+            }},
             /**
              * Inserts a substring in a string
              * @public
@@ -1774,10 +1948,10 @@
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString();
-            }
+            }}
         }
     });
     construct('num', {native:Number}, {
@@ -1934,10 +2108,10 @@
              * @method   num#toString
              * @returns {string} - string representation of the number
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString()
-            }
+            }}
         }
     });
     construct('fnc', {native:Function}, {
@@ -1950,41 +2124,26 @@
              * @public
              * @static
              * @method fnc.bind
-             * @param   {...any=}  ___args_ - arguments to prefill
+             * @param   {Array=}     _args_ - arguments to prefill
              * @param   {function}    fnc   - function to bind
-             * @param   {object=}     ctx_  - optional context
+             * @param   {Object=}     ctx_  - optional context
              * @returns {function}          - bootstrapped version of the function
              */
-            bind: function(___args_, fnc, ctx_)
+            bind: function(_args_, fnc, ctx_)
             {
-                if(arguments.length &lt;= 2
-                && typeof(arguments[0]) === 'function'
-                && typeof(arguments[1]) !== 'function')
-                {
-                    return fnc.bind(ctx_)
-                }
-                // TODO don't return a partial in case no undefined arguments are given
-                // if ___args_ are given return a partial
-                var args     = arguments;
-                var argsMax  = args.length-(typeof(args[args.length-1]) === 'function' ? 1 : 2);
-                var partials = 0;
+                if(_.isFunction(_args_))       {return _args_.bind(fnc)}
+                if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
     
-                args._.each(function(arg) {if(arg === undefined) partials++});
+                var blanks  = _args_._.count(undefined);
+                var prefils = _args_.length;
     
                 return function() {
-                    var max  = argsMax + arguments.length - partials;
-                    var tmp;
+                    var args = arguments.length;
+                    var max  = prefils + args - blanks;
     
-                    for(var i = max-1, arg = arguments.length-1; i >= 0; i--)
+                    for(var i = max-1, arg = args-1; i >= 0; i--)
                     {
-                        if(args[i] !== undefined && i &lt; argsMax) {
-                            arguments[i] = args[i]
-                        }
-                        else
-                        {
-                            tmp = arguments[arg--]; // we need an intermediate variable here otherwise the arg is undefined on setting
-                            arguments[i] = tmp;
-                        }
+                        arguments[i] = (_args_[i] !== undefined && i &lt; prefils)? _args_[i] : arguments[arg--];
                     }
     
                     arguments.length = max; // set the new length of arguments
@@ -2031,13 +2190,34 @@
                 child[super_ || '_super'] = parent.prototype;
             },
             /**
+             * Mixin properties on a class. It is assumed this function is called inside the constructor
+             * @public
+             * @method module:_.fnc.mixin
+             * @param {Function}        child - child
+             * @param {Function|Array} mixins - array or sinlge mixin classes
+             */
+            // TODO this needs to be moved to Cell.Type
+            mixin: function(child, mixins) {
+    
+                child._mixin = function(mixin) {
+                    return mixin.prototype;
+                };
+    
+                mixins._.each(function(mixin) {
+                    // copy static fucntions
+                    _.extend(child, mixin);
+                    // copy prototype functions
+                    _.extend(child.prototype, mixin.prototype);
+                });
+            },
+            /**
              * returns a negated form of a function
              * @public
-             * @method fnc.not
+             * @method fnc.negate
              * @param  {function} fnc - an array of functions or a single function in case of supplying
              * @return {function} negated form of the function
              */
-            not: function(fnc) {
+            negate: function(fnc) {
                 return function() { return !fnc.apply(this, arguments)}
             },
             /**
@@ -2065,10 +2245,10 @@
              * @method fnc#toString
              * @returns {string} - string representation of the function
              */
-            toString: function()
+            toString: {overrideaction: 'ignore', value: function()
             {
                 return this.toString();
-            }
+            }}
         }
     });
     construct('int', {
@@ -2320,7 +2500,7 @@
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Sun Mar 15th 2015 using the <a
+		on Mon May 18th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

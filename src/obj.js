@@ -13,8 +13,8 @@ construct('obj', {native:Object}, {
          */
         // TODO These should be expanded with frozen, extensible states etc
         clone: function clone(obj) {
-            if(_.obj.isPrimitive(obj)) return obj;
-            if(_.is.array(obj))        return obj.slice();
+            if(_.isPrimitive(obj)) return obj;
+            if(_.isArray(obj))     return obj.slice();
 
             var clone = _.create(obj._.proto());
             var names = obj._.names();
@@ -35,7 +35,7 @@ construct('obj', {native:Object}, {
          */
         // TODO adaptation for arrays in phantomJS
         cloneDeep: function cloneDeep(obj) {
-            if(_.obj.isPrimitive(obj)) return obj;
+            if(_.isPrimitive(obj)) return obj;
 
             var clone = _.create(obj._.proto());
             obj._.names()._.each(function (name) {
@@ -67,66 +67,6 @@ construct('obj', {native:Object}, {
          * @return  {Object}  obj          - the extended object
          */
         extend: extend,
-        /**
-         * Checks is a property is defined
-         * @public
-         * @static
-         * @method obj.isDefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isDefined: function(prop) {
-            return prop !== undefined;
-        },
-        /**
-         * Checks if an object is empty
-         * @public
-         * @static
-         * @method obj.isEmpty
-         * @param   {Object}  obj - object to check the void
-         * @returns {boolean}     - boolean indicating if the object is empty
-         */
-        isEmpty: function (obj)
-        {
-            var key;
-
-            for (key in obj) {
-                return false;
-            }
-            return true;
-        },
-        /**
-         * Checks if an object is an primitive
-         * @public
-         * @static
-         * @method obj.isPrimitive
-         * @param   {Object} obj - object to classify
-         * @returns {boolean}    - boolean indicating if the object is a primitive
-         */
-        isPrimitive: function(obj) {
-            // maybe just check for valueOF??
-            var type = typeof(obj);
-
-            switch(type)
-            {
-                case 'object'   :
-                case 'function' :
-                    return obj === null;
-                default :
-                    return true
-            }
-        },
-        /**
-         * Checks is a property is undefined
-         * @public
-         * @static
-         * @method obj.isUndefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isUndefined: function(prop) {
-            return prop === undefined;
-        },
         /**
          * Returns the type of an object. Better suited then the one from js itself
          * @public
@@ -292,7 +232,7 @@ construct('obj', {native:Object}, {
          * @return {Array}         - this array for chaining
          */
         each: function(cb, ctx_) {
-            if(_.is.arguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+            if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
 
             for (var key in this) {
                 if (!this.hasOwnProperty(key)) continue;
@@ -313,7 +253,7 @@ construct('obj', {native:Object}, {
          */
         eachRight: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
-            if(_.is.arguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+            if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             this._.keys()._.eachRight(function(key) {
                 return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false

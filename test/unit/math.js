@@ -4,17 +4,6 @@ describe("math", function() {
 
 		describe("angle", function() {
 
-			xit("old angle", function() {
-				expect(_.math.deg.angle( 0, 1)).to.equal(0);
-				expect(_.math.deg.angle( 1, 1)).to.equal(45);
-				expect(_.math.deg.angle( 1, 0)).to.equal(90);
-				expect(_.math.deg.angle( 1,-1)).to.equal(135);
-				expect(_.math.deg.angle( 0,-1)).to.equal(180);
-				expect(_.math.deg.angle(-1,-1)).to.equal(225);
-				expect(_.math.deg.angle(-1, 0)).to.equal(270);
-				expect(_.math.deg.angle(-1, 1)).to.equal(315);
-			});
-
 			it("angle", function() {
 				expect(_.math.deg.angle( 0,-1)).to.equal(0);
 				expect(_.math.deg.angle( 1,-1)).to.equal(45);

@@ -1,10 +1,18 @@
-fnc:
-memoize
-wrapper (steal from ja)
-function execute once
+### _
 
-silent log functionality
+- settings in predefined root._ object
+- silent log functionality
+- shim setting in extend method
 
-shim setting in extend
+### function
+- memoize
+- wrapper object so we can exewcute multiple functions in the same callabck
+- execute once
 
-wrap arguments onto array
+### string
+- replaceFirst/Last
+
+
+
+
+

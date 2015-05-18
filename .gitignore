@@ -1,13 +1,9 @@
 #ignored folders
 .idea/
 .coverage/
-.sass-cache/
 node_modules/
 bower_components/
 projectFilesBackup/
-Backup/
 
-#ignored file types
-*.map
 
 

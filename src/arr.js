@@ -280,7 +280,7 @@ construct('arr', {native:Array}, {
         // TODO multi dimensional flattening
         flatten: function() {
             return this._.each(function(val, i) {
-                if(_.is.array(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
+                if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
             }, this)
         },
         /**

@@ -62,7 +62,7 @@ describe("Array", function() {
 		describe("converter", function() {
 
 			it("convert to array", function() {
-				expect(_.to.array(4)).to.deep.equal([]);
+				expect(_.toArray(4)).to.deep.equal([]);
 			});
 		});
 
@@ -243,163 +243,6 @@ describe("Array", function() {
 			});
 		});
 
-		xdescribe("copy", function() {
-
-			it("copy value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copy(arr2, 2)).to.eql([2, 5, 2]);
-			});
-
-			xit("copy values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copy(arr2, [2, 3])).to.eql([2, 5, 2, 3]);
-			});
-
-			it("copy function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copy(arr2, function(val) {return val === 2})).to.eql([2, 5, 2]);
-			});
-		});
-
-		xdescribe("copyAll", function() {
-
-			it("copyAll value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyAll(arr2, 2)).to.eql([2, 5, 2, 2]);
-			});
-
-			xit("copyAll values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyAll(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
-			});
-
-			it("copyAll function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyAll(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
-
-			});
-		});
-
-		xdescribe("copyKeys", function() {
-
-			it("copyKeys value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyKeys(arr2, 1)).to.eql([2, 5, 2]);
-			});
-
-			it("copyKeys values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyKeys(arr2, [1, 2])).to.eql([2, 5, 2, 3]);
-			});
-
-			it("copyKeys function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.copyKeys(arr2, function(i) {return i > 1})).to.eql([2, 5, 3, 2]);
-
-			});
-		});
-
-		xdescribe("cut", function() {
-
-			it("cut value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cut(arr2, 2)).to.eql([2, 5, 2]);
-				expect(arr1).to.eql([1, 3, 2]);
-			});
-
-			xit("cut values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cut(arr2, [2, 3])).to.eql([2, 5, 2, 3]);
-				expect(arr1).to.eql([1, 2]);
-			});
-
-			it("cut function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cut(arr2, function(val) {return val === 2})).to.eql([2, 5, 2]);
-				expect(arr1).to.eql([1, 3, 2]);
-			});
-		});
-
-		xdescribe("cutAll", function() {
-
-			it("cutAll value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutAll(arr2, 2)).to.eql([2, 5, 2, 2]);
-				expect(arr1).to.eql([1, 3]);
-			});
-
-			xit("cutAll values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutAll(arr2, [2, 3])).to.eql([2, 5, 2, 3, 2]);
-				expect(arr1).to.eql([1]);
-			});
-
-			it("cutAll function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutAll(arr2, function(val) {return val === 2})).to.eql([2, 5, 2, 2]);
-				expect(arr1).to.eql([1, 3]);
-
-			});
-		});
-
-		xdescribe("cutKeys", function() {
-
-			it("cutKeys value", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutKeys(arr2, 1)).to.eql([2, 5, 2]);
-				expect(arr1).to.eql([1, 3, 2]);
-			});
-
-			it("cutKeys values", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutKeys(arr2, [1, 2])).to.eql([2, 5, 2, 3]);
-				expect(arr1).to.eql([1, 2]);
-			});
-
-			it("cutKeys function", function() {
-				var arr1 = [1, 2, 3, 2];
-				var arr2 = [2, 5];
-
-				expect(arr1._.cutKeys(arr2, function(i) {return i > 1})).to.eql([2, 5, 3, 2]);
-				expect(arr1).to.eql([1, 2]);
-
-			});
-		});
-		// FIXME fix diff
 		describe("diff", function() {
 
 			it("simple difference", function() {
@@ -829,7 +672,7 @@ describe("Array", function() {
 				expect(arr).to.equal(arr);
 			});
 
-			xit("Select$ multiple elements", function() {
+			it("Select$ multiple elements", function() {
 				var arr = [1, 2, 1, 3, 2];
 
 				expect(arr._.Select$(1, 2)).to.eql([1, 2, 1, 2]);
@@ -964,7 +807,7 @@ describe("Array", function() {
 				expect(arr1._.unify(arr2)).to.eql([]);
 			});
 		});
-        // FIXME
+
 		describe("Unify", function() {
 
 			it("simple union", function() {
@@ -1070,7 +913,7 @@ describe("Array", function() {
 				expect(arr).to.eql([1, 2, 1]);
 			});
 
-			xit("remove multiple values", function() {
+			it("remove multiple values", function() {
 				var arr = [1, 2, 3, 2, 4, 4];
 
 				arr._.remove$(2,4);
@@ -1123,20 +966,20 @@ describe("Array", function() {
 				expect(arr).to.deep.equal([1, 3]);
 			});
 
-			xit("del from to index", function() {
+			it("del from to index", function() {
 				var arr = [1, 2, 3, 4, 5];
 
 				arr._.del(1, 3);
 
-				expect(arr).to.deep.equal([1, 5]);
+				expect(arr).to.deep.equal([1, 3, 5]);
 			});
 
-			xit("del from to index out of bounds", function() {
+			it("del from to index out of bounds", function() {
 				var arr = [1, 2, 3, 4, 5];
 
 				arr._.del(1, 6);
 
-				expect(arr).to.deep.equal([1]);
+				expect(arr).to.deep.equal([1, 3, 4, 5]);
 			});
 
 			it("del indexes with function", function() {
@@ -1167,17 +1010,17 @@ describe("Array", function() {
 				expect(arr).to.deep.equal([1, 2, 3]);
 			});
 
-			xit("Del from to index", function() {
+			it("Del from to index", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.Del(1, 3)).to.deep.equal([1, 5]);
+				expect(arr._.Del(1, 3)).to.deep.equal([1, 3, 5]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 
-			xit("del from to index out of bounds", function() {
+			it("del from to index out of bounds", function() {
 				var arr = [1, 2, 3, 4, 5];
 
-				expect(arr._.Del(1, 6)).to.deep.equal([1]);
+				expect(arr._.Del(1, 6)).to.deep.equal([1, 3, 4, 5]);
 				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 

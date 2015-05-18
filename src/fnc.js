@@ -15,7 +15,7 @@ construct('fnc', {native:Function}, {
          */
         bind: function(_args_, fnc, ctx_)
         {
-            if(_.is.function(_args_))       {return _args_.bind(fnc)}
+            if(_.isFunction(_args_))       {return _args_.bind(fnc)}
             if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
 
             var blanks  = _args_._.count(undefined);
@@ -80,6 +80,7 @@ construct('fnc', {native:Function}, {
          * @param {Function}        child - child
          * @param {Function|Array} mixins - array or sinlge mixin classes
          */
+        // TODO this needs to be moved to Cell.Type
         mixin: function(child, mixins) {
 
             child._mixin = function(mixin) {
