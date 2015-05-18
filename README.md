@@ -14,7 +14,9 @@ Javascript utility belt that takes a middle ground between sugar & underscore/lo
 The syntax of bottom\_line is close to the 'object-oriented' style of javascript pimped-up with the bottom\_line face .\_.
 
     ```javascript
-    [1, 2, 3]._.remove(2);
+    var arr = [1, 2, 3];
+    
+    arr._.remove(2);
     ```
 
 ### Extended Arguments functionality 
