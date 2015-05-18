@@ -2,7 +2,7 @@
  * _____________bottom_line.js_____
  * Bottom_line JavaScript Library
  *
- * Copyright 2013, Rogier Geertzema
+ * Copyright 2015, Rogier Geertzema
  * Released under the MIT license
  * ________________________________
  */
@@ -26,7 +26,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.0',
+        'version': '0.0.1',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
