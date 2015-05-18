@@ -35,7 +35,6 @@ module.exports = function (config) {
 		exclude       : [
 
 		],
-        // FIXME coverage does not work anymore
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
 		reporters     : ['dots', 'coverage'],

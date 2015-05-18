@@ -26,7 +26,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.1',
+        'version': '0.0.0',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
@@ -117,20 +117,22 @@
      * @public
      * @static
      * @method _.extend
-     * @param   {Object}  obj          - object to be extended
-     * @param   {Object=} _settings_   - optional settings/default descriptor
-     *      {boolean=} enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-     *      {boolean=} configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
-     *      {boolean=} writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
+     * @param   {Object}  obj           - object to be extended
+     * @param   {Object=}   _settings_  - optional settings/default descriptor
+     *     @param   {boolean=}  _settings_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *     @param   {boolean=}  _settings_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *     @param   {boolean=}  _settings_.writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *      {boolean=} override=true   - boolean indicating if properties should be overridden
-     *      {boolean=} overwrite=true  - boolean indicating if properties should be overwritten
+     *     @param   {boolean=}  _settings_.override=true   - boolean indicating if properties should be overridden
+     *     @param   {boolean=}  _settings_.overwrite=true  - boolean indicating if properties should be overwritten
      *
-     *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-     *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
      *
-     *      {function=}modifier        - modifier function to apply on all functions.
+     *     @param   {function=} _settings_.modifier        - modifier function to apply on all functions.
+     *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
+     *
      * @return  {Object}  obj          - the extended object
      */
     function extend(obj, _settings_, module) {
@@ -258,20 +260,20 @@
          * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
          * @param {string}  prop               - name of the property
          * @param {Object} descriptor          - descriptor/settings object on injection
-         *      {boolean}  value               - value of the property
-         *      {boolean=} static              - optional boolean indicating if the property is static
+         *     @param {boolean}  descriptor.value                - value of the property
+         *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
          *
-         *      {boolean=} enumerable          - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-         *      {boolean=} configurable        - boolean indicating if all properties should be configurable. can be overwritten on a config level
-         *      {boolean=} writable            - boolean indicating if all properties should be writable. can be overwritten on a config level
+         *     @param {boolean=} descriptor.enumerable           - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+         *     @param {boolean=} descriptor.configurable         - boolean indicating if all properties should be configurable. can be overwritten on a config level
+         *     @param {boolean=} descriptor.writable             - boolean indicating if all properties should be writable. can be overwritten on a config level
          *
-         *      {boolean=} override=true       - boolean indicating if properties should be overridden
-         *      {boolean=} overwrite=true      - boolean indicating if properties should be overwritten
+         *     @param {boolean=} descriptor.override=true        - boolean indicating if properties should be overridden
+         *     @param {boolean=} descriptor.overwrite=true       - boolean indicating if properties should be overwritten
          *
-         *      {string=} overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-         *      {string=} overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+         *     @param {string=}  descriptor.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+         *     @param {string=}  descriptor.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
          *
-         *      {function=}modifier            - modifier function to apply on all functions.
+         *     @param {function=} descriptor.modifier            - modifier function to apply on all functions.
          */
         inject: function(obj, prop, descriptor) {
             var module = {};
@@ -497,16 +499,6 @@
             create: function(proto) {
                 return (proto === Array.prototype) ? [] : Object.create(proto);
             },
-            /**
-             * Extends an object with function/properties from a module object
-             * @public
-             * @static
-             * @method obj.extend
-             * @param   {Object}  obj          - object to be extended
-             * @param   {Object=} settings_ - optional settings/default descriptor
-             * @param   {Object}  module       - object containing functions/properties to extend the object with
-             * @return  {Object}  obj          - the extended object
-             */
             extend: extend,
             /**
              * Returns the type of an object. Better suited then the one from js itself
