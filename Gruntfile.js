@@ -9,9 +9,9 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		bump: {
 			options: {
-				files: ['package.json', 'bower.json', 'dist/bottom_line.js', 'dist/bottom_line.min.js'],
+				files: ['package.json', 'bower.json', 'src/bottom_line.js'],
 				commit: true,
-				commitFiles: ['package.json', 'bower.json', 'dist/bottom_line.js', 'dist/bottom_line.min.js'],
+				commitFiles: ['-a'],
 				createTag: true,
 				push: true
 			}
@@ -59,7 +59,7 @@ module.exports = function(grunt) {
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
-	grunt.registerTask('build',   ['preprocess', 'uglify', 'docs']);
+	grunt.registerTask('build',   ['bump-only:prerelease', 'preprocess', 'uglify', 'docs', 'bump-commit']);
     grunt.registerTask('default', ['preprocess']);
 };
 
