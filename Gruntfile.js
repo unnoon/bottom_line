@@ -7,6 +7,15 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bump');
 
 	grunt.initConfig({
+		bump: {
+			options: {
+				files: ['package.json', 'bower.json', 'dist/bottom_line.js', 'dist/bottom_line.min.js'],
+				commit: true,
+				commitFiles: ['package.json', 'bower.json', 'dist/bottom_line.js', 'dist/bottom_line.min.js'],
+				createTag: true,
+				push: true
+			}
+		},
 		uglify: {
 			dist: {
 				files: {
