@@ -6,6 +6,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-bump');
 
+	var bump = grunt.option("bump") || 'patch'; // what to bump
+
 	grunt.initConfig({
 		bump: {
 			options: {
