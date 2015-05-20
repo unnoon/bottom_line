@@ -30,7 +30,17 @@
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
-    if(root_) root_._ = _; // TODO check for conflicts
+    if(root_)
+    {
+        if(root_.hasOwnProperty('_'))
+        {
+            console.error('_ is already defined on root object'); return;
+        }
+        else
+        {
+            root_._ = _;
+        }
+    }
 
     // TODO something to run methods in a different context. Apply will not work since the context will get lost when using other bottom_line functions internally
     // wrap functions for chaining
@@ -57,15 +67,23 @@
 
         if(obj && obj.prototype)
         {
-            // extend native object with special _ 'bottom_line' access property
-            // TODO check for conflicts
-            Object.defineProperty(obj.prototype, '_', {
-                enumerable: false, configurable: false,
-                get: function() {
-                    stack[index++] = this;
-                    return _methods
-                },
-                set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}); // we implement a set so it is still possible to use _ as an object property
+            if(obj.prototype.hasOwnProperty('_'))
+            {
+                // TODO add a silent log here
+            }
+            else
+            {
+                // extend native object with special _ 'bottom_line' access property
+                Object.defineProperty(obj.prototype, '_', {
+                    enumerable: false, configurable: false,
+                    get: function() {
+                        stack[index++] = this;
+                        return _methods
+                    },
+                    // we implement a set so it is still possible to use _ as an object property
+                    set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}
+                );
+            }
         }
 
         if(settings.global !== false)
@@ -378,7 +396,7 @@
                 default       : return NaN
             }
         },
-        toString: function(obj) {return obj? obj._.toString() : obj+''}
+        toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
     extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
