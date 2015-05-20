@@ -374,10 +374,10 @@
 
             switch (type)
             {
-                case 'arguments'                    : return Array.prototype.slice.call(obj, 0);
-                case 'object'                       : return obj._.values();
-                case 'array'                        : return obj;
-                default                             : return [];
+                case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                case 'object'    : return obj._.values();
+                case 'array'     : return obj;
+                default          : return [];
             }
         },
         toInteger: function(obj) {
