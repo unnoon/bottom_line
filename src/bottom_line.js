@@ -378,7 +378,7 @@
                 default       : return NaN
             }
         },
-        toString: function(obj) {return obj? obj._.toString() : obj+''}
+        toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
     /* @include shims.js */
