@@ -35,7 +35,6 @@ module.exports = function (config) {
 		exclude       : [
 
 		],
-        // FIXME coverage does not work anymore
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
 		reporters     : ['dots', 'coverage'],
@@ -69,7 +68,7 @@ module.exports = function (config) {
 
 		// Continuous Integration mode
 		// if true, it capture browsers, run tests and exit
-		singleRun     : false,
+		singleRun     : true,
 
 		plugins: [
 			'karma-mocha',

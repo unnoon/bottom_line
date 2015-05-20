@@ -56,16 +56,6 @@ construct('obj', {native:Object}, {
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
         },
-        /**
-         * Extends an object with function/properties from a module object
-         * @public
-         * @static
-         * @method obj.extend
-         * @param   {Object}  obj          - object to be extended
-         * @param   {Object=} settings_ - optional settings/default descriptor
-         * @param   {Object}  module       - object containing functions/properties to extend the object with
-         * @return  {Object}  obj          - the extended object
-         */
         extend: extend,
         /**
          * Returns the type of an object. Better suited then the one from js itself

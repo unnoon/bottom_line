@@ -7,6 +7,15 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-bump');
 
 	grunt.initConfig({
+		bump: {
+			options: {
+				files: ['package.json', 'bower.json', 'src/bottom_line.js'],
+				commit: true,
+				commitFiles: ['-a'],
+				createTag: true,
+				push: true
+			}
+		},
 		uglify: {
 			dist: {
 				files: {
@@ -18,7 +27,7 @@ module.exports = function(grunt) {
 			dist : {
 				src: ['dist/bottom_line.js'],
 				options: {
-					destination: 'docs',
+					destination: 'doc',
                     template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
                     configure : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json"
 				}
@@ -45,12 +54,12 @@ module.exports = function(grunt) {
 			}
 		},
         clean: {
-            docs: ['docs']
+            docs: ['doc']
         }
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
-	grunt.registerTask('build',   ['preprocess', 'uglify', 'docs']);
+	grunt.registerTask('build',   ['bump-only:patch', 'preprocess', 'uglify', 'docs', 'bump-commit']);
     grunt.registerTask('default', ['preprocess']);
 };
 
