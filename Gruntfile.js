@@ -15,7 +15,8 @@ module.exports = function(grunt) {
 				commit: true,
 				commitFiles: ['-a'],
 				createTag: true,
-				push: true
+				push: true,
+				pushTo: 'origin'
 			}
 		},
 		uglify: {
