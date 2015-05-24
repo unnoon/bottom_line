@@ -119,7 +119,11 @@ construct('fnc', {native:Function}, {
             {
                 cb.call(ctx_, i);
             }
-        }
+        },
+        /**
+         * See wrapper.js for documentation details
+         */
+        wrap: wrap
     },
     prototype:
     {

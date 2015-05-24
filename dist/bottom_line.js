@@ -178,19 +178,9 @@
                 if(config.clone) descriptor.value = clone(config.value); // clone deep maybe?
                 if(config.exec)  descriptor.value = config.value(obj);
                 if(config.wrap)
-                {
-                    /**
-                     * wraps 2 functions into 1. Return the result of the second function given
-                     *
-                     * @param {Function}   fnc1 - function to be wrapped
-                     * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
-                     * @returns {Function}      - the wrapping function
-                     */
-                    var wrap = function(fnc1, fnc2) {
-                        return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
-                    };
-                    // wrap super or override function with the module function
-                    descriptor.value = wrap(obj[prop], descriptor.value)
+                {    // wrap super or override function with the module function
+                    if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
+                    else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
             }
             // create the final settings object
@@ -374,10 +364,16 @@
 
             switch (type)
             {
-                case 'arguments'                    : return Array.prototype.slice.call(obj, 0);
-                case 'object'                       : return obj._.values();
-                case 'array'                        : return obj;
-                default                             : return [];
+                case 'arguments' : // make a copy instead of slice to not leak arguments
+                    var max  = arguments.length;
+                    var args = new Array(max);
+                    for(var i = 0; i < max; i++) {
+                        args[i] = arguments[i];
+                    }
+                    return args;
+                case 'object'    : return obj._.values();
+                case 'array'     : return obj;
+                default          : return [];
             }
         },
         toInteger: function(obj) {
@@ -459,6 +455,66 @@
             return typeof value === "number" && value !== value;
         }
     });
+    /**
+     * Create a wrapper function that can hold multiple callbacks that are executed in sequence The result of the last added function is returned
+     * The returned function will be decorated with with additional functionality. such as add, addOnce, remove, removeAll
+     *
+     * @param   {...Function|Array=} ___fnc_arr_ - optional 1 or more functions or array of functions to initialize the callbacks array with
+     * @returns {Function}                       - decorated wrapper function
+     */
+    function wrap(___fnc_arr_) {
+        var callbacks = Array.isArray(___fnc_arr_) ? ___fnc_arr_ : [];
+    
+        if(typeof(___fnc_arr_) === 'function')
+        {
+            for(var i = 0; i < arguments.length; i++) {
+                callbacks.push(arguments[i]);
+            }
+        }
+    
+        var wrapper = function() {
+            var result;
+    
+            for(var i = 0, max = callbacks.length; i < max; i++)
+            {
+                result = callbacks[i].apply(this, arguments);
+            }
+    
+            return result; // return the result of the last added function
+        };
+    
+        wrapper._callbacks = callbacks;
+    
+        wrapper.add = function(cb, ctx_) {
+            cb = ctx_? cb.bind(ctx_) : ctx_;
+    
+            callbacks.push(cb)
+        };
+    
+        wrapper.addOnce = function(cb, ctx_) {
+            cb = ctx_? cb.bind(ctx_) : ctx_;
+    
+            var once = function() {
+                wrapper.remove(once);
+                return cb.apply(this, arguments);
+            };
+    
+            callbacks.push(once)
+        };
+    
+        wrapper.remove = function(cb) {
+            var index = callbacks.indexOf(cb);
+    
+            if(~index) {callbacks.splice(index, 1)}
+            else       {console.warn('trying to remove function from wrapper that is not registered as a callback')}
+        };
+    
+        wrapper.removeAll = function() {
+            callbacks = [];
+        };
+    
+        return wrapper
+    }
     construct('obj', {native:Object}, {
         /**
          * @namespace obj
@@ -517,6 +573,9 @@
             create: function(proto) {
                 return (proto === Array.prototype) ? [] : Object.create(proto);
             },
+            /**
+             * See bottom_line.js for documentation details
+             */
             extend: extend,
             /**
              * Returns the type of an object. Better suited then the one from js itself
@@ -2162,7 +2221,11 @@
                 {
                     cb.call(ctx_, i);
                 }
-            }
+            },
+            /**
+             * See wrapper.js for documentation details
+             */
+            wrap: wrap
         },
         prototype:
         {

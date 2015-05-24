@@ -178,19 +178,9 @@
                 if(config.clone) descriptor.value = clone(config.value); // clone deep maybe?
                 if(config.exec)  descriptor.value = config.value(obj);
                 if(config.wrap)
-                {
-                    /**
-                     * wraps 2 functions into 1. Return the result of the second function given
-                     *
-                     * @param {Function}   fnc1 - function to be wrapped
-                     * @param {Function}   fnc2 - second function to be wrapped. The result of this function is returned as a result of the wrapping function
-                     * @returns {Function}      - the wrapping function
-                     */
-                    var wrap = function(fnc1, fnc2) {
-                        return function() {fnc1.apply(this, arguments); return fnc2.apply(this, arguments)}
-                    };
-                    // wrap super or override function with the module function
-                    descriptor.value = wrap(obj[prop], descriptor.value)
+                {    // wrap super or override function with the module function
+                    if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
+                    else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
             }
             // create the final settings object
@@ -374,7 +364,13 @@
 
             switch (type)
             {
-                case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                case 'arguments' : // make a copy instead of slice to not leak arguments
+                    var max  = arguments.length;
+                    var args = new Array(max);
+                    for(var i = 0; i < max; i++) {
+                        args[i] = arguments[i];
+                    }
+                    return args;
                 case 'object'    : return obj._.values();
                 case 'array'     : return obj;
                 default          : return [];
@@ -400,6 +396,7 @@
     });
 
     /* @include shims.js */
+    /* @include wrapper.js */
     /* @include obj.js  */
     /* @include arr.js  */
     /* @include str.js  */

@@ -56,6 +56,9 @@ construct('obj', {native:Object}, {
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
         },
+        /**
+         * See bottom_line.js for documentation details
+         */
         extend: extend,
         /**
          * Returns the type of an object. Better suited then the one from js itself
