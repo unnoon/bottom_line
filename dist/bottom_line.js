@@ -143,6 +143,7 @@
      *
      *     @param   {boolean=}  _settings_.override=true   - boolean indicating if properties should be overridden
      *     @param   {boolean=}  _settings_.overwrite=true  - boolean indicating if properties should be overwritten
+     *     @param   {boolean=}  _settings_.shim            - inverse of overwrite
      *
      *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
      *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
@@ -161,6 +162,11 @@
         settings.overwrite       = settings.overwrite !== false; // default is true
         settings.overwriteaction = settings.overwriteaction || 'warn';
         settings.overrideaction  = settings.overrideaction  || 'warn';
+
+        if(settings.shim === true) {
+            settings.overwrite       = false;
+            settings.overwriteaction = 'ignore'
+        }
 
         for(var prop in module)
         {   if(!module.hasOwnProperty(prop)) continue;
@@ -182,6 +188,7 @@
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
                     else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
+                if(config.constant) {config.enumerable = true; config.configurable = false; config.writable = false}
             }
             // create the final settings object
             var finalSettings = clone(settings);
@@ -265,7 +272,7 @@
          * @static
          * @method _.inject
          *
-         * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
+         * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
          * @param {string}  prop               - name of the property
          * @param {Object} descriptor          - descriptor/settings object on injection
          *     @param {boolean}  descriptor.value                - value of the property
@@ -395,7 +402,7 @@
         toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
-    extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
+    extend(Function.prototype, {shim: true}, {
         /**
          * Returns the name of a function
          * @public
@@ -430,7 +437,7 @@
         }
     });
     
-    extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
+    extend(Math, {shim: true}, {
         /**
          * Decimal log function
          * @public
@@ -443,7 +450,7 @@
         }
     });
     
-    extend(Number, {overwrite: false, overwriteaction: 'ignore'}, {
+    extend(Number, {shim: true}, {
         /**
          * Check for isNaN conform the ES6 specs
          * @public
@@ -459,6 +466,7 @@
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence The result of the last added function is returned
      * The returned function will be decorated with with additional functionality. such as add, addOnce, remove, removeAll
      *
+     * @method _.wrap
      * @param   {...Function|Array=} ___fnc_arr_ - optional 1 or more functions or array of functions to initialize the callbacks array with
      * @returns {Function}                       - decorated wrapper function
      */
@@ -488,7 +496,9 @@
         wrapper.add = function(cb, ctx_) {
             cb = ctx_? cb.bind(ctx_) : ctx_;
     
-            callbacks.push(cb)
+            callbacks.push(cb);
+    
+            return this
         };
     
         wrapper.addOnce = function(cb, ctx_) {
@@ -499,7 +509,9 @@
                 return cb.apply(this, arguments);
             };
     
-            callbacks.push(once)
+            callbacks.push(once);
+    
+            return this
         };
     
         wrapper.remove = function(cb) {
@@ -507,10 +519,18 @@
     
             if(~index) {callbacks.splice(index, 1)}
             else       {console.warn('trying to remove function from wrapper that is not registered as a callback')}
+    
+            return this
         };
     
         wrapper.removeAll = function() {
             callbacks = [];
+    
+            return this
+        };
+    
+        wrapper.length = function() {
+            return callbacks.length;
         };
     
         return wrapper
@@ -537,7 +557,7 @@
                 var names = obj._.names();
     
                 names._.each(function(name) {
-                    clone._.define(name, obj._.descriptor(name));
+                    Object.defineProperty(clone, name, obj._.descriptor(name));
                 });
     
                 return clone;
@@ -558,7 +578,7 @@
                 obj._.names()._.each(function (name) {
                     var pd = obj._.descriptor(name);
                     if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                    clone._.define(name, pd);
+                    Object.defineProperty(clone, name, pd);
                 });
                 return clone;
             },
@@ -637,17 +657,33 @@
                 return occurrences;
             },
             /**
-             * Copies keys to an array
+             * Shortcut to Object.defineProperty. If no descriptor property is given enumerable, configurable & writable will all be false
              * @public
              * @method obj#define
              * @this   {Object}
-             * @param  {string}       prop - the property name
-             * @param  {Object} descriptor - descriptor object
-             * @return {Object}       this - object for chaining
+             * @param  {string}  prop        - the property name
+             * @param  {Object=} descriptor_ - descriptor object
+             * @return {Object}  this        - object for chaining
              */
-            define: function(prop, descriptor)
+            define: function(prop, value, descriptor_)
             {
-                return Object.defineProperty(this, prop, descriptor)
+                descriptor_       = descriptor_ || {};
+                descriptor_.value = value;
+    
+                return Object.defineProperty(this, prop, descriptor_)
+            },
+            /**
+             * Defines a constant: enumerable, configurable & writable will all be false
+             * @public
+             * @method obj#constant
+             * @this   {Object}
+             * @param  {string} prop  - the constant name
+             * @param  {Object} value - the value of the constant.
+             * @return {Object} this  - object for chaining
+             */
+            constant: function(prop, value)
+            {
+                return Object.defineProperty(this, prop, {value:value, enumerable: true})
             },
             /**
              * Remove elements based on index
@@ -2117,7 +2153,7 @@
              */
             bind: function(_args_, fnc, ctx_)
             {
-                if(_.isFunction(_args_))       {return _args_.bind(fnc)}
+                if(_.isFunction(_args_))        {return _args_.bind(fnc)}
                 if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
     
                 var blanks  = _args_._.count(undefined);

@@ -20,7 +20,7 @@ construct('obj', {native:Object}, {
             var names = obj._.names();
 
             names._.each(function(name) {
-                clone._.define(name, obj._.descriptor(name));
+                Object.defineProperty(clone, name, obj._.descriptor(name));
             });
 
             return clone;
@@ -41,7 +41,7 @@ construct('obj', {native:Object}, {
             obj._.names()._.each(function (name) {
                 var pd = obj._.descriptor(name);
                 if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                clone._.define(name, pd);
+                Object.defineProperty(clone, name, pd);
             });
             return clone;
         },
@@ -120,17 +120,33 @@ construct('obj', {native:Object}, {
             return occurrences;
         },
         /**
-         * Copies keys to an array
+         * Shortcut to Object.defineProperty. If no descriptor property is given enumerable, configurable & writable will all be false
          * @public
          * @method obj#define
          * @this   {Object}
-         * @param  {string}       prop - the property name
-         * @param  {Object} descriptor - descriptor object
-         * @return {Object}       this - object for chaining
+         * @param  {string}  prop        - the property name
+         * @param  {Object=} descriptor_ - descriptor object
+         * @return {Object}  this        - object for chaining
          */
-        define: function(prop, descriptor)
+        define: function(prop, value, descriptor_)
         {
-            return Object.defineProperty(this, prop, descriptor)
+            descriptor_       = descriptor_ || {};
+            descriptor_.value = value;
+
+            return Object.defineProperty(this, prop, descriptor_)
+        },
+        /**
+         * Defines a constant: enumerable, configurable & writable will all be false
+         * @public
+         * @method obj#constant
+         * @this   {Object}
+         * @param  {string} prop  - the constant name
+         * @param  {Object} value - the value of the constant.
+         * @return {Object} this  - object for chaining
+         */
+        constant: function(prop, value)
+        {
+            return Object.defineProperty(this, prop, {value:value, enumerable: true})
         },
         /**
          * Remove elements based on index

@@ -1,4 +1,4 @@
-extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
+extend(Function.prototype, {shim: true}, {
     /**
      * Returns the name of a function
      * @public
@@ -33,7 +33,7 @@ extend(Function.prototype, {overwrite: false, overwriteaction: 'ignore'}, {
     }
 });
 
-extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
+extend(Math, {shim: true}, {
     /**
      * Decimal log function
      * @public
@@ -46,7 +46,7 @@ extend(Math, {overwrite: false, overwriteaction: 'ignore'}, {
     }
 });
 
-extend(Number, {overwrite: false, overwriteaction: 'ignore'}, {
+extend(Number, {shim: true}, {
     /**
      * Check for isNaN conform the ES6 specs
      * @public

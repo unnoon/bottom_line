@@ -15,7 +15,7 @@ construct('fnc', {native:Function}, {
          */
         bind: function(_args_, fnc, ctx_)
         {
-            if(_.isFunction(_args_))       {return _args_.bind(fnc)}
+            if(_.isFunction(_args_))        {return _args_.bind(fnc)}
             if(_args_._.not.has(undefined)) {return _args_.unshift(ctx_), fnc.bind.apply(fnc, _args_)}
 
             var blanks  = _args_._.count(undefined);

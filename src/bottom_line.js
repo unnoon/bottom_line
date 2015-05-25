@@ -143,6 +143,7 @@
      *
      *     @param   {boolean=}  _settings_.override=true   - boolean indicating if properties should be overridden
      *     @param   {boolean=}  _settings_.overwrite=true  - boolean indicating if properties should be overwritten
+     *     @param   {boolean=}  _settings_.shim            - inverse of overwrite
      *
      *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
      *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
@@ -161,6 +162,11 @@
         settings.overwrite       = settings.overwrite !== false; // default is true
         settings.overwriteaction = settings.overwriteaction || 'warn';
         settings.overrideaction  = settings.overrideaction  || 'warn';
+
+        if(settings.shim === true) {
+            settings.overwrite       = false;
+            settings.overwriteaction = 'ignore'
+        }
 
         for(var prop in module)
         {   if(!module.hasOwnProperty(prop)) continue;
@@ -182,6 +188,7 @@
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
                     else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
+                if(config.constant) {config.enumerable = true; config.configurable = false; config.writable = false}
             }
             // create the final settings object
             var finalSettings = clone(settings);
@@ -265,7 +272,7 @@
          * @static
          * @method _.inject
          *
-         * @param {Object}  obj                - object to be injected i.e _.arr|_.obj|etc...
+         * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
          * @param {string}  prop               - name of the property
          * @param {Object} descriptor          - descriptor/settings object on injection
          *     @param {boolean}  descriptor.value                - value of the property
