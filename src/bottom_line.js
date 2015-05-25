@@ -145,6 +145,8 @@
      *     @param   {boolean=}  _settings_.overwrite=true  - boolean indicating if properties should be overwritten
      *     @param   {boolean=}  _settings_.shim            - inverse of overwrite
      *
+     *     @param   {Array=}    _settings_.exclude         - array of properties that will be excluded
+     *
      *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
      *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
      *
@@ -162,6 +164,7 @@
         settings.overwrite       = settings.overwrite !== false; // default is true
         settings.overwriteaction = settings.overwriteaction || 'warn';
         settings.overrideaction  = settings.overrideaction  || 'warn';
+        settings.exclude         = settings.exclude || [];
 
         if(settings.shim === true) {
             settings.overwrite       = false;
@@ -169,7 +172,7 @@
         }
 
         for(var prop in module)
-        {   if(!module.hasOwnProperty(prop)) continue;
+        {   if(!module.hasOwnProperty(prop) || (settings.exclude.length && ~settings.exclude.indexOf(prop))) continue;
 
             var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
             var encapsulator = !!(descriptor.get || descriptor.set);

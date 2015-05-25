@@ -30,7 +30,7 @@ function wrap(___fnc_arr_) {
     wrapper._callbacks = callbacks;
 
     wrapper.add = function(cb, ctx_) {
-        cb = ctx_? cb.bind(ctx_) : ctx_;
+        cb = ctx_? cb.bind(ctx_) : cb;
 
         callbacks.push(cb);
 
@@ -38,7 +38,7 @@ function wrap(___fnc_arr_) {
     };
 
     wrapper.addOnce = function(cb, ctx_) {
-        cb = ctx_? cb.bind(ctx_) : ctx_;
+        cb = ctx_? cb.bind(ctx_) : cb;
 
         var once = function() {
             wrapper.remove(once);
@@ -63,10 +63,6 @@ function wrap(___fnc_arr_) {
         callbacks = [];
 
         return this
-    };
-
-    wrapper.length = function() {
-        return callbacks.length;
     };
 
     return wrapper
