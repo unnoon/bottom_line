@@ -26,7 +26,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.3',
+        'version': '0.0.4',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
@@ -2296,7 +2296,7 @@
              * @public
              * @method int.length
              * @param   {number}        int           - integer to measure the length
-             * @param   {string|number} format_length - format for the lead zero's for example '0000'
+             * @param   {string|number} format_length - format for the lead zero's for example '0000' or a number defining the length
              * @returns {string}                      - string with leading zero's
              */
             leadZeros: function(int, format_length)

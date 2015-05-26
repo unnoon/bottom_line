@@ -26,7 +26,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.3',
+        'version': '0.0.4',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
