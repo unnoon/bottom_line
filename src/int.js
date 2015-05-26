@@ -18,7 +18,7 @@ construct('int', {
          * @public
          * @method int.length
          * @param   {number}        int           - integer to measure the length
-         * @param   {string|number} format_length - format for the lead zero's for example '0000'
+         * @param   {string|number} format_length - format for the lead zero's for example '0000' or a number defining the length
          * @returns {string}                      - string with leading zero's
          */
         leadZeros: function(int, format_length)
