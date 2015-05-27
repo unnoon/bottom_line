@@ -8,6 +8,8 @@
 - silent log functionality
 - add functional versions for all functions. (use these internally for speed optimizations)
 - random number generator including seeds (https://github.com/davidbau/seedrandom?)
+- custom super regexp for extend function
+- enumerate non enumerables
 
 ### function
 - memoize

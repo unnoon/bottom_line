@@ -191,7 +191,7 @@
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
                     else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
-                if(config.constant) {config.enumerable = true; config.configurable = false; config.writable = false}
+                if(config.constant) {config.configurable = false; config.writable = false}
             }
             // create the final settings object
             var finalSettings = clone(settings);
