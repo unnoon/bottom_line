@@ -6,7 +6,6 @@
  * Released under the MIT license
  * ________________________________
  */
-'use strict';
 !function(root, bottom_line) {
     var environments = true;
     var requirejs    = typeof(define) === 'function'  && !!define.amd;
@@ -17,6 +16,8 @@
     case nodejs    : module.exports = bottom_line(); break;
     default        : bottom_line(root)}
 }(this, function(root_) {
+    'use strict';
+
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
