@@ -120,6 +120,22 @@ construct('obj', {native:Object}, {
             return occurrences;
         },
         /**
+         * Counts the number of occurrences of an element. Based on the match function
+         * @public
+         * @method obj#countFn
+         * @param   {Function}  matchFn     - match function should return a boolean or 0 1
+         * @return  {number}    occurrences - occurrences of the elm int he object
+         */
+        countFn: function(matchFn) {
+            var occurrences = 0;
+
+            this._.each(function(e) {
+                occurrences += matchFn(e); // js magic true = 1 false = 0
+            });
+
+            return occurrences;
+        },
+        /**
          * Shortcut to Object.defineProperty. If no descriptor property is given enumerable, configurable & writable will all be false
          * @public
          * @method obj#define
@@ -312,6 +328,9 @@ construct('obj', {native:Object}, {
             });
 
             return has;
+        }},
+        hasFn: {aliases: ['containsFn'], value: function(fn) {
+            return !!this._.find(fn);
         }},
         keyOf: {aliases: ['indexOf'], value: function(value) {
             var key = -1;

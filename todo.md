@@ -16,9 +16,13 @@
 ### function
 - memoize
 - execute once
+- functional version of unique, indexof, etc.
 
 ### string
 - replaceFirst/Last
+
+### array
+each$ - multidimensional iteration
 
 
 
