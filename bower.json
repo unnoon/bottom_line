@@ -6,9 +6,11 @@
   ],
   "description": "JS Toolbelt",
   "main": "dist/bottom_line.js",
-  "dependencies": {},
+  "dependencies": {
+    "seedrandom": "*"
+  },
   "devDependencies": {
-    "benchmark": "~1.0.0"
+    "benchmark": "*"
   },
   "keywords": [
     "tools",

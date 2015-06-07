@@ -16,8 +16,6 @@
     case nodejs    : module.exports = bottom_line(); break;
     default        : bottom_line(root)}
 }(this, function(root_) {
-    'use strict';
-
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
@@ -406,6 +404,9 @@
         toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
+
+    /* @include ../bower_components/seedrandom/seedrandom.js */
+    'use strict';
     /* @include shims.js */
     /* @include wrapper.js */
     /* @include obj.js  */
@@ -415,6 +416,8 @@
     /* @include fnc.js  */
     /* @include int.js  */
     /* @include math.js */
+
+    Math.seedrandom();
 
 	return _
 });
