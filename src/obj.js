@@ -254,17 +254,18 @@ construct('obj', {native:Object}, {
          * @this  {Object}
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
-         * @return {Array}         - this array for chaining
+         * @return {any|boolean}  - output from the callback function
          */
         each: function(cb, ctx_) {
             if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+            var output;
 
             for (var key in this) {
                 if (!this.hasOwnProperty(key)) continue;
-                if (cb.call(ctx_, this[key], key, this) === false) break;
+                if ((output = cb.call(ctx_, this[key], key, this)) === false) break;
             }
 
-            return this;
+            return output;
         },
         /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration

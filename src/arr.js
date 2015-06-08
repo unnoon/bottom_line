@@ -217,22 +217,23 @@ construct('arr', {native:Array}, {
          * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
          * @param  {function} cb    - callback function to be called for each element
          * @param  {Object=}  ctx_  - optional context for the callback function
-         * @return {Array}          - this for chaining
+         * @return {any|boolean}    - output from the callback function
          */
         each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = 0, to = this.length;
             var val, diff, size = to, delta = 0;
+            var output;
 
             for(var i = from; i < to; i += step_)
             {
                 if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                if(cb.call(ctx_, this[i], i, this, delta) === false) break;
+                if((output = cb.call(ctx_, this[i], i, this, delta)) === false) break;
                 if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
             }
 
-            return this;
+            return output;
         }},
         /**
          * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
