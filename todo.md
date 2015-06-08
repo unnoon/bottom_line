@@ -23,10 +23,10 @@
 
 ### array
 each$ - multidimensional iteration
-
+findRight
+ 
 ###array
 each from to
-each return the break result insted of this
 
 
 

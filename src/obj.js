@@ -321,6 +321,22 @@ construct('obj', {native:Object}, {
 
             return found;
         },
+        /**
+         * Finds first element that is picked by the callback function. Starting from the rioght
+         * @private
+         * @param  {Function} cb   - callback function to be called for each element
+         * @param  {Object=}  ctx_ - optional context
+         * @return {any} first value that is found
+         */
+        findRight: function(cb, ctx_) {
+            var found;
+
+            this._.eachRight(function(elm) {
+                if(cb.call(ctx_, elm)) return found = elm, false; // break iteration
+            });
+
+            return found;
+        },
         has: {aliases: ['contains'], value: function(value) {
             var has = false;
 
