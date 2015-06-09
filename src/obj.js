@@ -346,14 +346,23 @@ construct('obj', {native:Object}, {
 
             return has;
         }},
-        hasFn: {aliases: ['containsFn'], value: function(fn) {
-            return !!this._.find(fn);
+        hasFn: {aliases: ['containsFn'], value: function(cb, ctx_) {
+            return !!this._.find(cb, ctx_);
         }},
         keyOf: {aliases: ['indexOf'], value: function(value) {
             var key = -1;
 
             this._.each(function(val, k) {
                 if(value === val) return key = k, false;
+            });
+
+            return key;
+        }},
+        keyOfFn: {aliases: ['indexOfFn'], value: function(cb, ctx_) {
+            var key = -1;
+
+            this._.each(function(val, k) {
+                if(cb.call(ctx_, val)) return key = k, false;
             });
 
             return key;
@@ -600,7 +609,7 @@ construct('obj', {native:Object}, {
         },
         /**
          * Sets/gets the prototype of an object
-         * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+         * NOTE setting a prototype using __proto__ is non standard (and SLOOWWW) use at your own risk!
          *
          * @public
          * @method obj#proto
