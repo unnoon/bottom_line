@@ -275,17 +275,14 @@ construct('obj', {native:Object}, {
          * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
          * @param {function} cb    - callback function to be called for each element
          * @param {Object=}  ctx_  - optional context for the callback function
-         * @return {Array}         - this array for chaining
+         * @return {any|boolean}   - output from the callback function
          */
         eachRight: function(step_, cb, ctx_) {
-            if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
             if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
-            this._.keys()._.eachRight(function(key) {
+            return this._.keys()._.eachRight(function(key) {
                 return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
             }, this);
-
-            return this;
         },
         /**
          * Filters

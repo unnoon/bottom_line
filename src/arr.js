@@ -243,20 +243,21 @@ construct('arr', {native:Array}, {
          * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
          * @param  {function} cb    - callback function to be called for each element
          * @param  {Object=}  ctx_  - optional context for the callback function
-         * @return {Array}          - this array for chaining
+         * @return {any|boolean}    - output from the callback function
          */
         eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = this.length-1, to = -1;
+            var output;
 
             for(var i = from; i > to; i -= step_)
             {
                 if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                if(cb.call(ctx_, this[i], i, this) === false) break;
+                if((output = cb.call(ctx_, this[i], i, this)) === false) break;
             }
 
-            return this;
+            return output;
         }},
         /**
          * Get/sets: the first element of an array
@@ -280,9 +281,11 @@ construct('arr', {native:Array}, {
          */
         // TODO multi dimensional flattening
         flatten: function() {
-            return this._.each(function(val, i) {
+            this._.each(function(val, i) {
                 if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
-            }, this)
+            }, this);
+
+            return this
         },
         /**
          * Flattens a 2 dimensional array into a new array
