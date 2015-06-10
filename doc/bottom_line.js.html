@@ -89,7 +89,6 @@
  * Released under the MIT license
  * ________________________________
  */
-'use strict';
 !function(root, bottom_line) {
     var environments = true;
     var requirejs    = typeof(define) === 'function'  && !!define.amd;
@@ -100,6 +99,8 @@
     case nodejs    : module.exports = bottom_line(); break;
     default        : bottom_line(root)}
 }(this, function(root_) {
+    'use strict';
+
     var stack = []; // stack holding all wrapped objects accessed from ._
     var index = 0;  // current index in the stack
 
@@ -109,7 +110,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.4',
+        'version': '0.0.5',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
@@ -274,7 +275,7 @@
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
                     else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
                 }
-                if(config.constant) {config.enumerable = true; config.configurable = false; config.writable = false}
+                if(config.constant) {config.configurable = false; config.writable = false}
             }
             // create the final settings object
             var finalSettings = clone(settings);
@@ -739,6 +740,22 @@
                 return occurrences;
             },
             /**
+             * Counts the number of occurrences of an element. Based on the match function
+             * @public
+             * @method obj#countFn
+             * @param   {Function}  matchFn     - match function should return a boolean or 0 1
+             * @return  {number}    occurrences - occurrences of the elm int he object
+             */
+            countFn: function(matchFn) {
+                var occurrences = 0;
+    
+                this._.each(function(e) {
+                    occurrences += matchFn(e); // js magic true = 1 false = 0
+                });
+    
+                return occurrences;
+            },
+            /**
              * Shortcut to Object.defineProperty. If no descriptor property is given enumerable, configurable & writable will all be false
              * @public
              * @method obj#define
@@ -857,17 +874,18 @@
              * @this  {Object}
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
-             * @return {Array}         - this array for chaining
+             * @return {any|boolean}  - output from the callback function
              */
             each: function(cb, ctx_) {
                 if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+                var output;
     
                 for (var key in this) {
                     if (!this.hasOwnProperty(key)) continue;
-                    if (cb.call(ctx_, this[key], key, this) === false) break;
+                    if ((output = cb.call(ctx_, this[key], key, this)) === false) break;
                 }
     
-                return this;
+                return output;
             },
             /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -877,17 +895,14 @@
              * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
              * @param {function} cb    - callback function to be called for each element
              * @param {Object=}  ctx_  - optional context for the callback function
-             * @return {Array}         - this array for chaining
+             * @return {any|boolean}   - output from the callback function
              */
             eachRight: function(step_, cb, ctx_) {
-                if(typeof(step_) === 'function') {ctx_ = cb; cb = step_}
                 if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
-                this._.keys()._.eachRight(function(key) {
+                return this._.keys()._.eachRight(function(key) {
                     return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
                 }, this);
-    
-                return this;
             },
             /**
              * Filters
@@ -923,6 +938,22 @@
     
                 return found;
             },
+            /**
+             * Finds first element that is picked by the callback function. Starting from the rioght
+             * @private
+             * @param  {Function} cb   - callback function to be called for each element
+             * @param  {Object=}  ctx_ - optional context
+             * @return {any} first value that is found
+             */
+            findRight: function(cb, ctx_) {
+                var found;
+    
+                this._.eachRight(function(elm) {
+                    if(cb.call(ctx_, elm)) return found = elm, false; // break iteration
+                });
+    
+                return found;
+            },
             has: {aliases: ['contains'], value: function(value) {
                 var has = false;
     
@@ -932,11 +963,23 @@
     
                 return has;
             }},
+            hasFn: {aliases: ['containsFn'], value: function(cb, ctx_) {
+                return !!this._.find(cb, ctx_);
+            }},
             keyOf: {aliases: ['indexOf'], value: function(value) {
                 var key = -1;
     
                 this._.each(function(val, k) {
                     if(value === val) return key = k, false;
+                });
+    
+                return key;
+            }},
+            keyOfFn: {aliases: ['indexOfFn'], value: function(cb, ctx_) {
+                var key = -1;
+    
+                this._.each(function(val, k) {
+                    if(cb.call(ctx_, val)) return key = k, false;
                 });
     
                 return key;
@@ -1183,7 +1226,7 @@
             },
             /**
              * Sets/gets the prototype of an object
-             * NOTE setting a prototype using __proto__ is non standard use at your own risk!
+             * NOTE setting a prototype using __proto__ is non standard (and SLOOWWW) use at your own risk!
              *
              * @public
              * @method obj#proto
@@ -1464,22 +1507,23 @@
              * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb    - callback function to be called for each element
              * @param  {Object=}  ctx_  - optional context for the callback function
-             * @return {Array}          - this for chaining
+             * @return {any|boolean}    - output from the callback function
              */
             each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
                 var val, diff, size = to, delta = 0;
+                var output;
     
                 for(var i = from; i &lt; to; i += step_)
                 {
                     if((val = this[i]) === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                    if(cb.call(ctx_, this[i], i, this, delta) === false) break;
+                    if((output = cb.call(ctx_, this[i], i, this, delta)) === false) break;
                     if(diff = this.length - size) i += diff, to += diff, size += diff, delta += diff; // correct index after insertion or deletion
                 }
     
-                return this;
+                return output;
             }},
             /**
              * Inverse Array iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
@@ -1489,20 +1533,21 @@
              * @param  {number=}  step_ - step for the iteration. In case this is a negative value it will do a reverse iteration
              * @param  {function} cb    - callback function to be called for each element
              * @param  {Object=}  ctx_  - optional context for the callback function
-             * @return {Array}          - this array for chaining
+             * @return {any|boolean}    - output from the callback function
              */
             eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
+                var output;
     
                 for(var i = from; i > to; i -= step_)
                 {
                     if(this[i] === undefined && !this.hasOwnProperty(i)) continue; // handle broken arrays. skip indices, we first check for undefined because hasOwnProperty is slow
-                    if(cb.call(ctx_, this[i], i, this) === false) break;
+                    if((output = cb.call(ctx_, this[i], i, this)) === false) break;
                 }
     
-                return this;
+                return output;
             }},
             /**
              * Get/sets: the first element of an array
@@ -1526,9 +1571,11 @@
              */
             // TODO multi dimensional flattening
             flatten: function() {
-                return this._.each(function(val, i) {
+                this._.each(function(val, i) {
                     if(_.isArray(val)) this.splice.apply(this, val._.insert(1)._.insert(i));
-                }, this)
+                }, this);
+    
+                return this
             },
             /**
              * Flattens a 2 dimensional array into a new array
@@ -2587,7 +2634,8 @@
     });
 
 	return _
-});</pre>
+});
+</pre>
 	</article>
 </section>
 
@@ -2608,7 +2656,7 @@
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Tue May 26th 2015 using the <a
+		on Wed Jun 10th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
