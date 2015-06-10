@@ -1304,8 +1304,6 @@
             del: {overrideaction: 'ignore', value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
-                    if(this.splice === undefined) {console.log(this._.toString(), _.typeOf(this))}
-    
                     this.splice(key, 1);
                 }, this);
     
