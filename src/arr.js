@@ -523,7 +523,7 @@ construct('arr', {native:Array}, {
          * @returns {number} - sum of the  number array
          */
         sum: function() {
-            if(!this.length) return;
+            if(!this.length) return 0;
 
             return this.reduce(function(a, b) { return a + b });
         },
