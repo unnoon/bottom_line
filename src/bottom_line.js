@@ -190,7 +190,7 @@
                 if(config.wrap)
                 {    // wrap super or override function with the module function
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
-                    else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
+                    else                                                            {descriptor.value = Batcher(obj[prop], descriptor.value)}
                 }
                 if(config.constant) {config.configurable = false; config.writable = false}
             }
@@ -226,8 +226,9 @@
                 var action = function(type, conf, value) {
                     var message;
                     var action                = finalSettings[type+'action'];
-                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
-                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/\b_super\b/.test(value));
+                    // TODO make super a changeable regexp
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /this\._super/.test(value));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/this\._super/.test(value));
 
                     if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
 
@@ -407,7 +408,7 @@
     });
 
     /* @include shims.js */
-    /* @include wrapper.js */
+    /* @include Batcher.js */
     /* @include obj.js  */
     /* @include arr.js  */
     /* @include str.js  */

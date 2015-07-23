@@ -190,7 +190,7 @@
                 if(config.wrap)
                 {    // wrap super or override function with the module function
                     if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
-                    else                                                            {descriptor.value = wrap(obj[prop], descriptor.value)}
+                    else                                                            {descriptor.value = Batcher(obj[prop], descriptor.value)}
                 }
                 if(config.constant) {config.configurable = false; config.writable = false}
             }
@@ -226,8 +226,9 @@
                 var action = function(type, conf, value) {
                     var message;
                     var action                = finalSettings[type+'action'];
-                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
-                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/\b_super\b/.test(value));
+                    // TODO make super a changeable regexp
+                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /this\._super/.test(value));
+                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/this\._super/.test(value));
 
                     if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
 
@@ -467,24 +468,25 @@
         }
     });
     /**
-     * Create a wrapper function that can hold multiple callbacks that are executed in sequence The result of the last added function is returned
+     * Create a wrapper function that can hold multiple callbacks that are executed in sequence.
+     * The result of the last added function is returned
      * The returned function will be decorated with with additional functionality. such as add, addOnce, remove, removeAll
      *
-     * @method _.wrap
-     * @param   {...Function|Array=} ___fnc_arr_ - optional 1 or more functions or array of functions to initialize the callbacks array with
-     * @returns {Function}                       - decorated wrapper function
+     * @method _.fnc.Batcher
+     * @param   {...Function|Array=} ___fnc_arr_ - optional multiple functions or an array of functions.
+     * @returns {Function}                       - decorated batcher function
      */
-    function wrap(___fnc_arr_) {
+    function Batcher(___fnc_arr_) {
         var callbacks = Array.isArray(___fnc_arr_) ? ___fnc_arr_ : [];
     
-        if(typeof(___fnc_arr_) === 'function')
+        if(typeof(arguments[0]) === 'function')
         {
             for(var i = 0; i < arguments.length; i++) {
                 callbacks.push(arguments[i]);
             }
         }
     
-        var wrapper = function() {
+        var batcher = function() {
             var result;
     
             for(var i = 0, max = callbacks.length; i < max; i++)
@@ -495,46 +497,54 @@
             return result; // return the result of the last added function
         };
     
-        wrapper._callbacks = callbacks;
+        batcher._callbacks = callbacks;
     
-        wrapper.add = function(cb, ctx_) {
+        batcher.callbacks = function() {
+            return this._callbacks;
+        };
+    
+        batcher.add = function(cb, ctx_) {
             cb = ctx_? cb.bind(ctx_) : cb;
     
-            callbacks.push(cb);
+            this._callbacks.push(cb);
     
             return this
         };
     
-        wrapper.addOnce = function(cb, ctx_) {
+        batcher.addOnce = function(cb, ctx_) {
             cb = ctx_? cb.bind(ctx_) : cb;
     
             var once = function() {
-                wrapper.remove(once);
+                batcher.remove(once);
                 return cb.apply(this, arguments);
             };
     
-            callbacks.push(once);
+            this.add(once);
     
             return this
         };
     
-        wrapper.remove = function(cb) {
-            var index = callbacks.indexOf(cb);
+        batcher.remove = function(cb) {
+            var index = this._callbacks.indexOf(cb);
     
-            if(~index) {callbacks.splice(index, 1)}
-            else       {console.warn('trying to remove function from wrapper that is not registered as a callback')}
-    
-            return this
-        };
-    
-        wrapper.removeAll = function() {
-            callbacks = [];
+            if(~index) {this._callbacks.splice(index, 1)}
+            else       {console.warn('trying to remove a function from batcher that is not registered as a callback')}
     
             return this
         };
     
-        return wrapper
+        batcher.removeAll = function() {
+            this._callbacks = [];
+    
+            return this
+        };
+    
+        return batcher
     }
+    
+    Batcher.create = function() {
+        return Batcher.apply(null, arguments);
+    };
     construct('obj', {native:Object}, {
         /**
          * @namespace obj
@@ -1730,7 +1740,7 @@
              * @returns {number} - sum of the  number array
              */
             sum: function() {
-                if(!this.length) return;
+                if(!this.length) return 0;
     
                 return this.reduce(function(a, b) { return a + b });
             },
@@ -2305,9 +2315,9 @@
                 }
             },
             /**
-             * See wrapper.js for documentation details
+             * See Batcher.js for documentation details
              */
-            wrap: wrap
+            Batcher: Batcher
         },
         prototype:
         {
