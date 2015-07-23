@@ -121,9 +121,9 @@ construct('fnc', {native:Function}, {
             }
         },
         /**
-         * See wrapper.js for documentation details
+         * See Batcher.js for documentation details
          */
-        wrap: wrap
+        Batcher: Batcher
     },
     prototype:
     {
