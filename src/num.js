@@ -152,7 +152,7 @@ construct('num', {native:Number}, {
          * @method   num#toString
          * @returns {string} - string representation of the number
          */
-        toString: {overrideaction: 'ignore', value: function()
+        toString: {overrideaction: null, value: function()
         {
             return this.toString()
         }}

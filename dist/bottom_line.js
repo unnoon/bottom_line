@@ -6,16 +6,16 @@
  * Released under the MIT license
  * ________________________________
  */
-!function(root, bottom_line) {
+!function(bottom_line) {
     var environments = true;
     var requirejs    = typeof(define) === 'function'  && !!define.amd;
-    var nodejs       = typeof(module) !== 'undefined' && typeof(exports) !== 'undefined' && module.exports === exports;
+    var nodejs       = typeof(module) !== 'undefined' && this === module.exports;
 
     switch(environments) {
     case requirejs : define(bottom_line);            break;
     case nodejs    : module.exports = bottom_line(); break;
-    default        : bottom_line(root)}
-}(this, function(root_) {
+    default        : bottom_line(this)}
+}.call(this, function(root_) {
     'use strict';
 
     var stack = []; // stack holding all wrapped objects accessed from ._
@@ -131,143 +131,170 @@
 
         return clone;
     }
+
     /**
      * Extends an object with function/properties from a module object
      * @public
      * @static
      * @method _.extend
-     * @param   {Object}  obj           - object to be extended
-     * @param   {Object=}   _settings_  - optional settings/default descriptor
-     *     @param   {boolean=}  _settings_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-     *     @param   {boolean=}  _settings_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
-     *     @param   {boolean=}  _settings_.writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
+     * @param   {Object}   obj       - object to be extended
+     * @param   {Object=} _options_  - optional settings/default descriptor
+     *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
+     *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
+     *     @param   {boolean=}  _options_.writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
      *
-     *     @param   {boolean=}  _settings_.override=true   - boolean indicating if properties should be overridden
-     *     @param   {boolean=}  _settings_.overwrite=true  - boolean indicating if properties should be overwritten
-     *     @param   {boolean=}  _settings_.shim            - inverse of overwrite
+     *     @param   {boolean=}  _options_.override=true   - boolean indicating if properties should be overridden
+     *     @param   {boolean=}  _options_.overwrite=true  - boolean indicating if properties should be overwritten
+     *     @param   {boolean=}  _options_.shim            - inverse of overwrite
      *
-     *     @param   {Array=}    _settings_.exclude         - array of properties that will be excluded
+     *     @param   {Array=}    _options_.exclude         - array of properties that will be excluded
      *
-     *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-     *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *     @param   {Function=} _options_.overwriteaction=console.warn - function containing the overwrite action
+     *     @param   {Function=} _options_.overrideaction=console.warn  - function containing the override action
+    
+     *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
+     *     @param   {Object=}   _options_.overridectx=console  - context for the override action
      *
-     *     @param   {function=} _settings_.modifier        - modifier function to apply on all functions.
+     *     @param   {function=} _options_.modifier        - modifier function to apply on all functions.
      *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      *
      * @return  {Object}  obj          - the extended object
      */
-    function extend(obj, _settings_, module) {
-        var settings = module && _settings_ || {};
-        var module   = module || _settings_;
-
-        settings.override        = settings.override  !== false; // default is true
-        settings.overwrite       = settings.overwrite !== false; // default is true
-        settings.overwriteaction = settings.overwriteaction || 'warn';
-        settings.overrideaction  = settings.overrideaction  || 'warn';
-        settings.exclude         = settings.exclude || [];
-
-        if(settings.shim === true) {
-            settings.overwrite       = false;
-            settings.overwriteaction = 'ignore'
-        }
-
+    // TODO use string for aliases
+    function extend(obj, _options_, module) {
+        var options = module && _options_ || {};
+        var module  = module || _options_;
+    
+        defaultOptions(options);
+    
         for(var prop in module)
-        {   if(!module.hasOwnProperty(prop) || (settings.exclude.length && ~settings.exclude.indexOf(prop))) continue;
-
-            var descriptor   = Object.getOwnPropertyDescriptor(module, prop);
-            var encapsulator = !!(descriptor.get || descriptor.set);
-            var config       = {};
-
-            // special property specific config
-            if(!encapsulator && module[prop].hasOwnProperty('value'))
-            {
-                config           = module[prop];
-                descriptor.value = config.value;
-
-                if(config.clone) descriptor.value = clone(config.value); // clone deep maybe?
-                if(config.exec)  descriptor.value = config.value(obj);
-                if(config.wrap)
-                {    // wrap super or override function with the module function
-                    if(obj.hasOwnProperty(prop) && obj[prop].hasOwnProperty('add')) {descriptor.value.add()}
-                    else                                                            {descriptor.value = Batcher(obj[prop], descriptor.value)}
-                }
-                if(config.constant) {config.configurable = false; config.writable = false}
-            }
-            // create the final settings object
-            var finalSettings = clone(settings);
-            for(var conf in config)
-            {   if (!config.hasOwnProperty(conf)) continue;
-
-                finalSettings[conf] = config[conf];
-            }
-
-            descriptor.enumerable   = (finalSettings.enumerable     !== undefined)? finalSettings.enumerable    : descriptor.enumerable;
-            descriptor.configurable = (finalSettings.configurable   !== undefined)? finalSettings.configurable  : descriptor.configurable;
-            descriptor.writable     = (finalSettings.writable       !== undefined)? finalSettings.writable      : descriptor.writable;
-            // getters & setters don't have a writable option
-            if(encapsulator) delete descriptor.writable;
-
-            if(finalSettings.modifier && typeof(descriptor.value) === 'function') {
-                descriptor.value = finalSettings.modifier(descriptor.value);
-            }
-
-            var names = (config.aliases || []).concat(prop); // this is not super nice
-
+        {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
+    
+            var descriptor = Object.getOwnPropertyDescriptor(module, prop);
+            var value      = descriptor.value;
+    
+            copyPropertyConfigs(options, descriptor);
+    
+            handleAttributes(descriptor);
+            finalizeDescriptor(descriptor);
+    
+            var names = ((value && value.aliases) || []).concat(prop); // this is not super nice
+    
             names.forEach(function(prop) {
-                /**
-                 * Performs action based on type, conf & value. The 'conf' parameter determines a override/overwrite warning or a a redundant warning on the model.
-                 * In case of overrides a action is only performed if the super is not called by the override function
-                 *
-                 * @param {string}  type='override'|'overwrite'
-                 * @param {boolean} conf  - true or false value for type (override or overwrite)
-                 * @param {any}     value - value in the model
-                 */
-                var action = function(type, conf, value) {
-                    var message;
-                    var action                = finalSettings[type+'action'];
-                    // TODO make super a changeable regexp
-                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /this\._super/.test(value));
-                    var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/this\._super/.test(value));
-
-                    if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
-
-                    if(conf === true)
-                    {
-                        message = ((type === 'override')? 'overriding' : 'overwriting') +' property: '+prop+'.';
-                        if(overrideNotUsingSuper) message += ' But not calling super method.'
-                    }
-                    else
-                    {
-                        message = 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
-                    }
-
-                    if(action === 'throw') {throw message}
-                    else                   {
-                        console[action](message)
-                    }
-                };
-
-                if(obj.hasOwnProperty(prop)) // overwrite
+                // TODO move to action function
+                var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
+                                 prop in obj              ? 'override'  :
+                                                            'new';
+    
+                if(actionType !== 'new')
                 {
-                    action('overwrite', finalSettings.overwrite, descriptor.value);
-                    if(!finalSettings.overwrite) return; // continue
+                    action(actionType, descriptor, prop, descriptor.value);
+                    if(!descriptor[actionType]) {return} // continue
                 }
-                else if(prop in obj) // override
-                {
-                    action('override', finalSettings.override, descriptor.value);
-                    if(!finalSettings.override) return; // continue
-                }
-
+    
                 Object.defineProperty(obj, prop, descriptor)
             });
         }
-
+    
         return obj;
+    }
+    
+    /**
+     * Performs action based on type, enabled & value.
+     *
+     * @param {string}  type='override'|'overwrite'
+     * @param {Object}  settings
+     * @param {string}  prop  - name of the property
+     * @param {any}     value - value in the model
+     */
+    function action(type, settings, prop, value) {
+        var message;
+        var action  = settings[type+'action'];
+        var ctx     = settings[type+'ctx'];
+        var enabled = settings[type];
+    
+        if(!action) return; // no action required so return
+    
+        message = enabled ?
+            type +' on property: '+prop+'.' :
+            'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+    
+        action.call(ctx, message, value)
+    }
+    
+    function defaultOptions(settings) {
+        settings.override        = settings.override        !== false; // default is true
+        settings.overwrite       = settings.overwrite       !== false; // default is true
+        settings.overwriteaction = settings.overwriteaction || console.warn;
+        settings.overrideaction  = settings.overrideaction  || console.warn;
+        settings.overwritectx    = settings.overwritectx    || console;
+        settings.overridectx     = settings.overridectx     || console;
+    
+        if(settings.shim) {
+            settings.overwrite       = false;
+            settings.overwriteaction = undefined;
+        }
+    }
+    
+    function handleAttributes(descriptor) {
+        if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
+        // TODO add attribute check
+        var attrs      = descriptor.value.attrs.split(' '); // TODO make corrections for multiple space and add support for comma's
+        var attr;
+        var negated;
+    
+        for(var i = 0; i < attrs.length; i++)
+        {
+            attr    =  attrs[i];
+            negated = !attr.indexOf('no');
+    
+            descriptor[!negated ? attr : attr.slice(2)] = !negated;
+        }
+    }
+    
+    /**
+     * Will act on the actual descriptor to change some properties to final
+     *
+     * @param descriptor
+     */
+    function finalizeDescriptor(descriptor) {
+        if(descriptor.clone)                        {descriptor.value        = clone(descriptor.value)} // clone deep maybe?
+        if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
+        if(descriptor.modifier
+        && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
+    
+        // getters & setters don't have a writable option
+        if(descriptor.get || descriptor.set) {delete descriptor.writable}
+    }
+    /**
+     * Copies the main & property specific options to the property descriptor
+     *
+     * @param options
+     * @param descriptor
+     */
+    function copyPropertyConfigs(options, descriptor) {
+        var propertyConfig = descriptor.value;
+        // copy global options
+        for(var opt in options)
+        {   if(!options.hasOwnProperty(opt)) {continue}
+    
+            descriptor[opt] = options[opt];
+        }
+        // copy property specific options (if any).
+        // Maybe this needs to be a bit more specific
+        if(propertyConfig && propertyConfig.hasOwnProperty('value'))
+        {
+            for(var cfg in propertyConfig)
+            {   if(!propertyConfig.hasOwnProperty(cfg)) {continue}
+    
+                descriptor[cfg] = propertyConfig[cfg];
+            }
+        }
     }
 
     var objToString = Object.prototype.toString;
-    /**
+    /*
      *  'Global' _methods
      */
 
@@ -279,21 +306,9 @@
          *
          * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
          * @param {string}  prop               - name of the property
-         * @param {Object} descriptor          - descriptor/settings object on injection
+         * @param {Object} descriptor          - descriptor/settings object on injection. See extend documentation for more options
          *     @param {boolean}  descriptor.value                - value of the property
          *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
-         *
-         *     @param {boolean=} descriptor.enumerable           - boolean indicating if all properties should be enumerable. can be overwritten on a config level
-         *     @param {boolean=} descriptor.configurable         - boolean indicating if all properties should be configurable. can be overwritten on a config level
-         *     @param {boolean=} descriptor.writable             - boolean indicating if all properties should be writable. can be overwritten on a config level
-         *
-         *     @param {boolean=} descriptor.override=true        - boolean indicating if properties should be overridden
-         *     @param {boolean=} descriptor.overwrite=true       - boolean indicating if properties should be overwritten
-         *
-         *     @param {string=}  descriptor.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-         *     @param {string=}  descriptor.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
-         *
-         *     @param {function=} descriptor.modifier            - modifier function to apply on all functions.
          */
         inject: function(obj, prop, descriptor) {
             var module = {};
@@ -317,7 +332,7 @@
         {
             var key;
 
-            for (key in obj) {
+            for(key in obj) {
                 return false;
             }
             return true;
@@ -404,7 +419,7 @@
                 default       : return NaN
             }
         },
-        toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
+        toString: {overrideaction: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
     extend(Function.prototype, {shim: true}, {
@@ -1175,7 +1190,7 @@
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: 'ignore', value: function(visited_)
+            toString: {overrideaction: null, value: function(visited_)
             {
                 var output = '';
     
@@ -1311,7 +1326,7 @@
              * @param  {...number} ___indices - indices SORTED
              * @return     {Array}       this - mutated array for chaining
              */
-            del: {overrideaction: 'ignore', value: function(___indices)
+            del: {overrideaction: undefined, value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
@@ -1327,7 +1342,7 @@
              * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            delFn: {overrideaction: 'ignore', value: function(match, ctx_)
+            delFn: {overrideaction: null, value: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
@@ -1342,7 +1357,7 @@
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            remove$: {overrideaction: 'ignore', value: function(___values) {
+            remove$: {overrideaction: null, value: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1360,7 +1375,7 @@
              * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            remove$Fn: {overrideaction: 'ignore', value: function(match, ctx_) {
+            remove$Fn: {overrideaction: null, value: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
@@ -1436,7 +1451,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
+            each: {overrideaction: null, value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
@@ -1462,7 +1477,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
+            eachRight: {overrideaction: null, value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
@@ -1520,7 +1535,7 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: {aliases: ['contains'], overrideaction: 'ignore', value: function(elm) {
+            has: {aliases: ['contains'], overrideaction: null, value: function(elm) {
                 return this.indexOf(elm) > -1;
             }},
             /**
@@ -1680,7 +1695,7 @@
              * @param  {any}   val  - value to push
              * @return {Array} this - this for chaining
              */
-            _add: {overrideaction: 'ignore', value: function(val) {
+            _add: {overrideaction: null, value: function(val) {
                 this.push(val);
     
                 return this;
@@ -1725,7 +1740,7 @@
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
              */
-            size: {overrideaction: 'ignore', value: function(size_) {
+            size: {overrideaction: null, value: function(size_) {
                 if(size_ === undefined) return this.length;
     
                 this.length = size_;
@@ -1751,7 +1766,7 @@
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {overrideaction: null, value: function()
             {
                 var output = '[';
     
@@ -1956,7 +1971,7 @@
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
-            has: {overrideaction: 'ignore', value: function(substr) {
+            has: {overrideaction: null, value: function(substr) {
                 return !!~this.indexOf(substr);
             }},
             /**
@@ -2026,7 +2041,7 @@
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {overrideaction: null, value: function()
             {
                 return this.toString();
             }}
@@ -2186,7 +2201,7 @@
              * @method   num#toString
              * @returns {string} - string representation of the number
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {overrideaction: null, value: function()
             {
                 return this.toString()
             }}
@@ -2327,7 +2342,7 @@
              * @method fnc#toString
              * @returns {string} - string representation of the function
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {overrideaction: null, value: function()
             {
                 return this.toString();
             }}

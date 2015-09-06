@@ -628,7 +628,7 @@ construct('obj', {native:Object}, {
          * @this    {Object}
          * @returns {string} - string representation of the object
          */
-        toString: {overrideaction: 'ignore', value: function(visited_)
+        toString: {overrideaction: null, value: function(visited_)
         {
             var output = '';
 

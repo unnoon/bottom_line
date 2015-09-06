@@ -12,7 +12,7 @@
     "grunt-preprocess": "~4.1.0",
     "karma-firefox-launcher": "~0.1.6",
     "karma-script-launcher": "~0.1.0",
-    "karma-phantomjs-launcher": "~0.1.4",
+    "karma-phantomjs-launcher": "latest",
     "karma-mocha": "~0.1.10",
     "karma": "~0.12.32",
     "karma-jasmine": "~0.3.5",
