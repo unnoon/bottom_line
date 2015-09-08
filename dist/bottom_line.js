@@ -33,14 +33,8 @@
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
     if(root_)
     {
-        if(root_.hasOwnProperty('_'))
-        {
-            console.error('_ is already defined on root object'); return;
-        }
-        else
-        {
-            root_._ = _;
-        }
+        if(root_.hasOwnProperty('_')) {console.error('_ is already defined on root object'); return}
+        else                          {root_._ = _}
     }
 
     // TODO something to run methods in a different context. Apply will not work since the context will get lost when using other bottom_line functions internally
@@ -87,8 +81,8 @@
             }
         }
 
-        if(settings.global !== false)
-            _[key] = wrapper; // add wrapper to the bottom_line object
+        // by default add wrapper to the bottom_line object
+        if(settings.global !== false) {_[key] = wrapper}
 
         wrapStatics(wrapper,   module.static);
         wrapPrototype(wrapper, module.prototype);
@@ -161,7 +155,6 @@
      *
      * @return  {Object}  obj          - the extended object
      */
-    // TODO use string for aliases
     function extend(obj, _options_, module) {
         var options = module && _options_ || {};
         var module  = module || _options_;
@@ -172,17 +165,13 @@
         {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
     
             var descriptor = Object.getOwnPropertyDescriptor(module, prop);
-            var value      = descriptor.value;
     
             copyPropertyConfigs(options, descriptor);
     
             handleAttributes(descriptor);
             finalizeDescriptor(descriptor);
     
-            var names = ((value && value.aliases) || []).concat(prop); // this is not super nice
-    
-            names.forEach(function(prop) {
-                // TODO move to action function
+            getNames(prop, descriptor).forEach(function(prop) {
                 var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
                                  prop in obj              ? 'override'  :
                                                             'new';
@@ -236,7 +225,11 @@
             settings.overwriteaction = undefined;
         }
     }
-    
+    /**
+     * Processes the attributes and sets the correct value on the descriptor
+     *
+     * @param {Object} descriptor - the property descriptor
+     */
     function handleAttributes(descriptor) {
         if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
         // TODO add attribute check
@@ -247,16 +240,16 @@
         for(var i = 0; i < attrs.length; i++)
         {
             attr    =  attrs[i];
-            negated = !attr.indexOf('no');
+            negated = !attr.indexOf('!');
     
-            descriptor[!negated ? attr : attr.slice(2)] = !negated;
+            descriptor[!negated ? attr : attr.slice(1)] = !negated;
         }
     }
     
     /**
      * Will act on the actual descriptor to change some properties to final
      *
-     * @param descriptor
+     * @param {Object} descriptor - the property descriptor
      */
     function finalizeDescriptor(descriptor) {
         if(descriptor.clone)                        {descriptor.value        = clone(descriptor.value)} // clone deep maybe?
@@ -270,17 +263,19 @@
     /**
      * Copies the main & property specific options to the property descriptor
      *
-     * @param options
-     * @param descriptor
+     * @param {Object} options    - the global options object
+     * @param {Object} descriptor - the property descriptor
      */
     function copyPropertyConfigs(options, descriptor) {
-        var propertyConfig = descriptor.value;
+    
         // copy global options
         for(var opt in options)
         {   if(!options.hasOwnProperty(opt)) {continue}
     
             descriptor[opt] = options[opt];
         }
+    
+        var propertyConfig = descriptor.value;
         // copy property specific options (if any).
         // Maybe this needs to be a bit more specific
         if(propertyConfig && propertyConfig.hasOwnProperty('value'))
@@ -292,136 +287,22 @@
             }
         }
     }
-
-    var objToString = Object.prototype.toString;
-    /*
-     *  'Global' _methods
+    /**
+     * Generates an array of names including aliases
+     *
+     * @param {string} prop       - the property name
+     * @param {Object} descriptor - the property descriptor
+     * @returns {Array} names
      */
-
-    extend(_, {
-        /**
-         * @public
-         * @static
-         * @method _.inject
-         *
-         * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
-         * @param {string}  prop               - name of the property
-         * @param {Object} descriptor          - descriptor/settings object on injection. See extend documentation for more options
-         *     @param {boolean}  descriptor.value                - value of the property
-         *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
-         */
-        inject: function(obj, prop, descriptor) {
-            var module = {};
-
-            module[prop] = descriptor;
-
-            if(descriptor.static) {wrapStatics(obj, module)}
-            else                  {wrapPrototype(obj, module)}
-        },
-        isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
-        isArray:      Array.isArray,
-        /**
-         * Checks if an object is empty
-         * @public
-         * @static
-         * @method _.isEmpty
-         * @param   {Object}  obj - object to check the void
-         * @returns {boolean}     - boolean indicating if the object is empty
-         */
-        isEmpty: function (obj)
-        {
-            var key;
-
-            for(key in obj) {
-                return false;
-            }
-            return true;
-        },
-        isFunction:   function(obj) {return typeof(obj) === 'function'},
-        isInteger:    function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
-        isNull:       function(obj) {return obj === null},
-        isNumber:     function(obj) {return _.typeOf(obj) === 'number'},
-        isObject:     function(obj) {return _.typeOf(obj) === 'object'},
-        /**
-         * Checks if an object is an primitive
-         * @public
-         * @static
-         * @method _.isPrimitive
-         * @param   {Object} obj - object to classify
-         * @returns {boolean}    - boolean indicating if the object is a primitive
-         */
-        isPrimitive: function(obj) {
-            // maybe just check for valueOF??
-            var type = typeof(obj);
-
-            switch(type)
-            {
-                case 'object'   :
-                case 'function' :
-                    return obj === null;
-                default :
-                    return true
-            }
-        },
-        isString:     function(obj) {return _.typeOf(obj) === 'string'},
-        /**
-         * Checks is a property is undefined
-         * @public
-         * @static
-         * @method _.isUndefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isUndefined: function(prop) {
-            return prop === undefined;
-        },
-        /**
-         * Checks is a property is defined
-         * @public
-         * @static
-         * @method _.isDefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isDefined: function(prop) {
-            return prop !== undefined;
-        },
-        toArray: function(obj) {
-            var type = _.typeOf(obj);
-
-            switch (type)
-            {
-                case 'arguments' : // make a copy instead of slice to not leak arguments
-                    var max  = arguments.length;
-                    var args = new Array(max);
-                    for(var i = 0; i < max; i++) {
-                        args[i] = arguments[i];
-                    }
-                    return args;
-                case 'object'    : return obj._.values();
-                case 'array'     : return obj;
-                default          : return [];
-            }
-        },
-        toInteger: function(obj) {
-            switch(_.typeOf(obj))
-            {
-                case 'number' : return obj|0;
-                case 'string' : return parseInt(obj);
-                default       : return NaN
-            }
-        },
-        toNumber: function(obj) {
-            switch(_.typeOf(obj))
-            {
-                case 'number' : return obj;
-                case 'string' : return parseFloat(obj);
-                default       : return NaN
-            }
-        },
-        toString: {overrideaction: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
-    });
-
+    function getNames(prop, descriptor) {
+        var aliases = descriptor.aliases;
+        var names   = !aliases               ? [] :
+                      Array.isArray(aliases) ? clone(aliases) :
+                                               aliases.split(' '); // TODO better splitting including corrections;
+    
+        names.unshift(prop);
+        return names
+    }
     extend(Function.prototype, {shim: true}, {
         /**
          * Returns the name of a function
@@ -481,6 +362,134 @@
         isNaN: function(value) {
             return typeof value === "number" && value !== value;
         }
+    });
+    var objToString = Object.prototype.toString;
+    /*
+     *  'Global' _methods
+     */
+    
+    extend(_, {
+        /**
+         * @public
+         * @static
+         * @method _.inject
+         *
+         * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
+         * @param {string}  prop               - name of the property
+         * @param {Object} descriptor          - descriptor/settings object on injection. See extend documentation for more options
+         *     @param {boolean}  descriptor.value                - value of the property
+         *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
+         */
+        inject: function(obj, prop, descriptor) {
+            var module = {};
+    
+            module[prop] = descriptor;
+    
+            if(descriptor.static) {wrapStatics(obj, module)}
+            else                  {wrapPrototype(obj, module)}
+        },
+        isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
+        isArray:      Array.isArray,
+        /**
+         * Checks if an object is empty
+         * @public
+         * @static
+         * @method _.isEmpty
+         * @param   {Object}  obj - object to check the void
+         * @returns {boolean}     - boolean indicating if the object is empty
+         */
+        isEmpty: function (obj)
+        {
+            var key;
+    
+            for(key in obj) {
+                return false;
+            }
+            return true;
+        },
+        isFunction:   function(obj) {return typeof(obj) === 'function'},
+        isInteger:    function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
+        isNull:       function(obj) {return obj === null},
+        isNumber:     function(obj) {return _.typeOf(obj) === 'number'},
+        isObject:     function(obj) {return _.typeOf(obj) === 'object'},
+        /**
+         * Checks if an object is an primitive
+         * @public
+         * @static
+         * @method _.isPrimitive
+         * @param   {Object} obj - object to classify
+         * @returns {boolean}    - boolean indicating if the object is a primitive
+         */
+        isPrimitive: function(obj) {
+            // maybe just check for valueOF??
+            var type = typeof(obj);
+    
+            switch(type)
+            {
+                case 'object'   :
+                case 'function' :
+                    return obj === null;
+                default :
+                    return true
+            }
+        },
+        isString:     function(obj) {return _.typeOf(obj) === 'string'},
+        /**
+         * Checks is a property is undefined
+         * @public
+         * @static
+         * @method _.isUndefined
+         * @param   {Object} prop - property to check
+         * @returns {boolean}     - indication of the property definition
+         */
+        isUndefined: function(prop) {
+            return prop === undefined;
+        },
+        /**
+         * Checks is a property is defined
+         * @public
+         * @static
+         * @method _.isDefined
+         * @param   {Object} prop - property to check
+         * @returns {boolean}     - indication of the property definition
+         */
+        isDefined: function(prop) {
+            return prop !== undefined;
+        },
+        toArray: function(obj) {
+            var type = _.typeOf(obj);
+    
+            switch (type)
+            {
+                case 'arguments' : // make a copy instead of slice to not leak arguments
+                    var max  = arguments.length;
+                    var args = new Array(max);
+                    for(var i = 0; i < max; i++) {
+                        args[i] = arguments[i];
+                    }
+                    return args;
+                case 'object'    : return obj._.values();
+                case 'array'     : return obj;
+                default          : return [];
+            }
+        },
+        toInteger: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' : return obj|0;
+                case 'string' : return parseInt(obj);
+                default       : return NaN
+            }
+        },
+        toNumber: function(obj) {
+            switch(_.typeOf(obj))
+            {
+                case 'number' : return obj;
+                case 'string' : return parseFloat(obj);
+                default       : return NaN
+            }
+        },
+        toString: {overrideaction: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
     /**
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence.

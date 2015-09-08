@@ -27,7 +27,6 @@
  *
  * @return  {Object}  obj          - the extended object
  */
-// TODO use string for aliases
 function extend(obj, _options_, module) {
     var options = module && _options_ || {};
     var module  = module || _options_;
@@ -38,17 +37,13 @@ function extend(obj, _options_, module) {
     {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
 
         var descriptor = Object.getOwnPropertyDescriptor(module, prop);
-        var value      = descriptor.value;
 
         copyPropertyConfigs(options, descriptor);
 
         handleAttributes(descriptor);
         finalizeDescriptor(descriptor);
 
-        var names = ((value && value.aliases) || []).concat(prop); // this is not super nice
-
-        names.forEach(function(prop) {
-            // TODO move to action function
+        getNames(prop, descriptor).forEach(function(prop) {
             var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
                              prop in obj              ? 'override'  :
                                                         'new';
@@ -102,7 +97,11 @@ function defaultOptions(settings) {
         settings.overwriteaction = undefined;
     }
 }
-
+/**
+ * Processes the attributes and sets the correct value on the descriptor
+ *
+ * @param {Object} descriptor - the property descriptor
+ */
 function handleAttributes(descriptor) {
     if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
     // TODO add attribute check
@@ -113,16 +112,16 @@ function handleAttributes(descriptor) {
     for(var i = 0; i < attrs.length; i++)
     {
         attr    =  attrs[i];
-        negated = !attr.indexOf('no');
+        negated = !attr.indexOf('!');
 
-        descriptor[!negated ? attr : attr.slice(2)] = !negated;
+        descriptor[!negated ? attr : attr.slice(1)] = !negated;
     }
 }
 
 /**
  * Will act on the actual descriptor to change some properties to final
  *
- * @param descriptor
+ * @param {Object} descriptor - the property descriptor
  */
 function finalizeDescriptor(descriptor) {
     if(descriptor.clone)                        {descriptor.value        = clone(descriptor.value)} // clone deep maybe?
@@ -136,17 +135,19 @@ function finalizeDescriptor(descriptor) {
 /**
  * Copies the main & property specific options to the property descriptor
  *
- * @param options
- * @param descriptor
+ * @param {Object} options    - the global options object
+ * @param {Object} descriptor - the property descriptor
  */
 function copyPropertyConfigs(options, descriptor) {
-    var propertyConfig = descriptor.value;
+
     // copy global options
     for(var opt in options)
     {   if(!options.hasOwnProperty(opt)) {continue}
 
         descriptor[opt] = options[opt];
     }
+
+    var propertyConfig = descriptor.value;
     // copy property specific options (if any).
     // Maybe this needs to be a bit more specific
     if(propertyConfig && propertyConfig.hasOwnProperty('value'))
@@ -157,4 +158,20 @@ function copyPropertyConfigs(options, descriptor) {
             descriptor[cfg] = propertyConfig[cfg];
         }
     }
+}
+/**
+ * Generates an array of names including aliases
+ *
+ * @param {string} prop       - the property name
+ * @param {Object} descriptor - the property descriptor
+ * @returns {Array} names
+ */
+function getNames(prop, descriptor) {
+    var aliases = descriptor.aliases;
+    var names   = !aliases               ? [] :
+                  Array.isArray(aliases) ? clone(aliases) :
+                                           aliases.split(' '); // TODO better splitting including corrections;
+
+    names.unshift(prop);
+    return names
 }
