@@ -27,6 +27,9 @@
  *
  * @return  {Object}  obj          - the extended object
  */
+// TODO document attributes
+// TODO add deep extend
+// TODO add support for strings and arrays on options like exclude
 function extend(obj, _options_, module) {
     var options = module && _options_ || {};
     var module  = module || _options_;

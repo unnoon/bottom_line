@@ -155,6 +155,9 @@
      *
      * @return  {Object}  obj          - the extended object
      */
+    // TODO document attributes
+    // TODO add deep extend
+    // TODO add support for strings and arrays on options like exclude
     function extend(obj, _options_, module) {
         var options = module && _options_ || {};
         var module  = module || _options_;
@@ -461,13 +464,13 @@
     
             switch (type)
             {
-                case 'arguments' : // make a copy instead of slice to not leak arguments
-                    var max  = arguments.length;
-                    var args = new Array(max);
-                    for(var i = 0; i < max; i++) {
-                        args[i] = arguments[i];
-                    }
-                    return args;
+                case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                    //// make a copy instead of slice to not leak arguments
+                    //var max  = arguments.length;
+                    //var args = new Array(max);
+                    //for(var i = 0; i < max; i++) {
+                    //    args[i] = arguments[i];
+                    //}
                 case 'object'    : return obj._.values();
                 case 'array'     : return obj;
                 default          : return [];

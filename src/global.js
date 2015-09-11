@@ -96,13 +96,14 @@ extend(_, {
 
         switch (type)
         {
-            case 'arguments' : // make a copy instead of slice to not leak arguments
-                var max  = arguments.length;
-                var args = new Array(max);
-                for(var i = 0; i < max; i++) {
-                    args[i] = arguments[i];
-                }
-                return args;
+            case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                // the below is nice and all in theory but breaks in Chrome....
+                //// make a copy instead of slice to not leak arguments
+                //var max  = arguments.length;
+                //var args = new Array(max);
+                //for(var i = 0; i < max; i++) {
+                //    args[i] = arguments[i];
+                //}
             case 'object'    : return obj._.values();
             case 'array'     : return obj;
             default          : return [];
