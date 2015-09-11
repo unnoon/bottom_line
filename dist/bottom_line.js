@@ -208,11 +208,11 @@
     
         if(!action) return; // no action required so return
     
-        message = enabled ?
-            type +' on property: '+prop+'.' :
-            'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+        message = enabled
+            ? type +' on property: '+prop+'.'
+            : 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
     
-        action.call(ctx, message, value)
+        action.call(ctx, message, prop, value)
     }
     
     function defaultOptions(settings) {
@@ -465,6 +465,7 @@
             switch (type)
             {
                 case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                    // the below is nice and all in theory but breaks in Chrome....
                     //// make a copy instead of slice to not leak arguments
                     //var max  = arguments.length;
                     //var args = new Array(max);

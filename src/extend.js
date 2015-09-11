@@ -80,11 +80,11 @@ function action(type, settings, prop, value) {
 
     if(!action) return; // no action required so return
 
-    message = enabled ?
-        type +' on property: '+prop+'.' :
-        'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+    message = enabled
+        ? type +' on property: '+prop+'.'
+        : 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
 
-    action.call(ctx, message, value)
+    action.call(ctx, message, prop, value)
 }
 
 function defaultOptions(settings) {
