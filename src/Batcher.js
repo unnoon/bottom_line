@@ -26,7 +26,7 @@ function Batcher(___fnc_) {
         return result; // return the result of the last added function
     }
 
-    // initialize the batcher function
+    // add any initial functions
     if(___fnc_) add.apply(batcher, arguments);
 
     /**
@@ -39,8 +39,7 @@ function Batcher(___fnc_) {
      * @return {Array|Function} - callbacks array or batcher function
      */
     batcher.callbacks = function(functionArray)
-    {
-        if(functionArray === undefined) {return this._callbacks}
+    {   if(functionArray === undefined) {return this._callbacks}
 
         this._callbacks = functionArray;
 
@@ -56,8 +55,7 @@ function Batcher(___fnc_) {
      * @return {Object|Function} - context or batcher function
      */
     batcher.ctx = function(ctx_)
-    {
-        if(ctx_ === undefined) {return this._ctx}
+    {   if(ctx_ === undefined) {return this._ctx}
 
         this._ctx = ctx_;
 

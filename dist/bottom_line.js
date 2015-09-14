@@ -128,9 +128,11 @@
 
     /**
      * Extends an object with function/properties from a module object
+     *
      * @public
      * @static
      * @method _.extend
+     *
      * @param   {Object}   obj       - object to be extended
      * @param   {Object=} _options_  - optional settings/default descriptor
      *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
@@ -141,7 +143,7 @@
      *     @param   {boolean=}  _options_.overwrite=true  - boolean indicating if properties should be overwritten
      *     @param   {boolean=}  _options_.shim            - inverse of overwrite
      *
-     *     @param   {Array=}    _options_.exclude         - array of properties that will be excluded
+     *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
      *
      *     @param   {Function=} _options_.overwriteaction=console.warn - function containing the overwrite action
      *     @param   {Function=} _options_.overrideaction=console.warn  - function containing the override action
@@ -153,16 +155,15 @@
      *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      *
-     * @return  {Object}  obj          - the extended object
+     * @return {Object}  obj - the extended object
      */
     // TODO document attributes
     // TODO add deep extend
-    // TODO add support for strings and arrays on options like exclude
     function extend(obj, _options_, module) {
         var options = module && _options_ || {};
         var module  = module || _options_;
     
-        defaultOptions(options);
+        processOptions(options);
     
         for(var prop in module)
         {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
@@ -195,16 +196,16 @@
     /**
      * Performs action based on type, enabled & value.
      *
-     * @param {string}  type='override'|'overwrite'
-     * @param {Object}  settings
-     * @param {string}  prop  - name of the property
-     * @param {any}     value - value in the model
+     * @param {string}  type='override'|'overwrite' - type the action is acting to
+     * @param {Object}  options                     - the global options
+     * @param {string}  prop                        - name of the property
+     * @param {any}     value                       - value in the model
      */
-    function action(type, settings, prop, value) {
+    function action(type, options, prop, value) {
         var message;
-        var action  = settings[type+'action'];
-        var ctx     = settings[type+'ctx'];
-        var enabled = settings[type];
+        var action  = options[type+'action'];
+        var ctx     = options[type+'ctx'];
+        var enabled = options[type];
     
         if(!action) return; // no action required so return
     
@@ -214,18 +215,27 @@
     
         action.call(ctx, message, prop, value)
     }
+    /**
+     * processes the options, setting defaults etc.
+     *
+     * @param options
+     */
+    function processOptions(options) {
+        options.override        = options.override        !== false; // default is true
+        options.overwrite       = options.overwrite       !== false; // default is true
+        options.overwriteaction = options.overwriteaction || console.warn;
+        options.overrideaction  = options.overrideaction  || console.warn;
+        options.overwritectx    = options.overwritectx    || console;
+        options.overridectx     = options.overridectx     || console;
     
-    function defaultOptions(settings) {
-        settings.override        = settings.override        !== false; // default is true
-        settings.overwrite       = settings.overwrite       !== false; // default is true
-        settings.overwriteaction = settings.overwriteaction || console.warn;
-        settings.overrideaction  = settings.overrideaction  || console.warn;
-        settings.overwritectx    = settings.overwritectx    || console;
-        settings.overridectx     = settings.overridectx     || console;
+        if(options.shim) {
+            options.overwrite       = false;
+            options.overwriteaction = undefined;
+        }
     
-        if(settings.shim) {
-            settings.overwrite       = false;
-            settings.overwriteaction = undefined;
+        if(typeof(options.exclude) === 'string')
+        {
+            options.exclude = options.exclude.split(' ');
         }
     }
     /**
@@ -295,12 +305,13 @@
      *
      * @param {string} prop       - the property name
      * @param {Object} descriptor - the property descriptor
-     * @returns {Array} names
+     *
+     * @return {Array} names
      */
     function getNames(prop, descriptor) {
         var aliases = descriptor.aliases;
         var names   = !aliases               ? [] :
-                      Array.isArray(aliases) ? clone(aliases) :
+                      Array.isArray(aliases) ? clone(aliases) :    // TODO check why we need to clone here
                                                aliases.split(' '); // TODO better splitting including corrections;
     
         names.unshift(prop);
@@ -523,7 +534,7 @@
             return result; // return the result of the last added function
         }
     
-        // initialize the batcher function
+        // add any initial functions
         if(___fnc_) add.apply(batcher, arguments);
     
         /**
@@ -536,8 +547,7 @@
          * @return {Array|Function} - callbacks array or batcher function
          */
         batcher.callbacks = function(functionArray)
-        {
-            if(functionArray === undefined) {return this._callbacks}
+        {   if(functionArray === undefined) {return this._callbacks}
     
             this._callbacks = functionArray;
     
@@ -553,8 +563,7 @@
          * @return {Object|Function} - context or batcher function
          */
         batcher.ctx = function(ctx_)
-        {
-            if(ctx_ === undefined) {return this._ctx}
+        {   if(ctx_ === undefined) {return this._ctx}
     
             this._ctx = ctx_;
     
@@ -617,7 +626,7 @@
                 index = this._callbacks.indexOf(arguments[i]);
     
                 if (~index) {this._callbacks.splice(index, 1)}
-                else {console.warn('trying to remove a function from batcher that is not registered as a callback')}
+                else        {console.warn('trying to remove a function from batcher that is not registered as a callback')}
             }
     
             return this
