@@ -501,67 +501,136 @@
      * The returned function will be decorated with with additional functionality. such as add, addOnce, remove, removeAll
      *
      * @method _.fnc.Batcher
-     * @param   {...Function|Array=} ___fnc_arr_ - optional multiple functions or an array of functions.
-     * @returns {Function}                       - decorated batcher function
+     *
+     * @param  {...Function=} ___fnc_ - optional multiple functions.
+     *
+     * @return {Function} - decorated batcher function
      */
-    function Batcher(___fnc_arr_) {
-        var callbacks = Array.isArray(___fnc_arr_) ? ___fnc_arr_ : [];
+    function Batcher(___fnc_) {
     
-        if(typeof(arguments[0]) === 'function')
-        {
-            for(var i = 0; i < arguments.length; i++) {
-                callbacks.push(arguments[i]);
-            }
-        }
+        // store callbacks & context on the batcher function for easy debugging
+        batcher._callbacks = [];
+        batcher._ctx       = null;
     
-        var batcher = function() {
+        function batcher() {
             var result;
     
-            for(var i = 0, max = callbacks.length; i < max; i++)
+            for(var i = 0, max = batcher._callbacks.length; i < max; i++)
             {
-                result = callbacks[i].apply(this, arguments);
+                result = batcher._callbacks[i].apply(batcher._ctx || this, arguments);
             }
     
             return result; // return the result of the last added function
-        };
+        }
     
-        batcher._callbacks = callbacks;
+        // initialize the batcher function
+        if(___fnc_) add.apply(batcher, arguments);
     
-        batcher.callbacks = function() {
-            return this._callbacks;
-        };
+        /**
+         * Getter/Setter function for the internal callbacks array
+         *
+         * @this batcher
+         *
+         * @param  {Array=} functionArray - an array of functions.
+         *
+         * @return {Array|Function} - callbacks array or batcher function
+         */
+        batcher.callbacks = function(functionArray)
+        {
+            if(functionArray === undefined) {return this._callbacks}
     
-        batcher.add = function(cb, ctx_) {
-            cb = ctx_? cb.bind(ctx_) : cb;
-    
-            this._callbacks.push(cb);
-    
-            return this
-        };
-    
-        batcher.addOnce = function(cb, ctx_) {
-            cb = ctx_? cb.bind(ctx_) : cb;
-    
-            var once = function() {
-                batcher.remove(once);
-                return cb.apply(this, arguments);
-            };
-    
-            this.add(once);
+            this._callbacks = functionArray;
     
             return this
         };
+        /**
+         * Getter/Setter function for batcher context
+         *
+         * @this batcher
+         *
+         * @param {Object=} ctx_ - context for the batcher function
+         *
+         * @return {Object|Function} - context or batcher function
+         */
+        batcher.ctx = function(ctx_)
+        {
+            if(ctx_ === undefined) {return this._ctx}
     
-        batcher.remove = function(cb) {
-            var index = this._callbacks.indexOf(cb);
-    
-            if(~index) {this._callbacks.splice(index, 1)}
-            else       {console.warn('trying to remove a function from batcher that is not registered as a callback')}
+            this._ctx = ctx_;
     
             return this
         };
+        /**
+         * Adds a callback to the callback array
+         *
+         * @this batcher
+         *
+         * @param {...Function} ___cb - one or multiple callbacks to add
+         *
+         * @return {Function} - the batcher function
+         */
+        batcher.add = add; function add(___cb)
+        {
+            for(var i = 0, max = arguments.length; i < max; i++)
+            {
+                this._callbacks.push(arguments[i]);
+            }
     
-        batcher.removeAll = function() {
+            return this
+        }
+        /**
+         * Adds a callback, that is only executed once, to the callback array
+         *
+         * @param {...Function} ___cb - the callback function one likes to add
+         *
+         * @returns {Function} - the batcher function
+         */
+        batcher.addOnce = function(___cb)
+        {
+            for(var i = 0, max = arguments.length; i < max; i++)
+            {
+                !function(cb) {
+                    function once() {
+                        batcher.remove(once);
+                        return cb.apply(this, arguments);
+                    }
+    
+                    batcher.add(once);
+                }(arguments[i])
+            }
+    
+            return this
+        };
+        /**
+         * Removes a callbacks from the callback array
+         *
+         * @this batcher
+         *
+         * @param {...Function} ___cb - callback functions to remove
+         *
+         * @return {Function} - the batcher function
+         */
+        batcher.remove = function(___cb)
+        {
+            for(var i = 0, max = arguments.length, index; i < max; i++)
+            {
+                index = this._callbacks.indexOf(arguments[i]);
+    
+                if (~index) {this._callbacks.splice(index, 1)}
+                else {console.warn('trying to remove a function from batcher that is not registered as a callback')}
+            }
+    
+            return this
+        };
+        /**
+         * Removes all callbacks
+         *
+         * @this batcher
+         *
+         * @return {Function} - the batcher function
+         */
+        batcher.removeAll = function()
+        {
             this._callbacks = [];
     
             return this
@@ -569,8 +638,13 @@
     
         return batcher
     }
-    
-    Batcher.create = function() {
+    /**
+     * Wrapper to create a new batcher function avoiding the new keyword
+     *
+     * @returns {Function}
+     */
+    Batcher.create = function()
+    {
         return Batcher.apply(null, arguments);
     };
     construct('obj', {native:Object}, {
@@ -843,6 +917,29 @@
                 return output;
             },
             /**
+             * Object iterator without hasOWnProperty check.
+             * If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#each
+             * @this  {Object}
+             *
+             * @param {Function} cb   - callback function to be called for each element
+             * @param {Object=}  ctx_ - optional context
+             *
+             * @return {any|boolean}  - output from the callback function
+             */
+            each$: function(cb, ctx_) {
+                if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+                var output;
+    
+                for (var key in this) {
+                    if ((output = cb.call(ctx_, this[key], key, this)) === false) break;
+                }
+    
+                return output;
+            },
+            /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              * @public
              * @method obj#eachRight
@@ -856,6 +953,27 @@
                 if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 return this._.keys()._.eachRight(function(key) {
+                    return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
+                }, this);
+            },
+            /**
+             * Inverse iterator without hasOwnProperty check.
+             * If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#eachRight
+             * @this  {Object}
+             *
+             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+             * @param {function} cb    - callback function to be called for each element
+             * @param {Object=}  ctx_  - optional context for the callback function
+             *
+             * @return {any|boolean}   - output from the callback function
+             */
+            each$Right: function(step_, cb, ctx_) {
+                if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+    
+                return this._.names()._.eachRight(function(key) {
                     return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
                 }, this);
             },
@@ -1021,7 +1139,7 @@
     
                 this._.each(function(val, key, obj, delta) {
                     if(!matched && match.call(ctx_, val, key, obj, delta)) {matched = true}
-                    else                                                    {output._._add(val, key)}
+                    else                                                   {output._._add(val, key)}
                 }, this);
     
                 return output;

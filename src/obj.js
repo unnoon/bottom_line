@@ -268,6 +268,29 @@ construct('obj', {native:Object}, {
             return output;
         },
         /**
+         * Object iterator without hasOWnProperty check.
+         * If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#each
+         * @this  {Object}
+         *
+         * @param {Function} cb   - callback function to be called for each element
+         * @param {Object=}  ctx_ - optional context
+         *
+         * @return {any|boolean}  - output from the callback function
+         */
+        each$: function(cb, ctx_) {
+            if(_.isArguments(this)) return _.arr.methods.each.apply(this, arguments); // handle arguments.
+            var output;
+
+            for (var key in this) {
+                if ((output = cb.call(ctx_, this[key], key, this)) === false) break;
+            }
+
+            return output;
+        },
+        /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          * @public
          * @method obj#eachRight
@@ -281,6 +304,27 @@ construct('obj', {native:Object}, {
             if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             return this._.keys()._.eachRight(function(key) {
+                return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
+            }, this);
+        },
+        /**
+         * Inverse iterator without hasOwnProperty check.
+         * If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#eachRight
+         * @this  {Object}
+         *
+         * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+         * @param {function} cb    - callback function to be called for each element
+         * @param {Object=}  ctx_  - optional context for the callback function
+         *
+         * @return {any|boolean}   - output from the callback function
+         */
+        each$Right: function(step_, cb, ctx_) {
+            if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
+
+            return this._.names()._.eachRight(function(key) {
                 return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
             }, this);
         },
@@ -446,7 +490,7 @@ construct('obj', {native:Object}, {
 
             this._.each(function(val, key, obj, delta) {
                 if(!matched && match.call(ctx_, val, key, obj, delta)) {matched = true}
-                else                                                    {output._._add(val, key)}
+                else                                                   {output._._add(val, key)}
             }, this);
 
             return output;
