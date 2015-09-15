@@ -137,7 +137,6 @@ function handleAttributes(descriptor) {
  * @param {Object} descriptor - the property descriptor
  */
 function finalizeDescriptor(descriptor) {
-    if(descriptor.clone)                        {descriptor.value        = clone(descriptor.value)} // clone deep maybe?
     if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
     if(descriptor.modifier
     && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}

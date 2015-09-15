@@ -265,7 +265,6 @@
      * @param {Object} descriptor - the property descriptor
      */
     function finalizeDescriptor(descriptor) {
-        if(descriptor.clone)                        {descriptor.value        = clone(descriptor.value)} // clone deep maybe?
         if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
         if(descriptor.modifier
         && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
@@ -802,6 +801,7 @@
              * @param  {Object=} descriptor_ - descriptor object
              * @return {Object}  this        - object for chaining
              */
+            // TODO make value optional
             define: function(prop, value, descriptor_)
             {
                 descriptor_       = descriptor_ || {};
@@ -2421,27 +2421,6 @@
                 child.prototype = Object.create(parent.prototype);
                 child.prototype.constructor = child;
                 child[super_ || '_super'] = parent.prototype;
-            },
-            /**
-             * Mixin properties on a class. It is assumed this function is called inside the constructor
-             * @public
-             * @method module:_.fnc.mixin
-             * @param {Function}        child - child
-             * @param {Function|Array} mixins - array or sinlge mixin classes
-             */
-            // TODO this needs to be moved to Cell.Type
-            mixin: function(child, mixins) {
-    
-                child._mixin = function(mixin) {
-                    return mixin.prototype;
-                };
-    
-                mixins._.each(function(mixin) {
-                    // copy static fucntions
-                    _.extend(child, mixin);
-                    // copy prototype functions
-                    _.extend(child.prototype, mixin.prototype);
-                });
             },
             /**
              * returns a negated form of a function

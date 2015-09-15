@@ -144,6 +144,7 @@ construct('obj', {native:Object}, {
          * @param  {Object=} descriptor_ - descriptor object
          * @return {Object}  this        - object for chaining
          */
+        // TODO make value optional
         define: function(prop, value, descriptor_)
         {
             descriptor_       = descriptor_ || {};
