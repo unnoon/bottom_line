@@ -744,6 +744,23 @@
              */
             names: function(obj) {
                 return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
+            },
+            /**
+             * Returns the correct owner/prototype of a property in a prototype chain
+             *
+             * @param {string} prop - property name
+             * @param {Object} obj  - start prototype
+             *
+             * @return {Object|undefined} - the owning prototype
+             */
+            owner: function(prop, obj)
+            {
+                var proto = obj;
+    
+                do
+                {
+                    if(proto.hasOwnProperty(prop)) {return proto}
+                } while(proto = proto._.proto())
             }
         },
         prototype: {
@@ -794,18 +811,24 @@
             },
             /**
              * Shortcut to Object.defineProperty. If no descriptor property is given enumerable, configurable & writable will all be false
+             *
              * @public
              * @method obj#define
+             *
              * @this   {Object}
+             *
              * @param  {string}  prop        - the property name
              * @param  {Object=} descriptor_ - descriptor object
+             *
              * @return {Object}  this        - object for chaining
              */
-            // TODO make value optional
-            define: function(prop, value, descriptor_)
+            define: function(prop, _value_, descriptor_)
             {
+                var descriptor = descriptor_ || _value_;
+                var value      = descriptor_ && _value_ || descriptor.value;
+    
                 descriptor_       = descriptor_ || {};
-                descriptor_.value = value;
+                descriptor_.value = _value_;
     
                 return Object.defineProperty(this, prop, descriptor_)
             },
