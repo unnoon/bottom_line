@@ -54,7 +54,7 @@ function extend(obj, _options_, module) {
 
             if(actionType !== 'new')
             {
-                action(actionType, descriptor, prop, descriptor.value);
+                action(actionType, prop, descriptor);
                 if(!descriptor[actionType]) {return} // continue
             }
 
@@ -69,15 +69,14 @@ function extend(obj, _options_, module) {
  * Performs action based on type, enabled & value.
  *
  * @param {string}  type='override'|'overwrite' - type the action is acting to
- * @param {Object}  options                     - the global options
+ * @param {Object}  descriptor                  - the property descriptor. this also contains the global options
  * @param {string}  prop                        - name of the property
- * @param {any}     value                       - value in the model
  */
-function action(type, options, prop, value) {
+function action(type, prop, descriptor) {
     var message;
-    var action  = options[type+'action'];
-    var ctx     = options[type+'ctx'];
-    var enabled = options[type];
+    var action  = descriptor[type+'action'];
+    var ctx     = descriptor[type+'ctx'];
+    var enabled = descriptor[type];
 
     if(!action) return; // no action required so return
 
@@ -85,7 +84,7 @@ function action(type, options, prop, value) {
         ? type +' on property: '+prop+'.'
         : 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
 
-    action.call(ctx, message, prop, value)
+    action.call(ctx, message, prop, descriptor)
 }
 /**
  * processes the options, setting defaults etc.

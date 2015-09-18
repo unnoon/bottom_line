@@ -160,21 +160,14 @@ construct('obj', {native:Object}, {
          *
          * @this   {Object}
          *
-         * @param  {string}  prop        - the property name
-         * @param  {any=}    _value_     - value
-         * @param  {Object=} descriptor_ - descriptor object
+         * @param  {string} prop       - the property name
+         * @param  {Object} descriptor - descriptor object
          *
-         * @return {Object}  this        - object for chaining
+         * @return {Object} this        - object for chaining
          */
-        define: function(prop, _value_, descriptor_)
+        define: function(prop, descriptor)
         {
-            var descriptor = descriptor_ || _value_;
-            var value      = descriptor_ && _value_ || descriptor.value;
-
-            descriptor_       = descriptor_ || {};
-            descriptor_.value = _value_;
-
-            return Object.defineProperty(this, prop, descriptor_)
+            return Object.defineProperty(this, prop, descriptor)
         },
         /**
          * Defines a constant: enumerable, configurable & writable will all be false

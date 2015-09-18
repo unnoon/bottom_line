@@ -182,7 +182,7 @@
     
                 if(actionType !== 'new')
                 {
-                    action(actionType, descriptor, prop, descriptor.value);
+                    action(actionType, prop, descriptor);
                     if(!descriptor[actionType]) {return} // continue
                 }
     
@@ -197,15 +197,14 @@
      * Performs action based on type, enabled & value.
      *
      * @param {string}  type='override'|'overwrite' - type the action is acting to
-     * @param {Object}  options                     - the global options
+     * @param {Object}  descriptor                  - the property descriptor. this also contains the global options
      * @param {string}  prop                        - name of the property
-     * @param {any}     value                       - value in the model
      */
-    function action(type, options, prop, value) {
+    function action(type, prop, descriptor) {
         var message;
-        var action  = options[type+'action'];
-        var ctx     = options[type+'ctx'];
-        var enabled = options[type];
+        var action  = descriptor[type+'action'];
+        var ctx     = descriptor[type+'ctx'];
+        var enabled = descriptor[type];
     
         if(!action) return; // no action required so return
     
@@ -213,7 +212,7 @@
             ? type +' on property: '+prop+'.'
             : 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
     
-        action.call(ctx, message, prop, value)
+        action.call(ctx, message, prop, descriptor)
     }
     /**
      * processes the options, setting defaults etc.
@@ -817,20 +816,14 @@
              *
              * @this   {Object}
              *
-             * @param  {string}  prop        - the property name
-             * @param  {Object=} descriptor_ - descriptor object
+             * @param  {string} prop       - the property name
+             * @param  {Object} descriptor - descriptor object
              *
-             * @return {Object}  this        - object for chaining
+             * @return {Object} this        - object for chaining
              */
-            define: function(prop, _value_, descriptor_)
+            define: function(prop, descriptor)
             {
-                var descriptor = descriptor_ || _value_;
-                var value      = descriptor_ && _value_ || descriptor.value;
-    
-                descriptor_       = descriptor_ || {};
-                descriptor_.value = _value_;
-    
-                return Object.defineProperty(this, prop, descriptor_)
+                return Object.defineProperty(this, prop, descriptor)
             },
             /**
              * Defines a constant: enumerable, configurable & writable will all be false
