@@ -5,10 +5,13 @@ construct('obj', {native:Object}, {
     static: {
         /**
          * Clones an object
+         *
          * @public
          * @static
          * @method obj.clone
+         *
          * @param   {Object}  obj   - object to be cloned
+         *
          * @return  {Object}  clone - the cloned object
          */
         // TODO These should be expanded with frozen, extensible states etc
@@ -27,10 +30,13 @@ construct('obj', {native:Object}, {
         },
         /**
          * Clones an object
+         *
          * @public
          * @static
          * @method obj.cloneDeep
+         *
          * @param   {Object}  obj   - object to be cloned
+         *
          * @return  {Object}  clone - the cloned object
          */
         // TODO adaptation for arrays in phantomJS
@@ -47,10 +53,13 @@ construct('obj', {native:Object}, {
         },
         /**
          * creates an object based on a prototype
-         * @static
+         *
          * @public
+         * @static
          * @method _.create
+         *
          * @param  {Object} proto - prototype to base the object on
+         *
          * @return {Object}       - new object based on prototype
          */
         create: function(proto) {
@@ -62,11 +71,14 @@ construct('obj', {native:Object}, {
         extend: extend,
         /**
          * Returns the type of an object. Better suited then the one from js itself
+         *
          * @public
          * @static
          * @method obj.typeof
+         *
          * @param   {Object} obj - object tot check the type from
-         * @returns {string} - type of the object
+         *
+         * @return {string} - type of the object
          */
         typeOf: function(obj) {
 
@@ -79,17 +91,24 @@ construct('obj', {native:Object}, {
         },
         /**
          * Static version of _.names returns an empty array in case of null or undefined
+         *
          * @public
          * @static
          * @method obj.names
-         * @param   {Object} obj - object tot check the type from
-         * @returns {string}     - type of the object
+         *
+         * @param  {Object} obj - object tot check the type from
+         *
+         * @return {string}     - type of the object
          */
         names: function(obj) {
             return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
         },
         /**
          * Returns the correct owner/prototype of a property in a prototype chain
+         *
+         * @public
+         * @static
+         * @method obj.owner
          *
          * @param {string} prop - property name
          * @param {Object} obj  - start prototype
@@ -109,10 +128,14 @@ construct('obj', {native:Object}, {
     prototype: {
         /**
          * Singular push function to solve problems with differences between objects & arrays
+         *
          * @private
          * @method obj#_add
+         *
          * @this    {Object}
+         *
          * @param  {...any}  val - value to push
+         *
          * @return  {Array} this - this for chaining
          */
         _add: function(val, key) {
@@ -122,9 +145,12 @@ construct('obj', {native:Object}, {
         },
         /**
          * Counts the number of occurrences of an element
+         *
          * @public
          * @method obj#count
+         *
          * @param   {any}   elm  - value to push
+         *
          * @return  {number} occurrences - occurrences of the elm int he object
          */
         count: function(elm) {
@@ -138,9 +164,12 @@ construct('obj', {native:Object}, {
         },
         /**
          * Counts the number of occurrences of an element. Based on the match function
+         *
          * @public
          * @method obj#countFn
+         *
          * @param   {Function}  matchFn     - match function should return a boolean or 0 1
+         *
          * @return  {number}    occurrences - occurrences of the elm int he object
          */
         countFn: function(matchFn) {
@@ -171,11 +200,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Defines a constant: enumerable, configurable & writable will all be false
+         *
          * @public
          * @method obj#constant
+         *
          * @this   {Object}
+         *
          * @param  {string} prop  - the constant name
          * @param  {Object} value - the value of the constant.
+         *
          * @return {Object} this  - object for chaining
          */
         constant: function(prop, value)
@@ -184,10 +217,14 @@ construct('obj', {native:Object}, {
         },
         /**
          * Remove elements based on index
+         *
          * @public
          * @method obj#del
+         *
          * @this       {Object}
+         *
          * @param  {...number} ___keys - indices SORTED
+         *
          * @return     {Array}   this - mutated array for chaining
          */
         del: function(___keys)
@@ -200,11 +237,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Remove elements based on index
+         *
          * @public
          * @method obj#delFn
+         *
          * @this   {Array}
+         *
          * @param  {function(index, arr, delta)} match - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match function
+         *
          * @return {Array}                       this   - mutated array for chaining
          */
         delFn: function(match, ctx_)
@@ -217,10 +258,14 @@ construct('obj', {native:Object}, {
         },
         /**
          * Creates a new array without the specified indices
+         *
          * @public
          * @method obj#Del
+         *
          * @this       {Array}
+         *
          * @param  {...number} ___keys - keys
+         *
          * @return     {Array}    this - new array without the specified indices
          */
         Del: function(___keys)
@@ -236,11 +281,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Creates a new array without the specified indices
+         *
          * @public
          * @method obj#DelFn
+         *
          * @this   {Array}
+         *
          * @param  {function(index, arr, delta)} match - function specifying the indices to delete
          * @param  {Object=}                     ctx_   - optional context for the match function
+         *
          * @return {Array}                       this   - new array without the specified indices
          */
         DelFn: function(match, ctx_)
@@ -254,24 +303,32 @@ construct('obj', {native:Object}, {
             return output;
         },
         /**
-         * Copies keys to an array
+         * Gets the descriptor of a property. Will search through the prototype chain
+         *
          * @public
-         * @method obj#define
+         * @method obj#descriptor
+         *
          * @this   {Object}
+         *
          * @param  {string}       prop - the property name
+         *
          * @return {Object} descriptor - descriptor object
          */
         descriptor: function(prop)
         {
-            return Object.getOwnPropertyDescriptor(this, prop)
+            return Object.getOwnPropertyDescriptor(_.owner(prop, this), prop)
         },
         /**
          * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
          * @public
          * @method obj#each
+         *
          * @this  {Object}
+         *
          * @param {Function} cb   - callback function to be called for each element
          * @param {Object=}  ctx_ - optional context
+         *
          * @return {any|boolean}  - output from the callback function
          */
         each: function(cb, ctx_) {
@@ -286,11 +343,34 @@ construct('obj', {native:Object}, {
             return output;
         },
         /**
+         * Object descriptor iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#eachDsc
+         *
+         * @this  {Object}
+         *
+         * @param {Function} cb   - callback function to be called for each element
+         * @param {Object=}  ctx_ - optional context
+         *
+         * @return {any|boolean}  - output from the callback function
+         */
+        eachDsc: function(cb, ctx_) {
+            var output;
+
+            for (var key in this) {
+                if (!this.hasOwnProperty(key)) continue;
+                if ((output = cb.call(ctx_, this._.descriptor(key), key, this)) === false) break;
+            }
+
+            return output;
+        },
+        /**
          * Object iterator without hasOWnProperty check.
          * If the value false is returned, iteration is canceled. This can be used to stop iteration
          *
          * @public
-         * @method obj#each
+         * @method obj#each$
          * @this  {Object}
          *
          * @param {Function} cb   - callback function to be called for each element
@@ -309,13 +389,39 @@ construct('obj', {native:Object}, {
             return output;
         },
         /**
+         * Object descriptor iterator without hasOWnProperty check.
+         * If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#eachDsc$
+         * @this  {Object}
+         *
+         * @param {Function} cb   - callback function to be called for each element
+         * @param {Object=}  ctx_ - optional context
+         *
+         * @return {any|boolean}  - output from the callback function
+         */
+        eachDsc$: function(cb, ctx_) {
+            var output;
+
+            for (var key in this) {
+                if ((output = cb.call(ctx_, this._.descriptor(key), key, this)) === false) break;
+            }
+
+            return output;
+        },
+        /**
          * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
          * @public
          * @method obj#eachRight
+         *
          * @this  {Object}
+         *
          * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
          * @param {function} cb    - callback function to be called for each element
          * @param {Object=}  ctx_  - optional context for the callback function
+         *
          * @return {any|boolean}   - output from the callback function
          */
         eachRight: function(step_, cb, ctx_) {
@@ -326,11 +432,31 @@ construct('obj', {native:Object}, {
             }, this);
         },
         /**
+         * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#eachDscRight
+         *
+         * @this  {Object}
+         *
+         * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+         * @param {function} cb    - callback function to be called for each element
+         * @param {Object=}  ctx_  - optional context for the callback function
+         *
+         * @return {any|boolean}   - output from the callback function
+         */
+        eachDscRight: function(step_, cb, ctx_) {
+            return this._.keys()._.eachRight(function(key) {
+                return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
+            }, this);
+        },
+        /**
          * Inverse iterator without hasOwnProperty check.
          * If the value false is returned, iteration is canceled. This can be used to stop iteration
          *
          * @public
-         * @method obj#eachRight
+         * @method obj#each$Right
+         *
          * @this  {Object}
          *
          * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
@@ -347,12 +473,36 @@ construct('obj', {native:Object}, {
             }, this);
         },
         /**
+         * Inverse iterator without hasOwnProperty check.
+         * If the value false is returned, iteration is canceled. This can be used to stop iteration
+         *
+         * @public
+         * @method obj#eachDsc$Right
+         *
+         * @this  {Object}
+         *
+         * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+         * @param {function} cb    - callback function to be called for each element
+         * @param {Object=}  ctx_  - optional context for the callback function
+         *
+         * @return {any|boolean}   - output from the callback function
+         */
+        eachDsc$Right: function(step_, cb, ctx_) {
+            return this._.names()._.eachRight(function(key) {
+                return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
+            }, this);
+        },
+        /**
          * Filters
+         *
          * @public
          * @method obj#filter
+         *
          * @this   {Object}
+         *
          * @param  {Function} cb      - callback function to be called for each element
          * @param  {Object=}  opt_ctx - optional context
+         *
          * @return {Array} array containing the filtered values
          */
         filter: function(cb, opt_ctx) {
@@ -366,9 +516,13 @@ construct('obj', {native:Object}, {
         },
         /**
          * Finds first element that is picked by the callback function
-         * @private
+         *
+         * @public
+         * @method obj#find
+         *
          * @param  {Function} cb   - callback function to be called for each element
          * @param  {Object=}  ctx_ - optional context
+         *
          * @return {any} first value that is found
          */
         find: function(cb, ctx_) {
@@ -382,9 +536,13 @@ construct('obj', {native:Object}, {
         },
         /**
          * Finds first element that is picked by the callback function. Starting from the rioght
-         * @private
+         *
+         * @public
+         * @method obj#findRight
+         *
          * @param  {Function} cb   - callback function to be called for each element
          * @param  {Object=}  ctx_ - optional context
+         *
          * @return {any} first value that is found
          */
         findRight: function(cb, ctx_) {
@@ -396,6 +554,16 @@ construct('obj', {native:Object}, {
 
             return found;
         },
+        /**
+         * Checks if a value is contained ia a object
+         *
+         * @public
+         * @method obj#has
+         *
+         * @param {any} value - value to search for
+         *
+         * return {boolean} - boolean indicating if the object has the value
+         */
         has: {aliases: ['contains'], value: function(value) {
             var has = false;
 
@@ -405,6 +573,17 @@ construct('obj', {native:Object}, {
 
             return has;
         }},
+        /**
+         * Checks if a value is contained ia a object, matching the callback function
+         *
+         * @public
+         * @method obj#hasFn
+         *
+         * @param {Function} cb   - callback matching a value
+         * @param {Object=}  ctx_ - optional context for the callback function
+         *
+         * return {boolean} - boolean indicating if the object has the value
+         */
         hasFn: {aliases: ['containsFn'], value: function(cb, ctx_) {
             return !!this._.find(cb, ctx_);
         }},
@@ -428,9 +607,12 @@ construct('obj', {native:Object}, {
         }},
         /**
          * Returns an array containing the keys of an object (enumerable properties))
+         *
          * @public
          * @method obj#keys
+         *
          * @this   {Object}
+         *
          * @return {Array} keys of the object
          */
         keys: function() {
@@ -438,10 +620,14 @@ construct('obj', {native:Object}, {
         },
         /**
          * Removes 1st values from an object|array
+         *
          * @public
          * @method obj#remove
+         *
          * @this   {Object|Array}
+         *
          * @param  {...any}       ___values - values to remove
+         *
          * @return {Object|Array} this      - mutated array for chaining
          */
         remove: function(___values) {
@@ -458,11 +644,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Removes 1st value from an object|array based on a match function
+         *
          * @public
          * @method obj#removeFn
+         *
          * @this   {Array}
+         *
          * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
          * @param  {Object=}                          ctx_   - optional context for the match function
+         *
          * @return {Array}                            this   - mutated array for chaining
          */
         removeFn: function(match, ctx_) {
@@ -476,8 +666,11 @@ construct('obj', {native:Object}, {
          * Creates new array without the specified 1st values
          * @public
          * @method obj#Remove
+         *
          * @this   {Object|Array}
+         *
          * @param  {...any} ___values - values to remove
+         *
          * @return {Array}  output    - new array without the values
          */
         Remove: function(___values) {
@@ -495,11 +688,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Creates a new object|array without 1st value based on a match function
+         *
          * @public
          * @method obj#RemoveFn
+         *
          * @this   {Array}
+         *
          * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
          * @param  {Object=}                          ctx_   - optional context for the match function
+         *
          * @return {Array}                            output - new array without the value specified
          */
         RemoveFn: function(match, ctx_) {
@@ -515,10 +712,14 @@ construct('obj', {native:Object}, {
         },
         /**
          * Removes all specified values from an array
+         *
          * @public
          * @method obj#remove$
+         *
          * @this       {Array}
+         *
          * @param     {...any} ___values - values to remove
+         *
          * @return     {Array}     this - mutated array for chaining
          */
         remove$: function(___values) {
@@ -532,11 +733,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Removes all values from an array based on a match function
+         *
          * @public
          * @method obj#remove$Fn
+         *
          * @this   {Array}
+         *
          * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match function
+         *
          * @return {Array}                             this  - mutated array for chaining
          */
         remove$Fn: function(match, ctx_) {
@@ -549,10 +754,14 @@ construct('obj', {native:Object}, {
 
         /**
          * Creates new array without all specified values
+         *
          * @public
          * @method obj#Remove$
+         *
          * @this       {Array}
+         *
          * @param     {...any} ___values - values to remove
+         *
          * @return     {Array}    output - new array without the values
          */
         Remove$: function(___values) {
@@ -567,11 +776,15 @@ construct('obj', {native:Object}, {
         },
         /**
          * Creates a new array without all value specified by the match function
+         *
          * @public
          * @method obj#Remove$Fn
+         *
          * @this   {Array}
+         *
          * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
          * @param  {Object=}                            ctx_ - optional context for the match function
+         *
          * @return {Array}                           output  - new array without the value specified
          */
         Remove$Fn: function(match, ctx_) {
@@ -620,9 +833,12 @@ construct('obj', {native:Object}, {
         }},
         /**
          * Returns the number of own properties on an object
+         *
          * @public
          * @method obj#size
+         *
          * @this   {Object}
+         *
          * @return {number} the 'length' of the object
          */
         size: {aliases: ['length'], value: function() {
@@ -636,8 +852,10 @@ construct('obj', {native:Object}, {
         }},
         /**
          * Returns an array containing the names of an object (includes non-enumerable properties)
+         *
          * @public
          * @method obj#names
+         *
          * @return {Array} keys of the object
          */
         names: {aliases: ['keys$'], value:function() {
@@ -647,14 +865,18 @@ construct('obj', {native:Object}, {
          * Shortcut for hasOwnProperty
          * @public
          * @method obj#owns
+         *
          * @return {boolean} boolean indicating ownership
          */
         owns: Object.prototype.hasOwnProperty,
         /**
          * Returns an array containing the keys & values of an object (enumerable properties)
+         *
          * @public
          * @method obj#pairs
+         *
          * @this   {Object}
+         *
          * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
          */
         pairs: function() {
@@ -674,6 +896,7 @@ construct('obj', {native:Object}, {
          * @method obj#proto
          *
          * @param   {Array}        proto - the prototype to be set
+         *
          * @returns {Array|Object} this  - the prototype of the object or the object itself for chaining
          */
         proto: function(proto) {
@@ -685,9 +908,12 @@ construct('obj', {native:Object}, {
         },
         /**
          * Better to string version
+         *
          * @public
          * @method obj#toString
+         *
          * @this    {Object}
+         *
          * @returns {string} - string representation of the object
          */
         toString: {overrideaction: null, value: function(visited_)
@@ -715,8 +941,11 @@ construct('obj', {native:Object}, {
         /**
          * Returns an array containing the values of an object (enumerable properties)
          * @public
+         *
          * @method obj#values
+         *
          * @this   {Object}
+         *
          * @return {Array} values of the object
          */
         values: function() {

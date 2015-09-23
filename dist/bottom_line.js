@@ -151,7 +151,8 @@
      *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
      *     @param   {Object=}   _options_.overridectx=console  - context for the override action
      *
-     *     @param   {function=} _options_.modifier        - modifier function to apply on all functions.
+     *     @param   {function=} _options_.modifier            - modifier function to apply on all functions.
+     *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
      *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      *
@@ -159,6 +160,7 @@
      */
     // TODO document attributes
     // TODO add deep extend
+    // TODO to be able to add custom attributes and their functions i.e. inject
     function extend(obj, _options_, module) {
         var options = module && _options_ || {};
         var module  = module || _options_;
@@ -166,9 +168,9 @@
         processOptions(options);
     
         for(var prop in module)
-        {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
+        {   if((options.hasOwnPropertyCheck && !module.hasOwnProperty(prop)) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
     
-            var descriptor = Object.getOwnPropertyDescriptor(module, prop);
+            var descriptor = getDescriptor(module, prop);
     
             copyPropertyConfigs(options, descriptor);
     
@@ -220,12 +222,17 @@
      * @param options
      */
     function processOptions(options) {
-        options.override        = options.override        !== false; // default is true
-        options.overwrite       = options.overwrite       !== false; // default is true
-        options.overwriteaction = options.overwriteaction || console.warn;
-        options.overrideaction  = options.overrideaction  || console.warn;
-        options.overwritectx    = options.overwritectx    || console;
-        options.overridectx     = options.overridectx     || console;
+        options.override            = options.override            !== false; // default is true
+        options.overwrite           = options.overwrite           !== false; // default is true
+        options.hasOwnPropertyCheck = options.hasOwnPropertyCheck !== false; // default is true
+        options.overwriteaction     = options.hasOwnProperty('overwriteaction')
+            ? options.overwriteaction
+            : console.warn;
+        options.overrideaction      = options.hasOwnProperty('overrideaction')
+            ? options.overrideaction
+            : console.warn;
+        options.overwritectx        = options.overwritectx    || console;
+        options.overridectx         = options.overridectx     || console;
     
         if(options.shim) {
             options.overwrite       = false;
@@ -264,6 +271,7 @@
      * @param {Object} descriptor - the property descriptor
      */
     function finalizeDescriptor(descriptor) {
+        if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
         if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
         if(descriptor.modifier
         && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
@@ -314,6 +322,24 @@
     
         names.unshift(prop);
         return names
+    }
+    /**
+     * Gets the descriptor of a property in prototype chain
+     *
+     * @param {Object} obj  - the object in the prototype chain
+     * @param {string} prop - the name of the property
+     *
+     * @returns {Object} - the property descriptor
+     */
+    function getDescriptor(obj, prop) {
+        var proto = obj;
+    
+        do
+        {
+            if (proto.hasOwnProperty(prop)) {break}
+        } while (proto = Object.getPrototypeOf(proto));
+    
+        return Object.getOwnPropertyDescriptor(proto, prop)
     }
     extend(Function.prototype, {shim: true}, {
         /**
@@ -661,10 +687,13 @@
         static: {
             /**
              * Clones an object
+             *
              * @public
              * @static
              * @method obj.clone
+             *
              * @param   {Object}  obj   - object to be cloned
+             *
              * @return  {Object}  clone - the cloned object
              */
             // TODO These should be expanded with frozen, extensible states etc
@@ -683,10 +712,13 @@
             },
             /**
              * Clones an object
+             *
              * @public
              * @static
              * @method obj.cloneDeep
+             *
              * @param   {Object}  obj   - object to be cloned
+             *
              * @return  {Object}  clone - the cloned object
              */
             // TODO adaptation for arrays in phantomJS
@@ -703,10 +735,13 @@
             },
             /**
              * creates an object based on a prototype
-             * @static
+             *
              * @public
+             * @static
              * @method _.create
+             *
              * @param  {Object} proto - prototype to base the object on
+             *
              * @return {Object}       - new object based on prototype
              */
             create: function(proto) {
@@ -718,11 +753,14 @@
             extend: extend,
             /**
              * Returns the type of an object. Better suited then the one from js itself
+             *
              * @public
              * @static
              * @method obj.typeof
+             *
              * @param   {Object} obj - object tot check the type from
-             * @returns {string} - type of the object
+             *
+             * @return {string} - type of the object
              */
             typeOf: function(obj) {
     
@@ -735,17 +773,24 @@
             },
             /**
              * Static version of _.names returns an empty array in case of null or undefined
+             *
              * @public
              * @static
              * @method obj.names
-             * @param   {Object} obj - object tot check the type from
-             * @returns {string}     - type of the object
+             *
+             * @param  {Object} obj - object tot check the type from
+             *
+             * @return {string}     - type of the object
              */
             names: function(obj) {
                 return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
             },
             /**
              * Returns the correct owner/prototype of a property in a prototype chain
+             *
+             * @public
+             * @static
+             * @method obj.owner
              *
              * @param {string} prop - property name
              * @param {Object} obj  - start prototype
@@ -765,10 +810,14 @@
         prototype: {
             /**
              * Singular push function to solve problems with differences between objects & arrays
+             *
              * @private
              * @method obj#_add
+             *
              * @this    {Object}
+             *
              * @param  {...any}  val - value to push
+             *
              * @return  {Array} this - this for chaining
              */
             _add: function(val, key) {
@@ -778,9 +827,12 @@
             },
             /**
              * Counts the number of occurrences of an element
+             *
              * @public
              * @method obj#count
+             *
              * @param   {any}   elm  - value to push
+             *
              * @return  {number} occurrences - occurrences of the elm int he object
              */
             count: function(elm) {
@@ -794,9 +846,12 @@
             },
             /**
              * Counts the number of occurrences of an element. Based on the match function
+             *
              * @public
              * @method obj#countFn
+             *
              * @param   {Function}  matchFn     - match function should return a boolean or 0 1
+             *
              * @return  {number}    occurrences - occurrences of the elm int he object
              */
             countFn: function(matchFn) {
@@ -827,11 +882,15 @@
             },
             /**
              * Defines a constant: enumerable, configurable & writable will all be false
+             *
              * @public
              * @method obj#constant
+             *
              * @this   {Object}
+             *
              * @param  {string} prop  - the constant name
              * @param  {Object} value - the value of the constant.
+             *
              * @return {Object} this  - object for chaining
              */
             constant: function(prop, value)
@@ -840,10 +899,14 @@
             },
             /**
              * Remove elements based on index
+             *
              * @public
              * @method obj#del
+             *
              * @this       {Object}
+             *
              * @param  {...number} ___keys - indices SORTED
+             *
              * @return     {Array}   this - mutated array for chaining
              */
             del: function(___keys)
@@ -856,11 +919,15 @@
             },
             /**
              * Remove elements based on index
+             *
              * @public
              * @method obj#delFn
+             *
              * @this   {Array}
+             *
              * @param  {function(index, arr, delta)} match - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match function
+             *
              * @return {Array}                       this   - mutated array for chaining
              */
             delFn: function(match, ctx_)
@@ -873,10 +940,14 @@
             },
             /**
              * Creates a new array without the specified indices
+             *
              * @public
              * @method obj#Del
+             *
              * @this       {Array}
+             *
              * @param  {...number} ___keys - keys
+             *
              * @return     {Array}    this - new array without the specified indices
              */
             Del: function(___keys)
@@ -892,11 +963,15 @@
             },
             /**
              * Creates a new array without the specified indices
+             *
              * @public
              * @method obj#DelFn
+             *
              * @this   {Array}
+             *
              * @param  {function(index, arr, delta)} match - function specifying the indices to delete
              * @param  {Object=}                     ctx_   - optional context for the match function
+             *
              * @return {Array}                       this   - new array without the specified indices
              */
             DelFn: function(match, ctx_)
@@ -910,24 +985,32 @@
                 return output;
             },
             /**
-             * Copies keys to an array
+             * Gets the descriptor of a property. Will search through the prototype chain
+             *
              * @public
-             * @method obj#define
+             * @method obj#descriptor
+             *
              * @this   {Object}
+             *
              * @param  {string}       prop - the property name
+             *
              * @return {Object} descriptor - descriptor object
              */
             descriptor: function(prop)
             {
-                return Object.getOwnPropertyDescriptor(this, prop)
+                return Object.getOwnPropertyDescriptor(_.owner(prop, this), prop)
             },
             /**
              * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
              * @public
              * @method obj#each
+             *
              * @this  {Object}
+             *
              * @param {Function} cb   - callback function to be called for each element
              * @param {Object=}  ctx_ - optional context
+             *
              * @return {any|boolean}  - output from the callback function
              */
             each: function(cb, ctx_) {
@@ -942,11 +1025,34 @@
                 return output;
             },
             /**
+             * Object descriptor iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#eachDsc
+             *
+             * @this  {Object}
+             *
+             * @param {Function} cb   - callback function to be called for each element
+             * @param {Object=}  ctx_ - optional context
+             *
+             * @return {any|boolean}  - output from the callback function
+             */
+            eachDsc: function(cb, ctx_) {
+                var output;
+    
+                for (var key in this) {
+                    if (!this.hasOwnProperty(key)) continue;
+                    if ((output = cb.call(ctx_, this._.descriptor(key), key, this)) === false) break;
+                }
+    
+                return output;
+            },
+            /**
              * Object iterator without hasOWnProperty check.
              * If the value false is returned, iteration is canceled. This can be used to stop iteration
              *
              * @public
-             * @method obj#each
+             * @method obj#each$
              * @this  {Object}
              *
              * @param {Function} cb   - callback function to be called for each element
@@ -965,13 +1071,39 @@
                 return output;
             },
             /**
+             * Object descriptor iterator without hasOWnProperty check.
+             * If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#eachDsc$
+             * @this  {Object}
+             *
+             * @param {Function} cb   - callback function to be called for each element
+             * @param {Object=}  ctx_ - optional context
+             *
+             * @return {any|boolean}  - output from the callback function
+             */
+            eachDsc$: function(cb, ctx_) {
+                var output;
+    
+                for (var key in this) {
+                    if ((output = cb.call(ctx_, this._.descriptor(key), key, this)) === false) break;
+                }
+    
+                return output;
+            },
+            /**
              * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
              * @public
              * @method obj#eachRight
+             *
              * @this  {Object}
+             *
              * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
              * @param {function} cb    - callback function to be called for each element
              * @param {Object=}  ctx_  - optional context for the callback function
+             *
              * @return {any|boolean}   - output from the callback function
              */
             eachRight: function(step_, cb, ctx_) {
@@ -982,11 +1114,31 @@
                 }, this);
             },
             /**
+             * Inverse iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#eachDscRight
+             *
+             * @this  {Object}
+             *
+             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+             * @param {function} cb    - callback function to be called for each element
+             * @param {Object=}  ctx_  - optional context for the callback function
+             *
+             * @return {any|boolean}   - output from the callback function
+             */
+            eachDscRight: function(step_, cb, ctx_) {
+                return this._.keys()._.eachRight(function(key) {
+                    return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
+                }, this);
+            },
+            /**
              * Inverse iterator without hasOwnProperty check.
              * If the value false is returned, iteration is canceled. This can be used to stop iteration
              *
              * @public
-             * @method obj#eachRight
+             * @method obj#each$Right
+             *
              * @this  {Object}
              *
              * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
@@ -1003,12 +1155,36 @@
                 }, this);
             },
             /**
+             * Inverse iterator without hasOwnProperty check.
+             * If the value false is returned, iteration is canceled. This can be used to stop iteration
+             *
+             * @public
+             * @method obj#eachDsc$Right
+             *
+             * @this  {Object}
+             *
+             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
+             * @param {function} cb    - callback function to be called for each element
+             * @param {Object=}  ctx_  - optional context for the callback function
+             *
+             * @return {any|boolean}   - output from the callback function
+             */
+            eachDsc$Right: function(step_, cb, ctx_) {
+                return this._.names()._.eachRight(function(key) {
+                    return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
+                }, this);
+            },
+            /**
              * Filters
+             *
              * @public
              * @method obj#filter
+             *
              * @this   {Object}
+             *
              * @param  {Function} cb      - callback function to be called for each element
              * @param  {Object=}  opt_ctx - optional context
+             *
              * @return {Array} array containing the filtered values
              */
             filter: function(cb, opt_ctx) {
@@ -1022,9 +1198,13 @@
             },
             /**
              * Finds first element that is picked by the callback function
-             * @private
+             *
+             * @public
+             * @method obj#find
+             *
              * @param  {Function} cb   - callback function to be called for each element
              * @param  {Object=}  ctx_ - optional context
+             *
              * @return {any} first value that is found
              */
             find: function(cb, ctx_) {
@@ -1038,9 +1218,13 @@
             },
             /**
              * Finds first element that is picked by the callback function. Starting from the rioght
-             * @private
+             *
+             * @public
+             * @method obj#findRight
+             *
              * @param  {Function} cb   - callback function to be called for each element
              * @param  {Object=}  ctx_ - optional context
+             *
              * @return {any} first value that is found
              */
             findRight: function(cb, ctx_) {
@@ -1052,6 +1236,16 @@
     
                 return found;
             },
+            /**
+             * Checks if a value is contained ia a object
+             *
+             * @public
+             * @method obj#has
+             *
+             * @param {any} value - value to search for
+             *
+             * return {boolean} - boolean indicating if the object has the value
+             */
             has: {aliases: ['contains'], value: function(value) {
                 var has = false;
     
@@ -1061,6 +1255,17 @@
     
                 return has;
             }},
+            /**
+             * Checks if a value is contained ia a object, matching the callback function
+             *
+             * @public
+             * @method obj#hasFn
+             *
+             * @param {Function} cb   - callback matching a value
+             * @param {Object=}  ctx_ - optional context for the callback function
+             *
+             * return {boolean} - boolean indicating if the object has the value
+             */
             hasFn: {aliases: ['containsFn'], value: function(cb, ctx_) {
                 return !!this._.find(cb, ctx_);
             }},
@@ -1084,9 +1289,12 @@
             }},
             /**
              * Returns an array containing the keys of an object (enumerable properties))
+             *
              * @public
              * @method obj#keys
+             *
              * @this   {Object}
+             *
              * @return {Array} keys of the object
              */
             keys: function() {
@@ -1094,10 +1302,14 @@
             },
             /**
              * Removes 1st values from an object|array
+             *
              * @public
              * @method obj#remove
+             *
              * @this   {Object|Array}
+             *
              * @param  {...any}       ___values - values to remove
+             *
              * @return {Object|Array} this      - mutated array for chaining
              */
             remove: function(___values) {
@@ -1114,11 +1326,15 @@
             },
             /**
              * Removes 1st value from an object|array based on a match function
+             *
              * @public
              * @method obj#removeFn
+             *
              * @this   {Array}
+             *
              * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
              * @param  {Object=}                          ctx_   - optional context for the match function
+             *
              * @return {Array}                            this   - mutated array for chaining
              */
             removeFn: function(match, ctx_) {
@@ -1132,8 +1348,11 @@
              * Creates new array without the specified 1st values
              * @public
              * @method obj#Remove
+             *
              * @this   {Object|Array}
+             *
              * @param  {...any} ___values - values to remove
+             *
              * @return {Array}  output    - new array without the values
              */
             Remove: function(___values) {
@@ -1151,11 +1370,15 @@
             },
             /**
              * Creates a new object|array without 1st value based on a match function
+             *
              * @public
              * @method obj#RemoveFn
+             *
              * @this   {Array}
+             *
              * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
              * @param  {Object=}                          ctx_   - optional context for the match function
+             *
              * @return {Array}                            output - new array without the value specified
              */
             RemoveFn: function(match, ctx_) {
@@ -1171,10 +1394,14 @@
             },
             /**
              * Removes all specified values from an array
+             *
              * @public
              * @method obj#remove$
+             *
              * @this       {Array}
+             *
              * @param     {...any} ___values - values to remove
+             *
              * @return     {Array}     this - mutated array for chaining
              */
             remove$: function(___values) {
@@ -1188,11 +1415,15 @@
             },
             /**
              * Removes all values from an array based on a match function
+             *
              * @public
              * @method obj#remove$Fn
+             *
              * @this   {Array}
+             *
              * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match function
+             *
              * @return {Array}                             this  - mutated array for chaining
              */
             remove$Fn: function(match, ctx_) {
@@ -1205,10 +1436,14 @@
     
             /**
              * Creates new array without all specified values
+             *
              * @public
              * @method obj#Remove$
+             *
              * @this       {Array}
+             *
              * @param     {...any} ___values - values to remove
+             *
              * @return     {Array}    output - new array without the values
              */
             Remove$: function(___values) {
@@ -1223,11 +1458,15 @@
             },
             /**
              * Creates a new array without all value specified by the match function
+             *
              * @public
              * @method obj#Remove$Fn
+             *
              * @this   {Array}
+             *
              * @param  {function(val, index, arr, delta)} match - function specifying the value to delete
              * @param  {Object=}                            ctx_ - optional context for the match function
+             *
              * @return {Array}                           output  - new array without the value specified
              */
             Remove$Fn: function(match, ctx_) {
@@ -1276,9 +1515,12 @@
             }},
             /**
              * Returns the number of own properties on an object
+             *
              * @public
              * @method obj#size
+             *
              * @this   {Object}
+             *
              * @return {number} the 'length' of the object
              */
             size: {aliases: ['length'], value: function() {
@@ -1292,8 +1534,10 @@
             }},
             /**
              * Returns an array containing the names of an object (includes non-enumerable properties)
+             *
              * @public
              * @method obj#names
+             *
              * @return {Array} keys of the object
              */
             names: {aliases: ['keys$'], value:function() {
@@ -1303,14 +1547,18 @@
              * Shortcut for hasOwnProperty
              * @public
              * @method obj#owns
+             *
              * @return {boolean} boolean indicating ownership
              */
             owns: Object.prototype.hasOwnProperty,
             /**
              * Returns an array containing the keys & values of an object (enumerable properties)
+             *
              * @public
              * @method obj#pairs
+             *
              * @this   {Object}
+             *
              * @return {Array} keys & values of the object in a singular array [key1, val1, key2, val2, ...]]
              */
             pairs: function() {
@@ -1330,6 +1578,7 @@
              * @method obj#proto
              *
              * @param   {Array}        proto - the prototype to be set
+             *
              * @returns {Array|Object} this  - the prototype of the object or the object itself for chaining
              */
             proto: function(proto) {
@@ -1341,9 +1590,12 @@
             },
             /**
              * Better to string version
+             *
              * @public
              * @method obj#toString
+             *
              * @this    {Object}
+             *
              * @returns {string} - string representation of the object
              */
             toString: {overrideaction: null, value: function(visited_)
@@ -1371,8 +1623,11 @@
             /**
              * Returns an array containing the values of an object (enumerable properties)
              * @public
+             *
              * @method obj#values
+             *
              * @this   {Object}
+             *
              * @return {Array} values of the object
              */
             values: function() {

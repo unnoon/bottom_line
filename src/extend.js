@@ -23,7 +23,8 @@
  *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
  *     @param   {Object=}   _options_.overridectx=console  - context for the override action
  *
- *     @param   {function=} _options_.modifier        - modifier function to apply on all functions.
+ *     @param   {function=} _options_.modifier            - modifier function to apply on all functions.
+ *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
  *
  * @param   {Object}  module       - object containing functions/properties to extend the object with
  *
@@ -39,9 +40,9 @@ function extend(obj, _options_, module) {
     processOptions(options);
 
     for(var prop in module)
-    {   if(!module.hasOwnProperty(prop) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
+    {   if((options.hasOwnPropertyCheck && !module.hasOwnProperty(prop)) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
 
-        var descriptor = Object.getOwnPropertyDescriptor(module, prop);
+        var descriptor = getDescriptor(module, prop);
 
         copyPropertyConfigs(options, descriptor);
 
@@ -93,12 +94,17 @@ function action(type, prop, descriptor) {
  * @param options
  */
 function processOptions(options) {
-    options.override        = options.override        !== false; // default is true
-    options.overwrite       = options.overwrite       !== false; // default is true
-    options.overwriteaction = options.overwriteaction || console.warn;
-    options.overrideaction  = options.overrideaction  || console.warn;
-    options.overwritectx    = options.overwritectx    || console;
-    options.overridectx     = options.overridectx     || console;
+    options.override            = options.override            !== false; // default is true
+    options.overwrite           = options.overwrite           !== false; // default is true
+    options.hasOwnPropertyCheck = options.hasOwnPropertyCheck !== false; // default is true
+    options.overwriteaction     = options.hasOwnProperty('overwriteaction')
+        ? options.overwriteaction
+        : console.warn;
+    options.overrideaction      = options.hasOwnProperty('overrideaction')
+        ? options.overrideaction
+        : console.warn;
+    options.overwritectx        = options.overwritectx    || console;
+    options.overridectx         = options.overridectx     || console;
 
     if(options.shim) {
         options.overwrite       = false;
@@ -137,6 +143,7 @@ function handleAttributes(descriptor) {
  * @param {Object} descriptor - the property descriptor
  */
 function finalizeDescriptor(descriptor) {
+    if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
     if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
     if(descriptor.modifier
     && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
@@ -187,4 +194,22 @@ function getNames(prop, descriptor) {
 
     names.unshift(prop);
     return names
+}
+/**
+ * Gets the descriptor of a property in prototype chain
+ *
+ * @param {Object} obj  - the object in the prototype chain
+ * @param {string} prop - the name of the property
+ *
+ * @returns {Object} - the property descriptor
+ */
+function getDescriptor(obj, prop) {
+    var proto = obj;
+
+    do
+    {
+        if (proto.hasOwnProperty(prop)) {break}
+    } while (proto = Object.getPrototypeOf(proto));
+
+    return Object.getOwnPropertyDescriptor(proto, prop)
 }
