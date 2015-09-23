@@ -31,6 +31,7 @@
  */
 // TODO document attributes
 // TODO add deep extend
+// TODO to be able to add custom attributes and their functions i.e. inject
 function extend(obj, _options_, module) {
     var options = module && _options_ || {};
     var module  = module || _options_;
