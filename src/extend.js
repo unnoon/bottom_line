@@ -13,18 +13,24 @@
  *
  *     @param   {boolean=}  _options_.override=true   - boolean indicating if properties should be overridden
  *     @param   {boolean=}  _options_.overwrite=true  - boolean indicating if properties should be overwritten
- *     @param   {boolean=}  _options_.shim            - inverse of overwrite
+ *     @param   {boolean=}  _options_.new=true        - boolean indicating if new properties should be added
+ *     @param   {boolean=}  _options_.shim            - overwrites and their actions are false
  *
  *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
  *
  *     @param   {Function=} _options_.overwriteaction=console.warn - function containing the overwrite action
  *     @param   {Function=} _options_.overrideaction=console.warn  - function containing the override action
-
+ *     @param   {Function=} _options_.newaction=null               - function containing the new action
+ *     @param   {Function=} _options_.action                       - default action to apply
+ *
  *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
  *     @param   {Object=}   _options_.overridectx=console  - context for the override action
+ *     @param   {Object=}   _options_.newctx               - context for the new action
+ *     @param   {Object=}   _options_.ctx                  - context for the default action
  *
  *     @param   {function=} _options_.modifier            - modifier function to apply on all functions.
  *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
+ *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
  *
  * @param   {Object}  module       - object containing functions/properties to extend the object with
  *
@@ -54,11 +60,10 @@ function extend(obj, _options_, module) {
                              prop in obj              ? 'override'  :
                                                         'new';
 
-            if(actionType !== 'new')
-            {
-                action(actionType, prop, descriptor);
-                if(!descriptor[actionType]) {return} // continue
-            }
+            action(actionType, prop, descriptor);
+            action('', prop, descriptor); // default action
+
+            if(!descriptor[actionType]) {return} // continue
 
             Object.defineProperty(obj, prop, descriptor)
         });
@@ -94,8 +99,13 @@ function action(type, prop, descriptor) {
  * @param options
  */
 function processOptions(options) {
-    options.override            = options.override            !== false; // default is true
-    options.overwrite           = options.overwrite           !== false; // default is true
+    options.new                 = options.new !== false; // default is true
+    options.override            = options.safe
+        ? false
+        : options.override            !== false; // default is true
+    options.overwrite           = options.safe
+        ? false
+        : options.overwrite           !== false; // default is true
     options.hasOwnPropertyCheck = options.hasOwnPropertyCheck !== false; // default is true
     options.overwriteaction     = options.hasOwnProperty('overwriteaction')
         ? options.overwriteaction
@@ -108,7 +118,7 @@ function processOptions(options) {
 
     if(options.shim) {
         options.overwrite       = false;
-        options.overwriteaction = undefined;
+        options.overwriteaction = null;
     }
 
     if(typeof(options.exclude) === 'string')
