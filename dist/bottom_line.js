@@ -95,22 +95,22 @@
         if(!module) return;
 
         extend(wrapper,     {enumerable: false}, module);
-        extend(wrapper.not, {enumerable: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(wrapper.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
 
         if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
         extend(_,     {enumerable: false, overwrite: false}, module);
-        extend(_.not, {enumerable: false, overwrite: false, modifier: function(fn) { return function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(_.not, {enumerable: false, overwrite: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
     }
 
     function wrapPrototype(wrapper, module)
     {
         if(!module) return;
 
-        extend(wrapper._methods,     {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._methods.not, {enumerable: false, modifier: function(fn) { return function () {return  !fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._chains,      {enumerable: false, modifier: function(fn) { return function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
-        extend(wrapper._chains.not,  {enumerable: false, modifier: function(fn) { return function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
+        extend(wrapper._methods,     {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._methods.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return  !fn.apply(stack[--index], arguments)}}},          module);
+        extend(wrapper._chains,      {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
+        extend(wrapper._chains.not,  {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
 
         extend(wrapper.methods, {enumerable: false}, module);
     }
@@ -142,7 +142,9 @@
      *     @param   {boolean=}  _options_.override=true   - boolean indicating if properties should be overridden
      *     @param   {boolean=}  _options_.overwrite=true  - boolean indicating if properties should be overwritten
      *     @param   {boolean=}  _options_.new=true        - boolean indicating if new properties should be added
-     *     @param   {boolean=}  _options_.shim            - inverse of overwrite
+     *     @param   {boolean=}  _options_.shim            - overwrites and their actions are false
+     *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
+     *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
      *
      *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
      *
@@ -155,10 +157,6 @@
      *     @param   {Object=}   _options_.overridectx=console  - context for the override action
      *     @param   {Object=}   _options_.newctx               - context for the new action
      *     @param   {Object=}   _options_.ctx                  - context for the default action
-     *
-     *     @param   {function=} _options_.modifier            - modifier function to apply on all functions.
-     *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
-     *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
      *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      *
@@ -283,8 +281,6 @@
     function finalizeDescriptor(descriptor) {
         if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
         if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
-        if(descriptor.modifier
-        && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
     
         // getters & setters don't have a writable option
         if(descriptor.get || descriptor.set) {delete descriptor.writable}

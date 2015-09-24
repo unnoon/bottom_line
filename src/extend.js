@@ -15,6 +15,8 @@
  *     @param   {boolean=}  _options_.overwrite=true  - boolean indicating if properties should be overwritten
  *     @param   {boolean=}  _options_.new=true        - boolean indicating if new properties should be added
  *     @param   {boolean=}  _options_.shim            - overwrites and their actions are false
+ *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
+ *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
  *
  *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
  *
@@ -27,10 +29,6 @@
  *     @param   {Object=}   _options_.overridectx=console  - context for the override action
  *     @param   {Object=}   _options_.newctx               - context for the new action
  *     @param   {Object=}   _options_.ctx                  - context for the default action
- *
- *     @param   {function=} _options_.modifier            - modifier function to apply on all functions.
- *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
- *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
  *
  * @param   {Object}  module       - object containing functions/properties to extend the object with
  *
@@ -155,8 +153,6 @@ function handleAttributes(descriptor) {
 function finalizeDescriptor(descriptor) {
     if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
     if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
-    if(descriptor.modifier
-    && typeof(descriptor.value) === 'function') {descriptor.value        = descriptor.modifier(descriptor.value)}
 
     // getters & setters don't have a writable option
     if(descriptor.get || descriptor.set) {delete descriptor.writable}
