@@ -175,22 +175,18 @@
         {   if((options.hasOwnPropertyCheck && !module.hasOwnProperty(prop)) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
     
             var descriptor = getDescriptor(module, prop);
+            var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
+                             prop in obj              ? 'override'  :
+                                                        'new';
     
             copyPropertyConfigs(options, descriptor);
     
             handleAttributes(descriptor);
-            finalizeDescriptor(descriptor);
+            finalizeDescriptor(prop, descriptor, actionType);
     
-            getNames(prop, descriptor).forEach(function(prop) {
-                var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
-                                 prop in obj              ? 'override'  :
-                                                            'new';
+            if(!descriptor[actionType]) {continue} // continue
     
-                action(actionType, prop, descriptor);
-                action('', prop, descriptor); // default action
-    
-                if(!descriptor[actionType]) {return} // continue
-    
+            getNames(prop, descriptor).forEach(function(prop, i) {
                 Object.defineProperty(obj, prop, descriptor)
             });
         }
@@ -278,12 +274,15 @@
      *
      * @param {Object} descriptor - the property descriptor
      */
-    function finalizeDescriptor(descriptor) {
+    function finalizeDescriptor(prop, descriptor, actionType) {
         if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
         if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
     
         // getters & setters don't have a writable option
         if(descriptor.get || descriptor.set) {delete descriptor.writable}
+        // perform actions
+        action(actionType, prop, descriptor);
+        action('', prop, descriptor); // default action
     }
     /**
      * Copies the main & property specific options to the property descriptor
