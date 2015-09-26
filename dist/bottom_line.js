@@ -322,7 +322,7 @@
     function getNames(prop, descriptor) {
         var aliases = descriptor.aliases;
         var names   = !aliases               ? [] :
-                      Array.isArray(aliases) ? clone(aliases) :    // TODO check why we need to clone here
+                      Array.isArray(aliases) ? aliases :    // TODO check why we need to clone here
                                                aliases.split(' '); // TODO better splitting including corrections;
     
         names.unshift(prop);
