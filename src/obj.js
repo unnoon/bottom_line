@@ -487,11 +487,12 @@ construct('obj', {native:Object}, {
          *
          * @return {any|boolean}   - output from the callback function
          */
-        eachDsc$Right: function(step_, cb, ctx_) {
-            return this._.names()._.eachRight(function(key) {
-                return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
-            }, this);
-        },
+        // FIXME names not correct to use here
+        //eachDsc$Right: function(step_, cb, ctx_) {
+        //    return this._.names()._.eachRight(function(key) {
+        //        return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
+        //    }, this);
+        //},
         /**
          * Filters
          *
@@ -587,6 +588,21 @@ construct('obj', {native:Object}, {
         hasFn: {aliases: ['containsFn'], value: function(cb, ctx_) {
             return !!this._.find(cb, ctx_);
         }},
+        /**
+         * InstanceOf function that doesn't lie and returns true if the instance was created by the actual class or prototype
+         *
+         * @public
+         * @method obj#instanceOf
+         *
+         * @param {Function|Object} class_prototype - either a function or a prototype depending on the type of inheritance you are using
+         *
+         * @returns {boolean} - boolean indicating if the instance was created by the actual class or prototype
+         */
+        instanceOf: function(class_prototype) {
+            var cp = class_prototype;
+
+            return cp.prototype? this.constructor === cp : Object.getPrototypeOf(this) === cp;
+        },
         keyOf: {aliases: ['indexOf'], value: function(value) {
             var key = -1;
 
