@@ -125,5 +125,5 @@ extend(_, {
             default       : return NaN
         }
     },
-    toString: {overrideaction: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
+    toString: {onoverride: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
 });

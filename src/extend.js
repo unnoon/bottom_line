@@ -20,9 +20,9 @@
  *
  *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
  *
- *     @param   {Function=} _options_.overwriteaction=console.warn - function containing the overwrite action
- *     @param   {Function=} _options_.overrideaction=console.warn  - function containing the override action
- *     @param   {Function=} _options_.newaction=null               - function containing the new action
+ *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
+ *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
+ *     @param   {Function=} _options_.onnew=null               - function containing the new action
  *     @param   {Function=} _options_.action                       - default action to apply
  *
  *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
@@ -75,7 +75,7 @@ function extend(obj, _options_, module) {
  */
 function action(type, prop, descriptor) {
     var message;
-    var action  = descriptor[type+'action'];
+    var action  = descriptor[type? 'on' + type : 'action'];
     var ctx     = descriptor[type+'ctx'];
     var enabled = descriptor[type];
 
@@ -101,18 +101,18 @@ function processOptions(options) {
         ? false
         : options.overwrite           !== false; // default is true
     options.hasOwnPropertyCheck = options.hasOwnPropertyCheck !== false; // default is true
-    options.overwriteaction     = options.hasOwnProperty('overwriteaction')
-        ? options.overwriteaction
+    options.onoverwrite     = options.hasOwnProperty('onoverwrite')
+        ? options.onoverwrite
         : console.warn;
-    options.overrideaction      = options.hasOwnProperty('overrideaction')
-        ? options.overrideaction
+    options.onoverride      = options.hasOwnProperty('onoverride')
+        ? options.onoverride
         : console.warn;
     options.overwritectx        = options.overwritectx    || console;
     options.overridectx         = options.overridectx     || console;
 
     if(options.shim) {
         options.overwrite       = false;
-        options.overwriteaction = null;
+        options.onoverwrite = null;
     }
 
     if(typeof(options.exclude) === 'string')

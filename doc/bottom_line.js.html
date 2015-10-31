@@ -231,8 +231,8 @@
      *
      *     @param   {Array=}    _settings_.exclude         - array of properties that will be excluded
      *
-     *     @param   {string=}   _settings_.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-     *     @param   {string=}   _settings_.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+     *     @param   {string=}   _settings_.onoverwrite=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+     *     @param   {string=}   _settings_.onoverride=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
      *
      *     @param   {function=} _settings_.modifier        - modifier function to apply on all functions.
      *
@@ -246,13 +246,13 @@
 
         settings.override        = settings.override  !== false; // default is true
         settings.overwrite       = settings.overwrite !== false; // default is true
-        settings.overwriteaction = settings.overwriteaction || 'warn';
-        settings.overrideaction  = settings.overrideaction  || 'warn';
+        settings.onoverwrite = settings.onoverwrite || 'warn';
+        settings.onoverride  = settings.onoverride  || 'warn';
         settings.exclude         = settings.exclude || [];
 
         if(settings.shim === true) {
             settings.overwrite       = false;
-            settings.overwriteaction = 'ignore'
+            settings.onoverwrite = 'ignore'
         }
 
         for(var prop in module)
@@ -309,10 +309,10 @@
                 var action = function(type, conf, value) {
                     var message;
                     var action                = finalSettings[type+'action'];
-                    var skipOverrideAction    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
+                    var skiponoverride    = (type === 'override') && (conf === true) && ((typeof(value) !== 'function') ||  /\b_super\b/.test(value));
                     var overrideNotUsingSuper = (type === 'override') && (conf === true) && ((typeof(value) === 'function') && !/\b_super\b/.test(value));
 
-                    if(action === 'ignore' || skipOverrideAction || finalSettings.wrap) return; // no action required so return
+                    if(action === 'ignore' || skiponoverride || finalSettings.wrap) return; // no action required so return
 
                     if(conf === true)
                     {
@@ -372,8 +372,8 @@
          *     @param {boolean=} descriptor.override=true        - boolean indicating if properties should be overridden
          *     @param {boolean=} descriptor.overwrite=true       - boolean indicating if properties should be overwritten
          *
-         *     @param {string=}  descriptor.overwriteaction=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
-         *     @param {string=}  descriptor.overrideaction=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
+         *     @param {string=}  descriptor.onoverwrite=warn - loglevel in case global overwrites are set to false but overwrite. ignore|log|info|warn|error|throw
+         *     @param {string=}  descriptor.onoverride=warn  - loglevel for validation of super usage in function overrides.      ignore|log|info|warn|error|throw
          *
          *     @param {function=} descriptor.modifier            - modifier function to apply on all functions.
          */
@@ -486,7 +486,7 @@
                 default       : return NaN
             }
         },
-        toString: {overrideaction: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
+        toString: {onoverride: 'ignore', value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
 
     extend(Function.prototype, {shim: true}, {
@@ -1248,7 +1248,7 @@
              * @this    {Object}
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: 'ignore', value: function(visited_)
+            toString: {onoverride: 'ignore', value: function(visited_)
             {
                 var output = '';
     
@@ -1384,7 +1384,7 @@
              * @param  {...number} ___indices - indices SORTED
              * @return     {Array}       this - mutated array for chaining
              */
-            del: {overrideaction: 'ignore', value: function(___indices)
+            del: {onoverride: 'ignore', value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
@@ -1400,7 +1400,7 @@
              * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            delFn: {overrideaction: 'ignore', value: function(match, ctx_)
+            delFn: {onoverride: 'ignore', value: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
@@ -1415,7 +1415,7 @@
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            remove$: {overrideaction: 'ignore', value: function(___values) {
+            remove$: {onoverride: 'ignore', value: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1433,7 +1433,7 @@
              * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            remove$Fn: {overrideaction: 'ignore', value: function(match, ctx_) {
+            remove$Fn: {onoverride: 'ignore', value: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
@@ -1509,7 +1509,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            each: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
+            each: {onoverride: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
@@ -1535,7 +1535,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            eachRight: {overrideaction: 'ignore', value: function(step_, cb, ctx_) {
+            eachRight: {onoverride: 'ignore', value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
@@ -1593,7 +1593,7 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: {aliases: ['contains'], overrideaction: 'ignore', value: function(elm) {
+            has: {aliases: ['contains'], onoverride: 'ignore', value: function(elm) {
                 return this.indexOf(elm) > -1;
             }},
             /**
@@ -1753,7 +1753,7 @@
              * @param  {any}   val  - value to push
              * @return {Array} this - this for chaining
              */
-            _add: {overrideaction: 'ignore', value: function(val) {
+            _add: {onoverride: 'ignore', value: function(val) {
                 this.push(val);
     
                 return this;
@@ -1798,7 +1798,7 @@
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
              */
-            size: {overrideaction: 'ignore', value: function(size_) {
+            size: {onoverride: 'ignore', value: function(size_) {
                 if(size_ === undefined) return this.length;
     
                 this.length = size_;
@@ -1824,7 +1824,7 @@
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {onoverride: 'ignore', value: function()
             {
                 var output = '[';
     
@@ -2029,7 +2029,7 @@
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
-            has: {overrideaction: 'ignore', value: function(substr) {
+            has: {onoverride: 'ignore', value: function(substr) {
                 return !!~this.indexOf(substr);
             }},
             /**
@@ -2099,7 +2099,7 @@
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {onoverride: 'ignore', value: function()
             {
                 return this.toString();
             }}
@@ -2259,7 +2259,7 @@
              * @method   num#toString
              * @returns {string} - string representation of the number
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {onoverride: 'ignore', value: function()
             {
                 return this.toString()
             }}
@@ -2400,7 +2400,7 @@
              * @method fnc#toString
              * @returns {string} - string representation of the function
              */
-            toString: {overrideaction: 'ignore', value: function()
+            toString: {onoverride: 'ignore', value: function()
             {
                 return this.toString();
             }}

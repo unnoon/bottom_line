@@ -94,7 +94,7 @@ construct('arr', {native:Array}, {
          * @param  {...number} ___indices - indices SORTED
          * @return     {Array}       this - mutated array for chaining
          */
-        del: {overrideaction: undefined, value: function(___indices)
+        del: {onoverride: undefined, value: function(___indices)
         {
             arguments._.eachRight(function(key) {
                 this.splice(key, 1);
@@ -110,7 +110,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}                     ctx_   - optional context for the match function
          * @return {Array}                       this   - mutated array for chaining
          */
-        delFn: {overrideaction: null, value: function(match, ctx_)
+        delFn: {onoverride: null, value: function(match, ctx_)
         {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
@@ -125,7 +125,7 @@ construct('arr', {native:Array}, {
          * @param  {...any} ___values - values to remove
          * @return {Array}       this - mutated array for chaining
          */
-        remove$: {overrideaction: null, value: function(___values) {
+        remove$: {onoverride: null, value: function(___values) {
             var args = arguments;
 
             this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -143,7 +143,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}                            ctx_ - optional context for the match function
          * @return {Array}                             this  - mutated array for chaining
          */
-        remove$Fn: {overrideaction: null, value: function(match, ctx_) {
+        remove$Fn: {onoverride: null, value: function(match, ctx_) {
             this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                 if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
             }, this);
@@ -219,7 +219,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}  ctx_  - optional context for the callback function
          * @return {any|boolean}    - output from the callback function
          */
-        each: {overrideaction: null, value: function(step_, cb, ctx_) {
+        each: {onoverride: null, value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = 0, to = this.length;
@@ -245,7 +245,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}  ctx_  - optional context for the callback function
          * @return {any|boolean}    - output from the callback function
          */
-        eachRight: {overrideaction: null, value: function(step_, cb, ctx_) {
+        eachRight: {onoverride: null, value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
             var from = this.length-1, to = -1;
@@ -303,7 +303,7 @@ construct('arr', {native:Array}, {
          * @param   {Object}  elm - element to check membership of
          * @returns {boolean}     - boolean indicating if the array contains the element
          */
-        has: {aliases: ['contains'], overrideaction: null, value: function(elm) {
+        has: {aliases: ['contains'], onoverride: null, value: function(elm) {
             return this.indexOf(elm) > -1;
         }},
         /**
@@ -463,7 +463,7 @@ construct('arr', {native:Array}, {
          * @param  {any}   val  - value to push
          * @return {Array} this - this for chaining
          */
-        _add: {overrideaction: null, value: function(val) {
+        _add: {onoverride: null, value: function(val) {
             this.push(val);
 
             return this;
@@ -508,7 +508,7 @@ construct('arr', {native:Array}, {
          * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
          * @returns {number|Array} - the length of the array or the array itself
          */
-        size: {overrideaction: null, value: function(size_) {
+        size: {onoverride: null, value: function(size_) {
             if(size_ === undefined) return this.length;
 
             this.length = size_;
@@ -534,7 +534,7 @@ construct('arr', {native:Array}, {
          * @this    {Array}
          * @returns {string} - string representation of the array
          */
-        toString: {overrideaction: null, value: function()
+        toString: {onoverride: null, value: function()
         {
             var output = '[';
 

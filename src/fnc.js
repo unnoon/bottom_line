@@ -112,7 +112,7 @@ construct('fnc', {native:Function}, {
          * @method fnc#toString
          * @returns {string} - string representation of the function
          */
-        toString: {overrideaction: null, value: function()
+        toString: {onoverride: null, value: function()
         {
             return this.toString();
         }}

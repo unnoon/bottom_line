@@ -148,9 +148,9 @@
      *
      *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
      *
-     *     @param   {Function=} _options_.overwriteaction=console.warn - function containing the overwrite action
-     *     @param   {Function=} _options_.overrideaction=console.warn  - function containing the override action
-     *     @param   {Function=} _options_.newaction=null               - function containing the new action
+     *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
+     *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
+     *     @param   {Function=} _options_.onnew=null               - function containing the new action
      *     @param   {Function=} _options_.action                       - default action to apply
      *
      *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
@@ -203,7 +203,7 @@
      */
     function action(type, prop, descriptor) {
         var message;
-        var action  = descriptor[type+'action'];
+        var action  = descriptor[type? 'on' + type : 'action'];
         var ctx     = descriptor[type+'ctx'];
         var enabled = descriptor[type];
     
@@ -229,18 +229,18 @@
             ? false
             : options.overwrite           !== false; // default is true
         options.hasOwnPropertyCheck = options.hasOwnPropertyCheck !== false; // default is true
-        options.overwriteaction     = options.hasOwnProperty('overwriteaction')
-            ? options.overwriteaction
+        options.onoverwrite     = options.hasOwnProperty('onoverwrite')
+            ? options.onoverwrite
             : console.warn;
-        options.overrideaction      = options.hasOwnProperty('overrideaction')
-            ? options.overrideaction
+        options.onoverride      = options.hasOwnProperty('onoverride')
+            ? options.onoverride
             : console.warn;
         options.overwritectx        = options.overwritectx    || console;
         options.overridectx         = options.overridectx     || console;
     
         if(options.shim) {
             options.overwrite       = false;
-            options.overwriteaction = null;
+            options.onoverwrite = null;
         }
     
         if(typeof(options.exclude) === 'string')
@@ -302,7 +302,7 @@
         var propertyConfig = descriptor.value;
         // copy property specific options (if any).
         // Maybe this needs to be a bit more specific
-        if(propertyConfig && propertyConfig.hasOwnProperty('value'))
+        if(propertyConfig && isDescriptor(descriptor.value))
         {
             for(var cfg in propertyConfig)
             {   if(!propertyConfig.hasOwnProperty(cfg)) {continue}
@@ -345,6 +345,11 @@
         } while (proto = Object.getPrototypeOf(proto));
     
         return Object.getOwnPropertyDescriptor(proto, prop)
+    }
+    
+    function isDescriptor(value)
+    {
+        return (value.hasOwnProperty('value') || value.hasOwnProperty('get') || value.hasOwnProperty('set')) && value.isDescriptor !== false
     }
     extend(Function.prototype, {shim: true}, {
         /**
@@ -533,7 +538,7 @@
                 default       : return NaN
             }
         },
-        toString: {overrideaction: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
+        toString: {onoverride: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
     });
     /**
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence.
@@ -1619,7 +1624,7 @@
              *
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: null, value: function(visited_)
+            toString: {onoverride: null, value: function(visited_)
             {
                 var output = '';
     
@@ -1758,7 +1763,7 @@
              * @param  {...number} ___indices - indices SORTED
              * @return     {Array}       this - mutated array for chaining
              */
-            del: {overrideaction: undefined, value: function(___indices)
+            del: {onoverride: undefined, value: function(___indices)
             {
                 arguments._.eachRight(function(key) {
                     this.splice(key, 1);
@@ -1774,7 +1779,7 @@
              * @param  {Object=}                     ctx_   - optional context for the match function
              * @return {Array}                       this   - mutated array for chaining
              */
-            delFn: {overrideaction: null, value: function(match, ctx_)
+            delFn: {onoverride: null, value: function(match, ctx_)
             {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, i, arr, delta)) {this.splice(i, 1)}
@@ -1789,7 +1794,7 @@
              * @param  {...any} ___values - values to remove
              * @return {Array}       this - mutated array for chaining
              */
-            remove$: {overrideaction: null, value: function(___values) {
+            remove$: {onoverride: null, value: function(___values) {
                 var args = arguments;
     
                 this._.eachRight(function(val, i) { // eachRight is a little bit faster
@@ -1807,7 +1812,7 @@
              * @param  {Object=}                            ctx_ - optional context for the match function
              * @return {Array}                             this  - mutated array for chaining
              */
-            remove$Fn: {overrideaction: null, value: function(match, ctx_) {
+            remove$Fn: {onoverride: null, value: function(match, ctx_) {
                 this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
                     if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
                 }, this);
@@ -1883,7 +1888,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            each: {overrideaction: null, value: function(step_, cb, ctx_) {
+            each: {onoverride: null, value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = 0, to = this.length;
@@ -1909,7 +1914,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
-            eachRight: {overrideaction: null, value: function(step_, cb, ctx_) {
+            eachRight: {onoverride: null, value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
                 var from = this.length-1, to = -1;
@@ -1967,7 +1972,7 @@
              * @param   {Object}  elm - element to check membership of
              * @returns {boolean}     - boolean indicating if the array contains the element
              */
-            has: {aliases: ['contains'], overrideaction: null, value: function(elm) {
+            has: {aliases: ['contains'], onoverride: null, value: function(elm) {
                 return this.indexOf(elm) > -1;
             }},
             /**
@@ -2127,7 +2132,7 @@
              * @param  {any}   val  - value to push
              * @return {Array} this - this for chaining
              */
-            _add: {overrideaction: null, value: function(val) {
+            _add: {onoverride: null, value: function(val) {
                 this.push(val);
     
                 return this;
@@ -2172,7 +2177,7 @@
              * @param   {number} size_ - the new size of the array. In case no size is given the size is returned
              * @returns {number|Array} - the length of the array or the array itself
              */
-            size: {overrideaction: null, value: function(size_) {
+            size: {onoverride: null, value: function(size_) {
                 if(size_ === undefined) return this.length;
     
                 this.length = size_;
@@ -2198,7 +2203,7 @@
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: {overrideaction: null, value: function()
+            toString: {onoverride: null, value: function()
             {
                 var output = '[';
     
@@ -2403,7 +2408,7 @@
              * @param   {string}  substr - substring to check for
              * @returns {boolean}        - boolean indicating if the string contains the substring
              */
-            has: {overrideaction: null, value: function(substr) {
+            has: {onoverride: null, value: function(substr) {
                 return !!~this.indexOf(substr);
             }},
             /**
@@ -2473,7 +2478,7 @@
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: {overrideaction: null, value: function()
+            toString: {onoverride: null, value: function()
             {
                 return this.toString();
             }}
@@ -2633,7 +2638,7 @@
              * @method   num#toString
              * @returns {string} - string representation of the number
              */
-            toString: {overrideaction: null, value: function()
+            toString: {onoverride: null, value: function()
             {
                 return this.toString()
             }}
@@ -2753,7 +2758,7 @@
              * @method fnc#toString
              * @returns {string} - string representation of the function
              */
-            toString: {overrideaction: null, value: function()
+            toString: {onoverride: null, value: function()
             {
                 return this.toString();
             }}

@@ -932,7 +932,7 @@ construct('obj', {native:Object}, {
          *
          * @returns {string} - string representation of the object
          */
-        toString: {overrideaction: null, value: function(visited_)
+        toString: {onoverride: null, value: function(visited_)
         {
             var output = '';
 
