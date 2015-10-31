@@ -174,7 +174,7 @@ function copyPropertyConfigs(options, descriptor) {
     var propertyConfig = descriptor.value;
     // copy property specific options (if any).
     // Maybe this needs to be a bit more specific
-    if(propertyConfig && propertyConfig.hasOwnProperty('value'))
+    if(propertyConfig && isDescriptor(descriptor.value))
     {
         for(var cfg in propertyConfig)
         {   if(!propertyConfig.hasOwnProperty(cfg)) {continue}
@@ -217,4 +217,9 @@ function getDescriptor(obj, prop) {
     } while (proto = Object.getPrototypeOf(proto));
 
     return Object.getOwnPropertyDescriptor(proto, prop)
+}
+
+function isDescriptor(value)
+{
+    return (value.hasOwnProperty('value') || value.hasOwnProperty('get') || value.hasOwnProperty('set')) && value.isDescriptor !== false
 }
