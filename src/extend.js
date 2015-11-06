@@ -1,3 +1,4 @@
+// TODO maybe add treat as value option instead of isDescriptor
 /**
  * Extends an object with function/properties from a module object
  *
@@ -17,13 +18,14 @@
  *     @param   {boolean=}  _options_.shim            - overwrites and their actions are false
  *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
  *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
+ *     @param   {boolean=}  _options_.all=false           - includes non-enumerable properties
  *
  *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
  *
  *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
  *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
  *     @param   {Function=} _options_.onnew=null               - function containing the new action
- *     @param   {Function=} _options_.action                       - default action to apply
+ *     @param   {Function=} _options_.action                   - action to apply on all properties
  *
  *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
  *     @param   {Object=}   _options_.overridectx=console  - context for the override action
@@ -38,13 +40,39 @@
 // TODO add deep extend
 // TODO to be able to add custom attributes and their functions i.e. inject
 function extend(obj, _options_, module) {
-    var options = module && _options_ || {};
-    var module  = module || _options_;
+    var options    = processOptions(module && _options_ || {});
+    var module     = module || _options_;
+    var protoChain = collectPrototypeChain(module, obj, options);
 
-    processOptions(options);
+    if(options.overwrite) {protoChain.reverse()} // otherwise lower chain properties would be overwritten by higher ones
 
-    for(var prop in module)
-    {   if((options.hasOwnPropertyCheck && !module.hasOwnProperty(prop)) || (options.exclude && ~options.exclude.indexOf(prop))) {continue}
+    protoChain.forEach(function(proto) {
+        var properties = options.all
+            ? Object.getOwnPropertyNames(proto)
+            : Object.keys(proto);
+
+        processProperties(properties, options, proto, obj);
+    });
+
+    return obj;
+}
+
+function collectPrototypeChain(module, obj, options) {
+    var protoChain = [];
+    var proto      = module;
+
+    do {
+        protoChain.push(proto);
+
+        proto = Object.getPrototypeOf(proto);
+    } while(!proto.isPrototypeOf(obj) && !options.hasOwnPropertyCheck);
+
+    return protoChain
+}
+
+function processProperties(properties, options, module, obj) {
+    properties.forEach(function(prop) {
+        if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
 
         var descriptor = getDescriptor(module, prop);
         var actionType = obj.hasOwnProperty(prop) ? 'overwrite' :
@@ -56,14 +84,12 @@ function extend(obj, _options_, module) {
         handleAttributes(descriptor);
         finalizeDescriptor(prop, descriptor, actionType);
 
-        if(!descriptor[actionType]) {continue} // continue
+        if(!descriptor[actionType]) {return} // continue
 
         getNames(prop, descriptor).forEach(function(prop, i) {
             Object.defineProperty(obj, prop, descriptor)
         });
-    }
-
-    return obj;
+    });
 }
 
 /**
@@ -82,8 +108,8 @@ function action(type, prop, descriptor) {
     if(!action) return; // no action required so return
 
     message = enabled
-        ? type +' on property: '+prop+'.'
-        : 'redundant '+type+' defined in module for property '+prop+'. '+type+'s are set to false in settings/config';
+        ? (type +' on property: '+prop+'.')
+        : ('redundant '+type+' defined for property '+prop+'. '+type+'s are set to false in options/descriptor.');
 
     action.call(ctx, message, prop, descriptor)
 }
@@ -91,6 +117,8 @@ function action(type, prop, descriptor) {
  * processes the options, setting defaults etc.
  *
  * @param options
+ *
+ * @return options
  */
 function processOptions(options) {
     options.new                 = options.new !== false; // default is true
@@ -119,6 +147,8 @@ function processOptions(options) {
     {
         options.exclude = options.exclude.split(' ');
     }
+
+    return options
 }
 /**
  * Processes the attributes and sets the correct value on the descriptor
