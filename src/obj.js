@@ -15,19 +15,7 @@ construct('obj', {native:Object}, {
          * @return  {Object}  clone - the cloned object
          */
         // TODO These should be expanded with frozen, extensible states etc
-        clone: function clone(obj) {
-            if(_.isPrimitive(obj)) return obj;
-            if(_.isArray(obj))     return obj.slice();
-
-            var clone = _.create(obj._.proto());
-            var names = obj._.names();
-
-            names._.each(function(name) {
-                Object.defineProperty(clone, name, obj._.descriptor(name));
-            });
-
-            return clone;
-        },
+        clone: clone,
         /**
          * Clones an object
          *

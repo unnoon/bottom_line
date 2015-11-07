@@ -117,6 +117,11 @@
 
     // simple cloning function
     function clone(obj) {
+        var type = typeof(obj);
+
+        if(obj === null || (type !== 'object' && type !== 'function')) {return obj}
+        if(Array.isArray(obj))                                         {return obj.slice()}
+
         var clone = Object.create(Object.getPrototypeOf(obj));
 
         Object.getOwnPropertyNames(obj).forEach(function(name) {
@@ -126,7 +131,6 @@
         return clone;
     }
 
-    // TODO maybe add treat as value option instead of isDescriptor
     /**
      * Extends an object with function/properties from a module object
      *
@@ -164,6 +168,7 @@
      *
      * @return {Object}  obj - the extended object
      */
+    // TODO maybe add treat as value option instead of isDescriptor
     // TODO document attributes
     // TODO add deep extend
     // TODO to be able to add custom attributes and their functions i.e. inject
@@ -376,7 +381,13 @@
     
         return Object.getOwnPropertyDescriptor(proto, prop)
     }
-    
+    /**
+     * Checks if a property value is actually a descriptor.
+     *
+     * @param {any} value - the value to check
+     *
+     * @returns {boolean} - boolean indiacting if the value is a descriptor
+     */
     function isDescriptor(value)
     {
         return (value.hasOwnProperty('value') || value.hasOwnProperty('get') || value.hasOwnProperty('set')) && value.isDescriptor !== false
@@ -737,19 +748,7 @@
              * @return  {Object}  clone - the cloned object
              */
             // TODO These should be expanded with frozen, extensible states etc
-            clone: function clone(obj) {
-                if(_.isPrimitive(obj)) return obj;
-                if(_.isArray(obj))     return obj.slice();
-    
-                var clone = _.create(obj._.proto());
-                var names = obj._.names();
-    
-                names._.each(function(name) {
-                    Object.defineProperty(clone, name, obj._.descriptor(name));
-                });
-    
-                return clone;
-            },
+            clone: clone,
             /**
              * Clones an object
              *

@@ -117,6 +117,11 @@
 
     // simple cloning function
     function clone(obj) {
+        var type = typeof(obj);
+
+        if(obj === null || (type !== 'object' && type !== 'function')) {return obj}
+        if(Array.isArray(obj))                                         {return obj.slice()}
+
         var clone = Object.create(Object.getPrototypeOf(obj));
 
         Object.getOwnPropertyNames(obj).forEach(function(name) {

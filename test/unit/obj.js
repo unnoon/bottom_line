@@ -5,27 +5,33 @@ describe("Object", function() {
 		describe("clone", function() {
 
 			it("simple clone", function() {
-				var obj = {
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 666
-				};
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                };
 
-				expect(_.clone(obj)).to.deep.equal({
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 666
-				});
-				expect(_.clone(obj)).to.not.equal({
-					x: 1,
-					y: 2,
-					z: 3,
-					t: 666
-				});
-				expect(_.clone(obj)).to.not.equal(obj);
-			});
+                expect(_.clone(obj)).to.deep.equal({
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                });
+                expect(_.clone(obj)).to.not.equal({
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                });
+                expect(_.clone(obj)).to.not.equal(obj);
+            });
+
+            it("clone primitives", function() {
+                expect(_.clone(null)).to.deep.equal(null);
+                expect(_.clone(undefined)).to.deep.equal(undefined);
+                expect(_.clone(666)).to.deep.equal(666);
+            });
 		});
 
         describe("cloneDeep", function() {

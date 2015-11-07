@@ -39,7 +39,6 @@
 // TODO document attributes
 // TODO add deep extend
 // TODO to be able to add custom attributes and their functions i.e. inject
-// TODO make descriptors from module determine the enumerability etc by default add a testcase for this
 function extend(obj, _options_, module) {
     var options    = processOptions(module && _options_ || {});
     var module     = module || _options_;
