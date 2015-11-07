@@ -249,7 +249,13 @@ function getDescriptor(obj, prop) {
 
     return Object.getOwnPropertyDescriptor(proto, prop)
 }
-
+/**
+ * Checks if a property value is actually a descriptor.
+ *
+ * @param {any} value - the value to check
+ *
+ * @returns {boolean} - boolean indiacting if the value is a descriptor
+ */
 function isDescriptor(value)
 {
     return (value.hasOwnProperty('value') || value.hasOwnProperty('get') || value.hasOwnProperty('set')) && value.isDescriptor !== false
