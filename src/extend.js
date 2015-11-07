@@ -1,4 +1,3 @@
-// TODO maybe add treat as value option instead of isDescriptor
 /**
  * Extends an object with function/properties from a module object
  *
@@ -36,9 +35,11 @@
  *
  * @return {Object}  obj - the extended object
  */
+// TODO maybe add treat as value option instead of isDescriptor
 // TODO document attributes
 // TODO add deep extend
 // TODO to be able to add custom attributes and their functions i.e. inject
+// TODO make descriptors from module determine the enumerability etc by default add a testcase for this
 function extend(obj, _options_, module) {
     var options    = processOptions(module && _options_ || {});
     var module     = module || _options_;
