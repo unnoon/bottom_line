@@ -155,10 +155,10 @@
      *     @param   {Function=} _options_.onnew=null               - function containing the new action
      *     @param   {Function=} _options_.action                   - action to apply on all properties
      *
-     *     @param   {Object=}   _options_.overwritectx=console - context for the overwrite action
-     *     @param   {Object=}   _options_.overridectx=console  - context for the override action
-     *     @param   {Object=}   _options_.newctx               - context for the new action
-     *     @param   {Object=}   _options_.ctx                  - context for the default action
+     *     @param   {Object=}   _options_.onoverwritectx=console - context for the overwrite action
+     *     @param   {Object=}   _options_.onoverridectx=console  - context for the override action
+     *     @param   {Object=}   _options_.onnewctx               - context for the new action
+     *     @param   {Object=}   _options_.actionctx            - context for the default action
      *
      * @param   {Object}  module       - object containing functions/properties to extend the object with
      *
@@ -229,8 +229,8 @@
      */
     function action(type, prop, descriptor) {
         var message;
-        var action  = descriptor[type? 'on' + type : 'action'];
-        var ctx     = descriptor[type+'ctx'];
+        var action  = descriptor[(type? 'on' + type : 'action')];
+        var ctx     = descriptor[(type? 'on' + type : 'action')+'ctx'];
         var enabled = descriptor[type];
     
         if(!action) return; // no action required so return
@@ -263,8 +263,8 @@
         options.onoverride      = options.hasOwnProperty('onoverride')
             ? options.onoverride
             : console.warn;
-        options.overwritectx        = options.overwritectx    || console;
-        options.overridectx         = options.overridectx     || console;
+        options.onoverwritectx        = options.onoverwritectx    || console;
+        options.onoverridectx         = options.onoverridectx     || console;
     
         if(options.shim) {
             options.overwrite       = false;
