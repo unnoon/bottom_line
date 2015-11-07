@@ -117,16 +117,31 @@
 
     // simple cloning function
     function clone(obj) {
-        var type = typeof(obj);
+        var type        = typeof(obj);
+        var isPrimitive = (obj === null || (type !== 'object' && type !== 'function'));
+        var isObject    = !isPrimitive;
+        var clone;
 
-        if(obj === null || (type !== 'object' && type !== 'function')) {return obj}
-        if(Array.isArray(obj))                                         {return obj.slice()}
+        switch(true)
+        {
+            case isPrimitive :
+                clone = obj; break;
+            case Array.isArray(obj) :
+                clone = obj.slice(); break;
+            case isObject :
+                clone = Object.create(Object.getPrototypeOf(obj));
 
-        var clone = Object.create(Object.getPrototypeOf(obj));
+                Object.getOwnPropertyNames(obj).forEach(function(name) {
+                    Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
+                }); break;
+        }
 
-        Object.getOwnPropertyNames(obj).forEach(function(name) {
-            Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
-        });
+        if(isObject)
+        {
+            if(!Object.isExtensible(obj)) {Object.preventExtensions(clone)}
+            if(Object.isSealed(obj))      {Object.seal(clone)}
+            if(Object.isFrozen(obj))      {Object.freeze(clone)}
+        }
 
         return clone;
     }

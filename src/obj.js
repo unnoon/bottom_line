@@ -14,7 +14,6 @@ construct('obj', {native:Object}, {
          *
          * @return  {Object}  clone - the cloned object
          */
-        // TODO These should be expanded with frozen, extensible states etc
         clone: clone,
         /**
          * Clones an object
