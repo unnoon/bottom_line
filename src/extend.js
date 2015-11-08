@@ -7,6 +7,8 @@
  *
  * @param   {Object}   obj       - object to be extended
  * @param   {Object=} _options_  - optional settings/default descriptor
+ *     @param   {boolean=}  _options_.mode='mixed'    - mode of extend either 'values'|'descriptors'|'mixed'. Determines if the module contains only values, descriptors or can contain both
+ *
  *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
  *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
  *     @param   {boolean=}  _options_.writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
@@ -17,7 +19,7 @@
  *     @param   {boolean=}  _options_.shim            - overwrites and their actions are false
  *     @param   {boolean=}  _options_.hasOwnPropertyCheck - check if we should do a has own property check
  *     @param   {boolean=}  _options_.safe                - sets overwrites and overrides both to false
- *     @param   {boolean=}  _options_.all=false           - includes non-enumerable properties
+ *     @param   {boolean=}  _options_.nonenumerables=false           - includes non-enumerable properties
  *
  *     @param   {Array|string=} _options_.exclude     - array of properties that will be excluded
  *
@@ -35,6 +37,7 @@
  *
  * @return {Object}  obj - the extended object
  */
+// FIXME add mode for descriptor, values or mixed
 // TODO maybe add treat as value option instead of isDescriptor
 // TODO document attributes
 // TODO add deep extend
@@ -47,7 +50,7 @@ function extend(obj, _options_, module) {
     if(options.overwrite) {protoChain.reverse()} // otherwise lower chain properties would be overwritten by higher ones
 
     protoChain.forEach(function(proto) {
-        var properties = options.all
+        var properties = options.nonenumerables
             ? Object.getOwnPropertyNames(proto)
             : Object.keys(proto);
 
@@ -174,7 +177,9 @@ function handleAttributes(descriptor) {
 /**
  * Will act on the actual descriptor to change some properties to final
  *
+ * @param {string} prop       - name of the property
  * @param {Object} descriptor - the property descriptor
+ * @param {string} actionType - the action type 'override'|'overwrite'|'new'|''
  */
 function finalizeDescriptor(prop, descriptor, actionType) {
     if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
@@ -204,7 +209,7 @@ function copyPropertyConfigs(options, descriptor) {
     var propertyConfig = descriptor.value;
     // copy property specific options (if any).
     // Maybe this needs to be a bit more specific
-    if(propertyConfig && isDescriptor(descriptor.value))
+    if(options.mode !== 'values' && propertyConfig && (options.mode === 'descriptors' || isDescriptor(descriptor.value)))
     {
         for(var cfg in propertyConfig)
         {   if(!propertyConfig.hasOwnProperty(cfg)) {continue}
@@ -253,9 +258,11 @@ function getDescriptor(obj, prop) {
  *
  * @param {any} value - the value to check
  *
- * @returns {boolean} - boolean indiacting if the value is a descriptor
+ * @returns {boolean} - boolean indicating if the value is a descriptor
  */
 function isDescriptor(value)
 {
-    return (value.hasOwnProperty('value') || value.hasOwnProperty('get') || value.hasOwnProperty('set')) && value.isDescriptor !== false
+    return value.nondescriptor !== true &&
+           ((value.hasOwnProperty('value') && !value.hasOwnProperty('get') && !value.hasOwnProperty('set')) ||
+           ((value.hasOwnProperty('get') || value.hasOwnProperty('set'))   && !value.hasOwnProperty('value')))
 }
