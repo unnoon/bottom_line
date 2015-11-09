@@ -1168,7 +1168,7 @@
              * If the value false is returned, iteration is canceled. This can be used to stop iteration
              *
              * @public
-             * @method obj#eachDsc$
+             * @method obj#each$Dsc
              * @this  {Object}
              *
              * @param {Function} cb   - callback function to be called for each element
@@ -1176,7 +1176,7 @@
              *
              * @return {any|boolean}  - output from the callback function
              */
-            eachDsc$: function(cb, ctx_) {
+            each$Dsc: function(cb, ctx_) {
                 var output;
     
                 for (var key in this) {
@@ -1225,49 +1225,6 @@
                     return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
                 }, this);
             },
-            /**
-             * Inverse iterator without hasOwnProperty check.
-             * If the value false is returned, iteration is canceled. This can be used to stop iteration
-             *
-             * @public
-             * @method obj#each$Right
-             *
-             * @this  {Object}
-             *
-             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
-             * @param {function} cb    - callback function to be called for each element
-             * @param {Object=}  ctx_  - optional context for the callback function
-             *
-             * @return {any|boolean}   - output from the callback function
-             */
-            each$Right: function(step_, cb, ctx_) {
-                if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
-    
-                return this._.names()._.eachRight(function(key) {
-                    return cb.call(ctx_, this[key], key, this); // loop is broken upon returning false
-                }, this);
-            },
-            /**
-             * Inverse iterator without hasOwnProperty check.
-             * If the value false is returned, iteration is canceled. This can be used to stop iteration
-             *
-             * @public
-             * @method obj#eachDsc$Right
-             *
-             * @this  {Object}
-             *
-             * @param {number=}  step_ - step for the iteration. Only valid in case this is Arguments
-             * @param {function} cb    - callback function to be called for each element
-             * @param {Object=}  ctx_  - optional context for the callback function
-             *
-             * @return {any|boolean}   - output from the callback function
-             */
-            // FIXME names not correct to use here
-            //eachDsc$Right: function(step_, cb, ctx_) {
-            //    return this._.names()._.eachRight(function(key) {
-            //        return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
-            //    }, this);
-            //},
             /**
              * Filters
              *
