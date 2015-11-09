@@ -27,7 +27,7 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.5',
+        'version': '0.0.6',
         not: {} // object to hold negative functions
     };
     // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
@@ -1372,7 +1372,7 @@
              * @public
              * @method obj#remove
              *
-             * @this   {Object|Array}
+             * @this   {Object}
              *
              * @param  {...any}       ___values - values to remove
              *
@@ -1415,7 +1415,7 @@
              * @public
              * @method obj#Remove
              *
-             * @this   {Object|Array}
+             * @this   {Object}
              *
              * @param  {...any} ___values - values to remove
              *
@@ -2085,7 +2085,7 @@
              * Returns the maximum value of an array with numbers
              * @public
              * @method arr#max
-             * @this    {Array<number>|Array<any>}
+             * @this    {Array<number|any>}
              * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
              * @returns {number|any}           - maximum number or element in the array
              */
@@ -2106,7 +2106,7 @@
              * Returns the minimum value of an array with numbers
              * @public
              * @method arr#min
-             * @this    {Array<number>|Array<any>}
+             * @this    {Array<number|any>}
              * @param   {Function=} compareFn_ - optional compare function
              * @returns {number|any} - minimum element in the array
              */

@@ -1,6 +1,6 @@
 {
   "name": "bottom_line",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "JS Toolbelt",
   "main": "dist/bottom_line.js",
   "devDependencies": {

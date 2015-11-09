@@ -376,7 +376,7 @@ construct('arr', {native:Array}, {
          * Returns the maximum value of an array with numbers
          * @public
          * @method arr#max
-         * @this    {Array<number>|Array<any>}
+         * @this    {Array<number|any>}
          * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
          * @returns {number|any}           - maximum number or element in the array
          */
@@ -397,7 +397,7 @@ construct('arr', {native:Array}, {
          * Returns the minimum value of an array with numbers
          * @public
          * @method arr#min
-         * @this    {Array<number>|Array<any>}
+         * @this    {Array<number|any>}
          * @param   {Function=} compareFn_ - optional compare function
          * @returns {number|any} - minimum element in the array
          */
