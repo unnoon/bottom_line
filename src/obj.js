@@ -870,13 +870,13 @@ construct('obj', {native:Object}, {
          * Better to string version
          *
          * @public
-         * @method obj#toString
+         * @method obj#stringify
          *
          * @this    {Object}
          *
          * @returns {string} - string representation of the object
          */
-        toString: {onoverride: null, value: function(visited_)
+        stringify: {onoverride: null, value: function(visited_)
         {
             var output = '';
 
@@ -889,7 +889,7 @@ construct('obj', {native:Object}, {
                     if(!visited_)           {visited_ = [this]}
 
                     if(visited_._.has(obj)) {val = '[[circular ref]]'}
-                    else                    {visited_.push(obj); val = obj._.toString(visited_)}
+                    else                    {visited_.push(obj); val = obj._.stringify(visited_)}
                 }
 
                 // TODO punctuation for strings & proper formatting
@@ -897,6 +897,20 @@ construct('obj', {native:Object}, {
             });
 
             return output + '}';
+        }},
+        /**
+         * 'fixes' wrong implicit calls to the _methods object
+         *
+         * @public
+         * @method obj#toString
+         *
+         * @this    {Object}
+         *
+         * @returns {string} - empty string
+         */
+        toString: {onoverride: null, value: function()
+        {
+            return ''
         }},
         /**
          * Returns an array containing the values of an object (enumerable properties)

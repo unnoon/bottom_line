@@ -68,5 +68,15 @@ describe("Number", function() {
 				expect((3)._.odd).to.be.true;
 			});
 		});
+
+		describe("even", function() {
+
+			it("simple", function() {
+				expect((2)._.even).to.be.true;
+				expect((-2)._.even).to.be.true;
+				expect((-3)._.even).to.be.false;
+				expect((3)._.even).to.be.false;
+			});
+		});
 	});
 });

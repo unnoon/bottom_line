@@ -530,17 +530,17 @@ construct('arr', {native:Array}, {
         /**
          * Better to string version
          * @public
-         * @method arr#toString
+         * @method arr#stringify
          * @this    {Array}
          * @returns {string} - string representation of the array
          */
-        toString: {onoverride: null, value: function()
+        stringify: {onoverride: null, value: function()
         {
             var output = '[';
 
             for(var i = 0, max = this.length; i < max; i++)
             {
-                output += (i? ', ' : '') + this[i]._.toString();
+                output += (i? ', ' : '') + this[i]._.stringify();
             }
 
             return output + ']';

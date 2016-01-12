@@ -199,11 +199,11 @@ construct('str', {native:String}, {
         /**
          * Better to string version
          * @public
-         * @method str#toString
+         * @method str#stringify
          * @this    {string}
          * @returns {string} - string representation of the object
          */
-        toString: {onoverride: null, value: function()
+        stringify: {onoverride: null, value: function()
         {
             return this.toString();
         }}

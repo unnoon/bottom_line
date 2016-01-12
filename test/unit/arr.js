@@ -776,18 +776,18 @@ describe("Array", function() {
 			});
 		});
 
-        describe("_toString", function() {
+        describe("_stringify", function() {
 
-            it("simple _toString", function() {
+            it("simple _stringify", function() {
                 var arr1 = [1, 2, 3];
 
-                expect(arr1._.toString()).to.eql('[1, 2, 3]');
+                expect(arr1._.stringify()).to.eql('[1, 2, 3]');
             });
 
-            it("multi dimensional _toString", function() {
+            it("multi dimensional _stringify", function() {
                 var arr1 = [[6, 6], [7, 7, [8]]];
 
-                expect(arr1._.toString()).to.eql("[[6, 6], [7, 7, [8]]]");
+                expect(arr1._.stringify()).to.eql("[[6, 6], [7, 7, [8]]]");
             });
         });
 

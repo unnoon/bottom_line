@@ -149,10 +149,10 @@ construct('num', {native:Number}, {
         /**
          * Better to string version
          * @public
-         * @method   num#toString
+         * @method   num#stringify
          * @returns {string} - string representation of the number
          */
-        toString: {onoverride: null, value: function()
+        stringify: {onoverride: null, value: function()
         {
             return this.toString()
         }}

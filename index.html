@@ -7,6 +7,22 @@
         <script src="dist/bottom_line.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
+            var isOdd = (-3)._.odd;
+            console.log((2)._.odd);
+
+            console.log(isOdd);
+            var map = { '-': '!', '+':'2', '*':'3' };
+            var myString = ['b', '_', 'l'];
+            var tmp = map[myString[1]];
+
+            myString[1] = tmp;
+
+            var tmp2 = myString[1];
+
+            console.log('tmp: ', tmp);
+//            console.log('join: ', myString[0]+myString[1]+myString[2]);
+            console.log('join: ', myString.join(''));
+
             var obj = {
                 x: 1,
                 y: 2,
@@ -18,7 +34,7 @@
                     .first()
                     .value;
 
-            console.log(value._.toString());
+            console.log(value._.stringify());
 
             var obj2 = {
                 x: 1,
@@ -35,7 +51,7 @@
                     .keys()
                     .value;
 
-            console.log(first._.toString());
+            console.log(first._.stringify());
         </script>
     </head>
     <body>

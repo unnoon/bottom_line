@@ -420,15 +420,15 @@ describe("Object", function() {
             });
         });
 
-        describe("_toString", function() {
+        describe("_stringify", function() {
 
-            it("simple _toString", function() {
+            it("simple _stringify", function() {
                 var obj = {x: 1, y: 2, z: 3};
 
-                expect(obj._.toString()).to.eql('{x: 1, y: 2, z: 3}');
+                expect(obj._.stringify()).to.eql('{x: 1, y: 2, z: 3}');
             });
 
-            it("complex _toString", function() {
+            it("complex _stringify", function() {
                 var obj = {
                     x: 1,
                     str: 'aap',
@@ -438,14 +438,14 @@ describe("Object", function() {
                     obj: {xt: 666, arr: [{really: 'yes'}]}
                 };
 
-				// we remove spaces to regard for differences in spacing from for example toString of functions
+				// we remove spaces to regard for differences in spacing from for example stringify of functions
 				var expected = '{x: 1, str: aap, z: 3, arr: [[6, 6], [7, 7, [8]]], fnc: function () {}, obj: {xt: 666, arr: [{really: yes}]}}'.replace(/\s/g, '');
-				var result   = obj._.toString().replace(/\s/g, '');
+				var result   = obj._.stringify().replace(/\s/g, '');
 
                 expect(result).to.eql(expected);
             });
 
-			it("falsey _toString", function() {
+			it("falsey _stringify", function() {
 				var obj = {
 					x: 0,
 					y: undefined,
@@ -458,7 +458,7 @@ describe("Object", function() {
 					f: {x: 0, y:1}
 				};
 
-				expect(obj._.toString()).to.eql('{x: 0, y: undefined, z: null, a: NaN, b: 0, c: , d: false, e: 666, f: {x: 0, y: 1}}');
+				expect(obj._.stringify()).to.eql('{x: 0, y: undefined, z: null, a: NaN, b: 0, c: , d: false, e: 666, f: {x: 0, y: 1}}');
 			});
         });
 

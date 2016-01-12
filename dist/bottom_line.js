@@ -94,23 +94,31 @@
     {
         if(!module) return;
 
+        // action function that negates a function
+        var action = function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}};
+
         extend(wrapper,     {enumerable: false}, module);
-        extend(wrapper.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(wrapper.not, {enumerable: false, action: action}, module);
 
         if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
         extend(_,     {enumerable: false, overwrite: false}, module);
-        extend(_.not, {enumerable: false, overwrite: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(_.not, {enumerable: false, overwrite: false, action: action}, module);
     }
 
     function wrapPrototype(wrapper, module)
     {
         if(!module) return;
 
-        extend(wrapper._methods,     {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._methods.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return  !fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._chains,      {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
-        extend(wrapper._chains.not,  {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
+        var action               = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
+        var actionNegated        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return  !fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
+        var actionChained        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)._.chain}}} (method, dsc[method])}};
+        var actionChainedNegated = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}(method, dsc[method])}};
+
+        extend(wrapper._methods,     {enumerable: false, action: action}, module);
+        extend(wrapper._methods.not, {enumerable: false, action: actionNegated}, module);
+        extend(wrapper._chains,      {enumerable: false, action: actionChained},  module);
+        extend(wrapper._chains.not,  {enumerable: false, action: actionChainedNegated}, module);
 
         extend(wrapper.methods, {enumerable: false}, module);
     }
@@ -634,7 +642,7 @@
                 default       : return NaN
             }
         },
-        toString: {onoverride: null, value: function(obj) {return obj? obj._.toString() : obj+''}}
+        stringify: {onoverride: null, value: function(obj) {return obj? obj._.stringify() : obj+''}}
     });
     /**
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence.
@@ -1658,13 +1666,13 @@
              * Better to string version
              *
              * @public
-             * @method obj#toString
+             * @method obj#stringify
              *
              * @this    {Object}
              *
              * @returns {string} - string representation of the object
              */
-            toString: {onoverride: null, value: function(visited_)
+            stringify: {onoverride: null, value: function(visited_)
             {
                 var output = '';
     
@@ -1677,7 +1685,7 @@
                         if(!visited_)           {visited_ = [this]}
     
                         if(visited_._.has(obj)) {val = '[[circular ref]]'}
-                        else                    {visited_.push(obj); val = obj._.toString(visited_)}
+                        else                    {visited_.push(obj); val = obj._.stringify(visited_)}
                     }
     
                     // TODO punctuation for strings & proper formatting
@@ -1685,6 +1693,20 @@
                 });
     
                 return output + '}';
+            }},
+            /**
+             * 'fixes' wrong implicit calls to the _methods object
+             *
+             * @public
+             * @method obj#toString
+             *
+             * @this    {Object}
+             *
+             * @returns {string} - empty string
+             */
+            toString: {onoverride: null, value: function()
+            {
+                return ''
             }},
             /**
              * Returns an array containing the values of an object (enumerable properties)
@@ -2239,17 +2261,17 @@
             /**
              * Better to string version
              * @public
-             * @method arr#toString
+             * @method arr#stringify
              * @this    {Array}
              * @returns {string} - string representation of the array
              */
-            toString: {onoverride: null, value: function()
+            stringify: {onoverride: null, value: function()
             {
                 var output = '[';
     
                 for(var i = 0, max = this.length; i < max; i++)
                 {
-                    output += (i? ', ' : '') + this[i]._.toString();
+                    output += (i? ', ' : '') + this[i]._.stringify();
                 }
     
                 return output + ']';
@@ -2514,11 +2536,11 @@
             /**
              * Better to string version
              * @public
-             * @method str#toString
+             * @method str#stringify
              * @this    {string}
              * @returns {string} - string representation of the object
              */
-            toString: {onoverride: null, value: function()
+            stringify: {onoverride: null, value: function()
             {
                 return this.toString();
             }}
@@ -2675,10 +2697,10 @@
             /**
              * Better to string version
              * @public
-             * @method   num#toString
+             * @method   num#stringify
              * @returns {string} - string representation of the number
              */
-            toString: {onoverride: null, value: function()
+            stringify: {onoverride: null, value: function()
             {
                 return this.toString()
             }}
@@ -2795,10 +2817,10 @@
             /**
              * toString wrapper for bottom_line
              * @public
-             * @method fnc#toString
+             * @method fnc#stringify
              * @returns {string} - string representation of the function
              */
-            toString: {onoverride: null, value: function()
+            stringify: {onoverride: null, value: function()
             {
                 return this.toString();
             }}

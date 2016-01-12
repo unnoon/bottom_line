@@ -109,10 +109,10 @@ construct('fnc', {native:Function}, {
         /**
          * toString wrapper for bottom_line
          * @public
-         * @method fnc#toString
+         * @method fnc#stringify
          * @returns {string} - string representation of the function
          */
-        toString: {onoverride: null, value: function()
+        stringify: {onoverride: null, value: function()
         {
             return this.toString();
         }}

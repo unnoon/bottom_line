@@ -94,23 +94,31 @@
     {
         if(!module) return;
 
+        // action function that negates a function
+        var action = function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}};
+
         extend(wrapper,     {enumerable: false}, module);
-        extend(wrapper.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(wrapper.not, {enumerable: false, action: action}, module);
 
         if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
         extend(_,     {enumerable: false, overwrite: false}, module);
-        extend(_.not, {enumerable: false, overwrite: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}}}, module);
+        extend(_.not, {enumerable: false, overwrite: false, action: action}, module);
     }
 
     function wrapPrototype(wrapper, module)
     {
         if(!module) return;
 
-        extend(wrapper._methods,     {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._methods.not, {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return  !fn.apply(stack[--index], arguments)}}},          module);
-        extend(wrapper._chains,      {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return   fn.apply(stack[--index], arguments)._.chain}}},  module);
-        extend(wrapper._chains.not,  {enumerable: false, action: function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}, module);
+        var action               = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
+        var actionNegated        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return  !fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
+        var actionChained        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)._.chain}}} (method, dsc[method])}};
+        var actionChainedNegated = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}(method, dsc[method])}};
+
+        extend(wrapper._methods,     {enumerable: false, action: action}, module);
+        extend(wrapper._methods.not, {enumerable: false, action: actionNegated}, module);
+        extend(wrapper._chains,      {enumerable: false, action: actionChained},  module);
+        extend(wrapper._chains.not,  {enumerable: false, action: actionChainedNegated}, module);
 
         extend(wrapper.methods, {enumerable: false}, module);
     }
