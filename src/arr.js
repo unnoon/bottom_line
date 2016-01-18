@@ -27,7 +27,7 @@ construct('arr', {native:Array}, {
             var start;
 
             arguments._.each(function(arr) {
-                if(!arr) return; // continue
+                if(!arr) {return} // continue
 
                 start        = this.length; // start position to start appending
                 this.length += arr.length;  // set the length to the length after appending

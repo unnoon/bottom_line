@@ -109,10 +109,11 @@ function collectPrototypeChain(module, obj, options) {
 /**
  * Processes the properties of a prototype object
  *
- * @param {Object} properties - object containing the properties for extension
- * @param {Object} options    - object containing the options for extension
- * @param {Object} proto     -
- * @param obj
+ * @param {Object} proto   - prototype to process
+ * @param {Object} obj     - object to extend
+ * @param {Object} options - extension options
+ * @param {Object} module  - object containing the options for extension
+
  */
 function processProperties(proto, obj, options, module) {
     var properties = options.nonenumerables
@@ -130,12 +131,12 @@ function processProperties(proto, obj, options, module) {
 
         copyPropertyConfigs(options, dsc);
 
-        handleAttributes(dsc);
+        prop = handleAttributes(prop, dsc);
         finalizeDescriptor(prop, dsc, actionType);
 
         if(!dsc[actionType]) {return} // continue
 
-        getNames(prop, dsc).forEach(function(prop, i) {
+        getNames(prop, dsc).forEach(function(prop) {
             Object.defineProperty(obj, prop, dsc)
         });
     });
@@ -222,12 +223,21 @@ function isDescriptor(value)
 /**
  * Processes the attributes and sets the correct value on the descriptor
  *
+ * @param {string} prop       - property name that might contain attributes
  * @param {Object} descriptor - the property descriptor
+ *
+ * @return {string} prop - the property name without its attributes
  */
-function handleAttributes(descriptor) {
-    if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
-    // TODO add attribute check
-    var attrs      = descriptor.value.attrs.split(' '); // TODO make corrections for multiple space and add support for comma's
+function handleAttributes(prop, descriptor) {
+    var attrs = descriptor.hasOwnProperty('attrs')
+        ? descriptor.attrs
+        : '';
+
+    attrs += ' '+prop; // add property name attributes to attrs
+    attrs = attrs.split(' '); // TODO attribute check & make corrections for multiple space and add support for comma's
+
+    prop = attrs.pop(); // remove property name from attributes and set to prop
+
     var attr;
     var negated;
 
@@ -238,6 +248,8 @@ function handleAttributes(descriptor) {
 
         descriptor[!negated ? attr : attr.slice(1)] = !negated;
     }
+
+    return prop
 }
 
 /**
