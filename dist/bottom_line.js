@@ -178,6 +178,8 @@
      *     @param   {Object=}   _options_.onnewctx               - context for the new action
      *     @param   {Object=}   _options_.actionctx              - context for the default action
      *
+     *     @param   {Function=} _options_.condition              - condition for extension
+     *
      *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
      *     @param   {boolean=}  _options_.writable        - boolean indicating if all properties should be writable. can be overwritten on a config level
@@ -284,6 +286,7 @@
     
             if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
             if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
+            if(options.condition && !options.condition(prop, dsc)){return} // continue
     
             copyPropertyConfigs(options, dsc);
     
