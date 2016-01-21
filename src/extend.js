@@ -23,6 +23,7 @@
  *     @param   {Object=}   _options_.actionctx              - context for the default action
  *
  *     @param   {Function=} _options_.condition              - condition for extension
+ *     @param   {Object=}   _options_.conditionctx           - context for the condition function
  *
  *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
  *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
@@ -130,7 +131,7 @@ function processProperties(proto, obj, options, module) {
 
         if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
         if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
-        if(options.condition && !options.condition(prop, dsc)){return} // continue
+        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc)){return} // continue
 
         copyPropertyConfigs(options, dsc);
 
