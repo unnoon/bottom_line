@@ -14,11 +14,13 @@
  *
  *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
  *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
+ *     @param   {Function=} _options_.onconflict=null          - will set onoverride & onoverwrite at the ame time
  *     @param   {Function=} _options_.onnew=null               - function containing the new action
  *     @param   {Function=} _options_.action                   - action to apply on all properties
  *
  *     @param   {Object=}   _options_.onoverwritectx=console - context for the overwrite action
  *     @param   {Object=}   _options_.onoverridectx=console  - context for the override action
+ *     @param   {Object=}   _options_.onconflictctx          - context for the conflict action
  *     @param   {Object=}   _options_.onnewctx               - context for the new action
  *     @param   {Object=}   _options_.actionctx              - context for the default action
  *
@@ -72,10 +74,11 @@ function processOptions(options) {
     options.override            = options.safe ? false : options.override  !== false; // default is true
     options.overwrite           = options.safe ? false : options.overwrite !== false; // default is true
 
-    options.onoverwrite         = options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
-    options.onoverride          = options.hasOwnProperty('onoverride')  ? options.onoverride  : console.warn;
-    options.onoverwritectx      = options.onoverwritectx || console;
-    options.onoverridectx       = options.onoverridectx  || console;
+    // we need to do a hasOwnPropertyCheck here because null will specifically tell onoverride/write to do nothing
+    options.onoverwrite         = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
+    options.onoverride          = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverride  : console.warn;
+    options.onoverwritectx      = options.onconflictctx || options.onoverwritectx || console;
+    options.onoverridectx       = options.onconflictctx || options.onoverridectx  || console;
 
     if(options.shim)
     {

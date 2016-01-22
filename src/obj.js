@@ -16,7 +16,7 @@ construct('obj', {native:Object}, {
          */
         clone: clone,
         /**
-         * Clones an object
+         * Deep clones an object
          *
          * @public
          * @static
@@ -27,6 +27,8 @@ construct('obj', {native:Object}, {
          * @return  {Object}  clone - the cloned object
          */
         // TODO adaptation for arrays in phantomJS
+        // FIXME for circular objects
+        // TODO add sealed, frozen extensible
         cloneDeep: function cloneDeep(obj) {
             if(_.isPrimitive(obj)) return obj;
 
