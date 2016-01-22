@@ -558,6 +558,7 @@
         },
         isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
         isArray:      Array.isArray,
+        isDescriptor: isDescriptor,
         /**
          * Checks if an object is empty
          * @public
