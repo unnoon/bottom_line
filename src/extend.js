@@ -139,7 +139,7 @@ function processProperties(proto, obj, options, module) {
         copyPropertyConfigs(options, dsc);
 
         prop = handleAttributes(prop, dsc);
-        finalizeDescriptor(prop, dsc, actionType);
+        finalizeDescriptor(prop, dsc, actionType, obj);
 
         if(!dsc[actionType]) {return} // continue
 
@@ -265,26 +265,29 @@ function handleAttributes(prop, descriptor) {
  * @param {string} prop       - name of the property
  * @param {Object} descriptor - the property descriptor
  * @param {string} actionType - the action type 'override'|'overwrite'|'new'|''
+ * @param {Object} obj        - the object that is extended
+ *
  */
-function finalizeDescriptor(prop, descriptor, actionType) {
+function finalizeDescriptor(prop, descriptor, actionType, obj) {
     if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
     if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
 
     // getters & setters don't have a writable option
     if(descriptor.get || descriptor.set) {delete descriptor.writable}
     // perform actions
-    action(actionType, prop, descriptor);
-    action('', prop, descriptor); // default action
+    action(actionType, prop, descriptor, obj);
+    action('', prop, descriptor, obj); // default action
 }
 
 /**
  * Performs action based on type, enabled & value.
  *
- * @param {string}  type='override'|'overwrite' - type the action is acting to
- * @param {Object}  descriptor                  - the property descriptor. this also contains the global options
- * @param {string}  prop                        - name of the property
+ * @param {string} type='override'|'overwrite' - type the action is acting to
+ * @param {Object} descriptor                  - the property descriptor. this also contains the global options
+ * @param {string} prop                        - name of the property
+ * @param {Object} obj                         - the object that is extended
  */
-function action(type, prop, descriptor) {
+function action(type, prop, descriptor, obj) {
     var message;
     var action  = descriptor[(type? 'on' + type : 'action')];
     var ctx     = descriptor[(type? 'on' + type : 'action')+'ctx'];
@@ -296,7 +299,7 @@ function action(type, prop, descriptor) {
         ? (type +' on property: '+prop+'.')
         : ('redundant '+type+' defined for property '+prop+'. '+type+'s are set to false in options/descriptor.');
 
-    action.call(ctx, message, prop, descriptor)
+    action.call(ctx, message, prop, descriptor, obj)
 }
 
 /**
