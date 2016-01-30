@@ -713,7 +713,6 @@ construct('obj', {native:Object}, {
 
             return this;
         },
-
         /**
          * Creates new array without all specified values
          *
@@ -758,38 +757,132 @@ construct('obj', {native:Object}, {
 
             return output;
         },
-
+        /**
+         * Selects 1st values from an object|array
+         *
+         * @public
+         * @method obj#select
+         *
+         * @this   {Object}
+         *
+         * @param  {...any} ___values - values to select
+         *
+         * @return {Object|Array} this - mutated array for chaining
+         */
         select: function(___values) {
             var args = arguments;
             return this._.remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
-
+        /**
+         * Selects 1st value from an object|array based on a match function
+         *
+         * @public
+         * @method obj#selectFn
+         *
+         * @this   {Array}
+         *
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+         * @param  {Object=}                          ctx_   - optional context for the match function
+         *
+         * @return {Object|Array} this - mutated array for chaining
+         */
         selectFn: function(match, ctx_) {
             var matched = false;
             return this._.remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
-
+        /**
+         * Creates new array with the specified 1st values
+         * @public
+         * @method obj#Select
+         *
+         * @this   {Object}
+         *
+         * @param  {...any} ___values - values to select
+         *
+         * @return {Array} output - new array with the values
+         */
         Select: function(___values) {
             var args = arguments;
             return this._.Remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
         },
-
+        /**
+         * Creates a new object|array with 1st value based on a match function
+         *
+         * @public
+         * @method obj#SelectFn
+         *
+         * @this   {Array}
+         *
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+         * @param  {Object=}                          ctx_   - optional context for the match function
+         *
+         * @return {Array} output - new array with the value specified
+         */
         SelectFn: function(match, ctx_) {
             var matched = false;
             return this._.Remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
         },
-
+        /**
+         * Selects all specified values from an array
+         *
+         * @public
+         * @method obj#select$
+         *
+         * @this {Array}
+         *
+         * @param {...any} ___values - values to select
+         *
+         * @return {Array} this - mutated array for chaining
+         */
         select$: function(___values) {
             var args = arguments;
             return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
+        /**
+         * Selects all values from an array based on a match function
+         *
+         * @public
+         * @method obj#select$Fn
+         *
+         * @this   {Array}
+         *
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+         * @param  {Object=}                            ctx_ - optional context for the match function
+         *
+         * @return {Array} this - mutated array for chaining
+         */
         select$Fn: function(match, ctx_) {
             return this._.remove$Fn(_.fnc.negate(match), ctx_);
         },
+        /**
+         * Creates new array with all specified values
+         *
+         * @public
+         * @method obj#Select$
+         *
+         * @this {Object|Array}
+         *
+         * @param {...any} ___values - values to remove
+         *
+         * @return {Array} output - new array with the values
+         */
         Select$: function(___values) {
             var args = arguments;
             return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
         },
+        /**
+         * Creates a new array with all value specified by the match function
+         *
+         * @public
+         * @method obj#Select$Fn
+         *
+         * @this   {Array}
+         *
+         * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+         * @param  {Object=}                            ctx_ - optional context for the match function
+         *
+         * @return {Array} output - new array with the values specified
+         */
         Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
             return this._.Remove$Fn(_.fnc.negate(match), ctx_);
         }},
