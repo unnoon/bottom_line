@@ -14,32 +14,8 @@ construct('obj', {native:Object}, {
          *
          * @return  {Object}  clone - the cloned object
          */
+        // TODO add deep option to clone function itself
         clone: clone,
-        /**
-         * Deep clones an object
-         *
-         * @public
-         * @static
-         * @method obj.cloneDeep
-         *
-         * @param   {Object}  obj   - object to be cloned
-         *
-         * @return  {Object}  clone - the cloned object
-         */
-        // TODO adaptation for arrays in phantomJS
-        // FIXME for circular objects
-        // TODO add sealed, frozen extensible
-        cloneDeep: function cloneDeep(obj) {
-            if(_.isPrimitive(obj)) return obj;
-
-            var clone = _.create(obj._.proto());
-            obj._.names()._.each(function (name) {
-                var pd = obj._.descriptor(name);
-                if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                Object.defineProperty(clone, name, pd);
-            });
-            return clone;
-        },
         /**
          * creates an object based on a prototype
          *
@@ -971,7 +947,7 @@ construct('obj', {native:Object}, {
          *
          * @returns {string} - string representation of the object
          */
-        stringify: {onoverride: null, value: function(visited_)
+        stringify: function(visited_)
         {
             var output = '';
 
@@ -992,7 +968,7 @@ construct('obj', {native:Object}, {
             });
 
             return output + '}';
-        }},
+        },
         /**
          * 'fixes' wrong implicit calls to the _methods object
          *

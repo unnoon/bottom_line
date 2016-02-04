@@ -2,7 +2,7 @@ describe("Global", function() {
 
     describe("static methods", function() {
 
-        xdescribe("isFunction", function() {
+        describe("isFunction", function() {
 
             it("simple", function() {
                 expect(_.isFunction(function(){})).to.be.true;

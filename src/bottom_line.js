@@ -2,20 +2,20 @@
  * _____________bottom_line.js_____
  * Bottom_line JavaScript Library
  *
- * Copyright 2015, Rogier Geertzema
+ * Copyright 2016, Rogier Geertzema
  * Released under the MIT license
  * ________________________________
  */
 !function(bottom_line) {
     var environments = true;
-    var requirejs    = typeof(define) === 'function'  && !!define.amd;
-    var nodejs       = typeof(module) !== 'undefined' && this === module.exports;
+    var requirejs    = typeof(define) === 'function' && !!this.define && !!define.amd;
+    var nodejs       = typeof(module) === 'object'   && this === module.exports;
 
     switch(environments) {
-    case requirejs : define(bottom_line);            break;
-    case nodejs    : module.exports = bottom_line(); break;
-    default        : bottom_line(this)}
-}.call(this, function(root_) {
+    case requirejs : define(bottom_line);             break;
+    case nodejs    : module.exports  = bottom_line(); break;
+    default        : !this._? this._ = bottom_line() : console.error("'_' is already defined on root object")}
+}.call(this, function bottom_line() {
     'use strict';
 
     var stack = []; // stack holding all wrapped objects accessed from ._
@@ -27,54 +27,51 @@
 	 * @namespace _
 	 */
 	var _ = {
+        'name': 'bottom_line',
         'version': '0.0.7',
-        not: {} // object to hold negative functions
+        'description': 'JS Toolbelt'
     };
-    // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
-    if(root_)
-    {
-        if(root_.hasOwnProperty('_')) {console.error('_ is already defined on root object'); return}
-        else                          {root_._ = _}
-    }
 
     // TODO something to run methods in a different context. Apply will not work since the context will get lost when using other bottom_line functions internally
     // wrap functions for chaining
+    /**
+     * Constructs a wrapper object
+     *
+     * @param {string}   key       - the key/name of the wrapper object that is used to attach it to the root _ object
+     * @param {Object=} _settings_ - optional settings object
+     *     @param   {Object=}  _settings_.native               - the native object that is extended on the prototype
+     *     @param   {boolean=} _settings_.cloneAsWrapper=false - boolean indicating if the native object should be cloned and used as the wrapper object
+     *     @param   {Object= } _settings_.wrapper              - pre-specified object to be used as wrapper
+     * @param {Object}   module   - module object containing methods to be added to the wrapper object
+     *
+     * @returns {Object} - the constructed wrapper object
+     */
     function construct(key, _settings_, module)
     {
         var settings = module && _settings_ || {};
         var module   = module || _settings_;
         var obj      = settings.native;
 
-        var wrapper = settings.base? clone(settings.native) : {};
+        var wrapper = settings.cloneAsWrapper? clone(settings.native) : settings.wrapper || {};
 
         wrapper.not     = {};
         wrapper.methods = {}; // add methods unwrapped so we can use them with apply
 
         // create instance and chain object including not wrapper
-        var _methods = wrapper._methods = (key === 'obj') ? {not:{}} : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
-        var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
+        var _methods = wrapper._methods = (key === 'obj' || key === '_') ? {not:{}} : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
+        var _chains  = wrapper._chains  = (key === 'obj' || key === '_') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
 
-        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper._chains,  'value', {get: function() {
-            var elm = stack[--index];
-            return elm.valueOf? elm.valueOf() : elm;
-        }, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return _chains}, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {var elm = stack[--index]; return elm.valueOf? elm.valueOf() : elm}, enumerable: false, configurable: false});
 
         if(obj && obj.prototype)
-        {
-            if(obj.prototype.hasOwnProperty('_'))
-            {
-                // TODO add a silent log here
-            }
+        {   if(obj.prototype.hasOwnProperty('_')) {console.error("'_' is already defined on native prototype for "+key)}
             else
             {
                 // extend native object with special _ 'bottom_line' access property
                 Object.defineProperty(obj.prototype, '_', {
                     enumerable: false, configurable: false,
-                    get: function() {
-                        stack[index++] = this;
-                        return _methods
-                    },
+                    get: function() {stack[index++] = this; return _methods},
                     // we implement a set so it is still possible to use _ as an object property
                     set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}
                 );
@@ -82,7 +79,7 @@
         }
 
         // by default add wrapper to the bottom_line object
-        if(settings.global !== false) {_[key] = wrapper}
+        if(key !== '_') {_[key] = wrapper}
 
         wrapStatics(wrapper,   module.static);
         wrapPrototype(wrapper, module.prototype);
@@ -124,40 +121,89 @@
     }
 
     // simple cloning function
-    function clone(obj) {
-        var type        = typeof(obj);
-        var isPrimitive = (obj === null || (type !== 'object' && type !== 'function'));
-        var isObject    = !isPrimitive;
-        var clone;
+    //function clone(obj) {
+    //    var type        = typeof(obj);
+    //    var isPrimitive = (obj === null || (type !== 'object' && type !== 'function'));
+    //    var isObject    = !isPrimitive;
+    //    var clone;
+    //
+    //    switch(true)
+    //    {
+    //        case isPrimitive :
+    //            clone = obj; break;
+    //        case Array.isArray(obj) :
+    //            clone = obj.slice(); break;
+    //        case isObject :
+    //            clone = Object.create(Object.getPrototypeOf(obj));
+    //
+    //            Object.getOwnPropertyNames(obj).forEach(function(name) {
+    //                Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
+    //            }); break;
+    //    }
+    //
+    //    if(isObject)
+    //    {
+    //        if(!Object.isExtensible(obj)) {Object.preventExtensions(clone)}
+    //        if(Object.isSealed(obj))      {Object.seal(clone)}
+    //        if(Object.isFrozen(obj))      {Object.freeze(clone)}
+    //    }
+    //
+    //    return clone;
+    //}
 
-        switch(true)
-        {
-            case isPrimitive :
-                clone = obj; break;
-            case Array.isArray(obj) :
-                clone = obj.slice(); break;
-            case isObject :
-                clone = Object.create(Object.getPrototypeOf(obj));
+    /**
+     * cloning function
+     *
+     * @param {string=} _mode_='shallow' - 'shallow|deep' can be omitted completely
+     * @param {Object}   obj             - object to be cloned
+     * @param {Array=}   visited_        - array of visited objects to check for circular references
+     * @param {Array=}   clones_         - array of respective clones to fill circular references
+     *
+     * @returns {Object} - clone of the object
+     */
+    function clone(_mode_, obj, visited_, clones_) {
+        var mode = obj && _mode_ || 'shallow';
+        var obj  = obj || _mode_;
 
-                Object.getOwnPropertyNames(obj).forEach(function(name) {
-                    Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
-                }); break;
-        }
+        if(isPrimitive(obj)) {return obj}
+        if(visited_ && ~visited_.indexOf(obj)) {return clones_[visited_.indexOf(obj)]}
 
-        if(isObject)
-        {
-            if(!Object.isExtensible(obj)) {Object.preventExtensions(clone)}
-            if(Object.isSealed(obj))      {Object.seal(clone)}
-            if(Object.isFrozen(obj))      {Object.freeze(clone)}
-        }
+        var cln = Array.isArray(obj)
+            ? [] // otherwise chrome dev tools does not understand it is an array
+            : Object.create(Object.getPrototypeOf(obj));
 
-        return clone;
+        visited_ = visited_ || [];
+        clones_  = clones_  || [];
+
+        visited_.push(obj);
+        clones_.push(cln);
+
+        Object.getOwnPropertyNames(obj).forEach(function(name) {
+            var dsc = Object.getOwnPropertyDescriptor(obj, name);
+            dsc.value = dsc.hasOwnProperty('value') && mode === 'deep'
+                ? dsc.value = clone(mode, dsc.value, visited_, clones_)
+                : dsc.value;
+
+            Object.defineProperty(cln, name, dsc);
+        });
+
+        if(!Object.isExtensible(obj)) {Object.preventExtensions(cln)}
+        if(Object.isSealed(obj))      {Object.seal(cln)}
+        if(Object.isFrozen(obj))      {Object.freeze(cln)}
+
+        return cln;
+    }
+
+    function isPrimitive(obj)
+    {
+        var type = typeof(obj);
+        return (obj === null || (type !== 'object' && type !== 'function'));
     }
 
     /* @include extend.js */
     /* @include shims.js */
-    /* @include global.js */
     /* @include Batcher.js */
+    /* @include global.js */
     /* @include obj.js  */
     /* @include arr.js  */
     /* @include str.js  */
