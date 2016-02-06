@@ -99,7 +99,8 @@ construct('obj', {native:Object}, {
          *
          * @this    {Object}
          *
-         * @param  {...any}  val - value to push
+         * @param  {any}    val - value to add
+         * @param  {string} key - string key to add to the object
          *
          * @return  {Array} this - this for chaining
          */

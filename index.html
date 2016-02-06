@@ -8,73 +8,78 @@
         <script src="bin/bottom_line.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var isOdd = (-3)._.odd;
-            console.log((2)._.odd);
 
-            console.log(isOdd);
-            var map = { '-': '!', '+':'2', '*':'3' };
-            var myString = ['b', '_', 'l'];
-            var tmp = map[myString[1]];
+            var arr = [1, 2, 3];
+            var lst = arr._.last();
 
-            myString[1] = tmp;
 
-            var tmp2 = myString[1];
-
-            console.log('tmp: ', tmp);
-//            console.log('join: ', myString[0]+myString[1]+myString[2]);
-            console.log('join: ', myString.join(''));
-
-            var obj = {
-                x: 1,
-                y: 2,
-                z: 3
-            };
-
-            var value = obj._.chain
-                    .keys()
-                    .first()
-                    .value;
-
-            console.log(value._.stringify());
-
-            var obj2 = {
-                x: 1,
-                y: 2,
-                z: 3
-            };
-
-            var keys = Object.keys(obj2);
-
-            var first  = keys._.first();
-            var sfirst = keys[0];
-
-            var value2 = obj._.chain
-                    .keys()
-                    .value;
-
-            console.log(first._.stringify());
-
-            var obj = {
-                x: 1,
-                y: [{y1: {circ: null}}, {}],
-                z: 3,
-                t: {z: 666}
-            };
-
-            obj.y[0].y1.circ = obj;
-
-            var cobj = {
-                x: 1,
-                y: [{y1: {circ: null}}, {}],
-                z: 3,
-                t: {z: 666}
-            };
-
-            cobj.y[0].y1.circ = cobj;
-
-            var clone = _.clone('deep', obj);
-
-            console.assert(clone.y[0].y1.circ == clone, "incorrect ciruclar cloning");
+//            var isOdd = (-3)._.odd;
+//            console.log((2)._.odd);
+//
+//            console.log(isOdd);
+//            var map = { '-': '!', '+':'2', '*':'3' };
+//            var myString = ['b', '_', 'l'];
+//            var tmp = map[myString[1]];
+//
+//            myString[1] = tmp;
+//
+//            var tmp2 = myString[1];
+//
+//            console.log('tmp: ', tmp);
+////            console.log('join: ', myString[0]+myString[1]+myString[2]);
+//            console.log('join: ', myString.join(''));
+//
+//            var obj = {
+//                x: 1,
+//                y: 2,
+//                z: 3
+//            };
+//
+//            var value = obj._.chain
+//                    .keys()
+//                    .first()
+//                    .value;
+//
+//            console.log(value._.stringify());
+//
+//            var obj2 = {
+//                x: 1,
+//                y: 2,
+//                z: 3
+//            };
+//
+//            var keys = Object.keys(obj2);
+//
+//            var first  = keys._.first();
+//            var sfirst = keys[0];
+//
+//            var value2 = obj._.chain
+//                    .keys()
+//                    .value;
+//
+//            console.log(first._.stringify());
+//
+//            var obj = {
+//                x: 1,
+//                y: [{y1: {circ: null}}, {}],
+//                z: 3,
+//                t: {z: 666}
+//            };
+//
+//            obj.y[0].y1.circ = obj;
+//
+//            var cobj = {
+//                x: 1,
+//                y: [{y1: {circ: null}}, {}],
+//                z: 3,
+//                t: {z: 666}
+//            };
+//
+//            cobj.y[0].y1.circ = cobj;
+//
+//            var clone = _.clone('deep', obj);
+//
+//            console.assert(clone.y[0].y1.circ == clone, "incorrect ciruclar cloning");
         </script>
     </head>
     <body>

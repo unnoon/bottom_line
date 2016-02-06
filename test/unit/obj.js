@@ -87,6 +87,27 @@ describe("Object", function() {
                 expect(clone.y[0].y1.circ).to.equal(clone);
             });
 
+            it("simple clone.deep", function() {
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                };
+                var clone = _.clone.deep(obj);
+
+                expect(clone).to.deep.equal({
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                });
+                obj.t.z = 777;
+
+                expect(clone.t.z).to.equal(666);
+                expect(clone).to.not.equal(obj);
+            });
+
         });
 
 		describe("extend", function() {
