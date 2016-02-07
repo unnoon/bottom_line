@@ -24,7 +24,7 @@
     "requirejs": "latest"
   },
   "scripts": {
-    "test": "grunt preprocess && karma run",
+    "test": "karma run",
     "update": "npm-check-updates -u && npm install"
   },
   "repository": {
