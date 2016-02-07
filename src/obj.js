@@ -837,7 +837,7 @@ construct('obj', {native:Object}, {
          * @public
          * @method obj#Select$
          *
-         * @this {Object|Array}
+         * @this {Object}
          *
          * @param {...any} ___values - values to remove
          *

@@ -28,7 +28,7 @@
 	var _ = {
         'info': {
             'name': 'bottom_line',
-            'version': '0.0.7',
+            'version': '0.0.8',
             'description': 'JS Toolbelt'
         }
     };
@@ -1676,7 +1676,7 @@
              * @public
              * @method obj#Select$
              *
-             * @this {Object|Array}
+             * @this {Object}
              *
              * @param {...any} ___values - values to remove
              *
