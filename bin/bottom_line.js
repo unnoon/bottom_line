@@ -2,24 +2,23 @@
  * _____________bottom_line.js_____
  * Bottom_line JavaScript Library
  *
- * Copyright 2015, Rogier Geertzema
+ * Copyright 2016, Rogier Geertzema
  * Released under the MIT license
  * ________________________________
  */
 !function(bottom_line) {
     var environments = true;
-    var requirejs    = typeof(define) === 'function'  && !!define.amd;
-    var nodejs       = typeof(module) !== 'undefined' && this === module.exports;
+    var requirejs    = typeof(define) === 'function' && this.define == define && !!define.amd;
+    var nodejs       = typeof(module) === 'object'   && this === module.exports;
 
     switch(environments) {
-    case requirejs : define(bottom_line);            break;
-    case nodejs    : module.exports = bottom_line(); break;
-    default        : bottom_line(this)}
-}.call(this, function(root_) {
+    case requirejs : define(bottom_line);             break;
+    case nodejs    : module.exports  = bottom_line(); break;
+    default        : !this._? this._ = bottom_line() : console.error("'_' is already defined on root object")}
+}.call(this, function bottom_line() {
     'use strict';
 
     var stack = []; // stack holding all wrapped objects accessed from ._
-    var index = 0;  // current index in the stack
 
 	/**
 	 * bottom_line: base module. This will hold all type objects: obj, arr, num, str, fnc, math
@@ -27,54 +26,53 @@
 	 * @namespace _
 	 */
 	var _ = {
-        'version': '0.0.7',
-        not: {} // object to hold negative functions
+        'info': {
+            'name': 'bottom_line',
+            'version': '0.0.7',
+            'description': 'JS Toolbelt'
+        }
     };
-    // we can't set the root above since phantomJS 1.9.8 will break as it gets confused with _ defined on the object prototype
-    if(root_)
-    {
-        if(root_.hasOwnProperty('_')) {console.error('_ is already defined on root object'); return}
-        else                          {root_._ = _}
-    }
 
-    // TODO something to run methods in a different context. Apply will not work since the context will get lost when using other bottom_line functions internally
-    // wrap functions for chaining
+    /**
+     * Constructs a wrapper object
+     *
+     * @param {string}   key       - the key/name of the wrapper object that is used to attach it to the root _ object
+     * @param {Object=} _settings_ - optional settings object
+     *     @param   {Object=}  _settings_.native               - the native object that is extended on the prototype
+     *     @param   {boolean=} _settings_.cloneAsWrapper=false - boolean indicating if the native object should be cloned and used as the wrapper object
+     *     @param   {Object= } _settings_.wrapper              - pre-specified object to be used as wrapper
+     * @param {Object}   module   - module object containing methods to be added to the wrapper object
+     *
+     * @returns {Object} - the constructed wrapper object
+     */
     function construct(key, _settings_, module)
     {
         var settings = module && _settings_ || {};
         var module   = module || _settings_;
         var obj      = settings.native;
 
-        var wrapper = settings.base? clone(settings.native) : {};
+        var wrapper = settings.cloneAsWrapper? clone(settings.native) : settings.wrapper || {};
 
         wrapper.not     = {};
         wrapper.methods = {}; // add methods unwrapped so we can use them with apply
 
         // create instance and chain object including not wrapper
-        var _methods = wrapper._methods = (key === 'obj') ? {not:{}} : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
-        var _chains  = wrapper._chains  = (key === 'obj') ? {not:{}} : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
+        var _methods = (key === 'obj' || key === '_') ? Object.create(Object.prototype, {not:{value: {}}}) : Object.create(_.obj._methods, {not:{value:Object.create(_.obj._methods.not)}}); // inherit from object. // stores non-chainable use _methods
+        var _chains  = (key === 'obj' || key === '_') ? Object.create(Object.prototype, {not:{value: {}}}) : Object.create(_.obj._chains,  {not:{value:Object.create(_.obj._chains.not)}});  // inherit from object.  // stores chainable use _methods
 
-        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return        _chains}, enumerable: false, configurable: false});
-        Object.defineProperty(wrapper._chains,  'value', {get: function() {
-            var elm = stack[--index];
-            return elm.valueOf? elm.valueOf() : elm;
-        }, enumerable: false, configurable: false});
+        Object.defineProperty(wrapper, '_methods', {value: _methods});
+        Object.defineProperty(wrapper, '_chains',  {value: _chains});
+        Object.defineProperty(wrapper._methods, 'chain', {get: function() {return _chains}});
+        Object.defineProperty(wrapper._chains,  'value', {get: function() {var elm = stack.pop(); return elm.valueOf? elm.valueOf() : elm}});
 
         if(obj && obj.prototype)
-        {
-            if(obj.prototype.hasOwnProperty('_'))
-            {
-                // TODO add a silent log here
-            }
+        {   if(obj.prototype.hasOwnProperty('_')) {console.error("'_' is already defined on native prototype for "+key)}
             else
             {
                 // extend native object with special _ 'bottom_line' access property
                 Object.defineProperty(obj.prototype, '_', {
                     enumerable: false, configurable: false,
-                    get: function() {
-                        stack[index++] = this;
-                        return _methods
-                    },
+                    get: function() {stack.push(this); return _methods},
                     // we implement a set so it is still possible to use _ as an object property
                     set: function(val) {Object.defineProperty(this, '_', {value: val, enumerable: true,  configurable: true, writable: true})}}
                 );
@@ -82,7 +80,7 @@
         }
 
         // by default add wrapper to the bottom_line object
-        if(settings.global !== false) {_[key] = wrapper}
+        if(key !== '_') {_[key] = wrapper}
 
         wrapStatics(wrapper,   module.static);
         wrapPrototype(wrapper, module.prototype);
@@ -97,23 +95,23 @@
         // action function that negates a function
         var action = function(m, p, dsc) {var fn = dsc.value; if(fn instanceof Function) dsc.value = function () {return !fn.apply(wrapper, arguments)}};
 
-        extend(wrapper,     {enumerable: false}, module);
-        extend(wrapper.not, {enumerable: false, action: action}, module);
+        extend(wrapper,     {},               module);
+        extend(wrapper.not, {action: action}, module);
 
         if(wrapper !== _.obj && wrapper !== _.fnc) return;
         // add static obj & fnc functions to the global _ object
-        extend(_,     {enumerable: false, overwrite: false}, module);
-        extend(_.not, {enumerable: false, overwrite: false, action: action}, module);
+        extend(_,     {overwrite: false},                 module);
+        extend(_.not, {overwrite: false, action: action}, module);
     }
 
     function wrapPrototype(wrapper, module)
     {
         if(!module) return;
 
-        var action               = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
-        var actionNegated        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return  !fn.apply(stack[--index], arguments)}}}(method, dsc[method])}};
-        var actionChained        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack[--index], arguments)._.chain}}} (method, dsc[method])}};
-        var actionChainedNegated = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return (!fn.apply(stack[--index], arguments))._.chain}}}(method, dsc[method])}};
+        var action               = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack.pop(), arguments)}}}(method, dsc[method])}};
+        var actionNegated        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return  !fn.apply(stack.pop(), arguments)}}}(method, dsc[method])}};
+        var actionChained        = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return   fn.apply(stack.pop(), arguments)._.chain}}} (method, dsc[method])}};
+        var actionChainedNegated = function(m, p, dsc) {var methods = ['value', 'get', 'set'], i = 0, method; while(method = methods[i++]) {!function(method, fn) {if(fn instanceof Function) {dsc[method] = function () {return (!fn.apply(stack.pop(), arguments))._.chain}}}(method, dsc[method])}};
 
         extend(wrapper._methods,     {enumerable: false, action: action}, module);
         extend(wrapper._methods.not, {enumerable: false, action: actionNegated}, module);
@@ -123,35 +121,55 @@
         extend(wrapper.methods, {enumerable: false}, module);
     }
 
-    // simple cloning function
-    function clone(obj) {
-        var type        = typeof(obj);
-        var isPrimitive = (obj === null || (type !== 'object' && type !== 'function'));
-        var isObject    = !isPrimitive;
-        var clone;
+    /**
+     * cloning function
+     *
+     * @param {string=} _mode_='shallow' - 'shallow|deep' can be omitted completely
+     * @param {Object}   obj             - object to be cloned
+     * @param {Array=}   visited_        - array of visited objects to check for circular references
+     * @param {Array=}   clones_         - array of respective clones to fill circular references
+     *
+     * @returns {Object} - clone of the object
+     */
+    function clone(_mode_, obj, visited_, clones_) {
+        var mode = obj && _mode_ || 'shallow';
+        var obj  = obj || _mode_;
 
-        switch(true)
-        {
-            case isPrimitive :
-                clone = obj; break;
-            case Array.isArray(obj) :
-                clone = obj.slice(); break;
-            case isObject :
-                clone = Object.create(Object.getPrototypeOf(obj));
+        if(isPrimitive(obj)) {return obj}
+        if(visited_ && ~visited_.indexOf(obj)) {return clones_[visited_.indexOf(obj)]}
 
-                Object.getOwnPropertyNames(obj).forEach(function(name) {
-                    Object.defineProperty(clone, name, Object.getOwnPropertyDescriptor(obj, name));
-                }); break;
-        }
+        var cln = Array.isArray(obj)
+            ? [] // otherwise chrome dev tools does not understand it is an array
+            : Object.create(Object.getPrototypeOf(obj));
 
-        if(isObject)
-        {
-            if(!Object.isExtensible(obj)) {Object.preventExtensions(clone)}
-            if(Object.isSealed(obj))      {Object.seal(clone)}
-            if(Object.isFrozen(obj))      {Object.freeze(clone)}
-        }
+        visited_ = visited_ || [];
+        clones_  = clones_  || [];
 
-        return clone;
+        visited_.push(obj);
+        clones_.push(cln);
+
+        Object.getOwnPropertyNames(obj).forEach(function(name) {
+            var dsc = Object.getOwnPropertyDescriptor(obj, name);
+            dsc.value = dsc.hasOwnProperty('value') && mode === 'deep'
+                ? dsc.value = clone(mode, dsc.value, visited_, clones_)
+                : dsc.value;
+
+            Object.defineProperty(cln, name, dsc);
+        });
+
+        if(!Object.isExtensible(obj)) {Object.preventExtensions(cln)}
+        if(Object.isSealed(obj))      {Object.seal(cln)}
+        if(Object.isFrozen(obj))      {Object.freeze(cln)}
+
+        return cln;
+    }
+
+    clone.deep = clone.bind(null, 'deep');
+
+    function isPrimitive(obj)
+    {
+        var type = typeof(obj);
+        return (obj === null || (type !== 'object' && type !== 'function'));
     }
 
     /**
@@ -170,13 +188,18 @@
      *
      *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
      *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
+     *     @param   {Function=} _options_.onconflict=null          - will set onoverride & onoverwrite at the ame time
      *     @param   {Function=} _options_.onnew=null               - function containing the new action
      *     @param   {Function=} _options_.action                   - action to apply on all properties
      *
      *     @param   {Object=}   _options_.onoverwritectx=console - context for the overwrite action
      *     @param   {Object=}   _options_.onoverridectx=console  - context for the override action
+     *     @param   {Object=}   _options_.onconflictctx          - context for the conflict action
      *     @param   {Object=}   _options_.onnewctx               - context for the new action
      *     @param   {Object=}   _options_.actionctx              - context for the default action
+     *
+     *     @param   {Function=} _options_.condition              - condition for extension
+     *     @param   {Object=}   _options_.conditionctx           - context for the condition function
      *
      *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
      *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
@@ -225,10 +248,11 @@
         options.override            = options.safe ? false : options.override  !== false; // default is true
         options.overwrite           = options.safe ? false : options.overwrite !== false; // default is true
     
-        options.onoverwrite         = options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
-        options.onoverride          = options.hasOwnProperty('onoverride')  ? options.onoverride  : console.warn;
-        options.onoverwritectx      = options.onoverwritectx || console;
-        options.onoverridectx       = options.onoverridectx  || console;
+        // we need to do a hasOwnPropertyCheck here because null will specifically tell onoverride/write to do nothing
+        options.onoverwrite         = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
+        options.onoverride          = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverride  : console.warn;
+        options.onoverwritectx      = options.onconflictctx || options.onoverwritectx || console;
+        options.onoverridectx       = options.onconflictctx || options.onoverridectx  || console;
     
         if(options.shim)
         {
@@ -265,10 +289,11 @@
     /**
      * Processes the properties of a prototype object
      *
-     * @param {Object} properties - object containing the properties for extension
-     * @param {Object} options    - object containing the options for extension
-     * @param {Object} proto     -
-     * @param obj
+     * @param {Object} proto   - prototype to process
+     * @param {Object} obj     - object to extend
+     * @param {Object} options - extension options
+     * @param {Object} module  - object containing the options for extension
+    
      */
     function processProperties(proto, obj, options, module) {
         var properties = options.nonenumerables
@@ -283,15 +308,16 @@
     
             if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
             if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
+            if(options.condition && !options.condition.call(options.conditionctx, prop, dsc)){return} // continue
     
             copyPropertyConfigs(options, dsc);
     
-            handleAttributes(dsc);
-            finalizeDescriptor(prop, dsc, actionType);
+            prop = handleAttributes(prop, dsc);
+            finalizeDescriptor(prop, dsc, actionType, obj);
     
             if(!dsc[actionType]) {return} // continue
     
-            getNames(prop, dsc).forEach(function(prop, i) {
+            getNames(prop, dsc).forEach(function(prop) {
                 Object.defineProperty(obj, prop, dsc)
             });
         });
@@ -378,12 +404,21 @@
     /**
      * Processes the attributes and sets the correct value on the descriptor
      *
+     * @param {string} prop       - property name that might contain attributes
      * @param {Object} descriptor - the property descriptor
+     *
+     * @return {string} prop - the property name without its attributes
      */
-    function handleAttributes(descriptor) {
-        if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
-        // TODO add attribute check
-        var attrs      = descriptor.value.attrs.split(' '); // TODO make corrections for multiple space and add support for comma's
+    function handleAttributes(prop, descriptor) {
+        var attrs = descriptor.hasOwnProperty('attrs')
+            ? descriptor.attrs
+            : '';
+    
+        attrs += ' '+prop; // add property name attributes to attrs
+        attrs = attrs.split(' '); // TODO attribute check & make corrections for multiple space and add support for comma's
+    
+        prop = attrs.pop(); // remove property name from attributes and set to prop
+    
         var attr;
         var negated;
     
@@ -394,6 +429,8 @@
     
             descriptor[!negated ? attr : attr.slice(1)] = !negated;
         }
+    
+        return prop
     }
     
     /**
@@ -402,26 +439,29 @@
      * @param {string} prop       - name of the property
      * @param {Object} descriptor - the property descriptor
      * @param {string} actionType - the action type 'override'|'overwrite'|'new'|''
+     * @param {Object} obj        - the object that is extended
+     *
      */
-    function finalizeDescriptor(prop, descriptor, actionType) {
+    function finalizeDescriptor(prop, descriptor, actionType, obj) {
         if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
         if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
     
         // getters & setters don't have a writable option
         if(descriptor.get || descriptor.set) {delete descriptor.writable}
         // perform actions
-        action(actionType, prop, descriptor);
-        action('', prop, descriptor); // default action
+        action(actionType, prop, descriptor, obj);
+        action('', prop, descriptor, obj); // default action
     }
     
     /**
      * Performs action based on type, enabled & value.
      *
-     * @param {string}  type='override'|'overwrite' - type the action is acting to
-     * @param {Object}  descriptor                  - the property descriptor. this also contains the global options
-     * @param {string}  prop                        - name of the property
+     * @param {string} type='override'|'overwrite' - type the action is acting to
+     * @param {Object} descriptor                  - the property descriptor. this also contains the global options
+     * @param {string} prop                        - name of the property
+     * @param {Object} obj                         - the object that is extended
      */
-    function action(type, prop, descriptor) {
+    function action(type, prop, descriptor, obj) {
         var message;
         var action  = descriptor[(type? 'on' + type : 'action')];
         var ctx     = descriptor[(type? 'on' + type : 'action')+'ctx'];
@@ -433,7 +473,7 @@
             ? (type +' on property: '+prop+'.')
             : ('redundant '+type+' defined for property '+prop+'. '+type+'s are set to false in options/descriptor.');
     
-        action.call(ctx, message, prop, descriptor)
+        action.call(ctx, message, prop, descriptor, obj)
     }
     
     /**
@@ -514,135 +554,6 @@
         isNaN: function(value) {
             return typeof value === "number" && value !== value;
         }
-    });
-    var objToString = Object.prototype.toString;
-    /*
-     *  'Global' _methods
-     */
-    
-    extend(_, {
-        /**
-         * @public
-         * @static
-         * @method _.inject
-         *
-         * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
-         * @param {string}  prop               - name of the property
-         * @param {Object} descriptor          - descriptor/settings object on injection. See extend documentation for more options
-         *     @param {boolean}  descriptor.value                - value of the property
-         *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
-         */
-        inject: function(obj, prop, descriptor) {
-            var module = {};
-    
-            module[prop] = descriptor;
-    
-            if(descriptor.static) {wrapStatics(obj, module)}
-            else                  {wrapPrototype(obj, module)}
-        },
-        isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
-        isArray:      Array.isArray,
-        /**
-         * Checks if an object is empty
-         * @public
-         * @static
-         * @method _.isEmpty
-         * @param   {Object}  obj - object to check the void
-         * @returns {boolean}     - boolean indicating if the object is empty
-         */
-        isEmpty: function (obj)
-        {
-            var key;
-    
-            for(key in obj) {
-                return false;
-            }
-            return true;
-        },
-        isFunction:   function(obj) {return typeof(obj) === 'function'},
-        isInteger:    function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
-        isNull:       function(obj) {return obj === null},
-        isNumber:     function(obj) {return _.typeOf(obj) === 'number'},
-        isObject:     function(obj) {return _.typeOf(obj) === 'object'},
-        /**
-         * Checks if an object is an primitive
-         * @public
-         * @static
-         * @method _.isPrimitive
-         * @param   {Object} obj - object to classify
-         * @returns {boolean}    - boolean indicating if the object is a primitive
-         */
-        isPrimitive: function(obj) {
-            // maybe just check for valueOF??
-            var type = typeof(obj);
-    
-            switch(type)
-            {
-                case 'object'   :
-                case 'function' :
-                    return obj === null;
-                default :
-                    return true
-            }
-        },
-        isString:     function(obj) {return _.typeOf(obj) === 'string'},
-        /**
-         * Checks is a property is undefined
-         * @public
-         * @static
-         * @method _.isUndefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isUndefined: function(prop) {
-            return prop === undefined;
-        },
-        /**
-         * Checks is a property is defined
-         * @public
-         * @static
-         * @method _.isDefined
-         * @param   {Object} prop - property to check
-         * @returns {boolean}     - indication of the property definition
-         */
-        isDefined: function(prop) {
-            return prop !== undefined;
-        },
-        toArray: function(obj) {
-            var type = _.typeOf(obj);
-    
-            switch (type)
-            {
-                case 'arguments' : return Array.prototype.slice.call(obj, 0);
-                    // the below is nice and all in theory but breaks in Chrome....
-                    //// make a copy instead of slice to not leak arguments
-                    //var max  = arguments.length;
-                    //var args = new Array(max);
-                    //for(var i = 0; i < max; i++) {
-                    //    args[i] = arguments[i];
-                    //}
-                case 'object'    : return obj._.values();
-                case 'array'     : return obj;
-                default          : return [];
-            }
-        },
-        toInteger: function(obj) {
-            switch(_.typeOf(obj))
-            {
-                case 'number' : return obj|0;
-                case 'string' : return parseInt(obj);
-                default       : return NaN
-            }
-        },
-        toNumber: function(obj) {
-            switch(_.typeOf(obj))
-            {
-                case 'number' : return obj;
-                case 'string' : return parseFloat(obj);
-                default       : return NaN
-            }
-        },
-        stringify: {onoverride: null, value: function(obj) {return obj? obj._.stringify() : obj+''}}
     });
     /**
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence.
@@ -794,6 +705,138 @@
     {
         return Batcher.apply(null, arguments);
     };
+    var objToString = Object.prototype.toString;
+    /*
+     *  'Global' _methods
+     */
+    
+    construct('_', {wrapper: _}, {
+        static: {
+            /**
+             * @public
+             * @static
+             * @method _.inject
+             *
+             * @param {Object}  obj                - object to be injected on i.e _.arr|_.obj|etc...
+             * @param {string}  prop               - name of the property
+             * @param {Object} descriptor          - descriptor/settings object on injection. See extend documentation for more options
+             *     @param {boolean}  descriptor.value                - value of the property
+             *     @param {boolean=} descriptor.static               - optional boolean indicating if the property is static
+             */
+            inject: function(obj, prop, descriptor) {
+                var module = {};
+    
+                module[prop] = descriptor;
+    
+                if(descriptor.static) {wrapStatics(obj, module)}
+                else                  {wrapPrototype(obj, module)}
+            },
+            isArguments:  function(obj) {return objToString.call(obj) === '[object Arguments]'},
+            isArray:      Array.isArray,
+            isDescriptor: isDescriptor,
+            /**
+             * Checks if an object is empty
+             * @public
+             * @static
+             * @method _.isEmpty
+             * @param   {Object}  obj - object to check the void
+             * @returns {boolean}     - boolean indicating if the object is empty
+             */
+            isEmpty: function (obj)
+            {
+                var key;
+    
+                for(key in obj) {
+                    return false;
+                }
+                return true;
+            },
+            isFunction:   function(obj) {return typeof(obj) === 'function'},
+            isInteger:    function(obj) {return _.typeOf(obj) === 'number' && obj === (obj|0)},
+            isNull:       function(obj) {return obj === null},
+            isNumber:     function(obj) {return _.typeOf(obj) === 'number'},
+            isObject:     function(obj) {return _.typeOf(obj) === 'object'},
+            /**
+             * Checks if an object is an primitive
+             * @public
+             * @static
+             * @method _.isPrimitive
+             * @param   {Object} obj - object to classify
+             * @returns {boolean}    - boolean indicating if the object is a primitive
+             */
+            isPrimitive: function(obj) {
+                // maybe just check for valueOF??
+                var type = typeof(obj);
+    
+                switch(type)
+                {
+                    case 'object'   :
+                    case 'function' :
+                        return obj === null;
+                    default :
+                        return true
+                }
+            },
+            isString:     function(obj) {return _.typeOf(obj) === 'string'},
+            /**
+             * Checks is a property is undefined
+             * @public
+             * @static
+             * @method _.isUndefined
+             * @param   {Object} prop - property to check
+             * @returns {boolean}     - indication of the property definition
+             */
+            isUndefined: function(prop) {
+                return prop === undefined;
+            },
+            /**
+             * Checks is a property is defined
+             * @public
+             * @static
+             * @method _.isDefined
+             * @param   {Object} prop - property to check
+             * @returns {boolean}     - indication of the property definition
+             */
+            isDefined: function(prop) {
+                return prop !== undefined;
+            },
+            toArray: function(obj) {
+                var type = _.typeOf(obj);
+    
+                switch (type)
+                {
+                    case 'arguments' : return Array.prototype.slice.call(obj, 0);
+                        // the below is nice and all in theory but breaks in Chrome....
+                        //// make a copy instead of slice to not leak arguments
+                        //var max  = arguments.length;
+                        //var args = new Array(max);
+                        //for(var i = 0; i < max; i++) {
+                        //    args[i] = arguments[i];
+                        //}
+                    case 'object'    : return obj._.values();
+                    case 'array'     : return obj;
+                    default          : return [];
+                }
+            },
+            toInteger: function(obj) {
+                switch(_.typeOf(obj))
+                {
+                    case 'number' : return obj|0;
+                    case 'string' : return parseInt(obj);
+                    default       : return NaN
+                }
+            },
+            toNumber: function(obj) {
+                switch(_.typeOf(obj))
+                {
+                    case 'number' : return obj;
+                    case 'string' : return parseFloat(obj);
+                    default       : return NaN
+                }
+            },
+            stringify: {onoverride: null, value: function(obj) {return obj? obj._.stringify() : obj+''}}
+        }
+    });
     construct('obj', {native:Object}, {
         /**
          * @namespace obj
@@ -810,30 +853,8 @@
              *
              * @return  {Object}  clone - the cloned object
              */
+            // TODO add deep option to clone function itself
             clone: clone,
-            /**
-             * Clones an object
-             *
-             * @public
-             * @static
-             * @method obj.cloneDeep
-             *
-             * @param   {Object}  obj   - object to be cloned
-             *
-             * @return  {Object}  clone - the cloned object
-             */
-            // TODO adaptation for arrays in phantomJS
-            cloneDeep: function cloneDeep(obj) {
-                if(_.isPrimitive(obj)) return obj;
-    
-                var clone = _.create(obj._.proto());
-                obj._.names()._.each(function (name) {
-                    var pd = obj._.descriptor(name);
-                    if (pd.value) pd.value = _.cloneDeep(pd.value); // does this clone getters/setters ?
-                    Object.defineProperty(clone, name, pd);
-                });
-                return clone;
-            },
             /**
              * creates an object based on a prototype
              *
@@ -917,7 +938,8 @@
              *
              * @this    {Object}
              *
-             * @param  {...any}  val - value to push
+             * @param  {any}    val - value to add
+             * @param  {string} key - string key to add to the object
              *
              * @return  {Array} this - this for chaining
              */
@@ -1507,7 +1529,6 @@
     
                 return this;
             },
-    
             /**
              * Creates new array without all specified values
              *
@@ -1552,38 +1573,132 @@
     
                 return output;
             },
-    
+            /**
+             * Selects 1st values from an object|array
+             *
+             * @public
+             * @method obj#select
+             *
+             * @this   {Object}
+             *
+             * @param  {...any} ___values - values to select
+             *
+             * @return {Object|Array} this - mutated array for chaining
+             */
             select: function(___values) {
                 var args = arguments;
                 return this._.remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
-    
+            /**
+             * Selects 1st value from an object|array based on a match function
+             *
+             * @public
+             * @method obj#selectFn
+             *
+             * @this   {Array}
+             *
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+             * @param  {Object=}                          ctx_   - optional context for the match function
+             *
+             * @return {Object|Array} this - mutated array for chaining
+             */
             selectFn: function(match, ctx_) {
                 var matched = false;
                 return this._.remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
-    
+            /**
+             * Creates new array with the specified 1st values
+             * @public
+             * @method obj#Select
+             *
+             * @this   {Object}
+             *
+             * @param  {...any} ___values - values to select
+             *
+             * @return {Array} output - new array with the values
+             */
             Select: function(___values) {
                 var args = arguments;
                 return this._.Remove$Fn(function(val) {var index = args._.indexOf(val); if(~index) delete args[index]; return !~index});
             },
-    
+            /**
+             * Creates a new object|array with 1st value based on a match function
+             *
+             * @public
+             * @method obj#SelectFn
+             *
+             * @this   {Array}
+             *
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+             * @param  {Object=}                          ctx_   - optional context for the match function
+             *
+             * @return {Array} output - new array with the value specified
+             */
             SelectFn: function(match, ctx_) {
                 var matched = false;
                 return this._.Remove$Fn(function() {return (match.apply(this, arguments) && !matched)? !(matched = true) : true}, ctx_);
             },
-    
+            /**
+             * Selects all specified values from an array
+             *
+             * @public
+             * @method obj#select$
+             *
+             * @this {Array}
+             *
+             * @param {...any} ___values - values to select
+             *
+             * @return {Array} this - mutated array for chaining
+             */
             select$: function(___values) {
                 var args = arguments;
                 return this._.remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
+            /**
+             * Selects all values from an array based on a match function
+             *
+             * @public
+             * @method obj#select$Fn
+             *
+             * @this   {Array}
+             *
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+             * @param  {Object=}                            ctx_ - optional context for the match function
+             *
+             * @return {Array} this - mutated array for chaining
+             */
             select$Fn: function(match, ctx_) {
                 return this._.remove$Fn(_.fnc.negate(match), ctx_);
             },
+            /**
+             * Creates new array with all specified values
+             *
+             * @public
+             * @method obj#Select$
+             *
+             * @this {Object|Array}
+             *
+             * @param {...any} ___values - values to remove
+             *
+             * @return {Array} output - new array with the values
+             */
             Select$: function(___values) {
                 var args = arguments;
                 return this._.Remove$Fn(function(val) {return !~args._.indexOf(val)});
             },
+            /**
+             * Creates a new array with all value specified by the match function
+             *
+             * @public
+             * @method obj#Select$Fn
+             *
+             * @this   {Array}
+             *
+             * @param  {function(val, index, arr, delta)} match - function specifying the value to select
+             * @param  {Object=}                            ctx_ - optional context for the match function
+             *
+             * @return {Array} output - new array with the values specified
+             */
             Select$Fn: {aliases: ['find$'], value: function(match, ctx_) {
                 return this._.Remove$Fn(_.fnc.negate(match), ctx_);
             }},
@@ -1672,7 +1787,7 @@
              *
              * @returns {string} - string representation of the object
              */
-            stringify: {onoverride: null, value: function(visited_)
+            stringify: function(visited_)
             {
                 var output = '';
     
@@ -1693,7 +1808,7 @@
                 });
     
                 return output + '}';
-            }},
+            },
             /**
              * 'fixes' wrong implicit calls to the _methods object
              *
@@ -1758,7 +1873,7 @@
                 var start;
     
                 arguments._.each(function(arr) {
-                    if(!arr) return; // continue
+                    if(!arr) {return} // continue
     
                     start        = this.length; // start position to start appending
                     this.length += arr.length;  // set the length to the length after appending
@@ -2833,21 +2948,27 @@
         static: {
             /**
              * Returns the length of an integer
+             *
              * @public
              * @method int.length
-             * @param   {number} int - integer to measure the length
+             *
+             * @param {number} int - integer to measure the length
+             *
              * @returns {number} - length of the integer
              */
             length: function(int) {
                 return int? 1+ Math.log10(int)|0 : 1;
             },
             /**
-             * Returns the length of an integer
+             * Returns a string representation of an integer including leading zero's depending on a length or format
+             *
              * @public
-             * @method int.length
+             * @method int.leadZeros
+             *
              * @param   {number}        int           - integer to measure the length
              * @param   {string|number} format_length - format for the lead zero's for example '0000' or a number defining the length
-             * @returns {string}                      - string with leading zero's
+             *
+             * @returns {string} - string with leading zero's
              */
             leadZeros: function(int, format_length)
             {
@@ -2859,10 +2980,13 @@
             },
             /**
              * Returns a random integer between the min and max value
+             *
              * @public
              * @method int.random
+             *
              * @param   {number} min - integer lower bound
              * @param   {number} max - integer upper bound
+             *
              * @returns {number} - random integer in between
              */
             // TODO do all random options as for _.num.random see below
@@ -2872,9 +2996,12 @@
             /**
              * Rebounds a number between 2 values. Handy for arrays that are continuous
              * Curried version: for example - _.int.rebound(4)(-5, 7)
+             *
              * @public
              * @method int.rebound
+             *
              * @param   {number}  int - integer value
+             *
              * @returns {function} - function to add the range
              */
             rebound: function(int) {
@@ -2893,7 +3020,7 @@
             }
         }
     });
-    construct('math', {native:Math, base:true}, {
+    construct('math', {native:Math, cloneAsBase:true}, {
         /**
          * @namespace math
          */

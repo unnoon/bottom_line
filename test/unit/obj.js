@@ -43,7 +43,7 @@ describe("Object", function() {
                     z: 3,
                     t: {z: 666}
                 };
-                var clone = _.cloneDeep(obj);
+                var clone = _.clone('deep', obj);
 
                 expect(clone).to.deep.equal({
                     x: 1,
@@ -56,6 +56,58 @@ describe("Object", function() {
                 expect(clone.t.z).to.equal(666);
                 expect(clone).to.not.equal(obj);
             });
+
+            it("complex clone", function() {
+
+                var obj = {
+                    x: 1,
+                    y: [{y1: {circ: null}}, {}],
+                    z: 3,
+                    t: {z: 666}
+                };
+
+                obj.y[0].y1.circ = obj;
+
+                var cobj = {
+                    x: 1,
+                    y: [{y1: {circ: null}}, {}],
+                    z: 3,
+                    t: {z: 666}
+                };
+
+                cobj.y[0].y1.circ = cobj;
+
+                var clone = _.clone('deep', obj);
+
+                expect(clone).to.deep.equal(cobj);
+                obj.t.z = 777;
+
+                expect(clone.t.z).to.equal(666);
+                expect(clone).to.not.equal(obj);
+                expect(clone.y[0].y1.circ).to.equal(clone);
+            });
+
+            it("simple clone.deep", function() {
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                };
+                var clone = _.clone.deep(obj);
+
+                expect(clone).to.deep.equal({
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: {z: 666}
+                });
+                obj.t.z = 777;
+
+                expect(clone.t.z).to.equal(666);
+                expect(clone).to.not.equal(obj);
+            });
+
         });
 
 		describe("extend", function() {
@@ -314,16 +366,15 @@ describe("Object", function() {
 				expect(sum).to.be.below(6);
 			});
 
-			// FIXME somehow catching a type error doesn't work...
-//			xit("will throw a TypeError if no callback function is provided", function() {
-//				var obj = {
-//					x: 1,
-//					y: 2,
-//					z: 3
-//				};
-//
-//				expect(obj._.each()).to.throw(TypeError);
-//			});
+			it("will throw a TypeError if no callback function is provided", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3
+				};
+
+				expect(obj._.each).to.throw(TypeError);
+			});
 
 			it("it is possible to pass a different context for the callback function", function() {
 				var obj = {

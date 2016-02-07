@@ -5,21 +5,27 @@ construct('int', {
     static: {
         /**
          * Returns the length of an integer
+         *
          * @public
          * @method int.length
-         * @param   {number} int - integer to measure the length
+         *
+         * @param {number} int - integer to measure the length
+         *
          * @returns {number} - length of the integer
          */
         length: function(int) {
             return int? 1+ Math.log10(int)|0 : 1;
         },
         /**
-         * Returns the length of an integer
+         * Returns a string representation of an integer including leading zero's depending on a length or format
+         *
          * @public
-         * @method int.length
+         * @method int.leadZeros
+         *
          * @param   {number}        int           - integer to measure the length
          * @param   {string|number} format_length - format for the lead zero's for example '0000' or a number defining the length
-         * @returns {string}                      - string with leading zero's
+         *
+         * @returns {string} - string with leading zero's
          */
         leadZeros: function(int, format_length)
         {
@@ -31,10 +37,13 @@ construct('int', {
         },
         /**
          * Returns a random integer between the min and max value
+         *
          * @public
          * @method int.random
+         *
          * @param   {number} min - integer lower bound
          * @param   {number} max - integer upper bound
+         *
          * @returns {number} - random integer in between
          */
         // TODO do all random options as for _.num.random see below
@@ -44,9 +53,12 @@ construct('int', {
         /**
          * Rebounds a number between 2 values. Handy for arrays that are continuous
          * Curried version: for example - _.int.rebound(4)(-5, 7)
+         *
          * @public
          * @method int.rebound
+         *
          * @param   {number}  int - integer value
+         *
          * @returns {function} - function to add the range
          */
         rebound: function(int) {

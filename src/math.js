@@ -1,4 +1,4 @@
-construct('math', {native:Math, base:true}, {
+construct('math', {native:Math, cloneAsBase:true}, {
     /**
      * @namespace math
      */

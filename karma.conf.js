@@ -11,7 +11,7 @@ module.exports = function (config) {
 		// list of files / patterns to load in the browser
 		files     : [
 			// these are only watched and served
-			{pattern: 'dist/bottom_line.js'},
+			{pattern: 'bin/bottom_line.js'},
 			//{pattern: 'src/test.js'},
 			// included files - tests
 			{pattern: 'test/unit/**/*.js'}
@@ -22,7 +22,7 @@ module.exports = function (config) {
 			// source files, that you wanna generate coverage for
 			// do not include tests or libraries
 			// (these files will be instrumented by Istanbul)
-            'dist/bottom_line.js': ['coverage']
+            'bin/bottom_line.js': ['coverage']
 		},
 
 //		// optionally, configure the reporter
@@ -68,7 +68,7 @@ module.exports = function (config) {
 
 		// Continuous Integration mode
 		// if true, it capture browsers, run tests and exit
-		singleRun     : true,
+		singleRun     : false,
 
 		plugins: [
 			'karma-mocha',

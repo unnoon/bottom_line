@@ -14,13 +14,18 @@
  *
  *     @param   {Function=} _options_.onoverwrite=console.warn - function containing the overwrite action
  *     @param   {Function=} _options_.onoverride=console.warn  - function containing the override action
+ *     @param   {Function=} _options_.onconflict=null          - will set onoverride & onoverwrite at the ame time
  *     @param   {Function=} _options_.onnew=null               - function containing the new action
  *     @param   {Function=} _options_.action                   - action to apply on all properties
  *
  *     @param   {Object=}   _options_.onoverwritectx=console - context for the overwrite action
  *     @param   {Object=}   _options_.onoverridectx=console  - context for the override action
+ *     @param   {Object=}   _options_.onconflictctx          - context for the conflict action
  *     @param   {Object=}   _options_.onnewctx               - context for the new action
  *     @param   {Object=}   _options_.actionctx              - context for the default action
+ *
+ *     @param   {Function=} _options_.condition              - condition for extension
+ *     @param   {Object=}   _options_.conditionctx           - context for the condition function
  *
  *     @param   {boolean=}  _options_.enumerable      - boolean indicating if all properties should be enumerable. can be overwritten on a config level
  *     @param   {boolean=}  _options_.configurable    - boolean indicating if all properties should be configurable. can be overwritten on a config level
@@ -69,10 +74,11 @@ function processOptions(options) {
     options.override            = options.safe ? false : options.override  !== false; // default is true
     options.overwrite           = options.safe ? false : options.overwrite !== false; // default is true
 
-    options.onoverwrite         = options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
-    options.onoverride          = options.hasOwnProperty('onoverride')  ? options.onoverride  : console.warn;
-    options.onoverwritectx      = options.onoverwritectx || console;
-    options.onoverridectx       = options.onoverridectx  || console;
+    // we need to do a hasOwnPropertyCheck here because null will specifically tell onoverride/write to do nothing
+    options.onoverwrite         = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverwrite : console.warn;
+    options.onoverride          = options.hasOwnProperty('onconflict') ? options.onconflict : options.hasOwnProperty('onoverwrite') ? options.onoverride  : console.warn;
+    options.onoverwritectx      = options.onconflictctx || options.onoverwritectx || console;
+    options.onoverridectx       = options.onconflictctx || options.onoverridectx  || console;
 
     if(options.shim)
     {
@@ -109,10 +115,11 @@ function collectPrototypeChain(module, obj, options) {
 /**
  * Processes the properties of a prototype object
  *
- * @param {Object} properties - object containing the properties for extension
- * @param {Object} options    - object containing the options for extension
- * @param {Object} proto     -
- * @param obj
+ * @param {Object} proto   - prototype to process
+ * @param {Object} obj     - object to extend
+ * @param {Object} options - extension options
+ * @param {Object} module  - object containing the options for extension
+
  */
 function processProperties(proto, obj, options, module) {
     var properties = options.nonenumerables
@@ -127,15 +134,16 @@ function processProperties(proto, obj, options, module) {
 
         if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
         if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
+        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc)){return} // continue
 
         copyPropertyConfigs(options, dsc);
 
-        handleAttributes(dsc);
-        finalizeDescriptor(prop, dsc, actionType);
+        prop = handleAttributes(prop, dsc);
+        finalizeDescriptor(prop, dsc, actionType, obj);
 
         if(!dsc[actionType]) {return} // continue
 
-        getNames(prop, dsc).forEach(function(prop, i) {
+        getNames(prop, dsc).forEach(function(prop) {
             Object.defineProperty(obj, prop, dsc)
         });
     });
@@ -222,12 +230,21 @@ function isDescriptor(value)
 /**
  * Processes the attributes and sets the correct value on the descriptor
  *
+ * @param {string} prop       - property name that might contain attributes
  * @param {Object} descriptor - the property descriptor
+ *
+ * @return {string} prop - the property name without its attributes
  */
-function handleAttributes(descriptor) {
-    if(!descriptor.value || !descriptor.value.hasOwnProperty('attrs')) {return}
-    // TODO add attribute check
-    var attrs      = descriptor.value.attrs.split(' '); // TODO make corrections for multiple space and add support for comma's
+function handleAttributes(prop, descriptor) {
+    var attrs = descriptor.hasOwnProperty('attrs')
+        ? descriptor.attrs
+        : '';
+
+    attrs += ' '+prop; // add property name attributes to attrs
+    attrs = attrs.split(' '); // TODO attribute check & make corrections for multiple space and add support for comma's
+
+    prop = attrs.pop(); // remove property name from attributes and set to prop
+
     var attr;
     var negated;
 
@@ -238,6 +255,8 @@ function handleAttributes(descriptor) {
 
         descriptor[!negated ? attr : attr.slice(1)] = !negated;
     }
+
+    return prop
 }
 
 /**
@@ -246,26 +265,29 @@ function handleAttributes(descriptor) {
  * @param {string} prop       - name of the property
  * @param {Object} descriptor - the property descriptor
  * @param {string} actionType - the action type 'override'|'overwrite'|'new'|''
+ * @param {Object} obj        - the object that is extended
+ *
  */
-function finalizeDescriptor(prop, descriptor, actionType) {
+function finalizeDescriptor(prop, descriptor, actionType, obj) {
     if(descriptor.clone)                        {if(descriptor.hasOwnProperty('value') && typeof(descriptor.value) !== 'function') {descriptor.value = clone(descriptor.value)}}
     if(descriptor.constant)                     {descriptor.configurable = false; descriptor.writable = false}
 
     // getters & setters don't have a writable option
     if(descriptor.get || descriptor.set) {delete descriptor.writable}
     // perform actions
-    action(actionType, prop, descriptor);
-    action('', prop, descriptor); // default action
+    action(actionType, prop, descriptor, obj);
+    action('', prop, descriptor, obj); // default action
 }
 
 /**
  * Performs action based on type, enabled & value.
  *
- * @param {string}  type='override'|'overwrite' - type the action is acting to
- * @param {Object}  descriptor                  - the property descriptor. this also contains the global options
- * @param {string}  prop                        - name of the property
+ * @param {string} type='override'|'overwrite' - type the action is acting to
+ * @param {Object} descriptor                  - the property descriptor. this also contains the global options
+ * @param {string} prop                        - name of the property
+ * @param {Object} obj                         - the object that is extended
  */
-function action(type, prop, descriptor) {
+function action(type, prop, descriptor, obj) {
     var message;
     var action  = descriptor[(type? 'on' + type : 'action')];
     var ctx     = descriptor[(type? 'on' + type : 'action')+'ctx'];
@@ -277,7 +299,7 @@ function action(type, prop, descriptor) {
         ? (type +' on property: '+prop+'.')
         : ('redundant '+type+' defined for property '+prop+'. '+type+'s are set to false in options/descriptor.');
 
-    action.call(ctx, message, prop, descriptor)
+    action.call(ctx, message, prop, descriptor, obj)
 }
 
 /**

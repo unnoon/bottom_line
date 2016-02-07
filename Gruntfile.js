@@ -20,15 +20,15 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
-			dist: {
+			bin: {
 				files: {
-					'dist/bottom_line.min.js': ['dist/bottom_line.js']
+					'bin/bottom_line.min.js': ['bin/bottom_line.js']
 				}
 			}
 		},
 		jsdoc : {
-			dist : {
-				src: ['dist/bottom_line.js'],
+			bin : {
+				src: ['bin/bottom_line.js'],
 				options: {
 					destination: 'doc',
                     template : "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
             },
             js : {
                 src : 'src/bottom_line.js',
-                dest : 'dist/bottom_line.js'
+                dest : 'bin/bottom_line.js'
             }
         },
 		watch: {
