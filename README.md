@@ -1,8 +1,8 @@
 # bottom_line.js
-_- Adds face to your code_
-
-[![Inline docs](http://inch-ci.org/github/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line)
 [![Build Status](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line)
+[![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=master)](https://coveralls.io/github/unnoon/bottom_line?branch=master)
+[![Inline docs](http://inch-ci.org/github/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line)
+_- Adds face to your code_
 
 Javascript utility belt that takes a middle ground between sugar & underscore/lodash. Striving for consistency, code readability and adding face to your code.
 
