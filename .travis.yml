@@ -24,4 +24,4 @@ before_script:
     - grunt preprocess
 
 script:
-    - karma start --browsers Chrome --single-run
+    - karma start --browsers Firefox --single-run
