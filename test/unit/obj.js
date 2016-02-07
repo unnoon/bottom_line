@@ -366,16 +366,15 @@ describe("Object", function() {
 				expect(sum).to.be.below(6);
 			});
 
-			// FIXME somehow catching a type error doesn't work...
-//			xit("will throw a TypeError if no callback function is provided", function() {
-//				var obj = {
-//					x: 1,
-//					y: 2,
-//					z: 3
-//				};
-//
-//				expect(obj._.each()).to.throw(TypeError);
-//			});
+			it("will throw a TypeError if no callback function is provided", function() {
+				var obj = {
+					x: 1,
+					y: 2,
+					z: 3
+				};
+
+				expect(obj._.each).to.throw(TypeError);
+			});
 
 			it("it is possible to pass a different context for the callback function", function() {
 				var obj = {
