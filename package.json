@@ -18,10 +18,13 @@
     "karma-coveralls": "^1.1.2",
     "karma-mocha": "~0.2.0",
     "karma-phantomjs-launcher": "latest",
-    "karma-requirejs": "~0.2.2"
+    "karma-requirejs": "~0.2.2",
+    "mocha": "latest",
+    "phantomjs-prebuilt": "latest",
+    "requirejs": "latest"
   },
   "scripts": {
-    "test": "karma start",
+    "test": "karma run",
     "update": "npm-check-updates -u && npm install"
   },
   "repository": {
