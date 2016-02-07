@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-bump');
+	grunt.loadNpmTasks('grunt-karma-coveralls');
 
 	var bump = grunt.option("bump") || 'patch'; // what to bump
 
@@ -58,7 +59,12 @@ module.exports = function(grunt) {
 		},
         clean: {
             docs: ['doc']
-        }
+        },
+		coveralls: {
+			options: {
+				coverageDir: '.coverage/report-lcov'
+			}
+		}
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
