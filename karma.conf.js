@@ -36,8 +36,11 @@ module.exports = function (config) {
 
 //		// optionally, configure the reporter
 		coverageReporter: {
-			type : 'lcov',
-			dir : '.coverage/'
+			dir : '.coverage/',
+			reporters: [
+				{ type: 'html', subdir: '' },
+				{ type: 'lcov', subdir: 'report-lcov' }
+			]
 		},
 		//coverageReporter: {
 		//	type : 'html',
@@ -64,7 +67,7 @@ module.exports = function (config) {
 		// - IE (only Windows)
 		//browsers      : ['Chrome'],
 		//browsers      : ['Firefox'],
-		browsers      : ['PhantomJS'],
+		browsers      : ['Firefox'],
 		//browsers      : ['Chrome', 'PhantomJS', 'Firefox', 'IE', 'Opera'],
 		//captureConsole: false,
 		// If browser does not capture in given timeout [ms], kill it
