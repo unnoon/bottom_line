@@ -5,9 +5,8 @@
     "Rogier Geertzema"
   ],
   "description": "JS Toolbelt",
-  "main": "dist/bottom_line.js",
+  "main": "bin/bottom_line.js",
   "dependencies": {
-    "seedrandom": "*"
   },
   "devDependencies": {
     "benchmark": "*"

@@ -25,20 +25,24 @@ module.exports = function (config) {
             'bin/bottom_line.js': ['coverage']
 		},
 
-//		// optionally, configure the reporter
-		coverageReporter: {
-			type : 'html',
-			dir : '.coverage/'
-		},
-
 		// list of files to exclude
 		exclude       : [
 
 		],
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-		reporters     : ['dots', 'coverage'],
+		reporters     : ['dots', 'coverage', 'coveralls'],
 //		reporters     : ['dots'],
+
+//		// optionally, configure the reporter
+		coverageReporter: {
+			type : 'lcov',
+			dir : '.coverage/'
+		},
+		//coverageReporter: {
+		//	type : 'html',
+		//	dir : '.coverage/'
+		//},
 
 		// enable / disable colors in the output (reporters and logs)
 		colors        : true,
