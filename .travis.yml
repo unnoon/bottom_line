@@ -25,3 +25,6 @@ before_script:
 
 script:
     - karma start --browsers Firefox --single-run
+
+after_success:
+    - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
