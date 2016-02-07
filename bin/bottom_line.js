@@ -8,7 +8,7 @@
  */
 !function(bottom_line) {
     var environments = true;
-    var requirejs    = typeof(define) === 'function' && this.define == define && !!define.amd;
+    var requirejs    = typeof(define) === 'function' && this.define === define && !!define.amd;
     var nodejs       = typeof(module) === 'object'   && this === module.exports;
 
     switch(environments) {
