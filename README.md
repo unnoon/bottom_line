@@ -1,6 +1,6 @@
 # bottom_line.js
 [![Build Status](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line)
-[![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=master)](https://coveralls.io/github/unnoon/bottom_line?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=dev)](https://coveralls.io/github/unnoon/bottom_line?branch=dev)
 [![Inline docs](http://inch-ci.org/github/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line)
 
 _- Adds face to your code_
