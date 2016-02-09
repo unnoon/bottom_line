@@ -67,7 +67,7 @@ module.exports = function (config) {
 		// - IE (only Windows)
 		//browsers      : ['Chrome'],
 		//browsers      : ['Firefox'],
-		browsers      : ['Firefox'],
+		browsers      : ['PhantomJS'],
 		//browsers      : ['Chrome', 'PhantomJS', 'Firefox', 'IE', 'Opera'],
 		//captureConsole: false,
 		// If browser does not capture in given timeout [ms], kill it
@@ -78,6 +78,7 @@ module.exports = function (config) {
 		singleRun     : false,
 
 		plugins: [
+			'karma-coveralls',
 			'karma-mocha',
 			'karma-chai-plugins',
 			'karma-coverage',

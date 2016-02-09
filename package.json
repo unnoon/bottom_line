@@ -28,7 +28,7 @@
     "requirejs": "latest"
   },
   "scripts": {
-    "test": "karma run",
+    "test": "karma start --single-run",
     "update": "npm-check-updates -u && npm install"
   },
   "repository": {
