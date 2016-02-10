@@ -240,12 +240,12 @@ describe("Object", function() {
         describe("isString", function() {
 
             it("simple cases", function() {
-                expect(_.isEmpty('')).to.be.true;
-                expect(_.isEmpty('string')).to.be.true;
-                expect(_.isEmpty(new String('string'))).to.be.false; // TODO should this be true?
-                expect(_.isEmpty({})).to.be.false;
-                expect(_.isEmpty(null)).to.be.false;
-                expect(_.isEmpty(undefined)).to.be.false;
+                expect(_.isString('')).to.be.true;
+                expect(_.isString('string')).to.be.true;
+                expect(_.isString(new String('string'))).to.be.true;
+                expect(_.isString({})).to.be.false;
+                expect(_.isString(null)).to.be.false;
+                expect(_.isString(undefined)).to.be.false;
             });
         });
 
