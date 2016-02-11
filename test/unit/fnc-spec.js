@@ -1,3 +1,6 @@
+define([
+	'bin/bottom_line'
+], function(_) {
 describe("Function", function() {
 
 	describe("static methods", function() {
@@ -39,4 +42,5 @@ describe("Function", function() {
 			});
 		});
 	});
+});
 });

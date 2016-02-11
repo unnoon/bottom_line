@@ -1,3 +1,6 @@
+define([
+    'bin/bottom_line'
+], function(_) {
 describe("Batcher", function() {
 
     describe("simple batcher", function() {
@@ -73,4 +76,5 @@ describe("Batcher", function() {
             expect(batcher.ctx()).to.equal(ctx);
         });
     });
+});
 });

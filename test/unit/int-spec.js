@@ -1,3 +1,6 @@
+define([
+	'bin/bottom_line'
+], function(_) {
 describe("Integer", function() {
 
 	describe("static methods", function() {
@@ -64,4 +67,5 @@ describe("Integer", function() {
 			});
 		});
 	});
+});
 });

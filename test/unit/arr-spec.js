@@ -1,3 +1,7 @@
+define([
+	'bin/bottom_line'
+], function(_) {
+
 describe("Array", function() {
 
 	describe("static methods", function() {
@@ -1041,4 +1045,5 @@ describe("Array", function() {
 			});
 		});
 	});
+});
 });

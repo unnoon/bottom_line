@@ -1,3 +1,6 @@
+define([
+	'bin/bottom_line'
+], function(_) {
 describe("String", function() {
 
 	describe("prototype methods", function() {
@@ -53,4 +56,5 @@ describe("String", function() {
 			});
 		});
 	});
+});
 });

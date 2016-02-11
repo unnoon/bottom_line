@@ -25,6 +25,3 @@ before_script:
 
 script:
     - karma start --browsers Firefox --single-run
-
-#after_success:
-#    - grunt coveralls

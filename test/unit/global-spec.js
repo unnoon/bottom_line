@@ -1,3 +1,6 @@
+define([
+    'bin/bottom_line'
+], function(_) {
 describe("Global", function() {
 
     describe("static methods", function() {
@@ -16,4 +19,5 @@ describe("Global", function() {
         });
 
     });
+});
 });

@@ -1,3 +1,6 @@
+define([
+	'bin/bottom_line'
+], function(_) {
 describe("bottom_line.js", function() {
 
 	describe("bottom line js", function() {
@@ -53,4 +56,5 @@ describe("bottom_line.js", function() {
 			expect(arr1._.contains(3)).to.be.true;
 		});
 	});
+});
 });

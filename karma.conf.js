@@ -6,16 +6,13 @@ module.exports = function (config) {
 		basePath  : '',
 
 		// frameworks to use
-		frameworks: ['mocha', 'chai', 'sinon-chai'],
+		frameworks: ['mocha', 'requirejs', 'chai', 'sinon-chai'],
 
 		// list of files / patterns to load in the browser
 		files     : [
-			// these are only watched and served
-			{pattern: 'bin/bottom_line.js'},
-			//{pattern: 'src/test.js'},
-			// included files - tests
-			{pattern: 'test/unit/**/*.js'}
-			//{pattern: 'test/unit/javascript.js'}
+			'test/unit/test-main.js',
+			{pattern: 'bin/bottom_line.js', included: false},
+			{pattern: 'test/unit/**/*.js', included: false}
 		],
 
 		preprocessors: {
@@ -78,14 +75,15 @@ module.exports = function (config) {
 		singleRun     : false,
 
 		plugins: [
-			'karma-coveralls',
 			'karma-mocha',
+			'karma-requirejs',
 			'karma-chai-plugins',
 			'karma-coverage',
 			'karma-chrome-launcher',
             'karma-phantomjs-launcher',
 			'karma-firefox-launcher',
-			'karma-ie-launcher'
+			'karma-ie-launcher',
+			'karma-coveralls'
 		]
 	});
 };

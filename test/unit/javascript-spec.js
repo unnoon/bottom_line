@@ -1,3 +1,6 @@
+define([
+	'bin/bottom_line'
+], function(_) {
 /*
  * Just a reminder of how Javascript handles certain things
  */
@@ -319,4 +322,5 @@ describe("Extensions", function() {
 			});
 		});
 	});
+});
 });
