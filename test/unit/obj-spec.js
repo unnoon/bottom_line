@@ -1,6 +1,7 @@
 define([
-    'bin/bottom_line'
+    'bottom_line'
 ], function(_) {
+
 describe("Object", function() {
 
 	describe("static methods", function() {

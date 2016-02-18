@@ -11,15 +11,15 @@ module.exports = function (config) {
 		// list of files / patterns to load in the browser
 		files     : [
 			'test/unit/test-main.js',
-			{pattern: 'bin/bottom_line.js', included: false},
-			{pattern: 'test/unit/**/*.js', included: false}
+			{pattern: 'bin/bottom_line.test.js', included: false},
+			{pattern: 'test/unit/**/*.js',       included: false}
 		],
 
 		preprocessors: {
 			// source files, that you wanna generate coverage for
 			// do not include tests or libraries
 			// (these files will be instrumented by Istanbul)
-            'bin/bottom_line.js': ['coverage']
+            'bin/bottom_line.test.js': ['coverage']
 		},
 
 		// list of files to exclude

@@ -495,7 +495,7 @@
     }
     
     
-    var shimOptions = {shim: true};
+     var shimOptions = {overwrite: true, onoverwrite: null, override: true, onoverride: null};
     
     extend(Function.prototype, shimOptions, {
         bind: function(oThis) {

@@ -1,6 +1,7 @@
 define([
-	'bin/bottom_line'
+	'bottom_line'
 ], function(_) {
+
 /*
  * Just a reminder of how Javascript handles certain things
  */

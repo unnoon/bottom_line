@@ -1,14 +1,11 @@
-extend(Function.prototype, {shim: true}, {
-    /**
-     * Returns the name of a function
-     * @public
-     * @method Function#name
-     * @returns {string} - name of the functino
-     */
-    name: function()
-    {
-        return this.toString().match(/^function\s?([^\s(]*)/)[1];
-    },
+/* @ifdef TEST
+ var shimOptions = {overwrite: true, onoverwrite: null, override: true, onoverride: null};
+ /* @endif */
+/* @ifndef TEST */
+var shimOptions = {shim: true};
+/* @endif */
+
+extend(Function.prototype, shimOptions, {
     bind: function(oThis) {
         if (typeof this !== 'function') {
             // closest thing possible to the ECMAScript 5
@@ -33,7 +30,7 @@ extend(Function.prototype, {shim: true}, {
     }
 });
 
-extend(Math, {shim: true}, {
+extend(Math, shimOptions, {
     /**
      * Decimal log function
      * @public
@@ -46,7 +43,7 @@ extend(Math, {shim: true}, {
     }
 });
 
-extend(Number, {shim: true}, {
+extend(Number, shimOptions, {
     /**
      * Check for isNaN conform the ES6 specs
      * @public

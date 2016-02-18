@@ -10,7 +10,7 @@ requirejs.config({
 	baseUrl: '/base',
 
 	paths: {
-
+		bottom_line: 'bin/bottom_line.test'
 	},
 
 	// ask Require.js to load these files (all our tests)

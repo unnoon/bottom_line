@@ -1,7 +1,8 @@
 define([
-    'bin/bottom_line'
+    'bottom_line'
 ], function(_) {
-describe("Global", function() {
+
+        describe("Global", function() {
 
     describe("static methods", function() {
 

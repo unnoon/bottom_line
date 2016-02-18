@@ -37,15 +37,20 @@ module.exports = function(grunt) {
 			}
 		},
         preprocess : {
-            options: {
-                context : {
-                    DEBUG: true
-                }
-            },
-            js : {
+            bin : {
                 src : 'src/bottom_line.js',
                 dest : 'bin/bottom_line.js'
-            }
+            },
+			test: {
+				options: {
+					context : {
+						TEST: true
+					}
+				},
+				src : 'src/bottom_line.js',
+				dest : 'bin/bottom_line.test.js'
+			}
+
         },
 		watch: {
 			scripts: {
@@ -62,8 +67,8 @@ module.exports = function(grunt) {
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
-	grunt.registerTask('build',   ['bump-only:'+bump, 'preprocess', 'uglify', 'docs', 'bump-commit']);
-    grunt.registerTask('default', ['preprocess']);
+	grunt.registerTask('build',   ['bump-only:'+bump, 'preprocess:test', 'preprocess:bin', 'uglify', 'docs', 'bump-commit']);
+    grunt.registerTask('default', ['preprocess:test', 'preprocess:bin']);
 };
 
 
