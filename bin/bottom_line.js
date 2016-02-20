@@ -667,7 +667,7 @@
                 index = this._callbacks.indexOf(arguments[i]);
     
                 if (~index) {this._callbacks.splice(index, 1)}
-                else        {console.warn('trying to remove a function from batcher that is not registered as a callback')}
+                else        {console.warn('Trying to remove a function from batcher that is not registered as a callback.')}
             }
     
             return this

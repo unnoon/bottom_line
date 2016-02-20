@@ -43,7 +43,20 @@ define([
                 var batcher = _.Batcher.create(fn);
                 batcher.remove(fn);
 
+                expect(batcher.callbacks().length).to.deep.equal(0);
                 expect(batcher()).to.be.undefined;
+            });
+
+            before(function() {
+                sinon.stub(console, 'warn');
+            });
+
+            it("should throw a warning if it tries to remove a function that is not in the callbacks array", function() {
+                var fn      = function() {};
+                var batcher = _.Batcher.create(fn);
+                batcher.remove(function(){});
+
+                expect(console.warn.calledWith('Trying to remove a function from batcher that is not registered as a callback.')).to.be.true;
             });
 
             it("Remove all functions", function() {
@@ -57,7 +70,7 @@ define([
                 expect(batcher()).to.be.undefined;
             });
 
-            it("We should be able to get the calbacks", function() {
+            it("We should be able to get the callbacks", function() {
                 var closure = 0; // make a closure so we can make sure that all batched functions are executed
                 var batcher = _.Batcher.create();
                 var callbacks = [function() {return ++closure + 555}, function() {return ++closure + 666}];

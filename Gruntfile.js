@@ -67,8 +67,8 @@ module.exports = function(grunt) {
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
-	grunt.registerTask('build',   ['bump-only:'+bump, 'preprocess:test', 'preprocess:bin', 'uglify', 'docs', 'bump-commit']);
-    grunt.registerTask('default', ['preprocess:test', 'preprocess:bin']);
+	grunt.registerTask('build',   ['bump-only:'+bump, 'preprocess', 'uglify', 'docs', 'bump-commit']);
+    grunt.registerTask('default', ['preprocess']);
 };
 
 

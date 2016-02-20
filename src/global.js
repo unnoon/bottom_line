@@ -6,6 +6,8 @@ var objToString = Object.prototype.toString;
 construct('_', {wrapper: _}, {
     static: {
         /**
+         * Inject a property into bottom_line
+         *
          * @public
          * @static
          * @method _.inject
