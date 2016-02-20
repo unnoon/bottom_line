@@ -7,4 +7,5 @@ projectFilesBackup/
 doc/
 
 #ignored file types
+/bin/bottom_line.test.js
 *.log
