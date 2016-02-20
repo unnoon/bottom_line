@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
 	<title>DocStrap Namespace: math</title>
 
 	<!--[if lt IE 9]>
@@ -20,8 +21,13 @@
 <div class="container">
 	<div class="navbar-header">
 		<a class="navbar-brand" href="index.html">DocStrap</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
 	</div>
-	<div class="navbar-collapse">
+	<div class="navbar-collapse collapse" id="topNavigation">
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
@@ -32,19 +38,29 @@
 			</li>
 			
 		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
 	</div>
+
 </div>
 </div>
 
 
-<div class="container">
+<div class="container" id="toc-content">
 <div class="row">
 
 	
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Namespace: math</h1>
 			
 
 	<h1 class="page-title">Namespace: math</h1>
@@ -67,7 +83,7 @@
 
         
 <dl class="details">
-	
+    
 
 	
 
@@ -96,12 +112,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3024">line 3024</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3018">line 3018</a>
 			</li>
 		</ul>
 	</dd>
@@ -136,13 +152,14 @@
 
         <dl>
             
+<hr>
 <dt>
-    <h4 class="name" id=".byProb"><span class="type-signature">&lt;static> </span>byProb<span class="signature">(p)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id=".byProb"><span class="type-signature">&lt;static> </span>byProb(p)</h4>
     
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         <p>Return true based on a certain probability based on a number between 0 &amp; 1;</p>
@@ -152,7 +169,7 @@
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -160,23 +177,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -189,6 +206,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -199,15 +217,15 @@
             <td class="description last"><p>probability to return true</p></td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
     
-    
+
     
 <dl class="details">
-	
+    
 
 	
 
@@ -236,12 +254,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3028">line 3028</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3022">line 3022</a>
 			</li>
 		</ul>
 	</dd>
@@ -254,17 +272,17 @@
 	
 </dl>
 
-    
-    
 
     
 
     
 
     
+
     
+
     
-    
+
     
     <h5>Returns:</h5>
     
@@ -278,32 +296,34 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">boolean</span>
 
 
-	</dd>
+
+    </dd>
 </dl>
 
 
         
-    
+
     
 </dd>
 
         
             
+<hr>
 <dt>
-    <h4 class="name" id=".distance"><span class="type-signature">&lt;static> </span>distance<span class="signature">(x1, y1, x2, y2)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".distance"><span class="type-signature">&lt;static> </span>distance(x1, y1, x2, y2)</h4>
     
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         <p>Return the distance between 2 points in Euclidean space</p>
@@ -313,7 +333,7 @@
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -321,23 +341,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -350,6 +370,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -360,7 +381,7 @@
             <td class="description last"><p>x position for point1</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -373,6 +394,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -383,7 +405,7 @@
             <td class="description last"><p>y position for point1</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -396,6 +418,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -406,7 +429,7 @@
             <td class="description last"><p>x position for point2</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -419,6 +442,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -429,15 +453,15 @@
             <td class="description last"><p>y position for point2</p></td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
     
-    
+
     
 <dl class="details">
-	
+    
 
 	
 
@@ -466,12 +490,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3117">line 3117</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3111">line 3111</a>
 			</li>
 		</ul>
 	</dd>
@@ -484,17 +508,17 @@
 	
 </dl>
 
-    
-    
 
     
 
     
 
     
+
     
+
     
-    
+
     
     <h5>Returns:</h5>
     
@@ -508,32 +532,34 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">number</span>
 
 
-	</dd>
+
+    </dd>
 </dl>
 
 
         
-    
+
     
 </dd>
 
         
             
+<hr>
 <dt>
-    <h4 class="name" id=".distanceSquared"><span class="type-signature">&lt;static> </span>distanceSquared<span class="signature">(x1, y1, x2, y2)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".distanceSquared"><span class="type-signature">&lt;static> </span>distanceSquared(x1, y1, x2, y2)</h4>
     
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         <p>Return the squared distance between 2 points in Euclidean space</p>
@@ -543,7 +569,7 @@
     
 
     
-    
+
     
     
         <h5>Parameters:</h5>
@@ -551,23 +577,23 @@
 
 <table class="params table table-striped">
     <thead>
-	<tr>
-		
-		<th>Name</th>
-		
+    <tr>
+        
+        <th>Name</th>
+        
 
-		<th>Type</th>
+        <th>Type</th>
 
-		
+        
 
-		
+        
 
-		<th class="last">Description</th>
-	</tr>
-	</thead>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-	<tbody>
-	
+    <tbody>
+    
 
         <tr>
             
@@ -580,6 +606,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -590,7 +617,7 @@
             <td class="description last"><p>x position for point1</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -603,6 +630,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -613,7 +641,7 @@
             <td class="description last"><p>y position for point1</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -626,6 +654,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -636,7 +665,7 @@
             <td class="description last"><p>x position for point2</p></td>
         </tr>
 
-	
+    
 
         <tr>
             
@@ -649,6 +678,7 @@
 <span class="param-type">number</span>
 
 
+
             
             </td>
 
@@ -659,15 +689,15 @@
             <td class="description last"><p>y position for point2</p></td>
         </tr>
 
-	
-	</tbody>
+    
+    </tbody>
 </table>
 
     
-    
+
     
 <dl class="details">
-	
+    
 
 	
 
@@ -696,12 +726,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3130">line 3130</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3124">line 3124</a>
 			</li>
 		</ul>
 	</dd>
@@ -714,17 +744,17 @@
 	
 </dl>
 
-    
-    
 
     
 
     
 
     
+
     
+
     
-    
+
     
     <h5>Returns:</h5>
     
@@ -738,32 +768,34 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">number</span>
 
 
-	</dd>
+
+    </dd>
 </dl>
 
 
         
-    
+
     
 </dd>
 
         
             
+<hr>
 <dt>
-    <h4 class="name" id=".max$"><span class="type-signature">&lt;static> </span>max$<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".max$"><span class="type-signature">&lt;static> </span>max$()</h4>
     
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         <p>Significantly faster version of Math.max if there are more then 2+x elements</p>
@@ -773,13 +805,13 @@
     
 
     
+
     
     
-    
-    
+
     
 <dl class="details">
-	
+    
 
 	
 
@@ -808,12 +840,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3143">line 3143</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3137">line 3137</a>
 			</li>
 		</ul>
 	</dd>
@@ -826,17 +858,17 @@
 	
 </dl>
 
-    
-    
 
     
 
     
 
     
+
     
+
     
-    
+
     
     <h5>Returns:</h5>
     
@@ -848,32 +880,34 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">number</span>
 
 
-	</dd>
+
+    </dd>
 </dl>
 
 
         
-    
+
     
 </dd>
 
         
             
+<hr>
 <dt>
-    <h4 class="name" id=".min$"><span class="type-signature">&lt;static> </span>min$<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".min$"><span class="type-signature">&lt;static> </span>min$()</h4>
     
     
 </dt>
 <dd>
-    
+
     
     <div class="description">
         <p>Significantly faster version of Math.min if there are more then 2+x elements</p>
@@ -883,13 +917,13 @@
     
 
     
+
     
     
-    
-    
+
     
 <dl class="details">
-	
+    
 
 	
 
@@ -918,12 +952,12 @@
 
 
 	
-	<dt class="tag-source">Source:</dt>
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html">D:/Develop/projects/cell/lib/bottom_line/bin/bottom_line.js</a>,
-				 <a href="D__Develop_projects_cell_lib_bottom_line_bin_bottom_line.js.html#sunlight-1-line-3162">line 3162</a>
+				<a href="bottom_line.js.html">bottom_line.js</a>,
+				 <a href="bottom_line.js.html#sunlight-1-line-3156">line 3156</a>
 			</li>
 		</ul>
 	</dd>
@@ -936,17 +970,17 @@
 	
 </dl>
 
-    
-    
 
     
 
     
 
     
+
     
+
     
-    
+
     
     <h5>Returns:</h5>
     
@@ -958,20 +992,21 @@
 
 
 <dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
 <span class="param-type">number</span>
 
 
-	</dd>
+
+    </dd>
 </dl>
 
 
         
-    
+
     
 </dd>
 
@@ -995,33 +1030,47 @@
 
 	
 		<div class="col-md-3">
-			<div id="toc" class="col-md-3"></div>
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
 		</div>
 	
 
 </div>
 </div>
 
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
 
 <footer>
 
 
 	<span class="copyright">
-	DocStrap Copyright © 2012-2014 The contributors to the JSDoc3 and DocStrap projects.
+	DocStrap Copyright © 2012-2015 The contributors to the JSDoc3 and DocStrap projects.
 	</span>
-	<br />
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-	on Sun Feb 7th 2016 using the <a
-	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Sat Feb 20th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
 </footer>
 
-<!--<script src="scripts/sunlight.js"></script>-->
 <script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/bootstrap-dropdown.js"></script>
 <script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
 
 <script>
 $( function () {
@@ -1030,20 +1079,6 @@ $( function () {
 
 		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 	} );
-
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "h1,h2,h3,h4",
-		showAndHide : false,
-		scrollTo    : "100px"
-	} );
-
-	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
 	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
 		var $this = $( this );
@@ -1056,7 +1091,8 @@ $( function () {
 			example.html( exampleText );
 			lang = lang[1];
 		} else {
-			lang = "javascript";
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
 		}
 
 		if ( lang ) {
@@ -1074,6 +1110,28 @@ $( function () {
 		showMenu : true,
 		enableDoclinks : true
 	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
 } );
 </script>
 
@@ -1084,6 +1142,12 @@ $( function () {
 
 <!--Google Analytics-->
 
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
 
 </body>
 </html>
