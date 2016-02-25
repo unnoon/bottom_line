@@ -3,7 +3,7 @@
 <head>
     <title>Object loops</title>
     <script src="../../node_modules/benchmark/benchmark.js"></script>
-    <script src="../../src/bottom_line.js"></script>
+    <script src="../../bin/bottom_line.js"></script>
     <script>
         var obj = {};
         var elm;
@@ -42,8 +42,8 @@
                     elm = obj[keys[i]];
                 }
             })
-            .add('_each', function() {
-                obj._each(function(e) {
+            .add('._.each', function() {
+                obj._.each(function(e) {
                     elm = e;
                 })
             })

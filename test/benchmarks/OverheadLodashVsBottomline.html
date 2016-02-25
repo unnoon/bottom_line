@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>Overhead Lodash vs Bottomline</title>
-    <script src="../../bower_components/benchmark/benchmark.js"></script>
-    <script src="../../dist/bottom_line.js"></script>
+    <script src="../../node_modules/benchmark/benchmark.js"></script>
+    <script src="../../bin/bottom_line.js"></script>
     <script src="../../bower_components/lodash/lodash.js"></script>
     <script>
         var suite = new Benchmark.Suite;
@@ -11,7 +11,7 @@
         // add tests
         suite
             .add('contains lodash', function() {
-                _([1, 2]).forEach(function() {}).value();
+                _([1, 2]).forEach(function() {}).value;
             })
             .add('contains bottom_line', function() {
                 [1, 2]._.each(function(){});
