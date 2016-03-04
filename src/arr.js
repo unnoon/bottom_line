@@ -119,39 +119,6 @@ construct('arr', {native:Array}, {
             return this;
         }},
         /**
-         * Removes all specified values from an array
-         * @public
-         * @method  arr#remove$
-         * @param  {...any} ___values - values to remove
-         * @return {Array}       this - mutated array for chaining
-         */
-        remove$: {onoverride: null, value: function(___values) {
-            var args = arguments;
-
-            this._.eachRight(function(val, i) { // eachRight is a little bit faster
-                if(~args._.indexOf(val)) {this.splice(i, 1)}
-            }, this);
-
-            return this;
-        }},
-        /**
-         * Removes all values from an array based on a match function
-         * @public
-         * @method  arr#remove$Fn
-         * @this   {Array}
-         * @param  {function(val, index, arr, delta)} match  - function specifying the value to delete
-         * @param  {Object=}                            ctx_ - optional context for the match function
-         * @return {Array}                             this  - mutated array for chaining
-         */
-        remove$Fn: {onoverride: null, value: function(match, ctx_) {
-            this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
-                if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
-            }, this);
-
-            return this;
-        }},
-
-        /**
          * Difference between the current and other arrays
          * @public
          * @method   arr#diff
@@ -296,6 +263,25 @@ construct('arr', {native:Array}, {
         Flatten: function() {
             return this.concat.apply([], this);
         },
+        /**
+         * Harvest values based on a key in an array of objects (or 2 dimensional array)
+         *
+         * @public
+         * @method arr#harvest
+         *
+         * @param {string|number} key - key for values to harvest
+         *
+         * @returns {Array} - Array with harvested values
+         */
+        harvest: {aliases: ['pluck'], value: function(key) {
+            var harvest = [];
+
+            this._.each(function(sub) {
+                harvest.push(sub[key])
+            });
+
+            return harvest
+        }},
         /**
          * Check is an array contains a certain value
          * @public
@@ -478,6 +464,38 @@ construct('arr', {native:Array}, {
         random: function() {
             return this[_.int.random(0, this.length - 1)];
         },
+        /**
+         * Removes all specified values from an array
+         * @public
+         * @method  arr#remove$
+         * @param  {...any} ___values - values to remove
+         * @return {Array}       this - mutated array for chaining
+         */
+        remove$: {onoverride: null, value: function(___values) {
+            var args = arguments;
+
+            this._.eachRight(function(val, i) { // eachRight is a little bit faster
+                if(~args._.indexOf(val)) {this.splice(i, 1)}
+            }, this);
+
+            return this;
+        }},
+        /**
+         * Removes all values from an array based on a match function
+         * @public
+         * @method  arr#remove$Fn
+         * @this   {Array}
+         * @param  {function(val, index, arr, delta)} match  - function specifying the value to delete
+         * @param  {Object=}                            ctx_ - optional context for the match function
+         * @return {Array}                             this  - mutated array for chaining
+         */
+        remove$Fn: {onoverride: null, value: function(match, ctx_) {
+            this._.eachRight(function(val, i, arr, delta) { // eachRight is a little bit faster
+                if(match.call(ctx_, val, i, arr, delta)) {this.splice(i, 1)}
+            }, this);
+
+            return this;
+        }},
         /**
          * Removes one occurrence of of an element from an array
          * @public

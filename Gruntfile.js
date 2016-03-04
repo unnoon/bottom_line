@@ -62,13 +62,14 @@ module.exports = function(grunt) {
 			}
 		},
         clean: {
-            docs: ['doc']
+            docs: ['doc'],
+            bin:  ['bin/bottom_line.js', 'bin/bottom_line.test.js']
         }
 	});
 
     grunt.registerTask('docs',    ['clean:docs', 'jsdoc']);
 	grunt.registerTask('build',   ['bump-only:'+bump, 'preprocess', 'uglify', 'docs', 'bump-commit']);
-    grunt.registerTask('default', ['preprocess']);
+    grunt.registerTask('default', ['clean:bin', 'preprocess']);
 };
 
 
