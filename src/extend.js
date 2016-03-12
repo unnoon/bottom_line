@@ -118,7 +118,7 @@ function collectPrototypeChain(module, obj, options) {
  * @param {Object} proto   - prototype to process
  * @param {Object} obj     - object to extend
  * @param {Object} options - extension options
- * @param {Object} module  - object containing the options for extension
+ * @param {Object} module  - object containing the properties for extension
 
  */
 function processProperties(proto, obj, options, module) {
@@ -134,7 +134,7 @@ function processProperties(proto, obj, options, module) {
 
         if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
         if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
-        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc)){return} // continue
+        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto)){return} // continue
 
         copyPropertyConfigs(options, dsc);
 
