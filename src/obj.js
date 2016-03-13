@@ -280,10 +280,10 @@ construct('obj', {native:Object}, {
          *
          * @return {Object} descriptor - descriptor object
          */
-        descriptor: function(prop)
+        descriptor: {aliases: ['dsc'], value: function(prop)
         {
             return Object.getOwnPropertyDescriptor(_.owner(prop, this), prop)
-        },
+        }},
         /**
          * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
          *
@@ -390,7 +390,7 @@ construct('obj', {native:Object}, {
          *
          * @return {any|boolean}   - output from the callback function
          */
-        eachRight: function(step_, cb, ctx_) {
+        eachRight: function(cb, ctx_) {
             if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
 
             return this._.keys()._.eachRight(function(key) {
@@ -411,7 +411,7 @@ construct('obj', {native:Object}, {
          *
          * @return {any|boolean}   - output from the callback function
          */
-        eachDscRight: function(step_, cb, ctx_) {
+        eachDscRight: function(cb, ctx_) {
             return this._.keys()._.eachRight(function(key) {
                 return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
             }, this);

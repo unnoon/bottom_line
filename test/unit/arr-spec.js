@@ -266,6 +266,15 @@ describe("Array", function() {
 				expect(arr1._.Diff(arr2)).to.eql([1, 3]);
 				expect(arr1).to.eql([1, 2, 3]);
 			});
+
+			it("Difference multiple arrays", function() {
+				var arr1 = [1, 2, 3];
+				var arr2 = [2, 5];
+				var arr3 = [1, 7];
+
+				expect(arr1._.Diff(arr2, arr3)).to.eql([3]);
+				expect(arr1).to.eql([1, 2, 3]);
+			});
 		});
 
 		describe("dimit", function() {
@@ -455,6 +464,21 @@ describe("Array", function() {
 			});
 		});
 
+		describe("harvest", function() {
+
+			it("multidimensional arrays", function() {
+				var arr = [['aap', 3], ['hanuman', 6]];
+
+				expect(arr._.harvest(1)).to.deep.equal([3, 6]);
+			});
+
+			it("object arrays", function() {
+				var arr = [{'aap': 3}, {aap: 6}];
+
+				expect(arr._.harvest('aap')).to.deep.equal([3, 6]);
+			});
+		});
+
 		describe("has", function() {
 
 			it("contains functionality", function() {
@@ -562,6 +586,45 @@ describe("Array", function() {
 			});
 		});
 
+		describe("last", function() {
+
+			it("get", function() {
+				expect([1, 2, 3]._.last()).to.deep.equal(3);
+				expect([]._.last()).to.be.undefined;
+			});
+
+			it("set", function() {
+				expect([1, 2, 3]._.last(4)).to.deep.equal([1, 2, 4]);
+				expect([]._.last(4)).to.deep.equal([]);
+			});
+		});
+
+		describe("max", function() {
+
+			it("simple number array", function() {
+				expect([1, 2, 3, 6, 3, 2]._.max()).to.deep.equal(6);
+				expect([]._.max()).to.be.undefined;
+			});
+
+			it("simple functional", function() {
+				expect([1, 2, 3, -8, 6, 5]._.max(function(a, b) {return Math.abs(a) - Math.abs(b)})).to.deep.equal(-8);
+				expect([]._.max(function(a, b) {return Math.abs(a) - Math.abs(b)})).to.be.undefined;
+			});
+		});
+
+		describe("min", function() {
+
+			it("simple number array", function() {
+				expect([1, 2, 3, 6, 3, 2]._.min()).to.deep.equal(1);
+				expect([]._.min()).to.be.undefined;
+			});
+
+			it("simple functional", function() {
+				expect([2, 3, -8, -1, 6, 5]._.min(function(a, b) {return Math.abs(a) - Math.abs(b)})).to.deep.equal(-1);
+				expect([]._.min(function(a, b) {return Math.abs(a) - Math.abs(b)})).to.be.undefined;
+			});
+		});		
+
 		describe("modify", function() {
 
 			it("modify ", function() {
@@ -585,6 +648,16 @@ describe("Array", function() {
 				})).to.eql(['1x', '2x', '3x']);
 				expect(arr).to.eql([1, 2, 3]);
 				expect(arr).to.equal(arr);
+			});
+		});
+
+		describe("push", function() {
+
+			it("simple ", function() {
+				var arr = [1, 2, 3];
+
+				expect(arr._.push(4, 5)).to.equal(arr);
+				expect(arr).to.deep.equal([1, 2, 3, 4, 5]);
 			});
 		});
 

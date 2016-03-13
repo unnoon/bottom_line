@@ -118,13 +118,35 @@ construct('str', {native:String}, {
         },
         /**
          * Checks if the string ends with a certain substr
+         *
          * @public
          * @method str#endsWith
-         * @param   {string}  substr - substring to check for
-         * @returns {boolean}        - boolean indicating if the string ends with the given substring
+         *
+         * @param   {string} substr - substring to check for
+         *
+         * @returns {boolean} - boolean indicating if the string ends with the given substring
          */
         endsWith: function(substr) {
             return this.slice(-substr.length) === substr;
+        },
+        /**
+         * Formats a string
+         *
+         * @public
+         * @method str#format
+         *
+         * @param   {...string} ___formats - one or multiple fills
+         *
+         * @returns {string} - this for chaining
+         */
+        format: function(___formats) {
+            var args = arguments;
+
+            return this.replace(/{(\d+)}/g, function(match, number) {
+                return typeof args[number] !== 'undefined'
+                    ? args[number]
+                    : match
+            })
         },
         /**
          * Checks if the string contains a certain substring

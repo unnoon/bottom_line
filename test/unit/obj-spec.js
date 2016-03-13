@@ -282,9 +282,58 @@ describe("Object", function() {
 				expect(_.typeOf(cat)).to.eql('object');
 			});
 		});
+
+        describe("names", function() {
+
+            it("simple cases", function() {
+                expect(_.names(null)).to.deep.equal([]);
+                expect(_.names(undefined)).to.deep.equal([]);
+                expect(_.names()).to.deep.equal([]);
+                expect(_.names({x: 666, y: 777})).to.deep.equal(['x', 'y']);
+                expect(_.names([1, 2])).to.deep.equal(['0', '1', 'length']);
+            });
+        });
+
+
+        describe("owner", function() {
+            var proto1 = {x: 666};
+            var proto2 = Object.create(proto1, {y: {value: 777}});
+            var obj    = Object.create(proto2, {z: {value: 888}});
+
+            it("simple cases", function() {
+                expect(_.owner('x', obj)).to.deep.equal(proto1);
+                expect(_.owner('y', obj)).to.deep.equal(proto2);
+                expect(_.owner('z', obj)).to.deep.equal(obj);
+            });
+        });
 	});
 
 	describe("Object prototype methods", function() {
+
+        describe("constant", function() {
+
+            it("simple", function() {
+                var obj = {};
+
+                obj._.constant('x', 666);
+
+                var dsc = Object.getOwnPropertyDescriptor(obj, 'x');
+
+                expect(dsc.configurable).to.be.false;
+                expect(dsc.writable).to.be.false;
+                expect(dsc.enumerable).to.be.true;
+            });
+        });
+
+        describe("countFn", function() {
+
+            it("simple simple", function() {
+                var obj = {x: 666, y: 777, z: 888};
+
+                expect(obj._.countFn(function(v) {return v < 800})).to.deep.equal(2);
+            });
+
+        });
 
         describe("chaining", function() {
 
@@ -354,6 +403,151 @@ describe("Object", function() {
                         .value
                 ).to.eql('x');
             });
+        });
+
+        describe("define: shortcut to defineProperty", function() {
+
+            it("simple", function() {
+                var obj = {x: 666, y: 777};
+
+                obj._.define('z', {value: 777});
+
+                expect(obj.z).to.deep.equal(777);
+            });
+
+        });
+
+        describe("descriptor without own property check", function() {
+
+            var proto1 = {x: 666};
+            var proto2 = Object.create(proto1, {y: {value: 777}});
+            var obj    = Object.create(proto2, {z: {value: 888}});
+
+            it("simple cases", function() {
+                expect(obj._.descriptor('x').value).to.deep.equal(666);
+            });
+        });
+
+        describe("eachDsc", function() {
+            var obj    = {x: 666, y: 777};
+            var values = [];
+
+            obj._.eachDsc(function(dsc) {values.push(dsc.value)});
+
+            it("simple cases", function() {
+                expect(values).to.deep.equal([666, 777]);
+            });
+        });
+
+        describe("each$", function() {
+            var proto1 = {x: 666};
+            var proto2 = Object.create(proto1, {y: {value: 777, enumerable: true}});
+            var obj    = Object.create(proto2, {z: {value: 888, enumerable: true}});
+
+            var values = [];
+
+            obj._.each$(function(v) {values.push(v)});
+
+            it("simple cases", function() {
+                expect(values).to.deep.equal([888, 777, 666]);
+            });
+        });
+
+        describe("each$Dsc", function() {
+            var proto1 = {x: 666};
+            var proto2 = Object.create(proto1, {y: {value: 777, enumerable: true}});
+            var obj    = Object.create(proto2, {z: {value: 888, enumerable: true}});
+
+            var values = [];
+
+            obj._.each$Dsc(function(dsc) {values.push(dsc.value)});
+
+            it("simple cases", function() {
+                expect(values).to.deep.equal([888, 777, 666]);
+            });
+        });
+
+        describe("eachRight", function() {
+            var obj    = {x: 666, y: 777, z: 888};
+            var values = [];
+
+            obj._.eachRight(function(v) {values.push(v)});
+
+            it("simple cases", function() {
+                expect(values).to.deep.equal([888, 777, 666]);
+            });
+        });
+
+        describe("eachDscRight", function() {
+            var obj    = {x: 666, y: 777, z: 888};
+            var values = [];
+
+            obj._.eachDscRight(function(dsc) {values.push(dsc.value)});
+
+            it("simple cases", function() {
+                expect(values).to.deep.equal([888, 777, 666]);
+            });
+        });
+
+        describe("findRight", function() {
+            var obj    = {x: 666, y: 777, z: 888, q: 999};
+
+            it("simple cases", function() {
+                expect(obj._.findRight(function(v) {return v > 800})).to.deep.equal(999);
+                expect(obj._.findRight(function(v) {return v < 100})).to.deep.equal(undefined);
+            });
+        });
+
+        describe("hasFn", function() {
+            var obj    = {x: 666, y: 777, z: 888, q: 999};
+
+            it("simple cases", function() {
+                expect(obj._.hasFn(function(v) {return v > 888})).to.be.true;
+                expect(obj._.hasFn(function(v) {return v > 1000})).to.be.false;
+            });
+        });
+
+        describe("instanceOf", function() {
+
+            it("prototype", function() {
+                var fproto = function() {};
+                var proto1 = {x: 666};
+                var proto2 = Object.create(proto1, {y: {value: 777, enumerable: true}});
+                var obj    = Object.create(proto2, {z: {value: 888, enumerable: true}});
+
+                expect(obj._.instanceOf(proto1)).to.be.false;
+                expect(obj._.instanceOf(proto2)).to.be.true;
+                expect(obj._.instanceOf(fproto)).to.be.false;
+            });
+
+            it("functional", function() {
+                var Fake = function() {};
+                var Class1 = function () {this.x = 666};
+                var Class2 = function () {this.y = 777};
+
+                Class2.prototype = Object.create(Class1.prototype);
+                Class2.prototype.constructor = Class2;
+
+                var obj = new Class2;
+
+                expect(obj._.instanceOf(Class1)).to.be.false;
+                expect(obj._.instanceOf(Class2)).to.be.true;
+                expect(obj._.instanceOf(Fake)).to.be.false;
+            });
+        });
+
+        describe("keyOfFn", function() {
+
+            it("simple", function() {
+                var obj = {
+                    x: 1,
+                    y: 2,
+                    z: 3
+                };
+
+                expect(obj._.keyOfFn(function(v) {return v > 2})).to.eql('z');
+            });
+
         });
 
 		describe("keys", function() {
@@ -482,6 +676,46 @@ describe("Object", function() {
 				expect(obj._.pairs()).to.deep.equal(['x', 1, 'y', 2, 'z', 3, 't', 666]);
 			});
 		});
+
+        describe("proto", function() {
+
+            it("get", function() {
+                var proto = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                };
+
+                var obj = Object.create(proto);
+
+                expect(obj._.proto()).to.deep.equal(proto);
+            });
+
+            it("set", function() {
+                var proto = {
+                    x: 1,
+                    y: 2,
+                    z: 3,
+                    t: 666
+                };
+
+                var obj = {}._.proto(proto);
+
+                expect(obj._.proto()).to.deep.equal(proto);
+            });
+        });
+
+        describe("toString: fake toString", function() {
+
+            it("simple values", function() {
+                var obj = {
+                    x: 1
+                };
+
+                expect(obj._.toString()).to.deep.equal('');
+            });
+        });
 
 		describe("values", function() {
 

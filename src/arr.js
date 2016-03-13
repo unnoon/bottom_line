@@ -267,7 +267,7 @@ construct('arr', {native:Array}, {
          * Harvest values based on a key in an array of objects (or 2 dimensional array)
          *
          * @public
-         * @method arr#harvest
+         * @method obj#harvest
          *
          * @param {string|number} key - key for values to harvest
          *
@@ -345,14 +345,18 @@ construct('arr', {native:Array}, {
         },
         /**
          * gets/sets the last element of an array
+         *
          * @public
          * @method arr#last
          * @this    {Array}
-         * @param   {any}      val_ - Value to be set as the last element. If no value is given the last value is returned
-         * @returns {any|Array}     - last element of the array or this for chaiing
+         *
+         * @param   {any} val_ - Value to be set as the last element. If no value is given the last value is returned
+         *
+         * @returns {any|Array}- last element of the array or this for chaining
          */
         last: function(val_) {
-            if(val_ === undefined) return this[this.length-1];
+            if(val_ === undefined) {return this[this.length-1]}
+            if(!this.length)       {return this}
 
             this[this.length-1] = val_;
 
@@ -360,45 +364,50 @@ construct('arr', {native:Array}, {
         },
         /**
          * Returns the maximum value of an array with numbers
+         *
          * @public
          * @method arr#max
          * @this    {Array<number|any>}
-         * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
-         * @returns {number|any}           - maximum number or element in the array
+         *
+         * @param   {function=} compareFn_ - optional function to determine the the max in case of non-numeric array
+         *
+         * @returns {number|any} - maximum number or element in the array
          */
-        max: function(compareFn_) {
+        max: function(compareFn_)
+        {
+            if(!this.length)             {return undefined}
             if(compareFn_ === undefined) {return Math.max.apply(null, this)}
-            else
-            {
-                var max = this[0];
 
-                this._.each(function(elm) {
-                    if(compareFn_(elm, max) > 0) max = elm;
-                });
+            var max = this[0];
 
-                return max;
-            }
+            this._.each(function(elm) {
+                if(compareFn_(elm, max) > 0) max = elm;
+            });
+
+            return max;
         },
         /**
-         * Returns the minimum value of an array with numbers
+         * Returns the minimum value of an array
+         *
          * @public
          * @method arr#min
          * @this    {Array<number|any>}
-         * @param   {Function=} compareFn_ - optional compare function
+         *
+         * @param {Function=} compareFn_ - optional compare function
+         *
          * @returns {number|any} - minimum element in the array
          */
         min: function(compareFn_) {
+            if(!this.length)             {return undefined}
             if(compareFn_ === undefined) {return Math.min.apply(null, this)}
-            else
-            {
-                var min = this[0];
 
-                this._.each(function(elm) {
-                    if(compareFn_(elm, min) < 0) min = elm;
-                });
+            var min = this[0];
 
-                return min;
-            }
+            this._.each(function(elm) {
+                if(compareFn_(elm, min) < 0) min = elm;
+            });
+
+            return min;
         },
         /**
          * Modifies the members of an array according to a certain function
