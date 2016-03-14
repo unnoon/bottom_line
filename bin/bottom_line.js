@@ -292,7 +292,7 @@
      * @param {Object} proto   - prototype to process
      * @param {Object} obj     - object to extend
      * @param {Object} options - extension options
-     * @param {Object} module  - object containing the options for extension
+     * @param {Object} module  - object containing the properties for extension
     
      */
     function processProperties(proto, obj, options, module) {
@@ -308,7 +308,7 @@
     
             if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
             if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
-            if(options.condition && !options.condition.call(options.conditionctx, prop, dsc)){return} // continue
+            if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto)){return} // continue
     
             copyPropertyConfigs(options, dsc);
     
@@ -1113,10 +1113,10 @@
              *
              * @return {Object} descriptor - descriptor object
              */
-            descriptor: function(prop)
+            descriptor: {aliases: ['dsc'], value: function(prop)
             {
                 return Object.getOwnPropertyDescriptor(_.owner(prop, this), prop)
-            },
+            }},
             /**
              * Object iterator. If the value false is returned, iteration is canceled. This can be used to stop iteration
              *
@@ -1223,7 +1223,7 @@
              *
              * @return {any|boolean}   - output from the callback function
              */
-            eachRight: function(step_, cb, ctx_) {
+            eachRight: function(cb, ctx_) {
                 if(_.isArguments(this)) return _.arr.methods.eachRight.apply(this, arguments); // handle arguments.
     
                 return this._.keys()._.eachRight(function(key) {
@@ -1244,7 +1244,7 @@
              *
              * @return {any|boolean}   - output from the callback function
              */
-            eachDscRight: function(step_, cb, ctx_) {
+            eachDscRight: function(cb, ctx_) {
                 return this._.keys()._.eachRight(function(key) {
                     return cb.call(ctx_, this._.descriptor(key), key, this); // loop is broken upon returning false
                 }, this);
@@ -2107,7 +2107,7 @@
              * Harvest values based on a key in an array of objects (or 2 dimensional array)
              *
              * @public
-             * @method arr#harvest
+             * @method obj#harvest
              *
              * @param {string|number} key - key for values to harvest
              *
@@ -2185,14 +2185,18 @@
             },
             /**
              * gets/sets the last element of an array
+             *
              * @public
              * @method arr#last
              * @this    {Array}
-             * @param   {any}      val_ - Value to be set as the last element. If no value is given the last value is returned
-             * @returns {any|Array}     - last element of the array or this for chaiing
+             *
+             * @param   {any} val_ - Value to be set as the last element. If no value is given the last value is returned
+             *
+             * @returns {any|Array}- last element of the array or this for chaining
              */
             last: function(val_) {
-                if(val_ === undefined) return this[this.length-1];
+                if(val_ === undefined) {return this[this.length-1]}
+                if(!this.length)       {return this}
     
                 this[this.length-1] = val_;
     
@@ -2200,45 +2204,50 @@
             },
             /**
              * Returns the maximum value of an array with numbers
+             *
              * @public
              * @method arr#max
              * @this    {Array<number|any>}
-             * @param   {function}   compareFn_ - optional function to determine the the max in case of non-numeric array
-             * @returns {number|any}           - maximum number or element in the array
+             *
+             * @param   {function=} compareFn_ - optional function to determine the the max in case of non-numeric array
+             *
+             * @returns {number|any} - maximum number or element in the array
              */
-            max: function(compareFn_) {
+            max: function(compareFn_)
+            {
+                if(!this.length)             {return undefined}
                 if(compareFn_ === undefined) {return Math.max.apply(null, this)}
-                else
-                {
-                    var max = this[0];
     
-                    this._.each(function(elm) {
-                        if(compareFn_(elm, max) > 0) max = elm;
-                    });
+                var max = this[0];
     
-                    return max;
-                }
+                this._.each(function(elm) {
+                    if(compareFn_(elm, max) > 0) max = elm;
+                });
+    
+                return max;
             },
             /**
-             * Returns the minimum value of an array with numbers
+             * Returns the minimum value of an array
+             *
              * @public
              * @method arr#min
              * @this    {Array<number|any>}
-             * @param   {Function=} compareFn_ - optional compare function
+             *
+             * @param {Function=} compareFn_ - optional compare function
+             *
              * @returns {number|any} - minimum element in the array
              */
             min: function(compareFn_) {
+                if(!this.length)             {return undefined}
                 if(compareFn_ === undefined) {return Math.min.apply(null, this)}
-                else
-                {
-                    var min = this[0];
     
-                    this._.each(function(elm) {
-                        if(compareFn_(elm, min) < 0) min = elm;
-                    });
+                var min = this[0];
     
-                    return min;
-                }
+                this._.each(function(elm) {
+                    if(compareFn_(elm, min) < 0) min = elm;
+                });
+    
+                return min;
             },
             /**
              * Modifies the members of an array according to a certain function
@@ -2582,13 +2591,35 @@
             },
             /**
              * Checks if the string ends with a certain substr
+             *
              * @public
              * @method str#endsWith
-             * @param   {string}  substr - substring to check for
-             * @returns {boolean}        - boolean indicating if the string ends with the given substring
+             *
+             * @param   {string} substr - substring to check for
+             *
+             * @returns {boolean} - boolean indicating if the string ends with the given substring
              */
             endsWith: function(substr) {
                 return this.slice(-substr.length) === substr;
+            },
+            /**
+             * Formats a string
+             *
+             * @public
+             * @method str#format
+             *
+             * @param   {...string} ___formats - one or multiple fills
+             *
+             * @returns {string} - this for chaining
+             */
+            format: function(___formats) {
+                var args = arguments;
+    
+                return this.replace(/{(\d+)}/g, function(match, number) {
+                    return typeof args[number] !== 'undefined'
+                        ? args[number]
+                        : match
+                })
             },
             /**
              * Checks if the string contains a certain substring
