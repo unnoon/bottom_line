@@ -186,6 +186,7 @@ construct('arr', {native:Array}, {
          * @param  {Object=}  ctx_  - optional context for the callback function
          * @return {any|boolean}    - output from the callback function
          */
+        // TODO make length variable version of each
         each: {onoverride: null, value: function(step_, cb, ctx_) {
             if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
 
