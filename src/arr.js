@@ -150,7 +150,7 @@ construct('arr', {native:Array}, {
          * Creates a multidimensional array. The dimensions come from the array itself
          * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
          * @public
-         * @method arr#Dimit
+         * @method arr#dimit
          * @this   {Array}
          * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
          * @return {Array}               - this initialized multi-dimensional array
