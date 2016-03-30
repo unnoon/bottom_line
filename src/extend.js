@@ -134,7 +134,7 @@ function processProperties(proto, obj, options, module) {
 
         if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
         if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
-        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto)){return} // continue
+        if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto, obj)){return} // continue
 
         copyPropertyConfigs(options, dsc);
 
