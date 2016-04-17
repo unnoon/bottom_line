@@ -308,7 +308,7 @@
     
             if(options.exclude && ~options.exclude.indexOf(prop)) {return} // continue
             if(!isLowestDescriptor(module, prop, dsc))            {return} // continue
-            if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto)){return} // continue
+            if(options.condition && !options.condition.call(options.conditionctx, prop, dsc, proto, obj)){return} // continue
     
             copyPropertyConfigs(options, dsc);
     
@@ -1990,7 +1990,7 @@
              * Creates a multidimensional array. The dimensions come from the array itself
              * i.e. [3, 6]._.dimit('zero'); Creates a 2D array of 3 by 6 initialized by the value 'zero'
              * @public
-             * @method arr#Dimit
+             * @method arr#dimit
              * @this   {Array}
              * @param  {any|Function=} init_ - initial value for the array. Can be either a value or a function specifying the value
              * @return {Array}               - this initialized multi-dimensional array
@@ -2026,6 +2026,7 @@
              * @param  {Object=}  ctx_  - optional context for the callback function
              * @return {any|boolean}    - output from the callback function
              */
+            // TODO make length variable version of each
             each: {onoverride: null, value: function(step_, cb, ctx_) {
                 if(typeof(step_) === 'function') {ctx_ = cb; cb = step_; step_ = 1}
     
