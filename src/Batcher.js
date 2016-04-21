@@ -9,6 +9,7 @@
  *
  * @return {Function} - decorated batcher function
  */
+// TODO maybe replace batcher object by linking the next to the function itself
 function Batcher(___fnc_) {
 
     // store callbacks & context on the batcher function for easy debugging
