@@ -4,19 +4,20 @@
         <meta charset="utf-8" />
         <title>Just to run some custom tests</title>
 
-        <!--<script>this._ = 'hahaha' </script>-->
         <script>
 
         </script>
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var obj    = {x: 666, y: 777, z: 888};
-            var values = [];
+            function test()
+            {
+                arguments._.insert(6);
 
-            obj._.eachRight(function(v) {values.push(v)});
+                return arguments
+            }
 
-            console.log(values);
+            console.log(test(5, 7, 8));
         </script>
     </head>
     <body>
