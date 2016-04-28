@@ -10,11 +10,10 @@ construct('obj', {native:Object}, {
          * @static
          * @method obj.clone
          *
-         * @param   {Object}  obj   - object to be cloned
+         * @param {Object} obj - object to be cloned
          *
-         * @return  {Object}  clone - the cloned object
+         * @return {Object} clone - the cloned object
          */
-        // TODO add deep option to clone function itself
         clone: clone,
         /**
          * creates an object based on a prototype
@@ -23,9 +22,9 @@ construct('obj', {native:Object}, {
          * @static
          * @method _.create
          *
-         * @param  {Object} proto - prototype to base the object on
+         * @param {Object} proto - prototype to base the object on
          *
-         * @return {Object}       - new object based on prototype
+         * @return {Object} - new object based on prototype
          */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
@@ -41,7 +40,7 @@ construct('obj', {native:Object}, {
          * @static
          * @method obj.typeof
          *
-         * @param   {Object} obj - object tot check the type from
+         * @param {Object} obj - object tot check the type from
          *
          * @return {string} - type of the object
          */
@@ -63,7 +62,7 @@ construct('obj', {native:Object}, {
          *
          * @param  {Object} obj - object tot check the type from
          *
-         * @return {string}     - type of the object
+         * @return {Array} - Array containing the names of the object
          */
         names: function(obj) {
             return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
@@ -108,6 +107,60 @@ construct('obj', {native:Object}, {
             this[key] = val;
 
             return this;
+        },
+        /**
+         * local assign method including deep option
+         *
+         * @public
+         * @method obj#assign
+         *
+         * @this {Object}
+         *
+         * @param {string=}        _mode_ - mode for assignation 'shallow'|'deep'. default is 'shallow'
+         * @param {...Object} ___sources  - one or more object sources
+         *
+         * @return {Object} this - this after assignation
+         */
+        assign: function(_mode_, ___sources)
+        {   "use strict";
+
+            var mode = _mode_ === 'deep' || 'shallow' ? _mode_ : 'shallow';
+            var i    = _mode_ === 'deep' || 'shallow' ? 1      : 0;
+            var from;
+            var to = this;
+            var symbols;
+
+            for (; i < arguments.length; i++) {
+                from = Object(arguments[i]);
+
+                for (var key in from) {
+                    if (!from.hasOwnProperty(key)) {continue}
+
+                    if(mode === 'deep' && _.isObject(to[key]) && _.isObject(from[key]))
+                    {
+                        to[key]._.assign(mode, from[key])
+                    }
+                    else if(to.hasOwnProperty(key) && Object.getOwnPropertyDescriptor(to, key).writable === false)
+                    {
+
+                    }
+                    else
+                    {
+                        to[key] = from[key];
+                    }
+                }
+
+                if (Object.getOwnPropertySymbols) {
+                    symbols = Object.getOwnPropertySymbols(from);
+                    for (var s = 0; s < symbols.length; s++) {
+                        if (propIsEnumerable.call(from, symbols[s])) {
+                            to[symbols[s]] = from[symbols[s]];
+                        }
+                    }
+                }
+            }
+
+            return to;
         },
         /**
          * Counts the number of occurrences of an element
