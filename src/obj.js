@@ -478,15 +478,15 @@ construct('obj', {native:Object}, {
          * @this   {Object}
          *
          * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
+         * @param  {Object=}  ctx_ - optional context
          *
          * @return {Array} array containing the filtered values
          */
-        filter: function(cb, opt_ctx) {
+        filter: function(cb, ctx_) {
             var filtered = [];
 
             this._.each(function(elm) {
-                if(cb.call(opt_ctx, elm)) filtered.push(elm);
+                if(cb.call(ctx_, elm)) filtered.push(elm);
             });
 
             return filtered;
