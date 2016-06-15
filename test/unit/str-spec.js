@@ -17,6 +17,29 @@ define([
 				});
 			});
 
+			describe("afterLast", function() {
+
+				it("positive afterLast test", function() {
+					expect('ran!dom!stuff'._.afterLast('!')).to.eql('stuff');
+				});
+			});
+
+			describe("before", function() {
+
+				it("positive before test", function() {
+					expect('one.two'._.before('.t')).to.eql('one');
+				});
+
+			});
+
+			describe("beforeLast", function() {
+
+				it("positive beforeLast test", function() {
+					expect('ran!dom!stuff'._.beforeLast('!')).to.eql('ran!dom');
+				});
+
+			});
+
 			describe("capitalize", function() {
 
 				it("positive testcases", function() {
@@ -61,6 +84,13 @@ define([
 
 				it("positive testcase", function() {
 					expect('12[345]67'._.between('[', ']')).to.eql('345');
+				});
+			});
+
+			describe("betweenLast", function() {
+
+				it("positive testcase", function() {
+					expect('cell/plugins/pixi/Sprite'._.betweenLast('/', '.')).to.eql('Sprite');
 				});
 			});
 		});
