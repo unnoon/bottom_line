@@ -24,9 +24,7 @@
     BitVector.prototype = {
         and: function(bitvector) { "use strict";
         {
-            var word;
-
-            for(var i = 0, max = this.words.length-1; i < max; i++)
+            for(var i = 0, max = this.words.length, word; i < max; i++)
             {
                 if((word = bitvector.words[i]) === undefined) {break}
 
@@ -40,7 +38,7 @@
             var word;
             var maskword;
 
-            for(var i = 0, max = mask.words.length-1; i < max; i++)
+            for(var i = 0, max = mask.words.length; i < max; i++)
             {
                 word     = this.words[i];
                 maskword = mask.words[i];
@@ -76,13 +74,18 @@
         }},
         or: function(bitvector) { "use strict";
         {
-            var word;
-
-            for(var i = 0, max = this.words.length-1; i < max; i++)
+            for(var i = 0, max = this.words.length, word; i < max; i++)
             {
                 if((word = bitvector.words[i]) === undefined) {break}
 
                 this.words[i] |= word;
+            }
+
+            if(this.length < bitvector.length)
+            {
+                var diff = i*WORD_SIZE - this.length;
+                this.words[i-1] = this.words[i-1] <<  diff;
+                this.words[i-1] = this.words[i-1] >>> diff;
             }
 
             return this
@@ -101,17 +104,20 @@
 
             return this;
         }},
-        stringify: function() { "use strict";
+        stringify: function(all_) { "use strict";
         {
             var output = '';
+            var all    = all_ === 'all';
 
             for(var i = this.words.length-1; i >= 0; i--)
             {   // typed arrays will discard any leading zero's when using toString
                 // TODO some fancy bitshifting or something
                 output += ('0000000000000000000000000000000' + this.words[i].toString(2)).slice(-WORD_SIZE);
             }
+            // FIXME cleanup
+            if(!all) {output = output.slice(-this.length)}
 
-            return output.slice(-this.length)
+            return output
         }},
         unset: function(index) { "use strict";
         {
@@ -119,9 +125,7 @@
         }},
         xor: function(bitvector) { "use strict";
         {
-            var word;
-
-            for(var i = 0, max = this.words.length-1; i < max; i++)
+            for(var i = 0, max = this.words.length, word; i < max; i++)
             {
                 if((word = bitvector.words[i]) === undefined) {break}
 

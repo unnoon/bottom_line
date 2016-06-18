@@ -8,9 +8,9 @@
  */
 !function(root, bottom_line) {
     var environments = true; switch(environments) {
-        /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bottom_line);            break;
-        /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bottom_line(); break;
-        /*root*/      case !root._                                                                 : root._ = bottom_line();         break; default : console.error("'_' is already defined on root object")}
+    /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bottom_line);            break;
+    /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bottom_line(); break;
+    /*root*/      case !root._                                                                 : root._ = bottom_line();         break; default : console.error("'_' is already defined on root object")}
 }(this, function bottom_line() {
     'use strict';
 
@@ -180,7 +180,7 @@
     /* @include int.js  */
     /* @include math.js */
 
-    !function bottom_line_ctx(_)
+    !function includeLibs(_)
     {
         /* @include BitVector.js */
     }.call(_, _);
