@@ -58,6 +58,82 @@ define([
 
         });
 
+        describe("difference", function() {
+
+            it("simple difference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(16);
+
+                bs1.difference(bs2);
+
+                var str = bs1.stringify(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000000100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = bs1.stringify(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000000100000000000000');
+                expect(str_full.length).to.eql(64);
+            });
+
+            it("reverse case", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet(20).add(6).add(16);
+
+                bs2.difference(bs1);
+
+                var str = bs2.stringify(2);
+
+                expect(str).to.eql('00010000000000000000');
+                expect(str.length).to.eql(20);
+
+                var str_full = bs2.stringify(-1);
+
+                expect(str_full).to.eql('00000000000000010000000000000000');
+                expect(str_full.length).to.eql(32);
+            });            
+            
+        });
+
+        describe("exclusion", function() {
+
+            it("simple symmetric difference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(16);
+
+                bs1.exclusion(bs2);
+
+                var str = bs1.stringify(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000010100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = bs1.stringify(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
+                expect(str_full.length).to.eql(64);
+            });
+
+            it("reverse case (exclusion)", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet(20).add(6).add(16);
+
+                bs2.exclusion(bs1);
+
+                var str = bs2.stringify(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000010100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = bs2.stringify(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
+                expect(str_full.length).to.eql(64);
+            });
+
+        });
+
         xdescribe("and", function() {
 
             it("simple", function() {

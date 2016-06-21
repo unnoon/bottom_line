@@ -73,17 +73,6 @@
 
             return this
         }},
-        differenceSymmetric: function(bitset) { "use strict";
-        {
-            if(bitset.size > this.size) {this.resize(bitset.size)}
-
-            for(var i = 0, max = bitset.words.length; i < max; i++)
-            {
-                this.words[i] ^= bitset.words[i];
-            }
-
-            return this
-        }},
         each: function() { "use strict";
         {
             // TODO
@@ -96,6 +85,17 @@
             }
 
             return true
+        }},
+        exclusion: function(bitset) { "use strict"; "@aliases: symmetricDifference";
+        {
+            if(bitset.size > this.size) {this.resize(bitset.size)}
+
+            for(var i = 0, max = bitset.words.length; i < max; i++)
+            {
+                this.words[i] ^= bitset.words[i];
+            }
+
+            return this
         }},
         fits: function(mask) { "use strict"; "@aliases: contains";
         {
