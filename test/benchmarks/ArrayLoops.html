@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Array loops 1000 elements</title>
-    <script src="../../node_modules/benchmark/benchmark.js"></script>
-    <script src="../../dist/bottom_line.js"></script>
+    <title>Array loops 500 elements</title>
+    <script src="../../bower_components/lodash/lodash.js"></script>
+    <script src="../../bower_components/benchmark/benchmark.js"></script>
+    <!--<script src="../../bin/bottom_line.js"></script>-->
     <!--<script src="../../src/bottom_line.old.js"></script>-->
     <script>
         var arr = [];
         var elm;
 
-        for(var i = 0; i < 1000; i++)
+        for(var i = 0; i < 500; i++)
         {
             arr.push(i);
         }
@@ -18,42 +19,85 @@
         console.log(document.getElementsByTagName('title')[0].text+': running tests...');
         // add tests
         suite
-            .add('_each', function() {
-                arr._.each(function(e) {
-                    elm = e;
-                })
-            })
-            .add('for loop', function() {
-                for(var i = 0; i < arr.length; i++)
-                {
-                    elm = arr[i];
-                }
-            })
+//            .add('_each', function() {
+//                arr._.each(function(e) {
+//                    elm = e;
+//                })
+//            })
+//            .add('for loop', function() {
+//                for(var i = 0; i < arr.length; i++)
+//                {
+//                    elm = arr[i];
+//                }
+//            })
             .add('for loop predifined max', function() {
                 for(var i = 0, max = arr.length; i < max; i++)
                 {
                     elm = arr[i];
                 }
             })
-            .add('forEach', function() {
-                arr.forEach(function(e) {
-                    elm = e;
-                })
-            })
-            .add('while (inverse traversing)', function() {
-                var i = arr.length;
-
-                while(i--)
+//            .add('forEach', function() {
+//                arr.forEach(function(e) {
+//                    elm = e;
+//                })
+//            })
+//            .add('while (inverse traversing)', function() {
+//                var i = arr.length;
+//
+//                while(i--)
+//                {
+//                    elm = arr[i];
+//                }
+//            })
+            .add('for loop predifined max int32 conversion', function() {
+                for(var i = 0|0, max = arr.length; i < max; i++)
                 {
                     elm = arr[i];
                 }
+            })
+            .add('for loop predifined max int32 conversion ++i', function() {
+                for(var i = 0|0, max = arr.length; i < max; ++i)
+                {
+                    elm = arr[i];
+                }
+            })
+            .add('for loop predifined max ++i', function() {
+                for(var i = 0, max = arr.length; i < max; ++i)
+                {
+                    elm = arr[i];
+                }
+            })
+//            .add('for loop predifined max !==', function() {
+//                for(var i = 0, max = arr.length; i !== max; i++)
+//                {
+//                    elm = arr[i];
+//                }
+//            })
+            .add('for loop inverse', function() {
+                for(var i = arr.length; i--; )
+                {
+                    elm = arr[i];
+                }
+            })
+//            .add('for loop predifined max int32 conversion external vars', function() {
+//                var i = 0|0, max = arr.length;
+//
+//                for(; i < max; i++)
+//                {
+//                    elm = arr[i];
+//                }
+//            })
+            .add('for loop reverse no body', function() {
+
+                 for(var i = arr.length; i--; elm = arr[i]);
+
             })
             // add listeners
             .on('cycle', function(event) {
                 console.log(String(event.target));
             })
             .on('complete', function() {
-                console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+                console.log('Fastest is ' + this.filter('fastest').map('name'));
             })
             // run async
             .run({ 'async': true });

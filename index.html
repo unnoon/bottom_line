@@ -10,18 +10,13 @@
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var bv1 = new _.BitVector(64)
-                    .set(7)
-                    .set(16)
-                    .set(28)
-                    .set(50);
+            var bs  = new _.BitSet().add(6).add(14).add(62);
 
-            var bv2 = new _.BitVector(24)
-                    .set(12);
+            // bs.complement();
 
-            bv2.or(bv1);
+            var str = bs.stringify(-1);
 
-            console.log(bv2.stringify('all'));
+            console.log(str);
         </script>
     </head>
     <body>

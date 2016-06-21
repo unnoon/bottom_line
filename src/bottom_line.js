@@ -182,7 +182,7 @@
 
     !function includeLibs(_)
     {
-        /* @include BitVector.js */
+        /* @include BitSet.js */
     }.call(_, _);
 
 	return _
