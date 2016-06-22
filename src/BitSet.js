@@ -3,7 +3,7 @@
     /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bitset);            break;
     /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bitset(); break;
     /*root*/      case !root.BitSet                                                            : root.BitSet    = bitset(); break; default : console.error("'BitSet' is already defined on root object")}
-}(this, function bitset() {
+}(this, function bitset() { "use strict";
     var WORD_SIZE = 32;
     var WORD_LOG  = 5;
     /**
@@ -15,47 +15,57 @@
      *
      * @return {BitSet} - new BitSet
      */
-    function BitSet(length_) { "use strict";
+    function BitSet(length_) { 
     {
-        this.size  = length_ || WORD_SIZE;
+        this.size  = (length_ || WORD_SIZE)|0;
         this.words = new Uint32Array(Math.ceil(this.size / WORD_SIZE));
     }}
 
     BitSet.prototype = {
         /**
-         * Adds a number(index) to the set. It will resize the set in case the index falls out of bounds.
+         *  Adds a number(index) to the set. It will resize the set in case the index falls out of bounds.
          *
-         * @param index - index/number to add to the set
+         * @param {number}   index - index/number to add to the set
+         * @param {number=1} val_  - optional value to be set. Either 0 or 1
          *
          * @returns {BitSet} this
          */
-        add: function(index) { "use strict";
-        {
-            if(index >= this.size) {this.resize(index+1)}
+        add: function(index, val_) { "@aliases: set";
+        {   if((index |= 0) >= this.size) {this.resize(index+1)}
 
-            return this.set(index)
+            if(val_ === undefined || val_)
+            {
+                this.words[index >>> WORD_LOG] |=  (1 << index);
+            }
+            else
+            {
+                this.words[index >>> WORD_LOG] &= ~(1 << index);
+            }
+
+            return this;
         }},
         /**
          * Creates a clone of the bitset
          *
          * @returns {BitSet} clone
          */
-        clone: function() {
+        clone: function() { 
+        {
             var clone = Object.create(BitSet.prototype);
 
-            clone.size  = this.size;
+            clone.size  = this.size|0;
             clone.words = new Uint32Array(this.words);
 
             return clone;
-        },
+        }},
         /**
          * Calculates the inverse of the set. Any trailing bits outside the size bound will be set to 0.
          *
          * @returns {BitSet} this
          */
-        complement: function() { "use strict";
+        complement: function() { 
         {
-            for(var i = 0, max = this.words.length; i < max; i++)
+            for(var i = 0|0, max = this.words.length; i < max; i++)
             {
                 this.words[i] = ~this.words[i];
             }
@@ -64,45 +74,66 @@
 
             return this
         }},
-        difference: function(bitset) { "use strict";
+        difference: function(bitset) { 
         {
-            for(var i = 0, max = this.words.length; i < max; i++)
+            for(var i = 0|0, max = this.words.length; i < max; i++)
             {
                 this.words[i] &= ~bitset.words[i];
             }
 
             return this
         }},
-        each: function() { "use strict";
+        each: function(fnc, ctx_)
         {
-            // TODO
-        }},
-        equals: function(bitset) { "use strict";
+            var word;
+            var tmp;
+
+            for (var i = 0, max = this.words.length; i < max; i++)
+            {
+                word = this.words[i];
+
+                while (word !== 0)
+                {
+                    tmp = word & -word;
+
+                    fnc.call(ctx_, (i << WORD_LOG) + this.hammingWeight(tmp - 1));
+                    word ^= tmp;
+                }
+            }
+        },
+        hammingWeight: function(v)
         {
-            for(var i = 0, max = this.words.length; i < max; i++)
+            v -= ((v >>> 1) & 0x55555555);// works with signed or unsigned shifts
+            v  = (v & 0x33333333) + ((v >>> 2) & 0x33333333);
+
+            return ((v + (v >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24;
+        },
+        equals: function(bitset) { 
+        {
+            for(var i = 0|0, max = this.words.length; i < max; i++)
             {
                 if(this.words[i] !== bitset.words[i]) {return false}
             }
 
             return true
         }},
-        exclusion: function(bitset) { "use strict"; "@aliases: symmetricDifference";
+        exclusion: function(bitset) { "@aliases: symmetricDifference";
         {
             if(bitset.size > this.size) {this.resize(bitset.size)}
 
-            for(var i = 0, max = bitset.words.length; i < max; i++)
+            for(var i = 0|0, max = bitset.words.length; i < max; i++)
             {
                 this.words[i] ^= bitset.words[i];
             }
 
             return this
         }},
-        fits: function(mask) { "use strict"; "@aliases: contains";
+        fits: function(mask) { "@aliases: contains";
         {
             var word;
             var maskword;
 
-            for(var i = 0, max = mask.words.length; i < max; i++)
+            for(var i = 0|0, max = mask.words.length; i < max; i++)
             {
                 word     = this.words[i];
                 maskword = mask.words[i];
@@ -113,51 +144,50 @@
 
             return true
         }},
-        flip: function(index) { "use strict";
+        flip: function(index) { 
         {   if(index >= this.size) {return this}
 
             this.words[index >>> WORD_LOG] ^= (1 << index);
 
             return this
         }},
-        get: function(index) { "use strict";
+        get: function(index) { 
         {   if(index >= this.size) {return}
 
             var word = this.words[index >>> WORD_LOG];
 
             return (word >>> index) & 1;
         }},
-        has: function() { "use strict";
+        has: function() { 
         {   // TODO
         }},
-        intersection: function(bitset) { "use strict";
+        intersection: function(bitset) { 
         {
-            if(bitset.size > this.size) {this.resize(bitset.size)}
-
-            for(var i = 0, max = this.words.length; i < max; i++)
+            for(var i = 0|0, max = this.words.length; i < max; i++)
             {
                 this.words[i] &= bitset.words[i] || 0;
             }
 
             return this
         }},
-        intersects: function() { "use strict";
+        intersects: function() { 
         {   // TODO
         }},
-        isEmpty: function() { "use strict";
+        isEmpty: function() { 
         {   // TODO
         }},
-        max: function() { "use strict";
+        max: function() { 
         {   // TODO
         }},
-        min: function() { "use strict";
+        min: function() { 
         {   // TODO
         }},
-        remove: function() { "use strict";
-        {   // TODO
+        remove: function(index) {
+        {
+            return this.add(index, 0);
         }},
-        resize: function(size) { "use strict";
-        {   if(this.size === size) {return}
+        resize: function(size) {
+        {   if(this.size === (size |= 0)) {return}
 
             var diff      =  size - this.size;
             var newLength = (size - 1 + WORD_SIZE) >>> WORD_LOG;
@@ -169,7 +199,7 @@
             {
                 newWords = new Uint32Array(newLength);
 
-                for(var i = 0, max = Math.min(newLength, this.words.length); i < max; i++)
+                for(var i = 0|0, max = Math.min(newLength, this.words.length); i < max; i++)
                 {
                     newWords[i] = this.words[i];
                 }
@@ -182,29 +212,7 @@
 
             return this
         }},
-        /**
-         * Sets a number in the set. Will not resize use 'add' in this case
-         *
-         * @param {number}   index - index/number to add to the set
-         * @param {number=1} val_  - optional value to be set. Either 0 or 1
-         *
-         * @returns {BitSet} this
-         */
-        set: function(index, val_) { "use strict";
-        {   if(index >= this.size) {return this}
-
-            if (val_ === undefined || val_)
-            {
-                this.words[index >>> WORD_LOG] |=  (1 << index);
-            }
-            else
-            {
-                this.words[index >>> WORD_LOG] &= ~(1 << index);
-            }
-
-            return this;
-        }},
-        stringify: function(mode) { "use strict";
+        stringify: function(mode) { 
         {
             switch(mode)
             {
@@ -214,7 +222,7 @@
             }
 
         }},
-        toBinary: function() { "use strict";
+        toBinary: function() { 
         {
             var output = '';
 
@@ -226,10 +234,10 @@
 
             return output
         }},
-        trim: function() { "use strict";
+        trim: function() { 
         {   // TODO
         }},
-        trimTrailingBits: function() { "use strict";
+        trimTrailingBits: function() { 
         {
             var wordsLength = this.words.length;
             var diff        = wordsLength*WORD_SIZE - this.size;
@@ -238,20 +246,16 @@
 
             return this
         }},
-        union: function(bitset) { "use strict";
+        union: function(bitset) { 
         {
             if(bitset.size > this.size) {this.resize(bitset.size)}
 
-            for(var i = 0, max = bitset.words.length; i < max; i++)
+            for(var i = 0|0, max = bitset.words.length; i < max; i++)
             {
                 this.words[i] |= bitset.words[i];
             }
 
             return this
-        }},
-        unset: function(index) { "use strict";
-        {
-            return this.set(index, 0);
         }}
     };
 
