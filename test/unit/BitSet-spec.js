@@ -139,6 +139,24 @@ define([
 
         });
 
+        describe("equals", function() {
+
+            it("should be able to positively compare two bitsets", function() {
+                var bs1 = new _.BitSet().add(6).add(14).add(62);
+                var bs2 = new _.BitSet().add(6).add(14).add(62);
+
+                expect(bs1.equals(bs2)).to.be.true;
+            });
+
+            it("should be able to positively compare two bitsets", function() {
+                var bs1 = new _.BitSet().add(6).add(14).add(62);
+                var bs2 = new _.BitSet().add(6).add(14).add(78);
+
+                expect(bs1.equals(bs2)).to.be.false;
+            });
+
+        });
+
         describe("exclusion", function() {
 
             it("simple symmetric difference", function() {
@@ -177,47 +195,54 @@ define([
 
         });
 
-        xdescribe("and", function() {
+        describe("fits", function() {
 
-            it("simple", function() {
-                var bv1 = new _.BitSet(64)
-                    .set(7)
-                    .set(12)
-                    .set(16)
-                    .set(28)
-                    .set(50);
+            it("should be able to positively test if a mask fits", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
+                var mask = new _.BitSet().add(6).add(14).add(62);
 
-                var bv2 = new _.BitSet(24)
-                    .set(12);
-
-                bv2.and(bv1);
-
-                var str = bv2.stringify();
-
-                expect(str).to.eql('000000000001000000000000');
-                expect(str.length).to.eql(24);
+                expect(bs.fits(mask)).to.be.true;
             });
+
+            it("should be able to positively test if a larger mask fits", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
+                var mask = new _.BitSet().add(6).add(14).add(62).add(367, 0);
+
+                expect(bs.fits(mask)).to.be.true;
+            });
+
+            it("should be able to negatively test if a mask don't fit", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62);
+                var mask = new _.BitSet().add(6).add(14).add(78);
+
+                expect(bs.fits(mask)).to.be.false;
+            });
+
         });
 
-        xdescribe("or", function() {
 
-            it("simple", function() {
-                var bv1 = new _.BitSet(64)
-                    .set(7)
-                    .set(16)
-                    .set(28)
-                    .set(50);
+        describe("flip", function() {
 
-                var bv2 = new _.BitSet(24)
-                    .set(12);
+            it("should be able to flip a bit in the bitset", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
 
-                bv2.or(bv1);
+                bs
+                    .flip(16)
+                    .flip(14);
 
-                var str = bv2.stringify();
+                expect(bs.get(16)).to.eql(1);
+                expect(bs.get(14)).to.eql(0);
+            });
 
-                expect(str).to.eql('000000010001000010000000');
-                expect(str.length).to.eql(24);
-                expect(bv2.words[0]).to.eql(69760);
+            it("should be able to enlarge the bitset in case the flipdex is out of bounds", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62);
+
+                bs
+                    .flip(16)
+                    .flip(123);
+
+                expect(bs.get(16)).to.eql(1);
+                expect(bs.get(123)).to.eql(1);
             });
         });
 
@@ -225,13 +250,13 @@ define([
 
             it("simple", function() {
                 var bv1  = new _.BitSet(32)
-                    .set(7)
-                    .set(54)
-                    .set(23);
+                    .add(7)
+                    .add(54)
+                    .add(23);
                 var bv2  = new _.BitSet(63)
-                    .set(7)
-                    .set(67)
-                    .set(23);
+                    .add(7)
+                    .add(67)
+                    .add(23);
 
                 bv1.union(bv2);
 

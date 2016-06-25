@@ -10,25 +10,13 @@
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var bs  = new _.BitSet().add(6).add(14).add(62);
+            var bs   = new _.BitSet().add(6).add(14).add(62);
 
-            // bs.complement();
+            bs
+                    .flip(123)
+                    .flip(16);
 
-            var str = bs.stringify(-1);
-
-//            bs.forEach(function(val, i, bs) {
-//                console.log(val, i, bs);
-//            });
-
-            bs.each(function(val, i, bs) {
-                console.log(val, i, bs);
-            });
-
-            bs.each2(function(val, i, bs) {
-                console.log(val, i, bs);
-            });
-
-            console.log(str);
+            console.log(bs.get(123));
         </script>
     </head>
     <body>

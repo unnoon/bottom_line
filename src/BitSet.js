@@ -25,6 +25,9 @@
         /**
          *  Adds a number(index) to the set. It will resize the set in case the index falls out of bounds.
          *
+         * @public
+         * @method BitSet#add
+         *
          * @param {number}   index - index/number to add to the set
          * @param {number=1} val_  - optional value to be set. Either 0 or 1
          *
@@ -47,6 +50,9 @@
         /**
          * Creates a clone of the bitset
          *
+         * @public
+         * @method BitSet#clone
+         *
          * @returns {BitSet} clone
          */
         clone: function() { 
@@ -60,6 +66,9 @@
         }},
         /**
          * Calculates the inverse of the set. Any trailing bits outside the length bound will be set to 0.
+         *
+         * @public
+         * @method BitSet#complement
          *
          * @returns {BitSet} this
          */
@@ -77,6 +86,9 @@
         /**
          * Calculates the difference between 2 bitsets the result is stored in this
          *
+         * @public
+         * @method BitSet#difference
+         *
          * @param {BitSet} bitset - the bit set to subtract from the current one
          *
          * @returns {BitSet} this
@@ -91,8 +103,11 @@
             return this
         }},
         /**
-         * Iterates over the set bits and calls the callback function with value=1, index, this.
+         * Iterates over the set bits and calls the callback function with: value=1, index, this.
          * Can be broken prematurely by returning false
+         *
+         * @public
+         * @method BitSet#each
          *
          * @param {function} cb   - callback function o be called on each set bit
          * @param {Object}   ctx_ - optional context to be called upon the callback function
@@ -118,6 +133,16 @@
 
             return true
         },
+        /**
+         * Tests if 2 bitsets are equal
+         *
+         * @public
+         * @method BitSet#equals
+         *
+         * @param {BitSet} bitset - bitset to compare to this
+         *
+         * @returns {boolean} - boolean indicating if the the 2 bitsets are equal
+         */
         equals: function(bitset) { 
         {
             for(var i = 0|0, max = this.words.length; i < max; i++)
@@ -127,6 +152,17 @@
 
             return true
         }},
+        /**
+         * Calculates the exclusion/symmetric difference between to bitsets. The result is stored in this.
+         *
+         * @public
+         * @method BitSet#exclusion
+         * @alias  symmetricDifference
+         *
+         * @param {BitSet} bitset - the bitset to calculate the symmetric difference with.
+         *
+         * @returns {BitSet} this
+         */
         exclusion: function(bitset) { "@aliases: symmetricDifference";
         {
             if(bitset.length > this.length) {this.resize(bitset.length)}
@@ -138,6 +174,18 @@
 
             return this
         }},
+        /**
+         * Calculates if the bitset contains a certain bitset.
+         * In bitmask terms it will calculate if a bitmask fits a bitset
+         *
+         * @public
+         * @method BitSet#fits
+         * @alias  contains
+         *
+         * @param {BitSet} mask - bitset mask to test fit. i.e. subset to test containment
+         *
+         * @returns {boolean} - boolean indicating if the mask fits the bitset or is a subset
+         */
         fits: function(mask) { "@aliases: contains";
         {
             var word;
@@ -154,29 +202,59 @@
 
             return true
         }},
+        /**
+         * Flips a bit in the bitset. In case index will fall out of bounds the bitset is enlarged
+         *
+         * @public
+         * @method BitSet#flip
+         *
+         * @param {number} index - index of the bit to be flipped
+         *
+         * @returns {BitSet} this
+         */
         flip: function(index) { 
-        {   if(index >= this.length) {return this}
+        {   if((index |= 0) >= this.length) {this.resize(index+1)}
 
             this.words[index >>> WORD_LOG] ^= (1 << index);
 
             return this
         }},
+        /**
+         * Gets a specific bit from the bitset
+         *
+         * @public
+         * @method BitSet#get
+         *
+         * @param {number} index - index of the bit to get
+         *
+         * @returns {number} - the value of the bit at the given index
+         */
         get: function(index) { 
-        {   if(index >= this.length) {return}
+        {   if((index |= 0) >= this.length) {return 0|0}
 
-            var word = this.words[index >>> WORD_LOG];
-
-            return (word >>> index) & 1;
+            return ((this.words[index >>> WORD_LOG] >>> index) & 1)|0;
         }},
+        /**
+         * Calculate the hamming weight i.e. the number of ones in a bitstring/word
+         *
+         * @public
+         * @static
+         * @method BitSet#hammingWeight
+         *
+         * @param {number} w - word to get the number of set bits from
+         *
+         * @returns {number} - the number of set bits in the word
+         */
         hammingWeight: function(w)
         {
-            w -= ((w >>> 1) & 0x55555555)|0;// works with signed or unsigned shifts
+            w -= ((w >>> 1) & 0x55555555)|0;
             w  = (w & 0x33333333) + ((w >>> 2) & 0x33333333);
 
-            return ((w + (w >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24;
+            return (((w + (w >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24)|0;
         },
-        has: function() { 
-        {   // TODO
+        has: function(index) {
+        {
+            return !!this.get(index);
         }},
         intersection: function(bitset) { 
         {
