@@ -246,6 +246,33 @@ define([
             });
         });
 
+        describe("get", function() {
+
+            it("should get the value of bits in the bitset", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
+
+                expect(bs.get(16)).to.eql(0);
+                expect(bs.get(14)).to.eql(1);
+            });
+
+            it("should return 0 if the index is out of bounds", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62);
+
+                expect(bs.get(123)).to.eql(0);
+            });
+        });
+
+        describe("has", function() {
+
+            it("should return the correct boolean values for membership", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62);
+
+                expect(bs.has(14)).to.be.true;
+                expect(bs.has(16)).to.be.false;
+                expect(bs.has(123)).to.be.false;
+            });
+        });
+
         xdescribe("union", function() {
 
             it("simple", function() {

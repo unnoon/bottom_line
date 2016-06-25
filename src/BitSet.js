@@ -1,8 +1,8 @@
 !function(root, bitset) {
     var environments = true; switch(environments) {
-    /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bitset);            break;
-    /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bitset(); break;
-    /*root*/      case !root.BitSet                                                            : root.BitSet    = bitset(); break; default : console.error("'BitSet' is already defined on root object")}
+    /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bitset);                                                           break;
+    /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bitset();                                                break;
+    /*root*/      case !root.BitSet                                                            : Object.defineProperty(root, 'BitSet', {value: bitset(), enumerable: !0}); break; default : console.error("'BitSet' is already defined on root object")}
 }(this, function bitset() { "use strict";
     var WORD_SIZE = 32;
     var WORD_LOG  = 5;
@@ -252,7 +252,18 @@
 
             return (((w + (w >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24)|0;
         },
-        has: function(index) {
+        /**
+         * Checks is the bitsets has a value/index
+         *
+         * @public
+         * @method BitSet#has
+         * @alias  member
+         *
+         * @param {number} index - the index/value to check membership for
+         *
+         * @returns {boolean} - boolean indicating if the bitset has the vale/index
+         */
+        has: function(index) { "@aliases: member";
         {
             return !!this.get(index);
         }},
