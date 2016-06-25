@@ -105,27 +105,36 @@ define([
             
         });
 
-        xdescribe("each", function() {
+        describe("each", function() {
 
             it("should be able to iterate over the bitset", function() {
-                var bs  = new _.BitSet().add(6).add(14).add(62);
+                var bs      = new _.BitSet().add(6).add(14).add(62);
+                var indices = [];
 
-
-
-                bs.each(function() {
-                    "use strict";
-
+                var result = bs.each(function(val, i, bsi) {
+                    indices.push(i);
+                    expect(val).to.eql(1);
+                    expect(bsi).to.eql(bs);
                 });
 
-                var str = bs.stringify(2);
+                expect(indices).to.have.members([6, 14, 62]);
+                expect(result).to.be.true;
+            });
 
-                expect(str).to.eql('011111111111111111111111111111111111111111111111011111110111111');
-                expect(str.length).to.eql(63);
+            it("should be able to prematurely break iteration", function() {
+                var bs      = new _.BitSet().add(6).add(14).add(62);
+                var indices = [];
 
-                var str_full = bs.stringify(-1);
+                var result = bs.each(function(val, i, bsi) {
+                    indices.push(i);
+                    expect(val).to.eql(1);
+                    expect(bsi).to.eql(bs);
 
-                expect(str_full).to.eql('0011111111111111111111111111111111111111111111111011111110111111');
-                expect(str_full.length).to.eql(64);
+                    return i !== 14
+                });
+
+                expect(indices).to.have.members([6, 14]);
+                expect(result).to.be.false;
             });
 
         });
