@@ -1003,7 +1003,7 @@ construct('obj', {native:Object}, {
          */
         stringify: function(visited_)
         {
-            var output = '';
+            var output = '{';
 
             this._.each(function(obj, key) {
                 var val;
@@ -1018,7 +1018,7 @@ construct('obj', {native:Object}, {
                 }
 
                 // TODO punctuation for strings & proper formatting
-                output += (output? ', ' : '{') + key + ': ' + val
+                output += (output !== '{' ? ', ' : '') + key + ': ' + val
             });
 
             return output + '}';

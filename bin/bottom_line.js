@@ -1846,7 +1846,7 @@
              */
             stringify: function(visited_)
             {
-                var output = '';
+                var output = '{';
     
                 this._.each(function(obj, key) {
                     var val;
@@ -1861,7 +1861,7 @@
                     }
     
                     // TODO punctuation for strings & proper formatting
-                    output += (output? ', ' : '{') + key + ': ' + val
+                    output += (output !== '{' ? ', ' : '') + key + ': ' + val
                 });
     
                 return output + '}';
@@ -3383,6 +3383,7 @@
         }(this, function bitset() { "use strict";
             var WORD_SIZE = 32;
             var WORD_LOG  = 5;
+        
             /**
              * BitSet: no worrying about 32bits restrictions
              *
@@ -3394,11 +3395,65 @@
              */
             function BitSet(length_) { 
             {
-                this.length = (length_ || WORD_SIZE)|0;
-                this.words  = new Uint32Array(Math.ceil(this.length / WORD_SIZE));
+                Object.defineProperty(this,'_length', {value: (length_ || WORD_SIZE)|0, writable: true});
+                this.words = new Uint32Array(Math.ceil(this._length / WORD_SIZE));
             }}
         
             BitSet.prototype = {
+                /**
+                 * Calculate the hamming weight i.e. the number of ones in a bitstring/word
+                 *
+                 * @public
+                 * @static
+                 * @method BitSet#hammingWeight
+                 *
+                 * @param {number} w - word to get the number of set bits from
+                 *
+                 * @returns {number} - the number of set bits in the word
+                 */
+                hammingWeight: function(w) { "@aliases: popCount";
+                {
+                    w -= ((w >>> 1) & 0x55555555)|0;
+                    w  = (w & 0x33333333) + ((w >>> 2) & 0x33333333);
+        
+                    return (((w + (w >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24)|0;
+                }},
+                /**
+                 * Returns the least significant bit in a word. Returns 32 in case the word is 0
+                 *
+                 * @public
+                 * @static
+                 * @method BitSet#lsb
+                 *
+                 * @param {number} w - the word to get the least significant bit from
+                 *
+                 * @returns {number} - the least significant bit in w
+                 */
+                lsb: function(w) {
+                {
+                    return this.hammingWeight((w & -w) - 1);
+                }},
+                /**
+                 * Returns the most significant bit in a word
+                 *
+                 * @public
+                 * @static
+                 * @method BitSet#msb
+                 *
+                 * @param {number} w - the word to get the most significant bit from
+                 *
+                 * @returns {number} - the most significant bit in w
+                 */
+                msb: function(w) {
+                {
+                    w |= w >> 1;
+                    w |= w >> 2;
+                    w |= w >> 4;
+                    w |= w >> 8;
+                    w |= w >> 16;
+                    w = (w >> 1) + 1;
+                    return this.hammingWeight(w - 1);
+                }},
                 /**
                  *  Adds a number(index) to the set. It will resize the set in case the index falls out of bounds.
                  *
@@ -3411,7 +3466,7 @@
                  * @returns {BitSet} this
                  */
                 add: function(index, val_) { "@aliases: set";
-                {   if((index |= 0) >= this.length) {this.resize(index+1)}
+                {   if((index |= 0) >= this._length) {this.resize(index+1)}
         
                     if(val_ === undefined || val_)
                     {
@@ -3425,6 +3480,47 @@
                     return this;
                 }},
                 /**
+                 * Getter for the cardinality of the set.
+                 * In case of a set it will return a warning.
+                 *
+                 * @readonly
+                 * @name BitSet#cardinality
+                 * @type number
+                 * @default 0
+                 */
+                get cardinality() {
+                {
+                    var output = 0|0;
+        
+                    for(var i = 0|0, max = this.words.length; i < max; i++)
+                    {
+                        output += this.hammingWeight(this.words[i]);
+                    }
+        
+                    return output|0
+                }},
+                set cardinality(v) {
+                {
+                    console.warn('Cardinality is read only')
+                }},
+                /**
+                 * Clears the bitset. Length will be maintained.
+                 *
+                 * @public
+                 * @method BitSet#clear
+                 *
+                 * @returns {BitSet} this
+                 */
+                clear: function() {
+                {
+                    for(var i = 0|0, max = this.words.length; i < max; i++)
+                    {
+                        this.words[i] = 0;
+                    }
+        
+                    return this
+                }},
+                /**
                  * Creates a clone of the bitset
                  *
                  * @public
@@ -3436,8 +3532,8 @@
                 {
                     var clone = Object.create(BitSet.prototype);
         
-                    clone.length = this.length|0;
-                    clone.words  = new Uint32Array(this.words);
+                    clone._length = this._length|0;
+                    clone.words   = new Uint32Array(this.words);
         
                     return clone;
                 }},
@@ -3486,8 +3582,8 @@
                  * @public
                  * @method BitSet#each
                  *
-                 * @param {function} cb   - callback function o be called on each set bit
-                 * @param {Object}   ctx_ - optional context to be called upon the callback function
+                 * @param {function(value, index, bitset)} cb   - callback function o be called on each bit
+                 * @param {Object}                         ctx_ - optional context to be called upon the callback function
                  *
                  * @returns {boolean} - boolean indicating if the loop finished completely=true or was broken=false
                  */
@@ -3503,9 +3599,30 @@
                         while (word !== 0)
                         {
                             tmp = (word & -word)|0;
-                            if(cb.call(ctx_, 1|0, (i << WORD_LOG) + this.hammingWeight(tmp - 1|0), this) === false) {return false}
+                            if(cb.call(ctx_, 1, (i << WORD_LOG) + this.hammingWeight(tmp - 1), this) === false) {return false}
                             word ^= tmp;
                         }
+                    }
+        
+                    return true
+                },
+                /**
+                 * Iterates over all bits and calls the callback function with: value, index, this.
+                 * Can be broken prematurely by returning false
+                 *
+                 * @public
+                 * @method BitSet#each$
+                 *
+                 * @param {function(value, index, bitset)} cb   - callback function o be called on each bit
+                 * @param {Object}                         ctx_ - optional context to be called upon the callback function
+                 *
+                 * @returns {boolean} - boolean indicating if the loop finished completely=true or was broken=false
+                 */
+                each$: function(cb, ctx_)
+                {
+                    for(var i = 0|0, max = this._length; i < max; i++)
+                    {
+                        if(cb.call(ctx_, this.get(i), i, this) === false) {return false}
                     }
         
                     return true
@@ -3542,7 +3659,7 @@
                  */
                 exclusion: function(bitset) { "@aliases: symmetricDifference";
                 {
-                    if(bitset.length > this.length) {this.resize(bitset.length)}
+                    if(bitset.length > this._length) {this.resize(bitset.length)}
         
                     for(var i = 0|0, max = bitset.words.length; i < max; i++)
                     {
@@ -3590,7 +3707,7 @@
                  * @returns {BitSet} this
                  */
                 flip: function(index) { 
-                {   if((index |= 0) >= this.length) {this.resize(index+1)}
+                {   if((index |= 0) >= this._length) {this.resize(index+1)}
         
                     this.words[index >>> WORD_LOG] ^= (1 << index);
         
@@ -3607,30 +3724,16 @@
                  * @returns {number} - the value of the bit at the given index
                  */
                 get: function(index) { 
-                {   if((index |= 0) >= this.length) {return 0|0}
+                {   if((index |= 0) >= this._length) {return 0|0}
         
                     return ((this.words[index >>> WORD_LOG] >>> index) & 1)|0;
                 }},
                 /**
-                 * Calculate the hamming weight i.e. the number of ones in a bitstring/word
+                 * Checks is the bitsets has a value/index
                  *
                  * @public
-                 * @static
-                 * @method BitSet#hammingWeight
-                 *
-                 * @param {number} w - word to get the number of set bits from
-                 *
-                 * @returns {number} - the number of set bits in the word
-                 */
-                hammingWeight: function(w)
-                {
-                    w -= ((w >>> 1) & 0x55555555)|0;
-                    w  = (w & 0x33333333) + ((w >>> 2) & 0x33333333);
-        
-                    return (((w + (w >>> 4) & 0xF0F0F0F) * 0x1010101) >>> 24)|0;
-                },
-                /**
-                 * Checks is the bitsets has a value/index
+                 * @method BitSet#has
+                 * @alias  member
                  *
                  * @param {number} index - the index/value to check membership for
                  *
@@ -3640,6 +3743,17 @@
                 {
                     return !!this.get(index);
                 }},
+                /**
+                 * Calculates the intersection between two bitsets.
+                 * The result is stored in this.
+                 *
+                 * @public
+                 * @method BitSet#intersection
+                 *
+                 * @param {BitSet} bitset - the bitset to calculate the intersection with
+                 *
+                 * @returns {BitSet} this
+                 */
                 intersection: function(bitset) { 
                 {
                     for(var i = 0|0, max = this.words.length; i < max; i++)
@@ -3649,30 +3763,129 @@
         
                     return this
                 }},
-                intersects: function() { 
-                {   // TODO
+                /**
+                 * Calculates if two bitsets intersect
+                 *
+                 * @public
+                 * @method BitSet#intersects
+                 *
+                 * @param {BitSet} bitset - the bitset to check intersection with
+                 *
+                 * @returns {boolean} - boolean indicating if the two bitsets intersects
+                 */
+                intersects: function(bitset) {
+                {
+                    for(var i = 0|0, max = Math.min(this.words.length, bitset.words.length)|0; i < max; i++)
+                    {
+                        if(this.words[i] & bitset.words[i]) {return true}
+                    }
+        
+                    return false
                 }},
+                /**
+                 * Returns if a set is empty i.e. all words are 0
+                 *
+                 * @public
+                 * @method BitSet#isEmpty
+                 *
+                 * @returns {boolean} - boolean indicating that the set is empty
+                 */
                 isEmpty: function() { 
-                {   // TODO
+                {
+                    for(var i = 0|0, max = this.words.length; i < max; i++)
+                    {
+                        if(this.words[i]) {return false}
+                    }
+        
+                    return true
                 }},
-                max: function() { 
-                {   // TODO
+                /**
+                 * Getter for the length of the underlying bitvector.
+                 * In case of a set it will return a warning.
+                 *
+                 * @readonly
+                 * @name BitSet#length
+                 * @type number
+                 * @default 0
+                 */
+                get length() {
+                {
+                    return this._length|0;
                 }},
-                min: function() { 
-                {   // TODO
+                set length(v) {
+                {
+                    console.warn('Length is read only')
                 }},
+                /**
+                 * Returns the max index in a set
+                 *
+                 * @public
+                 * @method BitSet#max
+                 *
+                 * @returns {number} - the max number/index in the set
+                 */
+                max: function() {
+                {
+                    var word;
+        
+                    for(var i = this.words.length; i--;)
+                    {   if(!(word = this.words[i])) {continue}
+        
+                        return ((i << WORD_LOG) + this.msb(word))|0;
+                    }
+                }},
+                /**
+                 * Returns the minimum index in a set
+                 *
+                 * @public
+                 * @method BitSet#min
+                 *
+                 * @returns {number} - the minimum number/index in the set
+                 */
+                min: function() {
+                {
+                    var word;
+        
+                    for(var i = 0|0, max = this.words.length; i < max; i++)
+                    {   if(!(word = this.words[i])) {continue}
+        
+                        return ((i << WORD_LOG) + this.lsb(word))|0;
+                    }
+                }},
+                /**
+                 * Removes an index/number from the bitset.
+                 * Increases the length in case the index falls out of bounds.
+                 *
+                 * @public
+                 * @method BitSet#remove
+                 *
+                 * @param {number} index - the index/number to be removed
+                 *
+                 * @returns {BitSet}
+                 */
                 remove: function(index) {
                 {
                     return this.add(index, 0);
                 }},
+                /**
+                 * Resizes the underlying bitvector to a specific length.
+                 * Will trim any trailing bits in case length is smaller than the current length.
+                 *
+                 * @public
+                 * @method BitSet#resize
+                 *
+                 * @param {number} len - the new length
+                 *
+                 * @returns {BitSet} this - the resized bitset
+                 */
                 resize: function(len) {
-                {   if(this.length === (len |= 0)) {return}
+                {   if(this._length === (len |= 0)) {return}
         
-                    var diff      =   len - this.length;
-                    var newLength = ((len - (1|0) + WORD_SIZE) >>> WORD_LOG)|0;
+                    var diff      =  (len - this._length)|0;
+                    var newLength = ((len - 1 + WORD_SIZE) >>> WORD_LOG)|0;
                     var newWords;
         
-                    this.length = len;
+                    this._length = len;
         
                     if(newLength !== this.words.length)
                     {
@@ -3691,43 +3904,147 @@
         
                     return this
                 }},
-                stringify: function(mode) { 
+                /**
+                 * Outputs the set as an array
+                 *
+                 * @public
+                 * @method BitSet#toArray
+                 *
+                 * @param {number=} type_ - optional type for the array Uint(8|16|32)Array. Default is a normal Array.
+                 *
+                 * @returns {Array|Uint8Array|Uint16Array|Uint32Array}
+                 */
+                toArray: function(type_) {
                 {
-                    switch(mode)
+                    var arr;
+                    var i = 0|0;
+        
+                    switch(type_)
                     {
-                        case -1 /*binary full*/ : return this.toBinary();
-                        case  2 /*binary*/      : return this.toBinary().slice(-this.length);
-                        default /*set*/         : return ''; // TODO
+                        case  8 : arr = new Uint8Array(this.cardinality); break;
+                        case 16 : arr = new Uint16Array(this.cardinality); break;
+                        case 32 : arr = new Uint32Array(this.cardinality); break;
+                        default : arr = [];
                     }
         
+                    this.each(function(val, index) {arr[i++] = index});
+        
+                    return arr;
                 }},
-                toBinary: function() { 
+                /**
+                 * Outputs the underlying bitvector, starting with the least significant bits
+                 *
+                 * @public
+                 * @method BitSet#toBitArray
+                 *
+                 * @param {number=} type_ - optional type for the array Uint(8|16|32)Array. Default is a normal Array.
+                 *
+                 * @returns {Array|Uint8Array|Uint16Array|Uint32Array}
+                 */
+                toBitArray: function(type_) {
+                {
+                    var arr;
+        
+                    switch(type_)
+                    {
+                        case  8 : arr = new Uint8Array(this._length); break;
+                        case 16 : arr = new Uint16Array(this._length); break;
+                        case 32 : arr = new Uint32Array(this._length); break;
+                        default : arr = [];
+                    }
+        
+                    this.each$(function(val, index) {arr[index] = val});
+        
+                    return arr;
+                }},
+                /**
+                 * Outputs the underlying bitvector as a bitstring, starting with the most significant bit
+                 *
+                 * @public
+                 * @method BitSet#toBitString
+                 *
+                 * @param {number} mode_ - optional mode for stringification. -1 is used to display the full string including trailing bits
+                 *
+                 * @returns {string} - the stringified bitvector
+                 */
+                toBitString: function(mode_) {
                 {
                     var output = '';
         
-                    for(var i = this.words.length-1; i >= 0; i--)
+                    for(var i = this.words.length; i--;)
                     {   // typed arrays will discard any leading zero's when using toString
-                        // TODO some fancy bitshifting or something
                         output += ('0000000000000000000000000000000' + this.words[i].toString(2)).slice(-WORD_SIZE);
+                    }
+        
+                    return ~mode_ ? output.slice(-this._length) : output;
+                }},
+                /**
+                 * Will output a string version of the bitset, bitstring
+                 *
+                 * @public
+                 * @method BitSet#toString
+                 * @alias  stringify
+                 *
+                 * @param {number} mode - mode of toString. undefined=bitset | 2=bitstring | -1=full bitstring
+                 *
+                 * @returns {string} - stringified version of the bitset
+                 */
+                toString: function(mode) { "@aliases: stringify";
+                {
+                    var output = '';
+        
+                    switch(mode)
+                    {
+                        case -1 /*binary full*/ :
+                        case  2 /*binary*/      : output = this.toBitString(mode); break;
+                        default /*set*/         : output += '{'; this.each(function(val, index) {output += (output !== '{' ? ', ' : '') + index}); output += '}'
                     }
         
                     return output
                 }},
+                /**
+                 * Trims a bitset to the most significant bit to save space
+                 *
+                 * @public
+                 * @method BitSet#trim
+                 *
+                 * returns {BitSet} this
+                 */
                 trim: function() { 
-                {   // TODO
+                {
+                    return this.resize(this.max()+1)
                 }},
+                /**
+                 * Trims any trailing bits. That fal out of this.length but within this.words.length*WORD_SIZE.
+                 * Assumes this.length is somewhere in the last word.
+                 *
+                 * @public
+                 * @method BitSet#trimTrailingBits
+                 *
+                 * @returns {BitSet}
+                 */
                 trimTrailingBits: function() { 
                 {
                     var wordsLength = this.words.length;
-                    var diff        = wordsLength*WORD_SIZE - this.length;
+                    var diff        = wordsLength*WORD_SIZE - this._length;
         
                     this.words[wordsLength-1] = this.words[wordsLength-1] << diff >>> diff;
         
                     return this
                 }},
+                /**
+                 * Calculates the union between 2 bitsets The result is stored in this.
+                 *
+                 * @public
+                 * @method BitSet#union
+                 *
+                 * @param {BitSet} bitset - bitset to calculate the union with
+                 *
+                 * @returns {BitSet} this - the union of the two bitsets
+                 */
                 union: function(bitset) { 
                 {
-                    if(bitset.length > this.length) {this.resize(bitset.length)}
+                    if(bitset.length > this._length) {this.resize(bitset.length)}
         
                     for(var i = 0|0, max = bitset.words.length; i < max; i++)
                     {

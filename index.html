@@ -10,13 +10,13 @@
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var bs   = new _.BitSet().add(6).add(14).add(62);
+            var bs  = new _.BitSet().add(6).add(14).add(63);
 
-            bs
-                    .flip(123)
-                    .flip(16);
+            var car = bs.cardinality;
 
-            console.log(bs.get(123));
+//            console.log(bs.each$(function(v, i) {
+//                console.log(v, i);
+//            }));
         </script>
     </head>
     <body>
