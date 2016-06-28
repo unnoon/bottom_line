@@ -10,6 +10,7 @@
     /**
      * BitSet: no worrying about 32bits restrictions
      *
+     * @constructor
      * @method _.BitSet
      *
      * @param  {number=32} length_ - optional length
@@ -18,9 +19,23 @@
      */
     function BitSet(length_) { 
     {
-        Object.defineProperty(this,'_length', {value: (length_ || WORD_SIZE)|0, writable: true});
-        this.words = new Uint32Array(Math.ceil(this._length / WORD_SIZE));
+        this.init(length_);
     }}
+
+    /**
+     * Alternative create method for people who hate the 'new' keyword
+     *
+     * @static
+     * @method BitSet.create
+     *
+     * @param  {number=32} length_ - optional length
+     *
+     * @return {BitSet} - new BitSet
+     */
+    BitSet.create = function(length_) {
+    {
+        return Object.create(BitSet.prototype).init(length_);
+    }};
 
     BitSet.prototype = {
         /**
@@ -412,6 +427,20 @@
         has: function(index) { "@aliases: member";
         {
             return !!this.get(index);
+        }},
+        /**
+         * Initializes the BitSet. Useful in case one wants to use 'Object.create' instead of 'new'
+         *
+         * @param length_
+         *
+         * @returns {BitSet} this
+         */
+        init: function(length_) {
+        {
+            Object.defineProperty(this,'_length', {value: (length_ || WORD_SIZE)|0, writable: true});
+            this.words = new Uint32Array(Math.ceil(this._length / WORD_SIZE));
+
+            return this
         }},
         /**
          * Calculates the intersection between two bitsets.

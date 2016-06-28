@@ -8,6 +8,16 @@ define([
 
     describe("BitSet", function() {
 
+        describe("@static create", function() {
+
+            it("should create a new BitSet using the static BitSet.create", function() {
+                var bs = _.BitSet.create(234).add(6).add(14).add(62);
+
+                expect(bs.has(14)).to.be.true;
+                expect(bs.length).to.eql(234);
+            });
+        });
+
         describe("add", function() {
 
             it("should be able to add a number/index", function() {
@@ -401,6 +411,16 @@ define([
                 expect(bs.has(14)).to.be.true;
                 expect(bs.has(16)).to.be.false;
                 expect(bs.has(123)).to.be.false;
+            });
+        });
+
+        describe("init", function() {
+
+            it("should be able to init a BitSet created by Object.create", function() {
+                var bs = Object.create(_.BitSet.prototype).init(234).add(6).add(14).add(62);
+
+                expect(bs.has(14)).to.be.true;
+                expect(bs.length).to.eql(234);
             });
         });
 
