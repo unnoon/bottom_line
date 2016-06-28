@@ -272,27 +272,27 @@ define([
 
         });
 
-        describe("fits", function() {
+        describe("contains", function() {
 
-            it("should be able to positively test if a mask fits", function() {
+            it("should be able to positively test if a mask contains", function() {
                 var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
                 var mask = new _.BitSet().add(6).add(14).add(62);
 
-                expect(bs.fits(mask)).to.be.true;
+                expect(bs.contains(mask)).to.be.true;
             });
 
-            it("should be able to positively test if a larger mask fits", function() {
+            it("should be able to positively test if a larger mask contains", function() {
                 var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
                 var mask = new _.BitSet().add(6).add(14).add(62).add(367, 0);
 
-                expect(bs.fits(mask)).to.be.true;
+                expect(bs.contains(mask)).to.be.true;
             });
 
             it("should be able to negatively test if a mask don't fit", function() {
                 var bs   = new _.BitSet().add(6).add(14).add(62);
                 var mask = new _.BitSet().add(6).add(14).add(78);
 
-                expect(bs.fits(mask)).to.be.false;
+                expect(bs.contains(mask)).to.be.false;
             });
 
         });
