@@ -10,13 +10,12 @@
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var bs  = new _.BitSet().add(6).add(14).add(63);
+            var bs1  = new _.BitSet().add(6).add(14).add(62);
+            var bs2  = new _.BitSet().add(6).add(16);
 
-            var car = bs.cardinality;
+            var diff = bs1.Difference(bs2);
 
-//            console.log(bs.each$(function(v, i) {
-//                console.log(v, i);
-//            }));
+            console.log(diff);
         </script>
     </head>
     <body>

@@ -3376,7 +3376,7 @@
     !function includeLibs(_)
     {
         !function(root, bitset) {
-            var environments = true; switch(environments) {
+            var environments = true; /* istanbul ignore next */ switch(environments) {
             /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bitset);                                                           break;
             /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bitset();                                                break;
             /*root*/      case !root.BitSet                                                            : Object.defineProperty(root, 'BitSet', {value: bitset(), enumerable: !0}); break; default : console.error("'BitSet' is already defined on root object")}
@@ -3572,6 +3572,31 @@
                     return this.clone().complement();
                 }},
                 /**
+                 * Calculates if the bitset contains a certain bitset.
+                 * In bitmask terms it will calculate if a bitmask fits a bitset
+                 *
+                 * @public
+                 * @method BitSet#contains
+                 * @alias  fits
+                 *
+                 * @param {BitSet} mask - bitset mask to test fit. i.e. subset to test containment
+                 *
+                 * @returns {boolean} - boolean indicating if the mask fits the bitset or is a subset
+                 */
+                contains: function(mask) { "@aliases: fits";
+                {
+                    var maskword;
+        
+                    for(var i = 0|0, max = mask.words.length; i < max; i++)
+                    {
+                        maskword = mask.words[i];
+        
+                        if(((this.words[i] || 0) & maskword) !== maskword) {return false}
+                    }
+        
+                    return true
+                }},
+                /**
                  * Calculates the difference between 2 bitsets.
                  * The result is stored in this
                  *
@@ -3604,7 +3629,7 @@
                  */
                 Difference: function(bitset) {
                 {
-                    return this.clone().difference()
+                    return this.clone().difference(bitset)
                 }},
                 /**
                  * Iterates over the set bits and calls the callback function with: value=1, index, this.
@@ -3714,32 +3739,7 @@
                  */
                 Exclusion: function(bitset) { "@aliases: SymmetricDifference";
                 {
-                    return this.clone().exclusion()
-                }},
-                /**
-                 * Calculates if the bitset contains a certain bitset.
-                 * In bitmask terms it will calculate if a bitmask fits a bitset
-                 *
-                 * @public
-                 * @method BitSet#contains
-                 * @alias  fits
-                 *
-                 * @param {BitSet} mask - bitset mask to test fit. i.e. subset to test containment
-                 *
-                 * @returns {boolean} - boolean indicating if the mask fits the bitset or is a subset
-                 */
-                contains: function(mask) { "@aliases: fits";
-                {
-                    var maskword;
-        
-                    for(var i = 0|0, max = mask.words.length; i < max; i++)
-                    {
-                        maskword = mask.words[i];
-        
-                        if(((this.words[i] || 0) & maskword) !== maskword) {return false}
-                    }
-        
-                    return true
+                    return this.clone().exclusion(bitset)
                 }},
                 /**
                  * Flips a bit in the bitset. In case index will fall out of bounds the bitset is enlarged
@@ -3821,7 +3821,7 @@
                  */
                 Intersection: function(bitset) {
                 {
-                    return this.clone().intersection()
+                    return this.clone().intersection(bitset)
                 }},
                 /**
                  * Calculates if two bitsets intersect
@@ -3940,7 +3940,7 @@
                  * @returns {BitSet} this - the resized bitset
                  */
                 resize: function(len) {
-                {   if(this._length === (len |= 0)) {return}
+                {   if(this._length === (len |= 0)) {return this}
         
                     var diff      =  (len - this._length)|0;
                     var newLength = ((len - 1 + WORD_SIZE) >>> WORD_LOG)|0;
@@ -4128,7 +4128,7 @@
                  */
                 Union: function(bitset) {
                 {
-                    return this.clone().union();
+                    return this.clone().union(bitset);
                 }}
             };
         

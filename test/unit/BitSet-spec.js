@@ -36,7 +36,6 @@ define([
                 expect(str).to.eql('00000000000000000000000000000000');
                 expect(str.length).to.eql(32);
             });
-
         });
 
         describe("cardinality", function() {
@@ -71,7 +70,6 @@ define([
                 expect(bs.isEmpty()).to.be.true;
                 expect(bs.length).to.eql(64);
             });
-
         });
 
         describe("clone", function() {
@@ -83,7 +81,6 @@ define([
                 expect(bs.equals(cln)).to.be.true;
                 expect(bs === cln).to.be.false;
             });
-
         });
 
         describe("complement", function() {
@@ -103,9 +100,29 @@ define([
                 expect(str_full).to.eql('0011111111111111111111111111111111111111111111111011111110111111');
                 expect(str_full.length).to.eql(64);
             });
-
         });
 
+        describe("Complement", function() {
+
+            it("should be able to calculate the Complement and trim any trailing bits", function() {
+                var bs  = new _.BitSet().add(6).add(14).add(62);
+
+                var complement = bs.Complement();
+
+                var str = complement.toString(2);
+
+                expect(str).to.eql('011111111111111111111111111111111111111111111111011111110111111');
+                expect(str.length).to.eql(63);
+
+                var str_full = complement.toString(-1);
+
+                expect(str_full).to.eql('0011111111111111111111111111111111111111111111111011111110111111');
+                expect(str_full.length).to.eql(64);
+
+                expect(complement).to.not.equal(bs);
+            });
+        });        
+        
         describe("difference", function() {
 
             it("should be able to calculate a simple difference", function() {
@@ -140,8 +157,29 @@ define([
 
                 expect(str_full).to.eql('00000000000000010000000000000000');
                 expect(str_full.length).to.eql(32);
-            });            
-            
+            });
+        });
+
+        describe("Difference", function() {
+
+            it("should be able to calculate a simple Difference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(16);
+
+                var diff = bs1.Difference(bs2);
+
+                var str = diff.toString(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000000100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = diff.toString(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000000100000000000000');
+                expect(str_full.length).to.eql(64);
+
+                expect(diff).to.not.equal(bs1);
+            });
         });
 
         describe("each", function() {
@@ -175,7 +213,6 @@ define([
                 expect(indices).to.have.members([6, 14]);
                 expect(result).to.be.false;
             });
-
         });
 
         describe("each$", function() {
@@ -213,7 +250,6 @@ define([
                 expect(ones).to.eql(2);
                 expect(result).to.be.false;
             });
-
         });        
         
         describe("equals", function() {
@@ -231,7 +267,6 @@ define([
 
                 expect(bs1.equals(bs2)).to.be.false;
             });
-
         });
 
         describe("exclusion", function() {
@@ -269,9 +304,30 @@ define([
                 expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
                 expect(str_full.length).to.eql(64);
             });
-
         });
 
+        describe("Exclusion", function() {
+
+            it("simple symmetric difference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(16);
+
+                var exc = bs1.Exclusion(bs2);
+
+                var str = exc.toString(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000010100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = exc.toString(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
+                expect(str_full.length).to.eql(64);
+
+                expect(exc).to.not.equal(bs1);
+            });
+        });        
+        
         describe("contains", function() {
 
             it("should be able to positively test if a mask contains", function() {
@@ -294,9 +350,7 @@ define([
 
                 expect(bs.contains(mask)).to.be.false;
             });
-
         });
-
 
         describe("flip", function() {
 
@@ -375,6 +429,22 @@ define([
             });
         });
 
+        describe("Intersection", function() {
+
+            it("should calculate the Intersection between 2 sets", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(14);
+
+                var ins = bs1.Intersection(bs2);
+
+                var str = ins.toString();
+
+                expect(str).to.eql('{6, 14}');
+
+                expect(ins).to.not.equal(bs1);
+            });
+        });        
+        
         describe("intersects", function() {
 
             it("should calculate if two sets intersect", function() {
@@ -491,9 +561,10 @@ define([
             it("should be able to resize a bitset to a bigger size", function() {
                 var bs  = new _.BitSet().add(9).add(14).add(200);
 
-                bs.resize(456);
+                var self = bs.resize(456);
 
                 expect(bs.length).to.eql(456);
+                expect(self).to.equal(bs);
             });
 
             it("should be able to decrease the length of the bitset, trimming any trailing bits", function() {
@@ -504,6 +575,14 @@ define([
                 expect(bs.length).to.eql(60);
                 expect(bs.toString(-1)).to.eql('0000000000000000000000000000000000000000000000000000001000000000');
             });
+
+            it("should return the this (and in any other cases as well) in case the resize length is the same", function() {
+                var bs  = new _.BitSet().add(9).add(63);
+
+                var self = bs.resize(64);
+
+                expect(self).to.equal(bs);
+            });
         });
 
         describe("toArray", function() {
@@ -511,19 +590,27 @@ define([
             it("should return an array containing the indices", function() {
                 var bs  = new _.BitSet().add(9).add(14).add(60);
 
-                expect(bs.toArray()).to.have.members([9, 14, 60]);
+                var arr = bs.toArray();
+                expect(arr).to.have.members([9, 14, 60]);
+                expect(arr).instanceof(Array);
             });
 
             it("should return a typed array containing the indices depending on type", function() {
                 var bs  = new _.BitSet().add(9).add(14).add(60).add(789);
 
-                var arr = bs.toArray(8);
+                var arr8 = bs.toArray(8);
 
-                expect(arr[0]).to.eql(9);
-                expect(arr[1]).to.eql(14);
-                expect(arr[2]).to.eql(60);
-                expect(arr[3]).to.eql(21);
-                expect(arr).instanceof(Uint8Array);
+                expect(arr8[0]).to.eql(9);
+                expect(arr8[1]).to.eql(14);
+                expect(arr8[2]).to.eql(60);
+                expect(arr8[3]).to.eql(21);
+                expect(arr8).instanceof(Uint8Array);
+
+                var arr16 = bs.toArray(16);
+                expect(arr16).instanceof(Uint16Array);
+
+                var arr32 = bs.toArray(32);
+                expect(arr32).instanceof(Uint32Array);
             });
         });
 
@@ -533,14 +620,22 @@ define([
                 var bs  = new _.BitSet().add(9).add(14).add(33);
 
                 var expected = [0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-                var arr      = bs.toBitArray(8);
+                var arr      = bs.toBitArray();
 
                 expect(expected.length).to.equal(arr.length);
                 for(var i = 0; i < arr.length; i++){
                     expect(arr[i]).to.equal(expected[i]);
                 }
+                expect(arr).instanceof(Array);
 
-                expect(arr).instanceof(Uint8Array);
+                var arr8 = bs.toBitArray(8);
+                expect(arr8).instanceof(Uint8Array);
+
+                var arr16 = bs.toBitArray(16);
+                expect(arr16).instanceof(Uint16Array);
+
+                var arr32 = bs.toBitArray(32);
+                expect(arr32).instanceof(Uint32Array);
             });
         });
 
@@ -599,22 +694,45 @@ define([
         describe("union", function() {
 
             it("should calculate the union of 2 sets", function() {
-                var bv1  = new _.BitSet(32)
+                var bs1  = new _.BitSet(32)
                     .add(7)
                     .add(54)
                     .add(23);
-                var bv2  = new _.BitSet(63)
+                var bs2  = new _.BitSet(63)
                     .add(7)
                     .add(67)
                     .add(23);
 
-                bv1.union(bv2);
+                bs1.union(bs2);
 
-                var str = bv1.toString();
+                var str = bs1.toString();
 
                 expect(str).to.eql('{7, 23, 54, 67}');
-                expect(bv1.length).to.eql(68);
+                expect(bs1.length).to.eql(68);
             });
         });
+
+        describe("Union", function() {
+
+            it("should calculate the Union of 2 sets", function() {
+                var bs1  = new _.BitSet(32)
+                    .add(7)
+                    .add(54)
+                    .add(23);
+                var bs2  = new _.BitSet(63)
+                    .add(7)
+                    .add(67)
+                    .add(23);
+
+                var un = bs1.Union(bs2);
+
+                var str = un.toString();
+
+                expect(str).to.eql('{7, 23, 54, 67}');
+                expect(un.length).to.eql(68);
+
+                expect(un).to.not.equal(bs1);
+            });
+        });        
     });
 });
