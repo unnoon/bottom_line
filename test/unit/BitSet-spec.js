@@ -8,6 +8,16 @@ define([
 
     describe("BitSet", function() {
 
+        describe("@hammingWeight/$popCount", function() {
+
+            it("should calculate the hamming weight of a word", function() {
+                var bs = _.BitSet.create(234).add(6).add(14).add(62);
+
+                expect(bs.$hammingWeight(bs.words[0])).to.eql(2);
+                expect(bs.$popCount(bs.words[0])).to.eql(2); // alias
+            });
+        });
+
         describe("@static create", function() {
 
             it("should create a new BitSet using the static BitSet.create", function() {
@@ -18,10 +28,10 @@ define([
             });
         });
 
-        describe("add", function() {
+        describe("add/set", function() {
 
             it("should be able to add a number/index", function() {
-                var bs = new _.BitSet().add(6).add(14);
+                var bs = new _.BitSet().add(6).set(14);
 
                 var str = bs.toString(-1);
 
@@ -131,8 +141,33 @@ define([
 
                 expect(complement).to.not.equal(bs);
             });
-        });        
-        
+        });
+
+        describe("contains/fits", function() {
+
+            it("should be able to positively test if a mask contains", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
+                var mask = new _.BitSet().add(6).add(14).add(62);
+
+                expect(bs.contains(mask)).to.be.true;
+                expect(bs.fits(mask)).to.be.true;
+            });
+
+            it("should be able to positively test if a larger mask contains", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
+                var mask = new _.BitSet().add(6).add(14).add(62).add(367, 0);
+
+                expect(bs.contains(mask)).to.be.true;
+            });
+
+            it("should be able to negatively test if a mask don't fit", function() {
+                var bs   = new _.BitSet().add(6).add(14).add(62);
+                var mask = new _.BitSet().add(6).add(14).add(78);
+
+                expect(bs.contains(mask)).to.be.false;
+            });
+        });
+
         describe("difference", function() {
 
             it("should be able to calculate a simple difference", function() {
@@ -279,9 +314,9 @@ define([
             });
         });
 
-        describe("exclusion", function() {
+        describe("exclusion/symmetricDifference", function() {
 
-            it("simple symmetric difference", function() {
+            it("should calculate the symmetric difference", function() {
                 var bs1  = new _.BitSet().add(6).add(14).add(62);
                 var bs2  = new _.BitSet().add(6).add(16);
 
@@ -298,7 +333,7 @@ define([
                 expect(str_full.length).to.eql(64);
             });
 
-            it("reverse case (exclusion)", function() {
+            it("should calculate the symmetric difference in case the length of the bitsets is different)", function() {
                 var bs1  = new _.BitSet().add(6).add(14).add(62);
                 var bs2  = new _.BitSet(20).add(6).add(16);
 
@@ -314,11 +349,28 @@ define([
                 expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
                 expect(str_full.length).to.eql(64);
             });
+
+            it("should be able to use the alias symmetricDifference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet(20).add(6).add(16);
+
+                bs2.symmetricDifference(bs1);
+
+                var str = bs2.toString(2);
+
+                expect(str).to.eql('100000000000000000000000000000000000000000000010100000000000000');
+                expect(str.length).to.eql(63);
+
+                var str_full = bs2.toString(-1);
+
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
+                expect(str_full.length).to.eql(64);
+            });
         });
 
-        describe("Exclusion", function() {
+        describe("Exclusion/SymmetricDifference", function() {
 
-            it("simple symmetric difference", function() {
+            it("should calculate the symmetric difference and output a new bitset", function() {
                 var bs1  = new _.BitSet().add(6).add(14).add(62);
                 var bs2  = new _.BitSet().add(6).add(16);
 
@@ -336,29 +388,24 @@ define([
 
                 expect(exc).to.not.equal(bs1);
             });
-        });        
-        
-        describe("contains", function() {
 
-            it("should be able to positively test if a mask contains", function() {
-                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
-                var mask = new _.BitSet().add(6).add(14).add(62);
+            it("should be possible to use the alias SymmetricDifference", function() {
+                var bs1  = new _.BitSet().add(6).add(14).add(62);
+                var bs2  = new _.BitSet().add(6).add(16);
 
-                expect(bs.contains(mask)).to.be.true;
-            });
+                var exc = bs1.SymmetricDifference(bs2);
 
-            it("should be able to positively test if a larger mask contains", function() {
-                var bs   = new _.BitSet().add(6).add(14).add(62).add(123);
-                var mask = new _.BitSet().add(6).add(14).add(62).add(367, 0);
+                var str = exc.toString(2);
 
-                expect(bs.contains(mask)).to.be.true;
-            });
+                expect(str).to.eql('100000000000000000000000000000000000000000000010100000000000000');
+                expect(str.length).to.eql(63);
 
-            it("should be able to negatively test if a mask don't fit", function() {
-                var bs   = new _.BitSet().add(6).add(14).add(62);
-                var mask = new _.BitSet().add(6).add(14).add(78);
+                var str_full = exc.toString(-1);
 
-                expect(bs.contains(mask)).to.be.false;
+                expect(str_full).to.eql('0100000000000000000000000000000000000000000000010100000000000000');
+                expect(str_full.length).to.eql(64);
+
+                expect(exc).to.not.equal(bs1);
             });
         });
 
@@ -403,14 +450,14 @@ define([
             });
         });
 
-        describe("has", function() {
+        describe("has/member", function() {
 
             it("should return the correct boolean values for membership", function() {
                 var bs   = new _.BitSet().add(6).add(14).add(62);
 
                 expect(bs.has(14)).to.be.true;
                 expect(bs.has(16)).to.be.false;
-                expect(bs.has(123)).to.be.false;
+                expect(bs.member(123)).to.be.false;
             });
         });
 
@@ -520,12 +567,13 @@ define([
             });
         });
 
-        describe("max", function() {
+        describe("max/msb", function() {
 
             it("should return the max index of a bitset", function() {
                 var bs  = new _.BitSet(588).add(9).add(14);
 
                 expect(bs.max()).to.eql(14);
+                expect(bs.msb()).to.eql(14);
             });
 
             it("should return undefined in case the set is empty", function() {
@@ -535,12 +583,13 @@ define([
             });
         });
 
-        describe("min", function() {
+        describe("min/lsb", function() {
 
             it("should return the min index of a bitset", function() {
                 var bs  = new _.BitSet(588).add(9).add(14);
 
                 expect(bs.min()).to.eql(9);
+                expect(bs.lsb()).to.eql(9);
             });
 
             it("should return the min index of a bitset", function() {
@@ -669,12 +718,13 @@ define([
             });
         });
 
-        describe("toString", function() {
+        describe("toString/stringify", function() {
 
             it("should return set, bitstring or full bitstring depending on mode", function() {
                 var bs  = new _.BitSet().add(9).add(14).add(60);
 
                 expect(bs.toString()).to.eql('{9, 14, 60}');
+                expect(bs.stringify()).to.eql('{9, 14, 60}');
                 expect(bs.toString(2)).to.eql('1000000000000000000000000000000000000000000000100001000000000');
                 expect(bs.toString(-1)).to.eql('0001000000000000000000000000000000000000000000000100001000000000');
             });

@@ -10,12 +10,12 @@
         <script src="bin/bottom_line.test.js"></script>
         <!--<script src="bower_components/seedrandom/seedrandom.js"></script>-->
         <script>
-            var bs1  = new _.BitSet().add(6).add(14).add(62);
-            var bs2  = new _.BitSet().add(6).add(16);
+            var bs = _.BitSet.create(234).add(6).add(14).add(62);
 
-            var diff = bs1.Difference(bs2);
+            bs.$popCount(bs.words[0]);
+            bs.$hammingWeight(bs.words[0]);
 
-            console.log(diff);
+//            console.log(diff);
         </script>
     </head>
     <body>

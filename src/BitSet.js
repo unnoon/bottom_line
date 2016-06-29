@@ -37,7 +37,7 @@
         return Object.create(BitSet.prototype).init(length_);
     }};
 
-    BitSet.prototype = {
+    extend(BitSet.prototype, {
         /**
          * Calculate the hamming weight i.e. the number of ones in a bitstring/word
          *
@@ -784,7 +784,24 @@
         {
             return this.clone().union(bitset);
         }}
-    };
+    });
+
+    function extend(obj, properties)
+    {
+        for(var prop in properties)
+        {   if(!properties.hasOwnProperty(prop)) {continue}
+
+            var dsc     = Object.getOwnPropertyDescriptor(properties, prop);
+            var aliases = dsc.value && dsc.value.toString().match(/\"@aliases:(.*)\"/);
+            var names   = aliases? aliases[1].match(/[\w\$]+/g) : [];
+
+            names.unshift(prop);
+
+            names.forEach(function(name) {
+                Object.defineProperty(obj, name, dsc);
+            });
+        }
+    }
 
     return BitSet
 });

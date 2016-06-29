@@ -3387,6 +3387,7 @@
             /**
              * BitSet: no worrying about 32bits restrictions
              *
+             * @constructor
              * @method _.BitSet
              *
              * @param  {number=32} length_ - optional length
@@ -3395,11 +3396,25 @@
              */
             function BitSet(length_) { 
             {
-                Object.defineProperty(this,'_length', {value: (length_ || WORD_SIZE)|0, writable: true});
-                this.words = new Uint32Array(Math.ceil(this._length / WORD_SIZE));
+                this.init(length_);
             }}
         
-            BitSet.prototype = {
+            /**
+             * Alternative create method for people who hate the 'new' keyword
+             *
+             * @static
+             * @method BitSet.create
+             *
+             * @param  {number=32} length_ - optional length
+             *
+             * @return {BitSet} - new BitSet
+             */
+            BitSet.create = function(length_) {
+            {
+                return Object.create(BitSet.prototype).init(length_);
+            }};
+        
+            extend(BitSet.prototype, {
                 /**
                  * Calculate the hamming weight i.e. the number of ones in a bitstring/word
                  *
@@ -3468,7 +3483,8 @@
                  * @returns {BitSet} this
                  */
                 add: function(index, val_) { "@aliases: set";
-                {   if((index |= 0) >= this._length) {this.resize(index+1)}
+                {
+                    if((index |= 0) >= this._length) {this.resize(index+1)}
         
                     if(val_ === undefined || val_)
                     {
@@ -3752,7 +3768,8 @@
                  * @returns {BitSet} this
                  */
                 flip: function(index) { 
-                {   if((index |= 0) >= this._length) {this.resize(index+1)}
+                {
+                    if((index |= 0) >= this._length) {this.resize(index+1)}
         
                     this.words[index >>> WORD_LOG] ^= (1 << index);
         
@@ -3787,6 +3804,20 @@
                 has: function(index) { "@aliases: member";
                 {
                     return !!this.get(index);
+                }},
+                /**
+                 * Initializes the BitSet. Useful in case one wants to use 'Object.create' instead of 'new'
+                 *
+                 * @param length_
+                 *
+                 * @returns {BitSet} this
+                 */
+                init: function(length_) {
+                {
+                    Object.defineProperty(this,'_length', {value: (length_ || WORD_SIZE)|0, writable: true});
+                    this.words = new Uint32Array(Math.ceil(this._length / WORD_SIZE));
+        
+                    return this
                 }},
                 /**
                  * Calculates the intersection between two bitsets.
@@ -4130,7 +4161,24 @@
                 {
                     return this.clone().union(bitset);
                 }}
-            };
+            });
+        
+            function extend(obj, properties)
+            {
+                for(var prop in properties)
+                {   if(!properties.hasOwnProperty(prop)) {continue}
+        
+                    var dsc     = Object.getOwnPropertyDescriptor(properties, prop);
+                    var aliases = dsc.value && dsc.value.toString().match(/\"@aliases:(.*)\"/);
+                    var names   = aliases? aliases[1].match(/[\w\$]+/g) : [];
+        
+                    names.unshift(prop);
+        
+                    names.forEach(function(name) {
+                        Object.defineProperty(obj, name, dsc);
+                    });
+                }
+            }
         
             return BitSet
         });
