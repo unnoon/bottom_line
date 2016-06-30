@@ -673,6 +673,22 @@
             return arr;
         }},
         /**
+         * Outputs the underlying bitvector as a boolean array, starting with the least significant bits
+         *
+         * @public
+         * @method BitSet#toBooleanArray
+         *
+         * @returns {Array}
+         */
+        toBooleanArray: function() {
+            {
+                var arr = [];
+
+                this.each$(function(val, index) {arr[index] = !!val});
+
+                return arr;
+            }},
+        /**
          * Outputs the underlying bitvector as a bitstring, starting with the most significant bit
          *
          * @public

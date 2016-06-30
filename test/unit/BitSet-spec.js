@@ -708,6 +708,21 @@ define([
             });
         });
 
+        describe("toBooleanArray", function() {
+
+            it("should return an array containing all bits converted to booleans", function() {
+                var bs  = new _.BitSet().add(9).add(14).add(33);
+
+                var expected = [false,false,false,false,false,false,false,false,false,true,false,false,false,false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,true];
+                var arr      = bs.toBooleanArray();
+
+                expect(expected.length).to.equal(arr.length);
+                for(var i = 0; i < arr.length; i++){
+                    expect(arr[i]).to.equal(expected[i]);
+                }
+            });
+        });
+
         describe("toBitString", function() {
 
             it("should return set, bitstring or full bitstring depending on mode", function() {
