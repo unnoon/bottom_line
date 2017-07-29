@@ -180,9 +180,10 @@
     /* @include int.js  */
     /* @include math.js */
 
+    // include with _ as global context
     !function includeLibs(_)
     {
-        /* @include BitSet.js */
+
     }.call(_, _);
 
 	return _
