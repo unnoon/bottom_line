@@ -10,11 +10,10 @@ construct('obj', {native:Object}, {
          * @static
          * @method obj.clone
          *
-         * @param   {Object}  obj   - object to be cloned
+         * @param {Object} obj - object to be cloned
          *
-         * @return  {Object}  clone - the cloned object
+         * @return {Object} clone - the cloned object
          */
-        // TODO add deep option to clone function itself
         clone: clone,
         /**
          * creates an object based on a prototype
@@ -23,9 +22,9 @@ construct('obj', {native:Object}, {
          * @static
          * @method _.create
          *
-         * @param  {Object} proto - prototype to base the object on
+         * @param {Object} proto - prototype to base the object on
          *
-         * @return {Object}       - new object based on prototype
+         * @return {Object} - new object based on prototype
          */
         create: function(proto) {
             return (proto === Array.prototype) ? [] : Object.create(proto);
@@ -41,7 +40,7 @@ construct('obj', {native:Object}, {
          * @static
          * @method obj.typeof
          *
-         * @param   {Object} obj - object tot check the type from
+         * @param {Object} obj - object tot check the type from
          *
          * @return {string} - type of the object
          */
@@ -63,7 +62,7 @@ construct('obj', {native:Object}, {
          *
          * @param  {Object} obj - object tot check the type from
          *
-         * @return {string}     - type of the object
+         * @return {Array} - Array containing the names of the object
          */
         names: function(obj) {
             return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
@@ -425,15 +424,15 @@ construct('obj', {native:Object}, {
          * @this   {Object}
          *
          * @param  {Function} cb      - callback function to be called for each element
-         * @param  {Object=}  opt_ctx - optional context
+         * @param  {Object=}  ctx_ - optional context
          *
          * @return {Array} array containing the filtered values
          */
-        filter: function(cb, opt_ctx) {
+        filter: function(cb, ctx_) {
             var filtered = [];
 
             this._.each(function(elm) {
-                if(cb.call(opt_ctx, elm)) filtered.push(elm);
+                if(cb.call(ctx_, elm)) filtered.push(elm);
             });
 
             return filtered;
@@ -950,7 +949,7 @@ construct('obj', {native:Object}, {
          */
         stringify: function(visited_)
         {
-            var output = '';
+            var output = '{';
 
             this._.each(function(obj, key) {
                 var val;
@@ -965,7 +964,7 @@ construct('obj', {native:Object}, {
                 }
 
                 // TODO punctuation for strings & proper formatting
-                output += (output? ', ' : '{') + key + ': ' + val
+                output += (output !== '{' ? ', ' : '') + key + ': ' + val
             });
 
             return output + '}';

@@ -6,16 +6,12 @@
  * Released under the MIT license
  * ________________________________
  */
-!function(bottom_line) {
-    var environments = true;
-    var requirejs    = typeof(define) === 'function' && this.define === define && !!define.amd;
-    var nodejs       = typeof(module) === 'object'   && this === module.exports;
-
-    switch(environments) {
-    case requirejs : define(bottom_line);             break;
-    case nodejs    : module.exports  = bottom_line(); break;
-    default        : !this._? this._ = bottom_line() : console.error("'_' is already defined on root object")}
-}.call(this, function bottom_line() {
+!function(root, bottom_line) {
+    var environments = true; switch(environments) {
+    /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bottom_line);            break;
+    /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bottom_line(); break;
+    /*root*/      case !root._                                                                 : root._ = bottom_line();         break; default : console.error("'_' is already defined on root object")}
+}(this, function bottom_line() {
     'use strict';
 
     var stack = []; // stack holding all wrapped objects accessed from ._
@@ -183,6 +179,12 @@
     /* @include fnc.js  */
     /* @include int.js  */
     /* @include math.js */
+
+    // include with _ as global context
+    !function includeLibs(_)
+    {
+
+    }.call(_, _);
 
 	return _
 });

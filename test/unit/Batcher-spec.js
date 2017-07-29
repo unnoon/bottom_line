@@ -12,7 +12,7 @@ define([
                 expect(batcher()).to.be.undefined;
             });
 
-            it("batcher initilized with muliple functions or add functions on the fly", function() {
+            it("batcher initialized with multiple functions or add functions on the fly", function() {
                 var closure = 0; // make a closure so we can make sure that all batched functions are executed
 
                 var batcher = _.Batcher.create(

@@ -6,16 +6,12 @@
  * Released under the MIT license
  * ________________________________
  */
-!function(bottom_line) {
-    var environments = true;
-    var requirejs    = typeof(define) === 'function' && this.define === define && !!define.amd;
-    var nodejs       = typeof(module) === 'object'   && this === module.exports;
-
-    switch(environments) {
-    case requirejs : define(bottom_line);             break;
-    case nodejs    : module.exports  = bottom_line(); break;
-    default        : !this._? this._ = bottom_line() : console.error("'_' is already defined on root object")}
-}.call(this, function bottom_line() {
+!function(root, bottom_line) {
+    var environments = true; switch(environments) {
+    /*requirejs*/ case typeof(define) === 'function' && root.define === define && !!define.amd : define(bottom_line);            break;
+    /*nodejs*/    case typeof(module) === 'object'   && root === module.exports                : module.exports = bottom_line(); break;
+    /*root*/      case !root._                                                                 : root._ = bottom_line();         break; default : console.error("'_' is already defined on root object")}
+}(this, function bottom_line() {
     'use strict';
 
     var stack = []; // stack holding all wrapped objects accessed from ._
@@ -525,9 +521,12 @@
     extend(Math, shimOptions, {
         /**
          * Decimal log function
+         *
          * @public
          * @method Math.log10
+         *
          * @param   {number} val - value to get the log10 from
+         *
          * @returns {number}     - angle in degrees
          */
         log10: function(val) {
@@ -538,14 +537,21 @@
     extend(Number, shimOptions, {
         /**
          * Check for isNaN conform the ES6 specs
+         *
          * @public
          * @method Number.isNaN
+         *
          * @param   {number} value - value to check is NaN for
+         *
          * @returns {boolean}      - boolean indicating if the value is NaN
          */
         isNaN: function(value) {
             return typeof value === "number" && value !== value;
         }
+    });
+    
+    extend(Object, shimOptions, {
+        
     });
     /**
      * Create a wrapper function that can hold multiple callbacks that are executed in sequence.
@@ -821,6 +827,9 @@
                     default       : return NaN
                 }
             },
+            toObject: function(val) {
+                return Object(val);
+            },
             toNumber: function(obj) {
                 switch(_.typeOf(obj))
                 {
@@ -844,11 +853,10 @@
              * @static
              * @method obj.clone
              *
-             * @param   {Object}  obj   - object to be cloned
+             * @param {Object} obj - object to be cloned
              *
-             * @return  {Object}  clone - the cloned object
+             * @return {Object} clone - the cloned object
              */
-            // TODO add deep option to clone function itself
             clone: clone,
             /**
              * creates an object based on a prototype
@@ -857,9 +865,9 @@
              * @static
              * @method _.create
              *
-             * @param  {Object} proto - prototype to base the object on
+             * @param {Object} proto - prototype to base the object on
              *
-             * @return {Object}       - new object based on prototype
+             * @return {Object} - new object based on prototype
              */
             create: function(proto) {
                 return (proto === Array.prototype) ? [] : Object.create(proto);
@@ -875,7 +883,7 @@
              * @static
              * @method obj.typeof
              *
-             * @param   {Object} obj - object tot check the type from
+             * @param {Object} obj - object tot check the type from
              *
              * @return {string} - type of the object
              */
@@ -897,7 +905,7 @@
              *
              * @param  {Object} obj - object tot check the type from
              *
-             * @return {string}     - type of the object
+             * @return {Array} - Array containing the names of the object
              */
             names: function(obj) {
                 return (obj === null || obj === undefined) ? [] : Object.getOwnPropertyNames(obj);
@@ -1259,15 +1267,15 @@
              * @this   {Object}
              *
              * @param  {Function} cb      - callback function to be called for each element
-             * @param  {Object=}  opt_ctx - optional context
+             * @param  {Object=}  ctx_ - optional context
              *
              * @return {Array} array containing the filtered values
              */
-            filter: function(cb, opt_ctx) {
+            filter: function(cb, ctx_) {
                 var filtered = [];
     
                 this._.each(function(elm) {
-                    if(cb.call(opt_ctx, elm)) filtered.push(elm);
+                    if(cb.call(ctx_, elm)) filtered.push(elm);
                 });
     
                 return filtered;
@@ -1784,7 +1792,7 @@
              */
             stringify: function(visited_)
             {
-                var output = '';
+                var output = '{';
     
                 this._.each(function(obj, key) {
                     var val;
@@ -1799,7 +1807,7 @@
                     }
     
                     // TODO punctuation for strings & proper formatting
-                    output += (output? ', ' : '{') + key + ': ' + val
+                    output += (output !== '{' ? ', ' : '') + key + ': ' + val
                 });
     
                 return output + '}';
@@ -3310,6 +3318,12 @@
             rad: rad
         }
     });
+
+    // include with _ as global context
+    !function includeLibs(_)
+    {
+
+    }.call(_, _);
 
 	return _
 });

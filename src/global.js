@@ -121,6 +121,9 @@ construct('_', {wrapper: _}, {
                 default       : return NaN
             }
         },
+        toObject: function(val) {
+            return Object(val);
+        },
         toNumber: function(obj) {
             switch(_.typeOf(obj))
             {

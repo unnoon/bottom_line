@@ -33,9 +33,12 @@ extend(Function.prototype, shimOptions, {
 extend(Math, shimOptions, {
     /**
      * Decimal log function
+     *
      * @public
      * @method Math.log10
+     *
      * @param   {number} val - value to get the log10 from
+     *
      * @returns {number}     - angle in degrees
      */
     log10: function(val) {
@@ -46,12 +49,19 @@ extend(Math, shimOptions, {
 extend(Number, shimOptions, {
     /**
      * Check for isNaN conform the ES6 specs
+     *
      * @public
      * @method Number.isNaN
+     *
      * @param   {number} value - value to check is NaN for
+     *
      * @returns {boolean}      - boolean indicating if the value is NaN
      */
     isNaN: function(value) {
         return typeof value === "number" && value !== value;
     }
+});
+
+extend(Object, shimOptions, {
+    
 });
