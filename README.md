@@ -9,7 +9,7 @@ Javascript utility belt that takes a middle ground between sugar & underscore/lo
 
 ## Deprecated
 
-But bottom_line will be back slowly build back into a new form soon. Stay tuned.
+But bottom_line will be back. Stay tuned.
 
 ## Installation
 
