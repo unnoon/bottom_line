@@ -24,7 +24,7 @@
 	var _ = {
         'info': {
             'name': 'bottom_line',
-            'version': '0.0.10',
+            'version': '0.0.11',
             'description': 'JS Toolbelt'
         }
     };
