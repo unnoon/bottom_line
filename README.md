@@ -7,6 +7,10 @@ _- Adds face to your code_
 
 Javascript utility belt that takes a middle ground between sugar & underscore/lodash. Striving for consistency, code readability and adding face to your code.
 
+## Deprecated
+
+But bottom_line will be back slowly build back into a new form soon. Stay tuned.
+
 ## Installation
 
     npm install bottom_line
