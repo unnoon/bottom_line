@@ -1,51 +1,72 @@
 {
   "name": "bottom_line",
-  "version": "0.0.11",
   "description": "JS Toolbelt",
-  "main": "bin/bottom_line.js",
-  "devDependencies": {
-    "coveralls": "~2.11.6",
-    "grunt": "~1.0.1",
-    "grunt-bump": "~0.8.0",
-    "grunt-contrib-clean": "~1.0.0",
-    "grunt-contrib-uglify": "~1.0.1",
-    "grunt-contrib-watch": "~1.0.0",
-    "grunt-jsdoc": "~1.1.0",
-    "grunt-karma-coveralls": "~2.5.4",
-    "grunt-preprocess": "~5.1.0",
-    "ink-docstrap": "^1.1.2",
-    "karma": "~0.13.9",
-    "karma-chai-plugins": "~0.7.0",
-    "karma-chrome-launcher": "~0.2.0",
-    "karma-coverage": "~0.5.2",
-    "karma-coveralls": "~1.1.2",
-    "karma-firefox-launcher": "~0.1.7",
-    "karma-ie-launcher": "~0.2.0",
-    "karma-mocha": "~0.2.0",
-    "karma-phantomjs-launcher": "~1.0.0",
-    "karma-requirejs": "~0.2.4",
-    "mocha": "~2.4.5",
-    "phantomjs-prebuilt": "~2.1.4",
-    "requirejs": "~2.2.0"
-  },
-  "scripts": {
-    "test": "karma start --single-run",
-    "update": "npm-check-updates -u && npm install"
+  "version": "0.0.11",
+  "homepage": "https://github.com/unnoon/bottom_line",
+  "author": {
+    "name": "Rogier Geertzema",
+    "email": "r.geertzema@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/unnoon/bottom_line"
+    "url": "git://github.com/unnoon/bottom_line"
   },
+  "license": "MIT",
   "keywords": [
     "tools",
     "utilities",
     "toolbelt",
     "utilitybelt"
   ],
-  "author": "Rogier Geertzema",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/unnoon/bottom_line/issues"
+  "scripts": {
+    "docs": "rimraf -rf doc && jsdoc -c .jsdoc.conf.json",
+    "release": "npm version",
+    "precommit": "npm test",
+    "prepush": "npm test",
+    "preversion": "npm test && npm run docs",
+    "version": "npm run build && git add -A bin",
+    "postversion": "git push && git push --tags && npm publish",
+    "test": "karma start --single-run",
+    "update": "ncu -u -a && npm install",
+    "webpack:watch": "webpack --progress --colors --watch"
   },
-  "homepage": "https://github.com/unnoon/bottom_line"
+  "dependencies": {
+    "@types/is": "0.0.17",
+    "@types/lodash": "^4.14.71",
+    "@types/reflect-metadata": "^0.0.5",
+    "core-js": "^2.4.1",
+    "is_js": "^0.9.0",
+    "lodash": "^4.17.4",
+    "lodash-decorators": "^4.3.5",
+    "reflect-metadata": "^0.1.10"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.2",
+    "@types/mocha": "^2.2.41",
+    "@types/sinon": "^2.3.3",
+    "awesome-typescript-loader": "^3.2.2",
+    "chai": "^4.1.0",
+    "coveralls": "^2.13.1",
+    "husky": "^0.14.3",
+    "jaguarjs-jsdoc": "^1.1.0",
+    "jsdoc": "^3.5.3",
+    "karma": "^1.7.0",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-mocha": "^1.3.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-sinon": "^1.0.5",
+    "karma-typescript-preprocessor2": "^1.2.1",
+    "karma-webpack": "^2.0.4",
+    "metascript": "^1.0.0",
+    "mocha": "^3.5.0",
+    "phantomjs-prebuilt": "^2.1.14",
+    "rimraf": "^2.6.1",
+    "sinon": "^3.0.0",
+    "tslint": "^5.5.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "^2.4.2",
+    "uglify-js": "^3.0.27",
+    "webpack": "^3.4.1"
+  }
 }
