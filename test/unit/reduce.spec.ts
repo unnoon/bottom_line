@@ -26,7 +26,7 @@ describe('reduce', () =>
     {
         const obj     = {x: 1, y: 2, z: 3};
 
-        const result = reduce(obj, (accumulator, value) => accumulator + value, 0, 1);
+        const result = reduce(obj, (accumulator, value) => accumulator + value, 0, 'y');
 
         expect(result).to.eql(5);
     });
@@ -35,7 +35,7 @@ describe('reduce', () =>
     {
         const obj     = {x: 1, y: 2, z: 3, zz: 6};
 
-        const result = reduce(obj, (accumulator, value) => accumulator + value, 0, 1, 3);
+        const result = reduce(obj, (accumulator, value) => accumulator + value, 0, 'y', 'zz');
 
         expect(result).to.eql(5);
     });

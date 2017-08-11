@@ -47,4 +47,13 @@ describe('count', () =>
 
         expect(c).to.eql(2);
     });
+
+    it('should count elements in sets from and to a certain element', () =>
+    {
+        const arr = [1, 2, 1, 0, 4];
+
+        const c = count(arr, (e) => e > 0, 1, 4);
+
+        expect(c).to.eql(2);
+    });
 });

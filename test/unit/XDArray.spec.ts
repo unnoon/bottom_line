@@ -8,7 +8,7 @@ describe('XDArray', () =>
     it('should initialize a multi-dimensional array', () =>
     {
         const xdarray = new XDArray([3, 2, 4], (pos, dimensions) =>
-        {
+        {   // calculate the index
             const index = reduce(pos, (acc, val, i) => acc + (val / dimensions[i]) * reduce(dimensions, (acc, val, j) => acc * dimensions[j], 1, i), 1);
 
             return index;

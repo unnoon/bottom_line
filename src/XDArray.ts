@@ -35,7 +35,7 @@ export default class XDArray extends Array
         }
     }
 
-    constructor(dimensions: number[], init: any|Value|((position: number[]) => any) = null)
+    constructor(dimensions: number[], init: any|Value|((position: number[], dimensions: number[]) => any) = null)
     {
         super();
 

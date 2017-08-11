@@ -60,7 +60,7 @@ describe('each', () =>
         map.set('x', 1).set('y', 2).set(keyZ, 3);
         const entries = [];
 
-        const result = each(map, (value, key) => entries.push([key, value]), 0, keyZ);
+        const result = each(map, (value, key) => entries.push([key, value]), 'x', keyZ);
 
         expect(result).to.eql(map);
         expect(entries).to.eql([['x', 1], ['y', 2]]);

@@ -1,17 +1,17 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 
-import after from '../../src/after';
+import rightOf from '../../src/rightOf';
 import { expect } from './test-utils';
 
-describe('after', () =>
+describe('rightOf', () =>
 {
     it('should return the rest of the string if it contains the substring', () =>
     {
         const str = 'one...two';
 
-        const afterString = after(str, '...');
+        const rightOfString = rightOf(str, '...');
 
-        expect(afterString).to.eql('two');
+        expect(rightOfString).to.eql('two');
         expect(str).to.eql('one...two'); // string are immutable of course
     });
 
@@ -19,28 +19,28 @@ describe('after', () =>
     {
         const str = 'one...two';
 
-        const afterString = after(str, 'three');
+        const rightOfString = rightOf(str, 'three');
 
-        expect(afterString).to.eql('one...two');
+        expect(rightOfString).to.eql('one...two');
     });
 
     it('should return an empty string in case no input is given', () =>
     {
         const str = undefined;
 
-        const afterString1 = after(str, 'three');
-        const afterString2 = after(str);
+        const rightOfString1 = rightOf(str, 'three');
+        const rightOfString2 = rightOf(str);
 
-        expect(afterString1).to.eql('');
-        expect(afterString2).to.eql('');
+        expect(rightOfString1).to.eql('');
+        expect(rightOfString2).to.eql('');
     });
 
     it('should deal with multiple substrings', () =>
     {
         const str = 'one...two...three';
 
-        const afterString = after(str, 'zero...', '...', 'two');
+        const rightOfString = rightOf(str, 'zero...', '...', 'two');
 
-        expect(afterString).to.eql('...three');
+        expect(rightOfString).to.eql('...three');
     });
 });
