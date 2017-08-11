@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 
 import count from '../../src/count';
-import { expect } from './test-utils';
+import { expect } from './test-utils.spec';
 
 describe('count', () =>
 {

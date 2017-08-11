@@ -1,11 +1,17 @@
 #ignored folders
 .idea/
 .cov/
+.coverage/
+coverage/
 node_modules/
 bower_components/
 jspm_packages/
 projectFilesBackup/
 doc/
 
+src/**/*.js
+test/unit/**/*.js
+
 #ignored file types
 *.log
+

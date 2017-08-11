@@ -1,41 +1,23 @@
-var webpackConfig = require('./webpack.config');
+const tsconfig = require('./tsconfig.json');
 
-module.exports = function (config) {
+module.exports = function(config) {
     config.set({
-        basePath: './',
-        frameworks: ['mocha', 'chai', 'sinon'],
+        frameworks: ['mocha', 'chai', 'sinon', 'karma-typescript'],
         files: [
-            'test/unit/**/*.ts'
-        ],
-        exclude: [
+            { pattern: 'src/**/*.ts' }, // *.tsx for React Jsx
+            { pattern: 'test/unit/**/*.spec.ts' }, // *.tsx for React Jsx
         ],
         preprocessors: {
-            'test/unit/**/*.ts': ['webpack']
+            '**/*.ts': ['karma-typescript'], // *.tsx for React Jsx
         },
-        mime: {
-            'text/x-typescript': ['ts']
-        },
-        webpack: {
-            module: webpackConfig.module,
-            resolve: webpackConfig.resolve
-        },
-        reporters     : ['dots', 'coverage'],
-        coverageReporter: {
-            dir : '.cov/',
-            reporters: [
-                { type: 'html', subdir: '' },
-                { type: 'lcov', subdir: 'report-lcov' }
-            ]
-        },
-        port: 9876,
-        colors: true,
-        logLevel: config.LOG_INFO,
-        autoWatch: true,
-        // browsers: ['PhantomJS'],
-        // browsers: ['Chrome'],
-        // browsers: ['Firefox'],
+        reporters: ['progress', 'karma-typescript'],
         browsers: ['ChromeHeadless'],
-        singleRun: false,
-        concurrency: Infinity
-    })
+        karmaTypescriptConfig: {
+            'compilerOptions': tsconfig.compilerOptions,
+            reports: {
+                'html': '.coverage',
+                'text-summary': ''
+            },
+        },
+    });
 };

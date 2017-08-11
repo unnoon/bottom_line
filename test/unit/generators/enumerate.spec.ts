@@ -1,6 +1,6 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 import enumerate from '../../../src/generators/enumerate';
-import { expect } from '../test-utils';
+import { expect } from '../test-utils.spec';
 
 describe('generators/enumerate', () =>
 {

@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 import reduce from '../../src/reduce';
 import XDArray from '../../src/XDArray';
-import { expect } from './test-utils';
+import { expect } from './test-utils.spec';
 
 describe('XDArray', () =>
 {
