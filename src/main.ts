@@ -2,11 +2,13 @@
  * Created by Rogier on 13/04/2017.
  */
 
-import each from './each';
+import { clone } from 'lodash';
+import Value from './Value';
+import XDArray from './XDArray';
 
-const obj     = {x: 0, y: 1, z: 2};
-const entries = [];
+const fnValue = () => 3;
+const init    = Value.of(fnValue);
+const xdarray = new XDArray([3, 2, 4], init);
 
-const result = each(obj, (value, key) => entries.push([key, value]));
-
-console.log(entries);
+const o = clone(fnValue);
+console.log(xdarray[1][0][2]());

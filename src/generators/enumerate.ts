@@ -2,21 +2,35 @@
  * Created by Rogier on 13/04/2017.
  */
 import is from '../is';
-import iterator from '../iterator';
+import keyedIterator from '../keyedIterator';
 import { Collection } from '../types';
 
-export default function* enumerate<T>(collection: Collection<T>, from?: any|number, to?: any|number): any
+/**
+ * @generator
+ * @function enumerate
+ * @desc
+ *       Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
+ *       Optionally a from & to key can be provided for partial enumeration.
+ *
+ * @param {Collection} collection - Collection to enumerate.
+ * @param {any=}       from       - Optional from key.
+ * @param {any=}       to         - Optional to key.
+ *
+ * @yields {[any, any]} - Array containing key & value.
+ */
+export default function* enumerate<T, U>(collection: Collection<T>, from?: any, to?: any): IterableIterator<[any, any]>
 {
-    const iter = iterator(collection);
-    let yields = iter.next();
-    let kvp = yields.value; // key-value-pair
+    const it = keyedIterator(collection);
+
+    let yields = it.next();
+    let kvp: [any, any] = yields.value; // key-value-pair
 
     from = is.undefined(from) && kvp ? kvp[0] : from;
 
     /* tslint:disable-next-line:no-empty */
-    for(;!yields.done && kvp[0] !== from; yields = iter.next(), kvp = yields.value) {} // fast forward to from
+    for(;!yields.done && kvp[0] !== from; yields = it.next(), kvp = yields.value) {} // fast forward to from
 
-    for(;!yields.done && kvp[0] !== to;   yields = iter.next(), kvp = yields.value)
+    for(;!yields.done && kvp[0] !== to;   yields = it.next(), kvp = yields.value)
     {
         yield kvp;
     }

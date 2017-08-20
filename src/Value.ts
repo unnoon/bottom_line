@@ -5,7 +5,7 @@
 /**
  * @class Value
  * @desc
- *        Wraps/tags function as a value. Helpful to distinguish between a callback and a function value.
+ *        Value container to distinguish between special attributes such as callbacks or values.
  */
 export default class Value
 {
@@ -13,7 +13,7 @@ export default class Value
      * @method Value.of
      * @desc   Static 'constructor' sidestepping ugly 'new' keywords.
      *
-     * @param {function} x - The function to be wrapped as value.
+     * @param {function} x - The value to be wrapped in Value.
      *
      * @returns {Value}
      */
@@ -27,7 +27,7 @@ export default class Value
     /**
      * @constructor Value
      *
-     * @param {function} x - The function to be wrapped as value.
+     * @param {function} x - The value to be wrapped in Value.
      *
      * @returns {Value}
      */

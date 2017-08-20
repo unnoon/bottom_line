@@ -11,7 +11,6 @@ module.exports = function(config) {
             '**/*.ts': ['karma-typescript'], // *.tsx for React Jsx
         },
         reporters: ['progress', 'karma-typescript'],
-        browsers: ['ChromeHeadless'],
         karmaTypescriptConfig: {
             'compilerOptions': tsconfig.compilerOptions,
             reports: {
@@ -19,5 +18,6 @@ module.exports = function(config) {
                 'text-summary': ''
             },
         },
+        browsers: ['ChromeHeadless'],
     });
 };

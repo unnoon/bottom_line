@@ -3,12 +3,27 @@
  */
 import enumerate from './generators/enumerate';
 import is from './is';
-import iterator from './iterator';
+import keyedIterator from './keyedIterator';
 import { Collection } from './types';
 
+/**
+ * @function map
+ * @desc
+ *       Reduce a collection by running each value through iteratee.
+ *       The iteratee is invoked with three arguments: (accumulator, value, key, collection).
+ *       Optionally a from & to key can be provided for partial reduction.
+ *
+ * @param {Collection}                                   collection  - Collection to enumerate.
+ * @param {(accumulator, value, key, collection) => any} iteratee    - Iteratee invoked on each item..
+ * @param {any=}                                         accumulator - Optional initial accumulator. If omitted the first value will be taken as the accumulator.
+ * @param {any=}                                         from        - Optional from key.
+ * @param {any=}                                         to          - Optional to key.
+ *
+ * @returns {any} - The reduced value.
+ */
 export default function reduce<T>(collection: Collection<T>, iteratee: (accumulator, value, key, collection) => any, accumulator?: any, from?: any|number, to?: any|number): any
 {
-    const it = iterator(collection);
+    const it = keyedIterator(collection);
 
     accumulator = is.undefined(accumulator) && is.not.empty(collection) ? it.next().value[1] : accumulator;
 
@@ -19,15 +34,3 @@ export default function reduce<T>(collection: Collection<T>, iteratee: (accumula
 
     return accumulator;
 }
-
-// export default function* reduce<T>(collection: Collection<T>, iteratee: (accumulator, value, key, collection) => any, accumulator?: any, from?: any|number, to?: any|number): any
-// {
-//     const iter  = iterator(collection);
-//
-//     accumulator = is.undefined(accumulator) ? iter.next().value[1] : accumulator;
-//
-//     each(iter, (value, key, coll) => accumulator = iteratee(accumulator, value, key, coll), from, to);
-//
-//     yield accumulator;
-// }
-

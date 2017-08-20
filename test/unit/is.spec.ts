@@ -25,6 +25,21 @@ describe('is', () =>
         });
     });
 
+    describe('uncloneable', () =>
+    {
+        it('should return a boolean indicating if a value is cloneable', () =>
+        {
+            expect(is.uncloneable(new Error())).to.be.true;
+            expect(is.uncloneable(new Function())).to.be.true;
+            expect(is.uncloneable(() => 3)).to.be.true;
+            expect(is.uncloneable(new WeakMap())).to.be.true;
+            expect(is.uncloneable(Symbol())).to.be.true;
+            expect(is.uncloneable(document.createElement('p'))).to.be.true;
+            expect(is.uncloneable({})).to.be.false;
+            expect(is.uncloneable(6)).to.be.false;
+        });
+    });
+
     describe('undefined', () =>
     {
         it('should be able to define for any predicate if it is undefined', () =>

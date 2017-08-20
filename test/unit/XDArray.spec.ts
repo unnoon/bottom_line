@@ -1,11 +1,12 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 import reduce from '../../src/reduce';
+import Value from '../../src/Value';
 import XDArray from '../../src/XDArray';
 import { expect } from './test-utils.spec';
 
 describe('XDArray', () =>
 {
-    it('should initialize a multi-dimensional array', () =>
+    it('should initialize a multi-dimensional array using an init function', () =>
     {
         const xdarray = new XDArray([3, 2, 4], (pos, dimensions) =>
         {   // calculate the index
@@ -16,4 +17,23 @@ describe('XDArray', () =>
 
         expect(xdarray[1][0][2]).to.eql(11);
     });
+
+    it('should initialize a multi-dimensional array using an init value (shallow-cloned)', () =>
+    {
+        const init    = {x: 1};
+        const xdarray = new XDArray([3, 2, 4], init);
+
+        expect(xdarray[1][0][2]).to.eql({x: 1});
+        expect(xdarray[1][0][2] === init).to.be.false;
+    });
+
+    it('should initialize a multi-dimensional array using an Value wrapped uncloneable', () =>
+    {
+        const fnValue = () => 3;
+        const init    = Value.of(fnValue);
+        const xdarray = new XDArray([3, 2, 4], init);
+
+        expect(xdarray[1][0][2]()).to.eql(3);
+    });
+
 });

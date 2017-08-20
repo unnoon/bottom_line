@@ -1,17 +1,17 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 
-import rightOf from '../../src/rightOf';
+import leftOf from '../../src/leftOf';
 import { expect } from './test-utils.spec';
 
-describe('rightOf', () =>
+describe('leftOf', () =>
 {
     it('should return the rest of the sequence if it contains the substring', () =>
     {
         const str = 'one...two';
 
-        const rightOfString = rightOf(str, '...');
+        const leftOfString = leftOf(str, '...');
 
-        expect(rightOfString).to.eql('two');
+        expect(leftOfString).to.eql('one');
         expect(str).to.eql('one...two'); // string are immutable of course
     });
 
@@ -19,27 +19,27 @@ describe('rightOf', () =>
     {
         const str = 'one...two';
 
-        const rightOfString = rightOf(str, 'three');
+        const leftOfString = leftOf(str, 'three');
 
-        expect(rightOfString).to.eql('one...two');
+        expect(leftOfString).to.eql('one...two');
     });
 
     it('should deal with multiple subs', () =>
     {
         const str = 'one...two...three';
 
-        const rightOfString = rightOf(str, 'zero...', '...', 'two');
+        const leftOfString = leftOf(str, 'zero...', '...', 'ne');
 
-        expect(rightOfString).to.eql('...three');
+        expect(leftOfString).to.eql('o');
     });
 
-    it('should return the rest of the array if it contains the element', () =>
+    it('should return the left of the array if it contains the element', () =>
     {
         const arr = [2, 3, 5, 3, 6];
 
-        const rightOfArr = rightOf(arr, 3);
+        const leftOfArr = leftOf(arr, 5);
 
-        expect(rightOfArr).to.eql([5, 3, 6]);
+        expect(leftOfArr).to.eql([2, 3]);
         expect(arr).to.eql([2, 3, 5, 3, 6]);
     });
 });
