@@ -1,24 +1,22 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import is from '../is';
+import * as is from '../is';
 import keyedIterator from '../keyedIterator';
 import { Collection } from '../types';
 
 /**
  * @generator
- * @function enumerate
- * @desc
- *       Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
- *       Optionally a from & to key can be provided for partial enumeration.
+ * Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
+ * Optionally a from & to key can be provided for partial enumeration.
  *
- * @param {Collection} collection - Collection to enumerate.
- * @param {any=}       from       - Optional from key.
- * @param {any=}       to         - Optional to key.
+ * @param collection - Collection to enumerate.
+ * @param from       - From key to start enumeration.
+ * @param to         - To key (exclusive) to stop enumeration.
  *
  * @yields {[any, any]} - Array containing key & value.
  */
-export default function* enumerate<T, U>(collection: Collection<T>, from?: any, to?: any): IterableIterator<[any, any]>
+export default function* enumerate<T>(collection: Collection<T>, from?, to?): IterableIterator<[any, any]>
 {
     const it = keyedIterator(collection);
 

@@ -6,19 +6,17 @@ import reduce from './reduce';
 import { Collection } from './types';
 
 /**
- * @function count
- * @desc
- *       Counts the occurrences as defined by a match function.
- *       Optionally a from & to key can be provided for partial counts.
+ * Counts the occurrences matched by the match function. (value, key, collection) => boolean
+ * Optionally a from & to key can be provided for partial counts.
  *
- * @param {Collection}         collection - The collection to count elements from.
- * @param {(value) => boolean} match      - Match function.
- * @param {any=}               from       - Optional from key.
- * @param {any=}               to         - Optional to key.
+ * @param collection - The collection to count elements from.
+ * @param match      - Match function.
+ * @param from       - Key to start counting.
+ * @param to         - Key (exclusive) to stop counting.
  *
- * @returns {number} - The total number of occurrences.
+ * @returns - The total number of occurrences as matched by the match function.
  */
-export default function count<T>(collection: Collection<T>, match: (value: T) => boolean, from?: any, to?: any): number
+export default function count<T>(collection: Collection<T>, match: (value: T, key, collection: Collection<T>) => boolean, from?, to?): number
 {
-    return reduce(collection, (accumulator, value) => accumulator + (match(value) ? 1 : 0), 0, from, to);
+    return reduce(collection, (accumulator, value, key, coll) => accumulator + (match(value, key, coll) ? 1 : 0), 0, from, to);
 }

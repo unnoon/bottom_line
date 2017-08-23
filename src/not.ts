@@ -3,15 +3,13 @@
  */
 
 /**
- * @function not
- * @desc
- *       Negates a given predicate.
+ * Negates a given predicate.
  *
- * @param {any} predicate - Predicate to negate.
+ * @param predicate - Predicate to negate.
  *
- * @returns {boolean} - The negated predicate.
+ * @returns The negated predicate.
  */
-export default function not(predicate: any): boolean
+export default function not(predicate): boolean
 {
     return !predicate;
 }

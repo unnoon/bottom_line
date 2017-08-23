@@ -3,8 +3,8 @@
  */
 
 import { clone } from 'lodash';
-import Value from './Value';
-import XDArray from './XDArray';
+import Value from '../../src/Value';
+import XDArray from '../../src/XDArray';
 
 const fnValue = () => 3;
 const init    = Value.of(fnValue);

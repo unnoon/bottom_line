@@ -3,33 +3,29 @@
  */
 
 /**
- * @class Value
- * @desc
- *        Value container to distinguish between special attributes such as callbacks or values.
+ * Value container that marks special objects such as uncloneables as pass through values.
  */
 export default class Value
 {
     /**
-     * @method Value.of
-     * @desc   Static 'constructor' sidestepping ugly 'new' keywords.
+     * Static 'constructor' sidestepping ugly 'new' keywords.
      *
-     * @param {function} x - The value to be wrapped in Value.
+     * @param x - The value to be wrapped in Value.
      *
-     * @returns {Value}
+     * @returns A new Value Container containing x.
      */
-    public static of(x)
+    public static of(x): Value
     {
         return new Value(x);
     }
 
-    public __value: any;
+    /**
+     * Stores the Value container value.
+     */
+    private __value;
 
     /**
-     * @constructor Value
-     *
-     * @param {function} x - The value to be wrapped in Value.
-     *
-     * @returns {Value}
+     * @param x - The value to be wrapped in Value.
      */
     public constructor(x)
     {
@@ -37,13 +33,9 @@ export default class Value
     }
 
     /**
-     * @method Value#valueOf
-     * @desc
-     *         Returns the container value.
-     *
-     * @returns {any}
+     * Returns the container value.
      */
-    public valueOf()
+    public valueOf(): any
     {
         return this.__value;
     }

@@ -1,5 +1,5 @@
 module.exports = {
-    entry: './src/main.ts',
+    entry: './test/prototypes/test.ts',
     output: {
         filename: 'bin/bundle.js',
         libraryTarget: 'umd'

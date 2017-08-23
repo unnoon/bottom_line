@@ -2,17 +2,15 @@
  * Created by Rogier on 13/04/2017.
  */
 import identity from './identity';
-import is from './is';
+import * as is from './is';
 import { Collection } from './types';
 
 /**
- * @function keyedIterator
- * @desc
- *       Returns a keyed iterator given any collection. In case no key exists an artificial one is provided.
+ * Returns a keyed iterator given any collection. In case no key exists an artificial key is provided.
  *
- * @param {Collection} collection - Collection to get an keyedIterator for.
+ * @param collection - Collection to get a keyedIterator for.
  *
- * @returns {IterableIterator<[any , any]>}
+ * @returns The generic keyed iterable iterator.
  */
 export default function keyedIterator<T>(collection: Collection<T>): IterableIterator<[any, any]>
 {

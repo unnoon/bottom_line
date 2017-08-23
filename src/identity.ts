@@ -4,9 +4,7 @@
 
 /**
  * @generator
- * @function
- * @desc
- *       Generic object keyedIterator.
+ * Generic object keyedIterator.
  *
  * @yields {[any , any]} - Array containing key & value.
  */

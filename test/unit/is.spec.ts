@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
-import is from '../../src/is';
+import * as is from '../../src/is';
 import { expect } from './test-utils.spec';
 
 describe('is', () =>
@@ -25,18 +25,18 @@ describe('is', () =>
         });
     });
 
-    describe('uncloneable', () =>
+    describe('cloneable', () =>
     {
         it('should return a boolean indicating if a value is cloneable', () =>
         {
-            expect(is.uncloneable(new Error())).to.be.true;
-            expect(is.uncloneable(new Function())).to.be.true;
-            expect(is.uncloneable(() => 3)).to.be.true;
-            expect(is.uncloneable(new WeakMap())).to.be.true;
-            expect(is.uncloneable(Symbol())).to.be.true;
-            expect(is.uncloneable(document.createElement('p'))).to.be.true;
-            expect(is.uncloneable({})).to.be.false;
-            expect(is.uncloneable(6)).to.be.false;
+            expect(is.cloneable(new Error())).to.be.false;
+            expect(is.cloneable(new Function())).to.be.false;
+            expect(is.cloneable(() => 3)).to.be.false;
+            expect(is.cloneable(new WeakMap())).to.be.false;
+            expect(is.cloneable(Symbol())).to.be.false;
+            expect(is.cloneable(document.createElement('p'))).to.be.false;
+            expect(is.cloneable({})).to.be.true;
+            expect(is.cloneable(6)).to.be.true;
         });
     });
 

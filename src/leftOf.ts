@@ -6,23 +6,21 @@ import reduce from './reduce';
 import { Sequence } from './types';
 
 /**
- * @function leftOf
- * @desc
- *       Returns the left of a sequence from each sub(element/string) index.
- *       The original sequence is left unmodified.
- *       In case the sub is not found, the entire string is returned.
- *       Arrays are only checked on a sub-element basis.
+ * Returns the left of a sequence from each sub(element/string) index.
+ * The original sequence is left unmodified.
+ * In case the sub is not found, the entire sequence is returned.
+ * Arrays are only checked on a sub-element basis.
  *
- * @param {string | any[]} sequence - The sequence.
- * @param {string | any}   subs     - One or multiple subs.
+ * @param sequence - The sequence.
+ * @param subs     - One or multiple subs.
  *
- * @returns {string | any[]} - The sub-sequence left of each found sub(element/string) index.
+ * @returns The sub-sequence left of each found sub(element/string) index.
  */
 export default function leftOf(sequence: Sequence, ...subs: Array<string|any>): Sequence
 {
-    const output: string|any[] = reduce(subs, (out, sub) =>
+    const output = reduce(subs, (out, sub) =>
     {
-        const index: number = out.indexOf(sub);
+        const index = out.indexOf(sub);
         return ~index ? out.slice(0, index) : out;
     }, sequence);
 

@@ -6,19 +6,17 @@ import enumerate from './enumerate';
 
 /**
  * @generator
- * @function map
- * @desc
- *       Runs each value through iteratee. The iteratee is invoked with three arguments: (value, key, collection).
- *       Optionally a from & to key can be provided for partial mapping.
+ * Runs each value through iteratee. The iteratee is invoked with three arguments: (value, key, collection).
+ * Optionally a from & to key can be provided for partial mapping.
  *
- * @param {Collection}                      collection - Collection to enumerate.
- * @param {(value, key, collection) => any} iteratee   - Function that maps each value.
- * @param {any=}                            from       - Optional from key.
- * @param {any=}                            to         - Optional to key.
+ * @param collection - Collection to enumerate.
+ * @param iteratee   - Function that maps each value.
+ * @param from       - Key to start mapping.
+ * @param to         - Key (exclusive) to stop mapping.
  *
  * @yields {any} - Mapped value.
  */
-export default function* map<T>(collection: Collection<T>, iteratee: (value, key, collection) => any, from?: any, to?: any): any
+export default function* map<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any, from?, to?): IterableIterator<any>
 {
     for(const [key, value] of enumerate(collection, from, to))
     {
