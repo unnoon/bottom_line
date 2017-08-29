@@ -1,7 +1,7 @@
 module.exports = {
     entry: './test/prototypes/index.ts',
     output: {
-        filename: 'bin/bundle.js',
+        filename: 'bin/tmp/bundle.js',
         libraryTarget: 'umd'
     },
     resolve: {

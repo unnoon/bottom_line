@@ -1,9 +1,4 @@
-/**
- * Created by Rogier on 13/04/2017.
- */
-import { Collection } from '../types';
 import enumerate from './enumerate';
-
 /**
  * @generator
  * Runs each value through iteratee. The iteratee is invoked with three arguments: (value, key, collection).
@@ -16,10 +11,8 @@ import enumerate from './enumerate';
  *
  * @yields {any} - Mapped value.
  */
-export default function* map<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any, from?, to?): Iterable<any>
-{
-    for(const [key, value] of enumerate(collection, from, to))
-    {
+export default function* map(collection, iteratee, from, to) {
+    for (const [key, value] of enumerate(collection, from, to)) {
         yield iteratee(value, key, collection);
     }
 }

@@ -11,4 +11,4 @@ const init    = Value.of(fnValue);
 const xdarray = new XDArray([3, 2, 4], init);
 
 const o = clone(fnValue);
-console.log(xdarray[1][0][2]());
+console.log(xdarray[1][0][2](), 666);

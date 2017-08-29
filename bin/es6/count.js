@@ -1,10 +1,7 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-
 import reduce from './reduce';
-import { Collection } from './types';
-
 /**
  * Counts the occurrences matched by the match function. (value, key, collection) => boolean
  * Optionally a from & to key can be provided for partial counts.
@@ -16,7 +13,6 @@ import { Collection } from './types';
  *
  * @returns The total number of occurrences as matched by the match function.
  */
-export default function count<T>(collection: Collection<T>, match: (value: T, key, collection: Collection<T>) => boolean, from?, to?): number
-{
+export default function count(collection, match, from, to) {
     return reduce(collection, (accumulator, value, key, coll) => accumulator + (match(value, key, coll) ? 1 : 0), 0, from, to);
 }

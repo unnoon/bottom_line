@@ -1,7 +1,11 @@
+dist: trusty
 sudo: false
 language: node_js
 node_js:
-    - "4.2"
+    - "6.10.2"
+
+addons:
+  chrome: stable
 
 branches:
     only:
@@ -9,7 +13,9 @@ branches:
         - dev
 
 before_install:
-    - npm install -g grunt-cli
+  - # start your web application and listen on `localhost`
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+  ⋮
 
 install:
     - npm install
@@ -18,10 +24,5 @@ cache:
     directories:
         - node_modules
 
-before_script:
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
-    - grunt preprocess
-
 script:
-    - karma start --browsers Firefox --single-run
+    - npm test

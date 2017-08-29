@@ -2,8 +2,6 @@
  * Created by Rogier on 13/04/2017.
  */
 import enumerate from './generators/enumerate';
-import { Collection } from './types';
-
 /**
  * Returns the key of a given value. Optionally a from & to key can be provided.
  *
@@ -14,10 +12,10 @@ import { Collection } from './types';
  *
  * @returns {any} - The key of he found value or undefined otherwise.
  */
-export default function keyOf<T>(collection: Collection<T>, value, from?, to?): any
-{
-    for(const [key, val] of enumerate(collection, from, to))
-    {
-        if(val === value) {return key;}
+export default function keyOf(collection, value, from, to) {
+    for (const [key, val] of enumerate(collection, from, to)) {
+        if (val === value) {
+            return key;
+        }
     }
 }

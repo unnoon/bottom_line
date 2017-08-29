@@ -4,8 +4,6 @@
 import enumerate from './generators/enumerate';
 import * as is from './is';
 import keyedIterator from './keyedIterator';
-import { Collection } from './types';
-
 /**
  * Reduce a collection by running each value through iteratee.
  * The iteratee is invoked with three arguments: (accumulator, value, key, collection).
@@ -19,16 +17,11 @@ import { Collection } from './types';
  *
  * @returns The reduced value.
  */
-export default function reduce<T>(collection: Collection<T>, iteratee: (accumulator, value, key, collection: Collection<T>) => any, accumulator?, from?, to?): any
-{
+export default function reduce(collection, iteratee, accumulator, from, to) {
     const it = keyedIterator(collection);
-
     accumulator = is.undefined(accumulator) && is.not.empty(collection) ? it.next().value[1] : accumulator;
-
-    for(const [key, value] of enumerate(it, from, to))
-    {
+    for (const [key, value] of enumerate(it, from, to)) {
         accumulator = iteratee(accumulator, value, key, collection);
     }
-
     return accumulator;
 }

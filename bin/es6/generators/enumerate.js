@@ -3,8 +3,6 @@
  */
 import * as is from '../is';
 import keyedIterator from '../keyedIterator';
-import { Collection } from '../types';
-
 /**
  * @generator
  * Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
@@ -16,20 +14,14 @@ import { Collection } from '../types';
  *
  * @yields {[any, any]} - Array containing key & value.
  */
-export default function* enumerate<T>(collection: Collection<T>, from?, to?): Iterable<[any, any]>
-{
+export default function* enumerate(collection, from, to) {
     const it = keyedIterator(collection);
-
     let yields = it.next();
-    let kvp: [any, any] = yields.value; // key-value-pair
-
+    let kvp = yields.value; // key-value-pair
     from = is.undefined(from) && kvp ? kvp[0] : from;
-
     /* tslint:disable-next-line:no-empty */
-    for(;!yields.done && kvp[0] !== from; yields = it.next(), kvp = yields.value) {} // fast forward to from
-
-    for(;!yields.done && kvp[0] !== to;   yields = it.next(), kvp = yields.value)
-    {
+    for (; !yields.done && kvp[0] !== from; yields = it.next(), kvp = yields.value) { } // fast forward to from
+    for (; !yields.done && kvp[0] !== to; yields = it.next(), kvp = yields.value) {
         yield kvp;
     }
 }

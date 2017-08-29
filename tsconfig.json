@@ -9,5 +9,14 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "jsx": "react"
-    }
+    },
+    "exclude": [
+        ".coverage",
+        ".idea",
+        "bin",
+        "doc",
+        "node_modules",
+        "rsc",
+        "test"
+    ]
 }

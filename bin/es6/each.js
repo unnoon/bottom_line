@@ -2,8 +2,6 @@
  * Created by Rogier on 13/04/2017.
  */
 import enumerate from './generators/enumerate';
-import { Collection } from './types';
-
 /**
  * Invokes iteratee for every item in a collection.
  * Iteration can be broken by letting the iteratee return false.
@@ -16,12 +14,11 @@ import { Collection } from './types';
  *
  * @returns The iterated collection.
  */
-export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any|boolean, from?, to?): Collection<T>
-{
-    for(const [key, value] of enumerate(collection, from, to))
-    {
-        if(iteratee(value, key, collection) === false) { break; } // break loop if 'false' is returned by iteratee
+export default function each(collection, iteratee, from, to) {
+    for (const [key, value] of enumerate(collection, from, to)) {
+        if (iteratee(value, key, collection) === false) {
+            break;
+        } // break loop if 'false' is returned by iteratee
     }
-
     return collection;
 }

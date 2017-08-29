@@ -24,5 +24,5 @@ export default function rightOfLast(sequence: Sequence, ...subs: Array<string|an
         return ~index ? out.slice(index + (typeof(sub) === 'string' ? sub.length : 1)) : out;
     }, sequence);
 
-    return output === sequence ? sequence.slice() : output; // copy
+    return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
 }
