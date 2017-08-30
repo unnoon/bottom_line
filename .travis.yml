@@ -20,7 +20,7 @@ install:
     - npm install
 
 script:
-    - npm test
+    - npm test | ./node_modules/coveralls/bin/coveralls.js
 
-after_script:
-  - cat ./.coverage/lcovonly | ./node_modules/coveralls/bin/coveralls.js
+#after_script:
+#  - cat ./.coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js

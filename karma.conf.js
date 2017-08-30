@@ -16,7 +16,8 @@ module.exports = function(config) {
             reports: {
                 'html': '.coverage',
                 'text-summary': '',
-                'lcovonly': '.coverage'
+                'lcovonly': '.coverage',
+                'text-lcov': ''
             },
         },
         browsers: ['ChromeHeadless'],
