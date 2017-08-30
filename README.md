@@ -15,6 +15,16 @@ Harnessing the power of generators and coming in handy per function packages.
      
     bower install bottom_line
 
+## Features
+
+- Fully tested
+- Fully documented
+- Per function packages
+- Generator based
+- Works on any Collection (Iterable(Iterators)|Objects) or Sequence (any[]|string)
+- ES6 exports
+- Made with bits of love!
+
 ## Future work
 
 - Port old functions
