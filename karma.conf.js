@@ -15,7 +15,8 @@ module.exports = function(config) {
             'compilerOptions': tsconfig.compilerOptions,
             reports: {
                 'html': '.coverage',
-                'text-summary': ''
+                'text-summary': '',
+                'text-lcov': ''
             },
         },
         browsers: ['ChromeHeadless'],
