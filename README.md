@@ -1,4 +1,4 @@
-<img src="https://github.com/unnoon/bottom_line/raw/master/rsc/img/bottom_line.png" style="width: 300px; height: 300px;">
+<img src="https://github.com/unnoon/bottom_line/raw/master/rsc/img/bottom_line.png" width="300" height="300p" />
 
 [![Build Status](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)](https://travis-ci.org/unnoon/bottom_line?branch=dev)
 [![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=dev)](https://coveralls.io/github/unnoon/bottom_line?branch=dev)
