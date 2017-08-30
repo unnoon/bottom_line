@@ -1,4 +1,4 @@
-<img src="https://github.com/unnoon/cell-bitset/raw/master/rsc/img/bottom_line.png">
+<img src="https://github.com/unnoon/cell-bitset/raw/master/rsc/img/bottom_line.png" style="width: 300px; height: 300px">
 
 [![Build Status](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)
 [![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=dev)](https://coveralls.io/github/unnoon/bottom_line?branch=dev)
@@ -17,8 +17,6 @@ Harnessing the power of generators and coming in handy per function packages.
 
 ## Future work
 
-- Funtional Programming variants
-- Currying
-- Composition
-- Lots more functions!
+- Port old functions
+- Functional Programming variants (including currying & composition)
 
