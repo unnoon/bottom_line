@@ -21,6 +21,3 @@ install:
 
 script:
     - npm test | ./node_modules/coveralls/bin/coveralls.js
-
-#after_script:
-#  - cat ./.coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
