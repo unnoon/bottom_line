@@ -1,8 +1,9 @@
-<img src="https://github.com/unnoon/bottom_line/raw/master/rsc/img/bottom_line.png" width="300" height="300p" />
+<img src="https://github.com/unnoon/bottom_line/raw/master/rsc/img/bottom_line.png" width="250" height="250" />
 
 [![Build Status](https://travis-ci.org/unnoon/bottom_line.svg?branch=dev)](https://travis-ci.org/unnoon/bottom_line?branch=dev)
 [![Coverage Status](https://coveralls.io/repos/github/unnoon/bottom_line/badge.svg?branch=dev)](https://coveralls.io/github/unnoon/bottom_line?branch=dev)
 [![Inline docs](http://inch-ci.org/github/unnoon/bottom_line.svg?branch=dev)](http://inch-ci.org/github/unnoon/bottom_line?branch=dev)
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 _- Adds face to your code_
 
@@ -12,8 +13,6 @@ Harnessing the power of generators and coming in handy per function packages.
 ## Installation
 
     npm install bottom_line
-     
-    bower install bottom_line
 
 ## Features
 
