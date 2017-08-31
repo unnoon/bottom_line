@@ -22,7 +22,6 @@
     "build": "rimraf -rf bin/es6 && tsc --rootDir src/ --outDir bin/es6/ -p tsconfig.json --module ES6",
     "docs": "rimraf -rf doc && typedoc --options .typedoc.json --out doc/ src/",
     "release": "npm version",
-    "precommit": "npm test",
     "prepush": "npm test",
     "preversion": "npm test && npm run docs",
     "version": "npm run build && git add -A bin",
