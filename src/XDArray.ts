@@ -5,7 +5,7 @@ import { clone } from 'lodash';
 import Value from './Value';
 
 /**
- * Array extension that supports initialized multi-dimensional arrays of any size.
+ * Array extension that supports (initialized) multi-dimensional arrays of any size.
  */
 export default class XDArray extends Array
 {

@@ -12,7 +12,7 @@ import { Collection } from './types';
  * @param from       - Key to start search.
  * @param to         - Key (exclusive) to stop search.
  *
- * @returns {any} - The key of he found value or undefined otherwise.
+ * @returns The key of the found value or undefined otherwise.
  */
 export default function keyOf<T>(collection: Collection<T>, value, from?, to?): any
 {
