@@ -11,8 +11,8 @@ doc/
 tmp/
 
 src/**/*.js
-test/unit/**/*.js
+test/**/*.js
 
 #ignored file types
 *.log
-
+*.map
