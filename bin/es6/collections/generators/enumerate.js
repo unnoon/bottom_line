@@ -1,7 +1,7 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import * as is from '../is';
+import * as is from '../../lang/is';
 import keyedIterator from '../keyedIterator';
 /**
  * @generator

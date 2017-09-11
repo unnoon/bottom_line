@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
+import * as is from '../lang/is';
 import enumerate from './generators/enumerate';
-import * as is from './is';
 import keyedIterator from './keyedIterator';
 /**
  * Reduce a collection by running each value through iteratee.

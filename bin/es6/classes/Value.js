@@ -10,7 +10,7 @@ export default class Value {
      *
      * @param x - The value to be wrapped in Value.
      *
-     * @returns A new Value Container containing x.
+     * @returns A new Value container containing x.
      */
     static of(x) {
         return new Value(x);

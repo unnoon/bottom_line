@@ -1,7 +1,7 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import reduce from './reduce';
+import reduce from '../collections/reduce';
 /**
  * Returns the left of a sequence from each sub(element/string) index.
  * The original sequence is left unmodified.

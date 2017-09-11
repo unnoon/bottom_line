@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import identity from './identity';
-import * as is from './is';
+import identity from '../lang/identity';
+import * as is from '../lang/is';
 /**
  * Returns a keyed iterator given any collection. In case no key exists an artificial key is provided.
  *

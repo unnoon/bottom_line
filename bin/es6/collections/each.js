@@ -1,6 +1,3 @@
-/**
- * Created by Rogier on 13/04/2017.
- */
 import enumerate from './generators/enumerate';
 /**
  * Invokes iteratee for every item in a collection.

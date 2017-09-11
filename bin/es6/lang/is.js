@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import keyedIterator from './keyedIterator';
-import negate from './negate';
+import keyedIterator from '../collections/keyedIterator';
+import negate from '../functions/negate';
 /**
  * Returns a boolean indicating if a value is an array.
  *
@@ -36,6 +36,15 @@ export function empty(collection) {
     return keyedIterator(collection).next().done;
 }
 /**
+ * Returns a boolean indicating if an object is iterable
+ *
+ * @param obj
+ * @returns {boolean}
+ */
+export function iterable(obj) {
+    return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
+}
+/**
  * Returns a boolean indicating if a value is undefined.
  *
  * @param {any} value - Value test if undefined.
@@ -52,5 +61,6 @@ export const not = {
     array: negate(array),
     cloneable: negate(cloneable),
     empty: negate(empty),
+    iterable: negate(iterable),
     undefined: negate(undefined),
 };
