@@ -21,6 +21,7 @@ Harnessing the power of generators and coming in handy per function packages.
 - Per function packages
 - Generator based
 - Works on any Collection (Iterable(Iterators)|Objects) or Sequence (any[]|string)
+- Decorators (that work on instance properties) & easy decorator creation tools
 - ES6 exports
 - Made with bits of love!
 
