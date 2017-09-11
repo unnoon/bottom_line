@@ -17,7 +17,7 @@ module.exports = function(config) {
                 'html': '.coverage',
                 'text-summary': '',
                 'text-lcov': ''
-            },
+            }
         },
         browsers: ['ChromeHeadless'],
     });
