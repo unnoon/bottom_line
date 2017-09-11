@@ -16,7 +16,10 @@
     "tools",
     "utilities",
     "toolbelt",
-    "utilitybelt"
+    "utilitybelt",
+    "typescript",
+    "decorators",
+    "generators"
   ],
   "scripts": {
     "build": "rimraf -rf bin/es6 && tsc --rootDir src/ --outDir bin/es6/ -p tsconfig.json --module ES6",
@@ -32,7 +35,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.74",
     "@types/reflect-metadata": "^0.0.5",
-    "core-js": "^2.5.0",
+    "core-js": "^2.5.1",
     "lodash": "^4.17.4",
     "lodash-decorators": "^4.4.1",
     "reflect-metadata": "^0.1.10"
@@ -42,10 +45,11 @@
     "@types/mocha": "^2.2.42",
     "@types/sinon": "^2.3.3",
     "awesome-typescript-loader": "^3.2.3",
-    "chai": "^4.1.1",
+    "chai": "^4.1.2",
     "coveralls": "^2.13.1",
+    "deep-eql": "^3.0.0",
     "husky": "^0.14.3",
-    "karma": "^1.7.0",
+    "karma": "^1.7.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-firefox-launcher": "^1.0.1",
@@ -54,11 +58,12 @@
     "karma-typescript": "^3.0.5",
     "metascript": "^1.0.0",
     "mocha": "^3.5.0",
+    "mkdirp": "^0.5.1",
     "rimraf": "^2.6.1",
     "sinon": "^3.2.1",
-    "tslint": "^5.6.0",
+    "tslint": "^5.7.0",
     "tslint-eslint-rules": "^4.1.1",
-    "typescript": "^2.4.2",
+    "typescript": "^2.5.2",
     "webpack": "^3.5.5"
   }
 }
