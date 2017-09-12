@@ -3,7 +3,7 @@
 import KeyPropertyDescriptor from '../../../src/classes/KeyPropertyDescriptor';
 import { expect } from '../test-utils.spec';
 
-describe('KeyPropertyDescriptor', () =>
+describe('classes/KeyPropertyDescriptor', () =>
 {
     it('should have basic properties', () =>
     {
@@ -167,7 +167,17 @@ describe('KeyPropertyDescriptor', () =>
             const fn = (v) => v + 10;
             const addOnaccess = () => kpd.onaccess(fn);
 
-            expect(addOnaccess).to.throw('Property key is not defined.');
+            expect(addOnaccess).to.throw(`Identity getter can't be initialized without a property key.`);
+        });
+
+        it('should throw an error in case an identity getter is needed and a symbol key is supplied', () =>
+        {
+            const kpd = new KeyPropertyDescriptor().key(Symbol('s'));
+
+            const fn = (v) => v + 10;
+            const addOnaccess = () => kpd.onaccess(fn);
+
+            expect(addOnaccess).to.throw(`Identity getter can't be initialized for symbol keys.`);
         });
 
         it('should throw an error in case an identity setter is needed and no key is supplied', () =>
@@ -175,12 +185,23 @@ describe('KeyPropertyDescriptor', () =>
             const kpd = new KeyPropertyDescriptor();
 
             kpd.get = function() {return this._id;};
-            kpd['_id'] = 10;
 
             const fn = (v) => v + 10;
-            const addOnaccess = () => kpd.onaccess(fn);
+            const addOnupdate = () => kpd.onupdate(fn);
 
-            expect(addOnaccess).to.throw('Property key is not defined.');
+            expect(addOnupdate).to.throw(`Identity setter can't be initialized without a property key.`);
+        });
+
+        it('should throw an error in case an identity setter is needed and a symbol key is supplied', () =>
+        {
+            const kpd = new KeyPropertyDescriptor().key(Symbol('s'));
+
+            kpd.get = function() {return this._id;};
+
+            const fn = (v) => v + 10;
+            const addOnupdate = () => kpd.onupdate(fn);
+
+            expect(addOnupdate).to.throw(`Identity setter can't be initialized for symbol keys.`);
         });
     });
 
