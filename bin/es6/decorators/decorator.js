@@ -35,7 +35,8 @@ export function decorator(handler) {
             case DecoratorType.Parameter === n_args + 1:
                 handler(target, key, dsc_index);
                 break;
-            default:/* istanbul ignore next */ 
+            /* istanbul ignore next */
+            default:
                 throw new Error('Decorators are not valid here!');
         }
     };
