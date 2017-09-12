@@ -45,6 +45,16 @@ export function iterable(obj) {
     return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
 }
 /**
+ * Returns a boolean indicating if a the value is a symbol.
+ *
+ * @param value - Value to identify as symbol.
+ *
+ * @returns Boolean indicating if value is a symbol.
+ */
+export function symbol(value) {
+    return typeof (value) === 'symbol';
+}
+/**
  * Returns a boolean indicating if a value is undefined.
  *
  * @param {any} value - Value test if undefined.
