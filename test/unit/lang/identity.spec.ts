@@ -2,7 +2,7 @@
 import identity from '../../../src/lang/identity';
 import { expect } from '../test-utils.spec';
 
-describe('identity', () =>
+describe('lang/identity', () =>
 {
     describe('iterator', () =>
     {

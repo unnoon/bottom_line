@@ -51,7 +51,7 @@ function onexecutedec<T>(resultObj)
     });
 }
 
-describe('decorator', () =>
+describe('decorators/decorator', () =>
 {
     describe('onaccess', () =>
     {

@@ -2,7 +2,7 @@
 import enumerate from '../../../../src/collections/generators/enumerate';
 import { expect } from '../../test-utils.spec';
 
-describe('generators/enumerate', () =>
+describe('collections/generators/enumerate', () =>
 {
     it('should enumerate any iterable including objects', () =>
     {

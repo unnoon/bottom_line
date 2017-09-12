@@ -2,7 +2,7 @@
 import map from '../../../src/collections/map';
 import { expect } from '../test-utils.spec';
 
-describe('map', () =>
+describe('collections/map', () =>
 {
     it('should map any iterable including objects', () =>
     {

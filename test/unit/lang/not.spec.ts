@@ -2,7 +2,7 @@
 import not from '../../../src/lang/not';
 import { expect } from '../test-utils.spec';
 
-describe('not', () =>
+describe('lang/not', () =>
 {
     it('should negate any predicate', () =>
     {

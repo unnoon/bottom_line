@@ -22,7 +22,7 @@
     "generators"
   ],
   "scripts": {
-    "build": "rimraf -rf bin/es6 && tsc --rootDir src/ --outDir bin/es6/ -p tsconfig.json --module ES6",
+    "build": "rimraf -rf bin/es6 && tsc --rootDir src/ --outDir bin/es6/ -p tsconfig.build.json && rimraf bin/es6/types.js",
     "docs": "rimraf -rf doc && typedoc --options .typedoc.json --out doc/ src/",
     "release": "npm version",
     "prepush": "npm test",

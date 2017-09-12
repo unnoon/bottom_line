@@ -3,7 +3,7 @@
 import leftOfLast from '../../../src/sequences/leftOfLast';
 import { expect } from '../test-utils.spec';
 
-describe('leftOfLast', () =>
+describe('sequences/leftOfLast', () =>
 {
     it('should return the rest of the sequence if it contains the substring', () =>
     {

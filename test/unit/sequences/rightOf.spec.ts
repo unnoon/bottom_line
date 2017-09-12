@@ -3,7 +3,7 @@
 import rightOf from '../../../src/sequences/rightOf';
 import { expect } from '../test-utils.spec';
 
-describe('rightOf', () =>
+describe('sequences/rightOf', () =>
 {
     it('should return the rest of the sequence if it contains the substring', () =>
     {

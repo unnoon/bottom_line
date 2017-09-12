@@ -2,7 +2,7 @@
 import Value from '../../../src/classes/Value';
 import { expect } from '../test-utils.spec';
 
-describe('Value', () =>
+describe('classes/Value', () =>
 {
     it('should create a value wrapping container using .of or the normal constructor', () =>
     {

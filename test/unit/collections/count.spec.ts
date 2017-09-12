@@ -3,7 +3,7 @@
 import count from '../../../src/collections/count';
 import { expect } from '../test-utils.spec';
 
-describe('count', () =>
+describe('collections/count', () =>
 {
     it('should count elements in strings', () =>
     {

@@ -2,7 +2,7 @@
 import iterator from '../../../src/collections/keyedIterator';
 import { expect } from '../test-utils.spec';
 
-describe('iterator', () =>
+describe('collections/iterator', () =>
 {
     it('should return a generic keyedIterator for any collection', () =>
     {

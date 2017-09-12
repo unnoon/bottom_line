@@ -2,7 +2,7 @@
 import each from '../../../src/collections/each';
 import { expect } from '../test-utils.spec';
 
-describe('each', () =>
+describe('collections/each', () =>
 {
     it('should iterate object', () =>
     {

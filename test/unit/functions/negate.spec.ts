@@ -2,7 +2,7 @@
 import negate from '../../../src/functions/negate';
 import { expect } from '../test-utils.spec';
 
-describe('negate', () =>
+describe('functions/negate', () =>
 {
     it('should negate any function', () =>
     {

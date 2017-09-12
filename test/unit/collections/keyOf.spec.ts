@@ -2,7 +2,7 @@
 import keyOf from '../../../src/collections/keyOf';
 import { expect } from '../test-utils.spec';
 
-describe('keyOf', () =>
+describe('collections/keyOf', () =>
 {
     it('should return the key in case the item is found in the collection', () =>
     {

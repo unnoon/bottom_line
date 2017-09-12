@@ -4,7 +4,7 @@ import Value from '../../../src/classes/Value';
 import XDArray from '../../../src/classes/XDArray';
 import { expect } from '../test-utils.spec';
 
-describe('XDArray', () =>
+describe('classes/XDArray', () =>
 {
     it('should initialize a multi-dimensional array using an init function', () =>
     {

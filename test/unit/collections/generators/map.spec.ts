@@ -2,7 +2,7 @@
 import map from '../../../../src/collections/generators/map';
 import { expect } from '../../test-utils.spec';
 
-describe('generators/map', () =>
+describe('collections/generators/map', () =>
 {
     it('should map any iterable including objects', () =>
     {

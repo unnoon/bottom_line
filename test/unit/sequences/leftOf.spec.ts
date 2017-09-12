@@ -3,7 +3,7 @@
 import leftOf from '../../../src/sequences/leftOf';
 import { expect } from '../test-utils.spec';
 
-describe('leftOf', () =>
+describe('sequences/leftOf', () =>
 {
     it('should return the rest of the sequence if it contains the substring', () =>
     {

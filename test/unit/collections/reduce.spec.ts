@@ -2,7 +2,7 @@
 import reduce from '../../../src/collections/reduce';
 import { expect } from '../test-utils.spec';
 
-describe('reduce', () =>
+describe('collections/reduce', () =>
 {
     it('should reduce collections', () =>
     {

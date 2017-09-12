@@ -1,9 +1,8 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
-
 import rightOfLast from '../../../src/sequences/rightOfLast';
 import { expect } from '../test-utils.spec';
 
-describe('rightOfLast', () =>
+describe('sequences/rightOfLast', () =>
 {
     it('should return the rest of the sequence if it contains the sub', () =>
     {
