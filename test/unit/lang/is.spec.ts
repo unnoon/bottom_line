@@ -2,7 +2,7 @@
 import * as is from '../../../src/lang/is';
 import { expect } from '../test-utils.spec';
 
-describe('is', () =>
+describe('lang/is', () =>
 {
     describe('empty', () =>
     {
@@ -51,6 +51,15 @@ describe('is', () =>
             // expect(is.iterable(1)).to.be.false; // WOW mocha makes numbers iterable...
             expect(is.iterable('')).to.be.true;
             expect(is.iterable([])).to.be.true;
+        });
+    });
+
+    describe('symbol', () =>
+    {
+        it('should be able to define for any predicate if it is undefined', () =>
+        {
+            expect(is.symbol(Symbol('symbol'))).to.be.true;
+            expect(is.symbol({x: 1})).to.be.false;
         });
     });
 
