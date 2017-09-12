@@ -36,7 +36,8 @@ export function decorator<T>(handler: Handler<T>): Decorator<T>
                 handler(target, key, dsc = getPropertyDescriptor<T>(target, key, dsc_index)); return dsc.descriptor();
             case DecoratorType.Parameter === n_args + 1 :
                 handler(target, key, dsc_index); break;
-            default: /* istanbul ignore next */
+            /* istanbul ignore next */
+            default:
                 throw new Error('Decorators are not valid here!');
         }
     };
