@@ -54,6 +54,18 @@ export function iterable(obj)
 }
 
 /**
+ * Returns a boolean indicating if a the value is a symbol.
+ *
+ * @param value - Value to identify as symbol.
+ *
+ * @returns Boolean indicating if value is a symbol.
+ */
+export function symbol(value): boolean
+{
+    return typeof(value) === 'symbol';
+}
+
+/**
  * Returns a boolean indicating if a value is undefined.
  *
  * @param {any} value - Value test if undefined.
@@ -73,5 +85,6 @@ export const not = {
     cloneable: negate(cloneable),
     empty:     negate(empty),
     iterable:  negate(iterable),
+    symbol:    negate(symbol),
     undefined: negate(undefined),
 };
