@@ -1,0 +1,22 @@
+{
+    "compilerOptions":
+    {
+        "target": "es6",
+        "lib": ["es6", "dom", "es2017.object"],
+        "types": ["reflect-metadata"],
+        "module": "es6",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "jsx": "react"
+    },
+    "exclude": [
+        ".coverage",
+        ".idea",
+        "bin",
+        "doc",
+        "node_modules",
+        "rsc",
+        "test"
+    ]
+}
