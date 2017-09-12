@@ -72,5 +72,6 @@ export const not = {
     cloneable: negate(cloneable),
     empty: negate(empty),
     iterable: negate(iterable),
+    symbol: negate(symbol),
     undefined: negate(undefined),
 };
