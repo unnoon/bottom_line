@@ -32,7 +32,7 @@
     "prepush": "npm test",
     "preversion": "npm test && npm run docs",
     "version": "npm run build && git add -A bin",
-    "postversion": "git push && git push --tags && cd bin && npm pack | npm publish",
+    "postversion": "git push && git push --tags && npm publish bin/",
     "test": "karma start --single-run",
     "update": "ncu -u -a && npm install"
   },
