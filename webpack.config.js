@@ -5,7 +5,7 @@ module.exports = {
         libraryTarget: 'umd'
     },
     resolve: {
-        extensions: ['.ts', '.js', '.tsx', '.jsx', 'json']
+        extensions: ['.ts', '.tsx', '.jsx', 'json']
     },
     module: {
         loaders: [
