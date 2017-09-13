@@ -3,8 +3,6 @@
  */
 import keyedIterator from '../collections/keyedIterator';
 import negate from '../functions/negate';
-import { Collection } from '../types';
-
 // TODO add number/string etc...
 /**
  * Returns a boolean indicating if a value is an array.
@@ -13,8 +11,7 @@ import { Collection } from '../types';
  *
  * @returns Boolean indicating if the value is an array.
  */
-export const array: (obj) => boolean = Array.isArray;
-
+export const array = Array.isArray;
 /**
  * returns true if a value is cloneable according to the structured clone algorithm.
  *
@@ -22,15 +19,13 @@ export const array: (obj) => boolean = Array.isArray;
  *
  * @returns Boolean indicating if the value is cloneable.
  */
-export function cloneable(value): boolean
-{
+export function cloneable(value) {
     return !(value instanceof Function
         || value instanceof Error
         || value instanceof WeakMap
         || value instanceof HTMLElement
-        || typeof(value) === 'symbol');
+        || typeof (value) === 'symbol');
 }
-
 /**
  * Returns a boolean indicating if a collection is empty.
  *
@@ -38,22 +33,18 @@ export function cloneable(value): boolean
  *
  * @returns Boolean indicating if the collection is empty.
  */
-export function empty(collection: Collection<any>): boolean
-{
+export function empty(collection) {
     return keyedIterator(collection).next().done;
 }
-
 /**
  * Returns a boolean indicating if an object is iterable
  *
  * @param obj
  * @returns {boolean}
  */
-export function iterable(obj)
-{
-    return (obj !== null && !undefined(obj)) && typeof(obj[Symbol.iterator]) === 'function';
+export function iterable(obj) {
+    return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
 }
-
 /**
  * Returns a boolean indicating if a the value is a symbol.
  *
@@ -61,11 +52,9 @@ export function iterable(obj)
  *
  * @returns Boolean indicating if value is a symbol.
  */
-export function symbol(value): boolean
-{
-    return typeof(value) === 'symbol';
+export function symbol(value) {
+    return typeof (value) === 'symbol';
 }
-
 /**
  * Returns a boolean indicating if a value is undefined.
  *
@@ -73,19 +62,18 @@ export function symbol(value): boolean
  *
  * @returns Boolean indicating if the value is undefined.
  */
-export function undefined(value): boolean
-{
-    return typeof(value) === 'undefined';
+export function undefined(value) {
+    return typeof (value) === 'undefined';
 }
-
 /**
  * Contains negated versions of functions.
  */
 export const not = {
-    array:     negate(array),
+    array: negate(array),
     cloneable: negate(cloneable),
-    empty:     negate(empty),
-    iterable:  negate(iterable),
-    symbol:    negate(symbol),
+    empty: negate(empty),
+    iterable: negate(iterable),
+    symbol: negate(symbol),
     undefined: negate(undefined),
 };
+//# sourceMappingURL=is.js.map
