@@ -1,7 +1,7 @@
 {
   "name": "bottom_line",
   "description": "Modern JS utility functions",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "homepage": "https://github.com/unnoon/bottom_line",
   "author": {
     "name": "Rogier Geertzema",
@@ -32,7 +32,7 @@
     "prepush": "npm test",
     "preversion": "npm test && npm run docs",
     "version": "npm run build && git add -A bin",
-    "postversion": "git push && git push --tags && npm publish",
+    "postversion": "git push && git push --tags && npm publish bin/",
     "test": "karma start --single-run",
     "update": "ncu -u -a && npm install"
   },
