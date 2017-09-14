@@ -12,7 +12,7 @@ import { Collection } from '../types';
  *
  * @returns Boolean indicating if the value is an array.
  */
-export const array: (obj) => boolean = Array.isArray;
+export const array: (obj) => obj is any[] = Array.isArray;
 
 /**
  * returns true if a value is cloneable according to the structured clone algorithm.
@@ -49,7 +49,7 @@ export function empty(collection: Collection<any>): boolean
  *
  * @returns Boolean indicating if the obj is iterable.
  */
-export function iterable(obj): boolean
+export function iterable(obj): obj is Iterable<any>|IterableIterator<any>
 {
     return (obj !== null && !undefined(obj)) && typeof(obj[Symbol.iterator]) === 'function';
 }
@@ -61,7 +61,7 @@ export function iterable(obj): boolean
  *
  * @returns Boolean indicating if the value is number.
  */
-export function number(value): boolean
+export function number(value): value is number
 {
     return typeof(value) === 'number';
 }
@@ -73,7 +73,7 @@ export function number(value): boolean
  *
  * @returns Boolean indicating if the value is string.
  */
-export function string(value): boolean
+export function string(value): value is string
 {
     return typeof(value) === 'string';
 }
