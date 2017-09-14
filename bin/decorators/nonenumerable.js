@@ -1,4 +1,4 @@
-import { decorator } from './decorator';
+import decorator from './decorator';
 /**
  * @decorator
  * Provides nonenumerability for properties.

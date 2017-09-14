@@ -7,7 +7,7 @@
  *
  * @yields {[any , any]} - Array containing key & value.
  */
-function* iterator() {
+export function* iterator() {
     for (const key in this) {
         /* istanbul ignore if */
         if (!this.hasOwnProperty(key)) {
@@ -16,7 +16,4 @@ function* iterator() {
         yield [key, this[key]];
     }
 }
-export default {
-    iterator,
-};
 //# sourceMappingURL=identity.js.map

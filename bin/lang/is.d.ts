@@ -18,18 +18,35 @@ export declare function cloneable(value: any): boolean;
 /**
  * Returns a boolean indicating if a collection is empty.
  *
- * @param collection - Collection to check
+ * @param collection - Collection to check.
  *
  * @returns Boolean indicating if the collection is empty.
  */
 export declare function empty(collection: Collection<any>): boolean;
 /**
- * Returns a boolean indicating if an object is iterable
+ * Returns a boolean indicating if an object is iterable.
  *
- * @param obj
- * @returns {boolean}
+ * @param obj - Object to check iterability for.
+ *
+ * @returns Boolean indicating if the obj is iterable.
  */
 export declare function iterable(obj: any): boolean;
+/**
+ * Returns a boolean indicating if a value is number.
+ *
+ * @param value - Value to be identified as a number.
+ *
+ * @returns Boolean indicating if the value is number.
+ */
+export declare function number(value: any): boolean;
+/**
+ * Returns a boolean indicating if a value is string.
+ *
+ * @param value - Value to be identified as a string.
+ *
+ * @returns Boolean indicating if the value is string.
+ */
+export declare function string(value: any): boolean;
 /**
  * Returns a boolean indicating if a the value is a symbol.
  *
@@ -54,6 +71,8 @@ export declare const not: {
     cloneable: Function;
     empty: Function;
     iterable: Function;
+    number: Function;
+    string: Function;
     symbol: Function;
     undefined: Function;
 };

@@ -1,4 +1,4 @@
-import { decorator } from './decorator';
+import decorator from './decorator';
 /**
  * @decorator
  * Provides easy onaccess wrapping. The supplied function is executed last.

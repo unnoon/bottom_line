@@ -19,7 +19,7 @@ export enum DecoratorType {
  *
  * @returns Decorator
  */
-export function decorator<T>(handler: Handler<T>): Decorator<T>
+export default function decorator<T>(handler: Handler<T>): Decorator<T>
 {
     return (...args) =>
     {

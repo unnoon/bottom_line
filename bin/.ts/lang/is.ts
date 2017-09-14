@@ -5,7 +5,6 @@ import keyedIterator from '../collections/keyedIterator';
 import negate from '../functions/negate';
 import { Collection } from '../types';
 
-// TODO add number/string etc...
 /**
  * Returns a boolean indicating if a value is an array.
  *
@@ -25,16 +24,16 @@ export const array: (obj) => boolean = Array.isArray;
 export function cloneable(value): boolean
 {
     return !(value instanceof Function
-        || value instanceof Error
-        || value instanceof WeakMap
-        || value instanceof HTMLElement
-        || typeof(value) === 'symbol');
+        ||   value instanceof Error
+        ||   value instanceof WeakMap
+        ||   value instanceof HTMLElement
+        ||   typeof(value) === 'symbol');
 }
 
 /**
  * Returns a boolean indicating if a collection is empty.
  *
- * @param collection - Collection to check
+ * @param collection - Collection to check.
  *
  * @returns Boolean indicating if the collection is empty.
  */
@@ -44,14 +43,39 @@ export function empty(collection: Collection<any>): boolean
 }
 
 /**
- * Returns a boolean indicating if an object is iterable
+ * Returns a boolean indicating if an object is iterable.
  *
- * @param obj
- * @returns {boolean}
+ * @param obj - Object to check iterability for.
+ *
+ * @returns Boolean indicating if the obj is iterable.
  */
-export function iterable(obj)
+export function iterable(obj): boolean
 {
     return (obj !== null && !undefined(obj)) && typeof(obj[Symbol.iterator]) === 'function';
+}
+
+/**
+ * Returns a boolean indicating if a value is number.
+ *
+ * @param value - Value to be identified as a number.
+ *
+ * @returns Boolean indicating if the value is number.
+ */
+export function number(value): boolean
+{
+    return typeof(value) === 'number';
+}
+
+/**
+ * Returns a boolean indicating if a value is string.
+ *
+ * @param value - Value to be identified as a string.
+ *
+ * @returns Boolean indicating if the value is string.
+ */
+export function string(value): boolean
+{
+    return typeof(value) === 'string';
 }
 
 /**
@@ -86,6 +110,8 @@ export const not = {
     cloneable: negate(cloneable),
     empty:     negate(empty),
     iterable:  negate(iterable),
+    number:    negate(number),
+    string:    negate(string),
     symbol:    negate(symbol),
     undefined: negate(undefined),
 };

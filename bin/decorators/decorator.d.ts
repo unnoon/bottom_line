@@ -12,4 +12,4 @@ export declare enum DecoratorType {
  *
  * @returns Decorator
  */
-export declare function decorator<T>(handler: Handler<T>): Decorator<T>;
+export default function decorator<T>(handler: Handler<T>): Decorator<T>;

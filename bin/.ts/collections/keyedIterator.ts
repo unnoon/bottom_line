@@ -1,7 +1,7 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import identity from '../lang/identity';
+import * as identity from '../lang/identity';
 import * as is from '../lang/is';
 import { Collection } from '../types';
 

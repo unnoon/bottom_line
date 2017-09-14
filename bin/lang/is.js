@@ -3,7 +3,6 @@
  */
 import keyedIterator from '../collections/keyedIterator';
 import negate from '../functions/negate';
-// TODO add number/string etc...
 /**
  * Returns a boolean indicating if a value is an array.
  *
@@ -29,7 +28,7 @@ export function cloneable(value) {
 /**
  * Returns a boolean indicating if a collection is empty.
  *
- * @param collection - Collection to check
+ * @param collection - Collection to check.
  *
  * @returns Boolean indicating if the collection is empty.
  */
@@ -37,13 +36,34 @@ export function empty(collection) {
     return keyedIterator(collection).next().done;
 }
 /**
- * Returns a boolean indicating if an object is iterable
+ * Returns a boolean indicating if an object is iterable.
  *
- * @param obj
- * @returns {boolean}
+ * @param obj - Object to check iterability for.
+ *
+ * @returns Boolean indicating if the obj is iterable.
  */
 export function iterable(obj) {
     return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
+}
+/**
+ * Returns a boolean indicating if a value is number.
+ *
+ * @param value - Value to be identified as a number.
+ *
+ * @returns Boolean indicating if the value is number.
+ */
+export function number(value) {
+    return typeof (value) === 'number';
+}
+/**
+ * Returns a boolean indicating if a value is string.
+ *
+ * @param value - Value to be identified as a string.
+ *
+ * @returns Boolean indicating if the value is string.
+ */
+export function string(value) {
+    return typeof (value) === 'string';
 }
 /**
  * Returns a boolean indicating if a the value is a symbol.
@@ -73,6 +93,8 @@ export const not = {
     cloneable: negate(cloneable),
     empty: negate(empty),
     iterable: negate(iterable),
+    number: negate(number),
+    string: negate(string),
     symbol: negate(symbol),
     undefined: negate(undefined),
 };

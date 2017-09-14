@@ -1,4 +1,4 @@
-import { decorator } from './decorator';
+import decorator from './decorator';
 /**
  * @decorator
  * Provides readonly for properties & methods.

@@ -1,6 +1,3 @@
-/**
- * Created by Rogier on 13/04/2017.
- */
 import mapG from './generators/map';
 /**
  * Runs each value through iteratee. The iteratee is invoked with three arguments: (value, key, collection).

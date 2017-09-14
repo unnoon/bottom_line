@@ -2,7 +2,7 @@ import { Class, Prototype } from '../types';
 /**
  * Property descriptor with handy extra utilities.
  */
-export declare class KeyPropertyDescriptor<T> {
+export default class KeyPropertyDescriptor<T> {
     enumerable: boolean;
     configurable: boolean;
     writable?: boolean;
@@ -74,4 +74,3 @@ export declare class KeyPropertyDescriptor<T> {
     private identityGetter();
     private identitySetter();
 }
-export default KeyPropertyDescriptor;

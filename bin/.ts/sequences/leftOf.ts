@@ -1,7 +1,6 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-
 import reduce from '../collections/reduce';
 import { Sequence } from '../types';
 

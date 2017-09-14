@@ -17,7 +17,7 @@ export var DecoratorType;
  *
  * @returns Decorator
  */
-export function decorator(handler) {
+export default function decorator(handler) {
     return (...args) => {
         const [target, key, dsc_index] = args;
         const n_args = count(args, (elm) => elm !== undefined);

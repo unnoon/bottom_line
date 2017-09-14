@@ -6,7 +6,7 @@ import { clone, flow } from 'lodash';
 /**
  * Property descriptor with handy extra utilities.
  */
-export class KeyPropertyDescriptor {
+export default class KeyPropertyDescriptor {
     constructor() {
         this.enumerable = false;
         this.configurable = false;
@@ -158,5 +158,4 @@ export class KeyPropertyDescriptor {
         };
     }
 }
-export default KeyPropertyDescriptor;
 //# sourceMappingURL=KeyPropertyDescriptor.js.map

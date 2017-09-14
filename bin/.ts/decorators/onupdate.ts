@@ -1,9 +1,9 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import { KeyPropertyDescriptor } from '../classes/KeyPropertyDescriptor';
+import KeyPropertyDescriptor from '../classes/KeyPropertyDescriptor';
 import { Class, PropertyDecorator, Prototype } from '../types';
-import { decorator } from './decorator';
+import decorator from './decorator';
 
 /**
  * @decorator

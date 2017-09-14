@@ -1,3 +1,6 @@
+/**
+ * Created by Rogier on 13/04/2017.
+ */
 import { Collection } from '../types';
 /**
  * Counts the occurrences matched by the match function. (value, key, collection) => boolean
