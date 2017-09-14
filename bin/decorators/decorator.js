@@ -3,6 +3,7 @@
  */
 import KeyPropertyDescriptor from '../classes/KeyPropertyDescriptor';
 import count from '../collections/count';
+// TODO frozen, solid=readonly & nonconfigurable, _accessor=nonconfigurable & nonenumerable, sealed, nonextensible
 export var DecoratorType;
 (function (DecoratorType) {
     DecoratorType[DecoratorType["Class"] = 1] = "Class";

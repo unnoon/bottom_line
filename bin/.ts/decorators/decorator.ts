@@ -5,6 +5,7 @@ import KeyPropertyDescriptor from '../classes/KeyPropertyDescriptor';
 import count from '../collections/count';
 import { Class, Decorator, Handler, Prototype } from '../types';
 
+// TODO frozen, solid=readonly & nonconfigurable, _accessor=nonconfigurable & nonenumerable, sealed, nonextensible
 export enum DecoratorType {
     Class = 1,
     Property,
