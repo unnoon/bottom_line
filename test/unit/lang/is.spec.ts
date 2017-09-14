@@ -13,6 +13,8 @@ describe('lang/is', () =>
 
             expect(is.empty([])).to.be.true;
             expect(is.empty([1])).to.be.false;
+
+            expect(is.not.empty([1])).to.be.true;
         });
     });
 
@@ -22,6 +24,8 @@ describe('lang/is', () =>
         {
             expect(is.array([])).to.be.true;
             expect(is.array({x: 1})).to.be.false;
+
+            expect(is.not.array({x: 1})).to.be.true;
         });
     });
 
@@ -37,6 +41,8 @@ describe('lang/is', () =>
             expect(is.cloneable(document.createElement('p'))).to.be.false;
             expect(is.cloneable({})).to.be.true;
             expect(is.cloneable(6)).to.be.true;
+
+            expect(is.not.cloneable(6)).to.be.false;
         });
     });
 
@@ -51,6 +57,30 @@ describe('lang/is', () =>
             // expect(is.iterable(1)).to.be.false; // WOW mocha makes numbers iterable...
             expect(is.iterable('')).to.be.true;
             expect(is.iterable([])).to.be.true;
+
+            expect(is.not.iterable([])).to.be.false;
+        });
+    });
+
+    describe('number', () =>
+    {
+        it('should be able to define for any predicate if it is number', () =>
+        {
+            expect(is.number(0)).to.be.true;
+            expect(is.number({x: 1})).to.be.false;
+
+            expect(is.not.number({x: 1})).to.be.true;
+        });
+    });
+
+    describe('string', () =>
+    {
+        it('should be able to define for any predicate if it is string', () =>
+        {
+            expect(is.string('')).to.be.true;
+            expect(is.string({x: 1})).to.be.false;
+
+            expect(is.not.string({x: 1})).to.be.true;
         });
     });
 
@@ -60,6 +90,8 @@ describe('lang/is', () =>
         {
             expect(is.symbol(Symbol('symbol'))).to.be.true;
             expect(is.symbol({x: 1})).to.be.false;
+
+            expect(is.not.symbol({x: 1})).to.be.true;
         });
     });
 
@@ -69,14 +101,7 @@ describe('lang/is', () =>
         {
             expect(is.undefined(undefined)).to.be.true;
             expect(is.undefined({x: 1})).to.be.false;
-        });
-    });
 
-    describe('not', () =>
-    {
-        it('should use negated versions when prefixing not.', () =>
-        {
-            expect(is.not.undefined(undefined)).to.be.false;
             expect(is.not.undefined({x: 1})).to.be.true;
         });
     });
