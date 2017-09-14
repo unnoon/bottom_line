@@ -1,4 +1,5 @@
 const tsconfig = require('./tsconfig.json');
+tsconfig.compilerOptions.noEmit = false;
 
 module.exports = function(config) {
     config.set({
