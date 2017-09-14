@@ -29,9 +29,9 @@
     "docs": "rimraf -rf doc && typedoc --options .typedoc.json --out doc/ src/",
     "dts": "dts-generator --name bottom_line --project ./ --out index.d.ts",
     "release": "npm version",
-    "prepush": "npm test",
+    "prepush": "npm test && npm run build",
     "preversion": "npm test && npm run docs",
-    "version": "npm run build && git add -A bin",
+    "version": "npm run build && git add -A bin/",
     "postversion": "git push && git push --tags && npm publish bin/",
     "test": "karma start --single-run",
     "update": "ncu -u -a && npm install"
