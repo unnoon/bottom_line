@@ -1,5 +1,6 @@
-const tsconfig = require('./tsconfig.json');
-tsconfig.compilerOptions.noEmit = false;
+const compilerOptions = require('./tsconfig.json').compilerOptions;
+
+compilerOptions.noEmit = false;
 
 module.exports = function(config) {
     config.set({
@@ -13,7 +14,7 @@ module.exports = function(config) {
         },
         reporters: ['progress', 'karma-typescript'],
         karmaTypescriptConfig: {
-            'compilerOptions': tsconfig.compilerOptions,
+            'compilerOptions': compilerOptions,
             reports: {
                 'html': '.coverage',
                 'text-summary': '',
