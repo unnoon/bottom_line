@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
-import identity from '../../../src/lang/identity';
+import * as identity from '../../../src/lang/identity';
 import { expect } from '../test-utils.spec';
 
 describe('lang/identity', () =>

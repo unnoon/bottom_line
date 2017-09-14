@@ -8,7 +8,7 @@
  *
  * @yields {[any , any]} - Array containing key & value.
  */
-function* iterator(): IterableIterator<[any, any]>
+export function* iterator(): IterableIterator<[any, any]>
 {
     for (const key in this)
     {
@@ -18,7 +18,3 @@ function* iterator(): IterableIterator<[any, any]>
         yield [key, this[key]];
     }
 }
-
-export default {
-    iterator,
-};

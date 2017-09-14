@@ -6,7 +6,7 @@
 import 'reflect-metadata';
 import * as is from '../../src/lang/is';
 // import { decorator }              from '../../src/decorators/decorator';
-import { KeyPropertyDescriptor } from '../../src/classes/KeyPropertyDescriptor';
+// import KeyPropertyDescriptor from '../../src/classes/KeyPropertyDescriptor';
 
 class TestDefineProperty
 {

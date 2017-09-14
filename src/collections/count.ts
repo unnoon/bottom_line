@@ -1,9 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-
-import reduce from './reduce';
 import { Collection } from '../types';
+import reduce from './reduce';
 
 /**
  * Counts the occurrences matched by the match function. (value, key, collection) => boolean

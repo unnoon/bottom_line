@@ -2,12 +2,11 @@
  * Created by Rogier on 05/05/2017.
  */
 /* tslint:disable:no-unused-expression max-classes-per-file no-console */
-
-import { decorator }             from '../../../src/decorators/decorator';
-import { nonconfigurable }       from '../../../src/decorators/nonconfigurable';
-import { nonenumerable }         from '../../../src/decorators/nonenumerable';
-import { KeyPropertyDescriptor } from '../../../src/classes/KeyPropertyDescriptor';
-import { expect }                from '../test-utils.spec';
+import KeyPropertyDescriptor from '../../../src/classes/KeyPropertyDescriptor';
+import decorator             from '../../../src/decorators/decorator';
+import nonconfigurable       from '../../../src/decorators/nonconfigurable';
+import nonenumerable         from '../../../src/decorators/nonenumerable';
+import { expect }            from '../test-utils.spec';
 
 function onaccessdec<T>(resultObj)
 {

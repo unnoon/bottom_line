@@ -8,7 +8,7 @@ import { Class, Prototype } from '../types';
 /**
  * Property descriptor with handy extra utilities.
  */
-export class KeyPropertyDescriptor<T>
+export default class KeyPropertyDescriptor<T>
 {
     public enumerable:   boolean = false;
     public configurable: boolean = false;
@@ -202,5 +202,3 @@ export class KeyPropertyDescriptor<T>
         };
     }
 }
-
-export default KeyPropertyDescriptor;
