@@ -49,7 +49,7 @@ export function empty(collection: Collection<any>): boolean
  *
  * @returns Boolean indicating if the obj is iterable.
  */
-export function iterable(obj): obj is Iterable|IterableIterator
+export function iterable(obj): obj is Iterable<any>|IterableIterator<any>
 {
     return (obj !== null && !undefined(obj)) && typeof(obj[Symbol.iterator]) === 'function';
 }
