@@ -3,16 +3,17 @@
  */
 /* tslint:disable:no-unused-expression max-classes-per-file no-console */
 
-import { aliasing } from '../../../src/decorators/aliasing';
+import aliases from '../../../src/decorators/aliases';
 import { expect } from '../test-utils.spec';
 
-describe('decorators/aliasing', () =>
+describe('decorators/aliases', () =>
 {
     it('we should be able to define aliases for properties', () =>
     {
         class Fish
         {
-            @aliasing<boolean>('flipper') public toes: boolean; // how to type check this shit??!?!?
+            @aliases<boolean>('flipper')
+            public toes: boolean; // how to type check this shit??!?!?
             public flipper: boolean = true;
         }
 
@@ -33,7 +34,8 @@ describe('decorators/aliasing', () =>
     {
         class Fish
         {
-            @aliasing<boolean>('flipper') public static toes: boolean; // how to type check this shit??!?!?
+            @aliases<boolean>('flipper')
+            public static toes: boolean; // how to type check this shit??!?!?
             public static flipper: boolean = true;
         }
 
@@ -50,7 +52,9 @@ describe('decorators/aliasing', () =>
     {
         class Fish
         {
-            @aliasing<(distance: number) => string>('swim') public move(distance: number): string {return;}
+            @aliases<(distance: number) => string>('go', 'swim')
+            public move(distance: number): string {return;}
+            public go(distance: number): string {return;}
             public swim(distance: number): string
             {
                 return 'swimming';
@@ -61,15 +65,18 @@ describe('decorators/aliasing', () =>
 
         expect(Fish.prototype.hasOwnProperty('swim')).to.be.true;
         expect(Fish.prototype.hasOwnProperty('move')).to.be.true;
+        expect(Fish.prototype.hasOwnProperty('go')).to.be.true;
         expect(fish.swim(0)).to.eql('swimming');
         expect(fish.move(0)).to.eql('swimming');
+        expect(fish.go(0)).to.eql('swimming');
     });
 
     it('we should be able to define aliases for static methods', () =>
     {
         class Fish
         {
-            @aliasing<(distance: number) => string>('swim') public static move(distance: number): string {return;}
+            @aliases<(distance: number) => string>('swim')
+            public static move(distance: number): string {return;}
             public static swim(distance: number): string
             {
                 return 'swimming';
