@@ -4,31 +4,25 @@
 /* tslint:disable: max-classes-per-file no-console */
 
 import 'reflect-metadata';
-import * as is from '../../src/lang/is';
-// import { decorator }              from '../../src/decorators/decorator';
+// import BitSet  from '../../src/BitSet';
+import aliases from '../../src/decorators/aliases';
 // import KeyPropertyDescriptor from '../../src/classes/KeyPropertyDescriptor';
 
-class TestDefineProperty
+class Fish
 {
-    public static id = 11;
-
-    public static method() { return 'do moar stuff';}
-
-    public id;
-
-    constructor()
+    @aliases<(distance: number) => string>('go', 'swim')
+    public move(distance: number): string {return;}
+    public go(distance: number): string {return;}
+    public swim(distance: number): string
     {
-        this.id = 10;
+        return 'swimming';
     }
-
-    public method() { return 'do stuff';}
 }
 
-const td = new TestDefineProperty();
+const fish = new Fish();
 
-const dsc1 = Object.getOwnPropertyDescriptor(TestDefineProperty, 'id');
-const dsc2 = Object.getOwnPropertyDescriptor(TestDefineProperty, 'method');
-const dsc3 = Object.getOwnPropertyDescriptor(td, 'id');
-const dsc4 = Object.getOwnPropertyDescriptor(TestDefineProperty.prototype, 'method');
+console.assert(fish.move(0) === 'swimming');
+console.assert(fish.go(0) === 'swimming');
+console.assert(fish.swim(0) === 'swimming');
 
 // console.assert(tdp['_id'].hasOwnProperty(), '_id should be defined on instance');
