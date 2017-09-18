@@ -52,7 +52,7 @@ describe('decorators/aliases', () =>
     {
         class Fish
         {
-            @aliases<(distance: number) => string>('go', 'swim')
+            @aliases<(distance: number) => string>('go', 'swim') // @readonly @nonconfigurable
             public move(distance: number): string {return;}
             public go(distance: number): string {return;}
             public swim(distance: number): string
@@ -87,5 +87,25 @@ describe('decorators/aliases', () =>
         expect(Fish.hasOwnProperty('move')).to.be.true;
         expect(Fish.swim(0)).to.eql('swimming');
         expect(Fish.move(0)).to.eql('swimming');
+    });
+
+    it('we should be able to define aliases without an implementation', () =>
+    {
+        class Fish
+        {
+            @aliases<(distance: number) => string>('noimplementation', 'swim')
+            public static move(distance: number): string {return;}
+            public static swim(distance: number): string
+            {
+                return 'swimming';
+            }
+        }
+
+        expect(Fish.hasOwnProperty('swim')).to.be.true;
+        expect(Fish.hasOwnProperty('move')).to.be.true;
+        expect(Fish.hasOwnProperty('noimplementation')).to.be.true;
+        expect(Fish.swim(0)).to.eql('swimming');
+        expect(Fish.move(0)).to.eql('swimming');
+        expect(Fish['noimplementation'](0)).to.eql('swimming');
     });
 });
