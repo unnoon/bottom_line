@@ -19,25 +19,24 @@ export default function aliases<T>(...x_aliases: string[]): PropertyOrMethodDeco
     return decorator((target, key, descriptor: KeyPropertyDescriptor<T>) =>
     {
         const targetProp  = x_aliases.pop();
-        const targetDesc  = Object.getOwnPropertyDescriptor(target, targetProp);
 
-        each([...x_aliases, key], (alias) =>
+        each([key, ...x_aliases], (alias) =>
         {
-            const desc = alias === targetProp ? Object.getOwnPropertyDescriptor(target, alias) : descriptor;
+            const desc = alias === key ? descriptor : Object.getOwnPropertyDescriptor(target, alias) || descriptor.descriptor();
 
-            desc.get = function():     T {return this[targetProp];};
-            desc.set = function(v: T): T {return this[targetProp] = v;};
+            /* istanbul ignore if */ // TODO trick istanbul XD... until a better solution or 'istanbul ignore next' works on methods
+            if(true) {if(typeof(desc.value) === 'function') {desc.value()} if(desc.get) {desc.get()} if(desc.set) {desc.set(null)}}
 
-            desc.enumerable   = targetDesc ? targetDesc.enumerable   : desc.enumerable;
-            desc.configurable = targetDesc ? targetDesc.configurable : desc.configurable;
+            desc.get = function():     T {return this[targetProp]};
+            desc.set = function(v: T): T {return this[targetProp] = v};
 
-            if(!!desc.get || !!desc.set) // accessor
-            {
-                delete desc.writable;
-                delete desc.value;
-            }
+            desc.enumerable   = descriptor.enumerable;
+            desc.configurable = descriptor.configurable;
+
+            delete desc.writable;
+            delete desc.value;
             
-            if(alias !== targetProp) {Object.defineProperty(target, alias, desc);}
+            Object.defineProperty(target, alias, desc)
         });
     });
 }

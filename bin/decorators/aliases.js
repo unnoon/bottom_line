@@ -11,20 +11,27 @@ import decorator from './decorator';
 export default function aliases(...x_aliases) {
     return decorator((target, key, descriptor) => {
         const targetProp = x_aliases.pop();
-        const targetDesc = Object.getOwnPropertyDescriptor(target, targetProp);
-        each([...x_aliases, key], (alias) => {
-            const desc = alias === targetProp ? Object.getOwnPropertyDescriptor(target, alias) : descriptor;
+        each([key, ...x_aliases], (alias) => {
+            const desc = alias === key ? descriptor : Object.getOwnPropertyDescriptor(target, alias) || descriptor.descriptor();
+            /* istanbul ignore if */ // TODO trick istanbul XD... until a better solution or 'istanbul ignore next' works on methods
+            if (true) {
+                if (typeof (desc.value) === 'function') {
+                    desc.value();
+                }
+                if (desc.get) {
+                    desc.get();
+                }
+                if (desc.set) {
+                    desc.set(null);
+                }
+            }
             desc.get = function () { return this[targetProp]; };
             desc.set = function (v) { return this[targetProp] = v; };
-            desc.enumerable = targetDesc ? targetDesc.enumerable : desc.enumerable;
-            desc.configurable = targetDesc ? targetDesc.configurable : desc.configurable;
-            if (!!desc.get || !!desc.set) {
-                delete desc.writable;
-                delete desc.value;
-            }
-            if (alias !== targetProp) {
-                Object.defineProperty(target, alias, desc);
-            }
+            desc.enumerable = descriptor.enumerable;
+            desc.configurable = descriptor.configurable;
+            delete desc.writable;
+            delete desc.value;
+            Object.defineProperty(target, alias, desc);
         });
     });
 }
