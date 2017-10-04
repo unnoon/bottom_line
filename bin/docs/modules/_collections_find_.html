@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;collections/keyedIterator&quot; | bottom_line</title>
+	<title>&quot;collections/find&quot; | bottom_line</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_collections_keyediterator_.html">&quot;collections/keyedIterator&quot;</a>
+					<a href="_collections_find_.html">&quot;collections/find&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;collections/keyedIterator&quot;</h1>
+			<h1>External module &quot;collections/find&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +73,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_collections_keyediterator_.html#keyediterator" class="tsd-kind-icon">keyed<wbr>Iterator</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_collections_find_.html#find" class="tsd-kind-icon">find</a></li>
 							</ul>
 						</section>
 					</div>
@@ -82,21 +82,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-					<a name="keyediterator" class="tsd-anchor"></a>
-					<h3>keyed<wbr>Iterator</h3>
+					<a name="find" class="tsd-anchor"></a>
+					<h3>find</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">keyed<wbr>Iterator&lt;T&gt;<span class="tsd-signature-symbol">(</span>collection<span class="tsd-signature-symbol">: </span><a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">find&lt;T&gt;<span class="tsd-signature-symbol">(</span>collection<span class="tsd-signature-symbol">: </span><a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, match<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, from<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span>, to<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/855b97b/src/collections/keyedIterator.ts#L15">collections/keyedIterator.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/2474d6c/src/collections/find.ts#L18">collections/find.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns a keyed iterator given any collection. In case no key exists an artificial key is provided.</p>
+									<p>Counts the occurrences matched by the match function. (value, key, collection) =&gt; boolean
+									Optionally a from &amp; to key can be provided for partial finds.</p>
 								</div>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -110,12 +111,54 @@
 								<li>
 									<h5>collection: <a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Collection to get a keyedIterator for.</p>
+										<p>The collection to find elements from.</p>
+									</div>
+								</li>
+								<li>
+									<h5>match: <span class="tsd-signature-type">function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Match function.</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, collection<span class="tsd-signature-symbol">: </span><a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>value: <span class="tsd-signature-type">T</span></h5>
+														</li>
+														<li>
+															<h5>key: <span class="tsd-signature-type">any</span></h5>
+														</li>
+														<li>
+															<h5>collection: <a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> from: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Key to start finding.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> to: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Key (exclusive) to stop finding.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4>
-							<p>The generic keyed iterable iterator.</p>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+							<p>The total number of occurrences as matched by the match function.</p>
 						</li>
 					</ul>
 				</section>
@@ -128,14 +171,14 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_collections_keyediterator_.html">"collections/keyed<wbr>Iterator"</a>
+						<a href="_collections_find_.html">"collections/find"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_collections_keyediterator_.html#keyediterator" class="tsd-kind-icon">keyed<wbr>Iterator</a>
+						<a href="_collections_find_.html#find" class="tsd-kind-icon">find</a>
 					</li>
 				</ul>
 			</nav>

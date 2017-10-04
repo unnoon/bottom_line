@@ -10,4 +10,4 @@ import { Sequence } from '../types';
  *
  * @returns The sub-sequence right of each found sub(element/string) index.
  */
-export default function rightOf(sequence: Sequence, ...subs: Array<string | any>): Sequence;
+export default function rightOf<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>;

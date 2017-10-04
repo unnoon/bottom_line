@@ -1,7 +1,7 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import keyedIterator from '../collections/keyedIterator';
+import KeyedIterator from '../classes/KeyedIterator';
 import negate from '../functions/negate';
 /**
  * Returns a boolean indicating if a value is an array.
@@ -33,7 +33,7 @@ export function cloneable(value) {
  * @returns Boolean indicating if the collection is empty.
  */
 export function empty(collection) {
-    return keyedIterator(collection).next().done;
+    return KeyedIterator.create(collection).next().done;
 }
 /**
  * Returns a boolean indicating if an object is iterable.
@@ -44,6 +44,16 @@ export function empty(collection) {
  */
 export function iterable(obj) {
     return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
+}
+/**
+ * Returns a boolean indicating if a value is NaN.
+ *
+ * @param value - Value to be identified as NaN.
+ *
+ * @returns Boolean indicating if the value is NaN.
+ */
+export function nan(value) {
+    return Object.is(value, NaN);
 }
 /**
  * Returns a boolean indicating if a value is number.
@@ -93,6 +103,7 @@ export const not = {
     cloneable: negate(cloneable),
     empty: negate(empty),
     iterable: negate(iterable),
+    nan: negate(nan),
     number: negate(number),
     string: negate(string),
     symbol: negate(symbol),

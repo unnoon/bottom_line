@@ -17,5 +17,8 @@ import reduce from './reduce';
  */
 export default function count<T>(collection: Collection<T>, match: (value: T, key, collection: Collection<T>) => boolean, from?, to?): number
 {
-    return reduce(collection, (accumulator, value, key, coll) => accumulator + (match(value, key, coll) ? 1 : 0), 0, from, to);
+    return reduce(collection, (accumulator, value, key, coll) =>
+    {
+        return accumulator + (match(value, key, coll) ? 1 : 0)
+    }, 0, from, to);
 }

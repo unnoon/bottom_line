@@ -32,6 +32,14 @@ export declare function empty(collection: Collection<any>): boolean;
  */
 export declare function iterable(obj: any): obj is Iterable<any> | IterableIterator<any>;
 /**
+ * Returns a boolean indicating if a value is NaN.
+ *
+ * @param value - Value to be identified as NaN.
+ *
+ * @returns Boolean indicating if the value is NaN.
+ */
+export declare function nan(value: any): boolean;
+/**
  * Returns a boolean indicating if a value is number.
  *
  * @param value - Value to be identified as a number.
@@ -71,6 +79,7 @@ export declare const not: {
     cloneable: Function;
     empty: Function;
     iterable: Function;
+    nan: Function;
     number: Function;
     string: Function;
     symbol: Function;

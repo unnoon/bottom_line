@@ -11,6 +11,8 @@ import reduce from './reduce';
  * @returns The total number of occurrences as matched by the match function.
  */
 export default function count(collection, match, from, to) {
-    return reduce(collection, (accumulator, value, key, coll) => accumulator + (match(value, key, coll) ? 1 : 0), 0, from, to);
+    return reduce(collection, (accumulator, value, key, coll) => {
+        return accumulator + (match(value, key, coll) ? 1 : 0);
+    }, 0, from, to);
 }
 //# sourceMappingURL=count.js.map

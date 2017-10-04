@@ -15,7 +15,7 @@ import { Sequence } from '../types';
  *
  * @returns The sub-sequence right of each last found sub(element/string) index.
  */
-export default function rightOfLast(sequence: Sequence, ...subs: Array<string|any>): Sequence
+export default function rightOfLast<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
     const output = reduce(subs, (out, sub) =>
     {

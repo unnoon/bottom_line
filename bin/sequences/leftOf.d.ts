@@ -10,4 +10,4 @@ import { Sequence } from '../types';
  *
  * @returns The sub-sequence left of each found sub(element/string) index.
  */
-export default function leftOf(sequence: Sequence, ...subs: Array<string | any>): Sequence;
+export default function leftOf<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>;

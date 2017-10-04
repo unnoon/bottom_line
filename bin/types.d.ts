@@ -1,6 +1,6 @@
 import KeyPropertyDescriptor from './classes/KeyPropertyDescriptor';
 export declare type Collection<T> = Iterable<T> | object;
-export declare type Sequence = string | any[];
+export declare type Sequence<T> = string | T[];
 export declare type Class<C> = ({
     new (): C;
 });

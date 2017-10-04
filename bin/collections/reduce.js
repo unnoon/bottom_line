@@ -1,9 +1,9 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
+import KeyedIterator from '../classes/KeyedIterator';
 import * as is from '../lang/is';
 import enumerate from './generators/enumerate';
-import keyedIterator from './keyedIterator';
 /**
  * Reduce a collection by running each value through iteratee.
  * The iteratee is invoked with three arguments: (accumulator, value, key, collection).
@@ -18,10 +18,10 @@ import keyedIterator from './keyedIterator';
  * @returns The reduced value.
  */
 export default function reduce(collection, iteratee, accumulator, from, to) {
-    const it = keyedIterator(collection);
+    const it = KeyedIterator.create(collection);
     accumulator = is.undefined(accumulator) && is.not.empty(collection) ? it.next().value[1] : accumulator;
-    for (const [key, value] of enumerate(it, from, to)) {
-        accumulator = iteratee(accumulator, value, key, collection);
+    for (const [index, value] of enumerate(it, from, to)) {
+        accumulator = iteratee(accumulator, value, index, collection);
     }
     return accumulator;
 }

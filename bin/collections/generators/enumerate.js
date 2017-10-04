@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
+import KeyedIterator from '../../classes/KeyedIterator';
 import * as is from '../../lang/is';
-import keyedIterator from '../keyedIterator';
 /**
  * @generator
  * Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
@@ -15,7 +15,7 @@ import keyedIterator from '../keyedIterator';
  * @yields {[any, any]} - Array containing key & value.
  */
 export default function* enumerate(collection, from, to) {
-    const it = keyedIterator(collection);
+    const it = KeyedIterator.create(collection);
     let yields = it.next();
     let kvp = yields.value; // key-value-pair
     from = is.undefined(from) && kvp ? kvp[0] : from;
