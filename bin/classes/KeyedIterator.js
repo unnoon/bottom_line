@@ -3,12 +3,16 @@
  */
 import * as identity from '../lang/identity';
 /**
- * Property descriptor with handy extra utilities.
+ * Keyed iterator. Utilizes the entries method if available, otherwise uses Symbol.iterator or the identity iterator.
  */
 export default class KeyedIterator {
-    static create(collection) {
-        return new KeyedIterator(collection);
-    }
+    /**
+     * Creates a new KeyedIterator.
+     *
+     * @param collection - The collection to create a KeyedIterator for.
+     *
+     * @returns new KeyedIterator.
+     */
     constructor(collection) {
         if (collection instanceof KeyedIterator) {
             return collection;
@@ -36,15 +40,44 @@ export default class KeyedIterator {
             })();
         }
     }
-    next() {
-        return this.it.next();
+    /**
+     * Creates a new KeyedIterator avoiding ugly new key words.
+     *
+     * @param collection - The collection to create a KeyedIterator for.
+     *
+     * @returns new KeyedIterator.
+     */
+    static create(collection) {
+        return new KeyedIterator(collection);
     }
-    return() {
-        return this.it.return();
+    /**
+     * Returns the next item in the iterator
+     *
+     * @param substitute - Value to be substituted for the last yield.
+     *
+     * @returns The next value object.
+     */
+    next(substitute) {
+        return this.it.next(substitute);
     }
-    throw() {
-        return this.it.throw();
+    /**
+     * Finishes the iterator and returns the value
+     *
+     * @param value - The value to return.
+     *
+     * @returns The value supplied.
+     */
+    return(value) {
+        return this.it.return(value);
     }
+    throw(exception) {
+        return this.it.throw(exception);
+    }
+    /**
+     * Makes sure the iterator is iterable.
+     *
+     * @returns The KeyedIterator
+     */
     [Symbol.iterator]() {
         return this;
     }
