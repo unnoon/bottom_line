@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
-import * as is from '../../../src/lang/is';
+import is from '../../../src/lang/is';
 import { expect } from '../test-utils.spec';
 
 describe('lang/is', () =>
@@ -62,6 +62,28 @@ describe('lang/is', () =>
         });
     });
 
+    describe('nan', () =>
+    {
+        it('should be able to define for any predicate if it is nan', () =>
+        {
+            expect(is.nan(NaN)).to.be.true;
+            expect(is.nan({x: 1})).to.be.false;
+
+            expect(is.not.nan({x: 1})).to.be.true;
+        });
+    });
+
+    describe('null', () =>
+    {
+        it('should be able to define for any predicate if it is null', () =>
+        {
+            expect(is.null(null)).to.be.true;
+            expect(is.null({x: 1})).to.be.false;
+
+            expect(is.not.null({x: 1})).to.be.true;
+        });
+    });
+    
     describe('number', () =>
     {
         it('should be able to define for any predicate if it is number', () =>

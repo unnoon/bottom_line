@@ -5,24 +5,13 @@
 
 import 'reflect-metadata';
 // import BitSet  from '../../src/BitSet';
+import KeyedIterator from '../../src/classes/KeyedIterator';
+import count from '../../src/collections/count';
+import each from '../../src/collections/each';
 import aliases from '../../src/decorators/aliases';
+import rebound from '../../src/integers/rebound';
 // import KeyPropertyDescriptor from '../../src/classes/KeyPropertyDescriptor';
 
-class Fish
-{
-    @aliases<(distance: number) => string>('go', 'swim')
-    public move(distance: number): string {return;}
-    public go(distance: number): string {return;}
-    public swim(distance: number): string
-    {
-        return 'swimming';
-    }
-}
-
-const fish = new Fish();
-
-console.assert(fish.move(0) === 'swimming');
-console.assert(fish.go(0) === 'swimming');
-console.assert(fish.swim(0) === 'swimming');
-
-// console.assert(tdp['_id'].hasOwnProperty(), '_id should be defined on instance');
+// const r1 = rebound(-3)(-5, 7); // -3
+// const r2 = rebound(-7)(-5, 7); // 6
+const r2 = rebound(-1)(1, 2); // 6

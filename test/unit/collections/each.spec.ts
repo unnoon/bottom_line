@@ -89,4 +89,16 @@ describe('collections/each', () =>
         expect(result).to.eql(fib);
         expect(entries).to.eql([[2, 2], [3, 3], [4, 5]]);
     });
+
+    it('should iterate multidimensional arrays', () =>
+    {
+        const arr     = [[1, 2], [3, 4], [5, 6]];
+        const entries = [];
+
+        const result = each(arr, (value, key) => entries.push([key, value]));
+
+        expect(result).to.eql(arr);
+        expect(entries).to.eql([[0, [1, 2]], [1, [3, 4]], [2, [5, 6]]]);
+    });
+
 });

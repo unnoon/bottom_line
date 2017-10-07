@@ -1,7 +1,7 @@
 /**
  * Created by Rogier on 05/05/2017.
  */
-import * as is from '../lang/is';
+import is from '../lang/is';
 import { clone, flow } from 'lodash';
 import { Class, Prototype } from '../types';
 

@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import * as is from '../../lang/is';
-import keyedIterator from '../keyedIterator';
+import KeyedIterator  from '../../classes/KeyedIterator';
+import is             from '../../lang/is';
 import { Collection } from '../../types';
 
 /**
@@ -18,7 +18,7 @@ import { Collection } from '../../types';
  */
 export default function* enumerate<T>(collection: Collection<T>, from?, to?): IterableIterator<[any, any]>
 {
-    const it = keyedIterator(collection);
+    const it = KeyedIterator.create(collection);
 
     let yields = it.next();
     let kvp: [any, any] = yields.value; // key-value-pair

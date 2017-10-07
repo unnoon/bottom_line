@@ -2,6 +2,7 @@
  * Created by Rogier on 13/04/2017.
  */
 import reduce from '../collections/reduce';
+import is           from '../lang/is';
 import { Sequence } from '../types';
 
 /**
@@ -15,12 +16,12 @@ import { Sequence } from '../types';
  *
  * @returns The sub-sequence right of each last found sub(element/string) index.
  */
-export default function rightOfLast(sequence: Sequence, ...subs: Array<string|any>): Sequence
+export default function rightOfLast<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
     const output = reduce(subs, (out, sub) =>
     {
         const index = out.lastIndexOf(sub);
-        return ~index ? out.slice(index + (typeof(sub) === 'string' ? sub.length : 1)) : out;
+        return ~index ? out.slice(index + (is.string(sub) ? sub.length : 1)) : out;
     }, sequence);
 
     return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
