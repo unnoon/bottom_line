@@ -30,6 +30,7 @@
     "build": "npm run build:clean && npm run build:es6 && npm run build:ts && npm run build:docs && npm run build:files",
     "docs": "rimraf -rf doc && typedoc --options .typedoc.json --out doc/ src/",
     "dts": "dts-generator --name bottom_line --project ./ --out index.d.ts",
+    "inch-ci:test": "jsdoc bin/ -r -d tmp/jsdoc/",
     "release": "npm version",
     "prepush": "npm test",
     "preversion": "npm test",
