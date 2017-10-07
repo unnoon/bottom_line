@@ -9,6 +9,14 @@
  */
 export default function rebound(index: number): (min: number, max: number) => number
 {
+    /**
+     * Range function
+     *
+     * @param min - Lower bound (inclusive).
+     * @param max - Upper bound (exclusive).
+     *
+     * @returns Rebounded index.
+     */
     return (min: number, max: number): number =>
     {
         index = index|0; min = min|0; max = (max - 1)|0;

@@ -5,7 +5,7 @@
  * @param min - Integer lower bound (inclusive).
  * @param max - Integer upper bound (exclusive).
  *
- * @returns Random integer in between the bounds (inclusive).
+ * @returns Random integer in between the bounds.
  */
 export default function random(min: number, max: number)
 {
