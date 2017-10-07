@@ -3,10 +3,11 @@
  */
 
 /**
- * @generator
  * Generic object keyedIterator.
  *
- * @yields {[any , any]} - Array containing key & value.
+ * @generator
+ *
+ * @yields Array containing key & value [any , any].
  */
 export function* iterator(): IterableIterator<[any, any]>
 {
