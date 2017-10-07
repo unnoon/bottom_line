@@ -1,14 +1,13 @@
 import enumerate from './generators/enumerate';
 /**
- * Counts the occurrences matched by the match function. (value, key, collection) => boolean
- * Optionally a from & to key can be provided for partial finds.
+ * Returns the first value in a collection matched by the match function.
  *
- * @param collection - The collection to find elements from.
- * @param match      - Match function.
- * @param from       - Key to start finding.
- * @param to         - Key (exclusive) to stop finding.
+ * @param collection - The collection to search through.
+ * @param match      - The match function.
+ * @param from       - Key to start searching.
+ * @param to         - Key (exclusive) to stop searching.
  *
- * @returns The total number of occurrences as matched by the match function.
+ * @returns The found value or undefined otherwise.
  */
 export default function find(collection, match, from, to) {
     for (const [key, value] of enumerate(collection, from, to)) {

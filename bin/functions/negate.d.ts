@@ -8,4 +8,4 @@
  *
  * @returns The negated function.
  */
-export default function negate(fn: Function): Function;
+export default function negate(fn: Function): (...args: any[]) => boolean;

@@ -2,7 +2,7 @@
  * Created by Rogier on 13/04/2017.
  */
 import KeyedIterator from '../../classes/KeyedIterator';
-import * as is from '../../lang/is';
+import is from '../../lang/is';
 /**
  * @generator
  * Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.

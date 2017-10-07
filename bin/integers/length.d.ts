@@ -1,11 +1,8 @@
 /**
- * Returns the length of an integer
+ * Returns the length of an integer (or trunc of any number).
  *
- * @public
- * @method int.length
+ * @param int - Integer to measure the length of.
  *
- * @param {number} int - integer to measure the length
- *
- * @returns {number} - length of the integer
+ * @returns Length of the integer.
  */
-export default function length(int: any): number;
+export default function length(int: number): number;

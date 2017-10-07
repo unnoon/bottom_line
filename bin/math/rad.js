@@ -1,28 +1,21 @@
-const DEGREE_2_RADIAN_FACTOR = Math.PI / 180;
-const PI2 = 2 * Math.PI;
+export const DEGREE_2_RADIAN_FACTOR = Math.PI / 180;
+export const PI2 = 2 * Math.PI;
 /**
  * Convert degrees to radians.
  *
- * @static
- * @method math.rad.convert
+ * @param degrees - The angle in degrees to convert.
  *
- * @param {number} degrees
- *
- * @returns {number} radians
+ * @returns The converted angle in radians.
  */
 export function from(degrees) {
     return degrees * DEGREE_2_RADIAN_FACTOR;
 }
 /**
- * normalizes an angle between 0 & 2*PI radians
+ * Normalizes an angle to the smallest positive angle.
  *
- * @public
- * @static
- * @method math.rad.normalize
+ * @param radians - The angle in radians.
  *
- * @param   {number} degrees - angle in radians
- *
- * @returns {number} - normalized angle
+ * @returns Normalized angle.
  */
 export function normalize(radians) {
     radians %= PI2;

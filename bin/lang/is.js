@@ -3,110 +3,126 @@
  */
 import KeyedIterator from '../classes/KeyedIterator';
 import negate from '../functions/negate';
-/**
- * Returns a boolean indicating if a value is an array.
- *
- * @param value - Value to identify as an array.
- *
- * @returns Boolean indicating if the value is an array.
- */
-export const array = Array.isArray;
-/**
- * returns true if a value is cloneable according to the structured clone algorithm.
- *
- * @param value - Value to check for cloneability.
- *
- * @returns Boolean indicating if the value is cloneable.
- */
-export function cloneable(value) {
-    return !(value instanceof Function
-        || value instanceof Error
-        || value instanceof WeakMap
-        || value instanceof HTMLElement
-        || typeof (value) === 'symbol');
-}
-/**
- * Returns a boolean indicating if a collection is empty.
- *
- * @param collection - Collection to check.
- *
- * @returns Boolean indicating if the collection is empty.
- */
-export function empty(collection) {
-    return KeyedIterator.create(collection).next().done;
-}
-/**
- * Returns a boolean indicating if an object is iterable.
- *
- * @param obj - Object to check iterability for.
- *
- * @returns Boolean indicating if the obj is iterable.
- */
-export function iterable(obj) {
-    return (obj !== null && !undefined(obj)) && typeof (obj[Symbol.iterator]) === 'function';
-}
-/**
- * Returns a boolean indicating if a value is NaN.
- *
- * @param value - Value to be identified as NaN.
- *
- * @returns Boolean indicating if the value is NaN.
- */
-export function nan(value) {
-    return Object.is(value, NaN);
-}
-/**
- * Returns a boolean indicating if a value is number.
- *
- * @param value - Value to be identified as a number.
- *
- * @returns Boolean indicating if the value is number.
- */
-export function number(value) {
-    return typeof (value) === 'number';
-}
-/**
- * Returns a boolean indicating if a value is string.
- *
- * @param value - Value to be identified as a string.
- *
- * @returns Boolean indicating if the value is string.
- */
-export function string(value) {
-    return typeof (value) === 'string';
-}
-/**
- * Returns a boolean indicating if a the value is a symbol.
- *
- * @param value - Value to identify as symbol.
- *
- * @returns Boolean indicating if value is a symbol.
- */
-export function symbol(value) {
-    return typeof (value) === 'symbol';
-}
-/**
- * Returns a boolean indicating if a value is undefined.
- *
- * @param {any} value - Value test if undefined.
- *
- * @returns Boolean indicating if the value is undefined.
- */
-export function undefined(value) {
-    return typeof (value) === 'undefined';
-}
-/**
- * Contains negated versions of functions.
- */
-export const not = {
-    array: negate(array),
-    cloneable: negate(cloneable),
-    empty: negate(empty),
-    iterable: negate(iterable),
-    nan: negate(nan),
-    number: negate(number),
-    string: negate(string),
-    symbol: negate(symbol),
-    undefined: negate(undefined),
+const not = {};
+const is = {
+    /**
+     * Returns a boolean indicating if a value is an array.
+     *
+     * @param value - Value to identify as an array.
+     *
+     * @returns Boolean indicating if the value is an array.
+     */
+    array: Array.isArray,
+    /**
+     * returns true if a value is cloneable according to the structured clone algorithm.
+     *
+     * @param value - Value to check for cloneability.
+     *
+     * @returns Boolean indicating if the value is cloneable.
+     */
+    cloneable: (value) => {
+        return !(value instanceof Function
+            || value instanceof Error
+            || value instanceof WeakMap
+            || value instanceof HTMLElement
+            || typeof (value) === 'symbol');
+    },
+    /**
+     * Returns a boolean indicating if a collection is empty.
+     *
+     * @param collection - Collection to check.
+     *
+     * @returns Boolean indicating if the collection is empty.
+     */
+    empty: (collection) => {
+        return KeyedIterator.create(collection).next().done;
+    },
+    /**
+     * Returns a boolean indicating if an object is iterable.
+     *
+     * @param obj - Object to check iterability for.
+     *
+     * @returns Boolean indicating if the obj is iterable.
+     */
+    iterable: (obj) => {
+        return obj !== null && obj !== undefined && typeof (obj[Symbol.iterator]) === 'function';
+    },
+    /**
+     * Returns a boolean indicating if a value is NaN.
+     *
+     * @param value - Value to be identified as NaN.
+     *
+     * @returns Boolean indicating if the value is NaN.
+     */
+    nan: (value) => {
+        return Object.is(value, NaN);
+    },
+    /**
+     * Contains negated versions of functions.
+     */
+    not,
+    /**
+     * Returns a boolean indicating if a value is null.
+     *
+     * @param value - Value to be identified as null.
+     *
+     * @returns Boolean indicating if the value is null.
+     */
+    null: (value) => {
+        return value === null;
+    },
+    /**
+     * Returns a boolean indicating if a value is number.
+     *
+     * @param value - Value to be identified as a number.
+     *
+     * @returns Boolean indicating if the value is number.
+     */
+    number: (value) => {
+        return typeof (value) === 'number';
+    },
+    /**
+     * Returns a boolean indicating if a value is string.
+     *
+     * @param value - Value to be identified as a string.
+     *
+     * @returns Boolean indicating if the value is string.
+     */
+    string: (value) => {
+        return typeof (value) === 'string';
+    },
+    /**
+     * Returns a boolean indicating if a the value is a symbol.
+     *
+     * @param value - Value to identify as symbol.
+     *
+     * @returns Boolean indicating if value is a symbol.
+     */
+    symbol: (value) => {
+        return typeof (value) === 'symbol';
+    },
+    /**
+     * Returns a boolean indicating if a value is undefined.
+     *
+     * @param {any} value - Value test if undefined.
+     *
+     * @returns Boolean indicating if the value is undefined.
+     */
+    undefined: (value) => {
+        return value === undefined;
+    },
 };
+is.not = {
+    array: negate(is.array),
+    cloneable: negate(is.cloneable),
+    empty: negate(is.empty),
+    iterable: negate(is.iterable),
+    nan: negate(is.nan),
+    null: negate(is.null),
+    number: negate(is.number),
+    string: negate(is.string),
+    symbol: negate(is.symbol),
+    undefined: negate(is.undefined),
+};
+export default is;
 //# sourceMappingURL=is.js.map

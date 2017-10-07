@@ -1,14 +1,13 @@
+/* tslint:disable:whitespace */
 /**
- * Returns the length of an integer
+ * Returns the length of an integer (or trunc of any number).
  *
- * @public
- * @method int.length
+ * @param int - Integer to measure the length of.
  *
- * @param {number} int - integer to measure the length
- *
- * @returns {number} - length of the integer
+ * @returns Length of the integer.
  */
 export default function length(int) {
-    return int ? 1 + Math.log10(int) | 0 : 1;
+    int = int | 0;
+    return (int ? 1 + Math.log10(Math.abs(int)) : 1) | 0;
 }
 //# sourceMappingURL=length.js.map

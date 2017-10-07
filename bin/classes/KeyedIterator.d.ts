@@ -12,6 +12,7 @@ export default class KeyedIterator<T> {
      */
     static create<T>(collection: Collection<T>): KeyedIterator<{}>;
     it: any;
+    [Symbol.toStringTag]: string;
     /**
      * Creates a new KeyedIterator.
      *
@@ -23,26 +24,9 @@ export default class KeyedIterator<T> {
     /**
      * Returns the next item in the iterator
      *
-     * @param substitute - Value to be substituted for the last yield.
-     *
      * @returns The next value object.
      */
-    next(substitute?: T): {
-        value: [any, T];
-        done: boolean;
-    };
-    /**
-     * Finishes the iterator and returns the value
-     *
-     * @param value - The value to return.
-     *
-     * @returns The value supplied.
-     */
-    return(value?: T): {
-        value: [any, T];
-        done: true;
-    };
-    throw<E extends Error>(exception: E): {
+    next(): {
         value: [any, T];
         done: boolean;
     };

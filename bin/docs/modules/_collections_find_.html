@@ -91,13 +91,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/e2e2fb4/src/collections/find.ts#L18">collections/find.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/6ceaf46/src/collections/find.ts#L17">collections/find.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Counts the occurrences matched by the match function. (value, key, collection) =&gt; boolean
-									Optionally a from &amp; to key can be provided for partial finds.</p>
+									<p>Returns the first value in a collection matched by the match function.</p>
 								</div>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -111,13 +110,13 @@
 								<li>
 									<h5>collection: <a href="_types_.html#collection" class="tsd-signature-type">Collection</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>The collection to find elements from.</p>
+										<p>The collection to search through.</p>
 									</div>
 								</li>
 								<li>
 									<h5>match: <span class="tsd-signature-type">function</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Match function.</p>
+										<p>The match function.</p>
 									</div>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-siganture">
@@ -147,18 +146,18 @@
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> from: <span class="tsd-signature-type">any</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Key to start finding.</p>
+										<p>Key to start searching.</p>
 									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> to: <span class="tsd-signature-type">any</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Key (exclusive) to stop finding.</p>
+										<p>Key (exclusive) to stop searching.</p>
 									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
-							<p>The total number of occurrences as matched by the match function.</p>
+							<p>The found value or undefined otherwise.</p>
 						</li>
 					</ul>
 				</section>

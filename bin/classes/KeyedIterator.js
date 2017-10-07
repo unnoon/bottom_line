@@ -14,6 +14,7 @@ export default class KeyedIterator {
      * @returns new KeyedIterator.
      */
     constructor(collection) {
+        this[Symbol.toStringTag] = 'Keyed Iterator';
         if (collection instanceof KeyedIterator) {
             return collection;
         }
@@ -53,25 +54,10 @@ export default class KeyedIterator {
     /**
      * Returns the next item in the iterator
      *
-     * @param substitute - Value to be substituted for the last yield.
-     *
      * @returns The next value object.
      */
-    next(substitute) {
-        return this.it.next(substitute);
-    }
-    /**
-     * Finishes the iterator and returns the value
-     *
-     * @param value - The value to return.
-     *
-     * @returns The value supplied.
-     */
-    return(value) {
-        return this.it.return(value);
-    }
-    throw(exception) {
-        return this.it.throw(exception);
+    next() {
+        return this.it.next();
     }
     /**
      * Makes sure the iterator is iterable.

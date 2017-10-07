@@ -2,6 +2,7 @@
  * Created by Rogier on 13/04/2017.
  */
 import reduce from '../collections/reduce';
+import is from '../lang/is';
 /**
  * Returns the right of a sequence from each last sub(element/string) index.
  * The original sequence is left unmodified.
@@ -16,7 +17,7 @@ import reduce from '../collections/reduce';
 export default function rightOfLast(sequence, ...subs) {
     const output = reduce(subs, (out, sub) => {
         const index = out.lastIndexOf(sub);
-        return ~index ? out.slice(index + (typeof (sub) === 'string' ? sub.length : 1)) : out;
+        return ~index ? out.slice(index + (is.string(sub) ? sub.length : 1)) : out;
     }, sequence);
     return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
 }

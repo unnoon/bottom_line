@@ -10,7 +10,7 @@
  * @returns The negated function.
  */
 /* tslint:disable-next-line:ban-types */
-export default function negate(fn: Function): Function
+export default function negate(fn: Function): (...args: any[]) => boolean
 {
     return function(...args)
     {

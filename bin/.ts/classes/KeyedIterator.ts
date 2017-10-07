@@ -23,6 +23,8 @@ export default class KeyedIterator<T>
 
     public it;
 
+    public [Symbol.toStringTag] = 'Keyed Iterator';
+
     /**
      * Creates a new KeyedIterator.
      *
@@ -59,30 +61,11 @@ export default class KeyedIterator<T>
     /**
      * Returns the next item in the iterator
      *
-     * @param substitute - Value to be substituted for the last yield.
-     *
      * @returns The next value object.
      */
-    public next(substitute?: T): {value: [any, T], done: boolean}
+    public next(): {value: [any, T], done: boolean}
     {
-        return this.it.next(substitute);
-    }
-
-    /**
-     * Finishes the iterator and returns the value
-     *
-     * @param value - The value to return.
-     *
-     * @returns The value supplied.
-     */
-    public return(value?: T): { value: [any, T], done: true }
-    {
-        return this.it.return(value);
-    }
-
-    public throw<E extends Error>(exception: E): { value: [any, T], done: boolean }
-    {
-        return this.it.throw(exception);
+        return this.it.next();
     }
 
     /**

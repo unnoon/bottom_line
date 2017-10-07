@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import KeyedIterator from '../../classes/KeyedIterator';
-import * as is from '../../lang/is';
+import KeyedIterator  from '../../classes/KeyedIterator';
+import is             from '../../lang/is';
 import { Collection } from '../../types';
 
 /**

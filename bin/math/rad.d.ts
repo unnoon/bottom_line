@@ -1,23 +1,18 @@
+export declare const DEGREE_2_RADIAN_FACTOR: number;
+export declare const PI2: number;
 /**
  * Convert degrees to radians.
  *
- * @static
- * @method math.rad.convert
+ * @param degrees - The angle in degrees to convert.
  *
- * @param {number} degrees
- *
- * @returns {number} radians
+ * @returns The converted angle in radians.
  */
-export declare function from(degrees: any): number;
+export declare function from(degrees: number): number;
 /**
- * normalizes an angle between 0 & 2*PI radians
+ * Normalizes an angle to the smallest positive angle.
  *
- * @public
- * @static
- * @method math.rad.normalize
+ * @param radians - The angle in radians.
  *
- * @param   {number} degrees - angle in radians
- *
- * @returns {number} - normalized angle
+ * @returns Normalized angle.
  */
-export declare function normalize(radians: any): any;
+export declare function normalize(radians: number): number;
