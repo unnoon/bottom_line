@@ -4,15 +4,16 @@
 import KeyedIterator from '../../classes/KeyedIterator';
 import is from '../../lang/is';
 /**
- * @generator
  * Enumerates any collection using a generic keyedIterator that returns a (artificial) key value pair.
  * Optionally a from & to key can be provided for partial enumeration.
+ *
+ * @generator
  *
  * @param collection - Collection to enumerate.
  * @param from       - From key to start enumeration.
  * @param to         - To key (exclusive) to stop enumeration.
  *
- * @yields {[any, any]} - Array containing key & value.
+ * @yields Array containing key & value [any, any].
  */
 export default function* enumerate(collection, from, to) {
     const it = KeyedIterator.create(collection);

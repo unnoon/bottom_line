@@ -2,9 +2,10 @@
  * Created by Rogier on 13/04/2017.
  */
 /**
- * @generator
  * Generic object keyedIterator.
  *
- * @yields {[any , any]} - Array containing key & value.
+ * @generator
+ *
+ * @yields Array containing key & value [any , any].
  */
 export declare function iterator(): IterableIterator<[any, any]>;

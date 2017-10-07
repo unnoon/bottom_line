@@ -8,6 +8,14 @@
  * @returns Range function which in turn returns the rebounded index.
  */
 export default function rebound(index) {
+    /**
+     * Range function
+     *
+     * @param min - Lower bound (inclusive).
+     * @param max - Upper bound (exclusive).
+     *
+     * @returns Rebounded index.
+     */
     return (min, max) => {
         index = index | 0;
         min = min | 0;
