@@ -22,8 +22,7 @@ export default class XDArray extends Array {
         let i = 0;
         let pos;
         for (; i < dim; i++) {
-            pos = clone(position);
-            pos.push(i);
+            pos = [...position, i];
             if (dimensions.length === pos.length) {
                 switch (true) {
                     case init instanceof Function:

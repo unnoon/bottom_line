@@ -27,7 +27,7 @@ export default class XDArray extends Array
 
         for(; i < dim; i++)
         {
-            pos = clone(position); pos.push(i);
+            pos = [...position, i];
 
             if(dimensions.length === pos.length)
             {

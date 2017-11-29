@@ -9,14 +9,14 @@ import enumerate from './generators/enumerate';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns The iterated collection.
+ * @returns Boolean indicating if iteration was UNbroken.
  */
 export default function each(collection, iteratee, from, to) {
     for (const [key, value] of enumerate(collection, from, to)) {
         if (iteratee(value, key, collection) === false) {
-            break;
+            return false;
         } // break loop if 'false' is returned by iteratee
     }
-    return collection;
+    return true;
 }
 //# sourceMappingURL=each.js.map

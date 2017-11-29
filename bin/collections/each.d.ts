@@ -12,6 +12,6 @@ import { Collection } from '../types';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns The iterated collection.
+ * @returns Boolean indicating if iteration was UNbroken.
  */
-export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any | boolean, from?: any, to?: any): Collection<T>;
+export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any | boolean, from?: any, to?: any): boolean;

@@ -14,14 +14,14 @@ import enumerate from './generators/enumerate';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns The iterated collection.
+ * @returns Boolean indicating if iteration was UNbroken.
  */
-export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any|boolean, from?, to?): Collection<T>
+export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any|boolean, from?, to?): boolean
 {
     for(const [key, value] of enumerate(collection, from, to))
     {
-        if(iteratee(value, key, collection) === false) { break; } // break loop if 'false' is returned by iteratee
+        if(iteratee(value, key, collection) === false) { return false; } // break loop if 'false' is returned by iteratee
     }
 
-    return collection;
+    return true
 }
