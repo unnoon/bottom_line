@@ -11,7 +11,7 @@ describe('collections/each', () =>
 
         const result = each(obj, (value, key) => entries.push([key, value]));
 
-        expect(result).to.eql(obj);
+        expect(result).to.eql(true);
         expect(entries).to.eql([['x', 0], ['y', 1], ['z', 2]]);
     });
 
@@ -22,7 +22,7 @@ describe('collections/each', () =>
 
         const result = each(str, (value, key) => entries.push([key, value]));
 
-        expect(result).to.eql(str);
+        expect(result).to.eql(true);
         expect(entries).to.eql([[0, '1'], [1, '2'], [2, '3']]);
     });
 
@@ -38,7 +38,7 @@ describe('collections/each', () =>
             return key !== 1; // break after index 1
         });
 
-        expect(result).to.eql(str);
+        expect(result).to.eql(false);
         expect(entries).to.eql([[0, '1'], [1, '2']]);
     });
 
@@ -49,7 +49,7 @@ describe('collections/each', () =>
 
         const result = each(str, (value, key) => entries.push([key, value]), 0, 2);
 
-        expect(result).to.eql(str);
+        expect(result).to.eql(true);
         expect(entries).to.eql([[0, '1'], [1, '2']]);
     });
 
@@ -62,7 +62,7 @@ describe('collections/each', () =>
 
         const result = each(map, (value, key) => entries.push([key, value]), 'x', keyZ);
 
-        expect(result).to.eql(map);
+        expect(result).to.eql(true);
         expect(entries).to.eql([['x', 1], ['y', 2]]);
     });
 
@@ -86,7 +86,7 @@ describe('collections/each', () =>
 
         const result = each(fib, (value, key) => entries.push([key, value]), 2, 5);
 
-        expect(result).to.eql(fib);
+        expect(result).to.eql(true);
         expect(entries).to.eql([[2, 2], [3, 3], [4, 5]]);
     });
 
@@ -97,7 +97,7 @@ describe('collections/each', () =>
 
         const result = each(arr, (value, key) => entries.push([key, value]));
 
-        expect(result).to.eql(arr);
+        expect(result).to.eql(true);
         expect(entries).to.eql([[0, [1, 2]], [1, [3, 4]], [2, [5, 6]]]);
     });
 
