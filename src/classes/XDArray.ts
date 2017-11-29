@@ -16,6 +16,8 @@ export default class XDArray extends Array
      * @param dimensions - Array containing the dimensions.
      * @param init       - Value (shallow-cloned) or initializer function to initialize the array. The Value wrapper can be used to force uncloneable values.
      * @param position   - Array containing the position of the source array in the root array.
+     *
+     * @returns dimensionalized input arr.
      */
     public static dimensionalize(arr: any[], dimensions: number[], init: any|Value|((position: number[], dimensions: number[]) => any) = null, position: number[] = [])
     {
@@ -41,6 +43,8 @@ export default class XDArray extends Array
                 XDArray.dimensionalize(arr[i] = [], dimensions, init, pos); // add another dimension.
             }
         }
+
+        return arr
     }
 
     /**

@@ -36,4 +36,13 @@ describe('classes/XDArray', () =>
         expect(xdarray[1][0][2]()).to.eql(3);
     });
 
+    it('should static initialize a multi-dimensional array using any input array', () =>
+    {
+        const init    = {x: 1};
+        const xdarray = XDArray.dimensionalize([], [3, 2, 4], init);
+
+        expect(xdarray[1][0][2]).to.eql({x: 1});
+        expect(xdarray[1][0][2] === init).to.be.false;
+    });
+
 });
