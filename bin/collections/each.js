@@ -9,7 +9,7 @@ import enumerate from './generators/enumerate';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns Boolean indicating if iteration was UNbroken.
+ * @returns Boolean indicating if iteration was UNbroken. Handy for breaking nested each loops.
  */
 export default function each(collection, iteratee, from, to) {
     for (const [key, value] of enumerate(collection, from, to)) {

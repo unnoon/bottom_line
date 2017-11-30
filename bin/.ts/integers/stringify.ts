@@ -16,7 +16,7 @@ export default function stringify(int: number, format: string): string
     const len = format.length;
     const max = Math.pow(10, len);
 
-    int = rebound(int)(0, max);
+    int = rebound(int,0, max);
 
     return (int / max).toFixed(len).substr(2);
 }

@@ -14,4 +14,4 @@ import rebound from '../../src/integers/rebound';
 
 // const r1 = rebound(-3)(-5, 7); // -3
 // const r2 = rebound(-7)(-5, 7); // 6
-const r2 = rebound(-1)(1, 2); // 6
+const r2 = rebound(-1, 1, 2); // 6
