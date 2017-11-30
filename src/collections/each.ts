@@ -14,7 +14,7 @@ import enumerate from './generators/enumerate';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns Boolean indicating if iteration was UNbroken.
+ * @returns Boolean indicating if iteration was UNbroken. Handy for breaking nested each loops.
  */
 export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any|boolean, from?, to?): boolean
 {
