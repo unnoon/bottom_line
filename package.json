@@ -36,6 +36,7 @@
     "preversion": "npm test",
     "version": "npm run build && git add -A bin/",
     "postversion": "git push && git push --tags && npm publish bin/",
+    "prototype": "webpack --progress --colors --watch",
     "test": "karma start --single-run",
     "update": "ncu -u -a && npm install"
   },
