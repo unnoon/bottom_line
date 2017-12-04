@@ -19,7 +19,7 @@ export default function* enumerate(collection, from, to) {
     const it = KeyedIterator.create(collection);
     let yields = it.next();
     let kvp = yields.value; // key-value-pair
-    from = is.undefined(from) && kvp ? kvp[0] : from;
+    from = (is.undefined(from) && kvp) ? kvp[0] : from;
     /* tslint:disable-next-line:no-empty */
     for (; !yields.done && kvp[0] !== from; yields = it.next(), kvp = yields.value) { } // fast forward to from
     for (; !yields.done && kvp[0] !== to; yields = it.next(), kvp = yields.value) {

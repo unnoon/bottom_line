@@ -12,6 +12,6 @@ import { Collection } from '../types';
  * @param from       - Key to start iteration.
  * @param to         - Key (exclusive) to stop iteration.
  *
- * @returns Boolean indicating if iteration was UNbroken. Handy for breaking nested each loops.
+ * @returns Boolean indicating if iteration was UN-broken. Handy for breaking nested each loops.
  */
 export default function each<T>(collection: Collection<T>, iteratee: (value, key, collection: Collection<T>) => any | boolean, from?: any, to?: any): boolean;

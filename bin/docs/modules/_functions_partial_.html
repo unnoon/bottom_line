@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;sequences/rightOfLast&quot; | bottom_line</title>
+	<title>&quot;functions/partial&quot; | bottom_line</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_sequences_rightoflast_.html">&quot;sequences/rightOfLast&quot;</a>
+					<a href="_functions_partial_.html">&quot;functions/partial&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;sequences/rightOfLast&quot;</h1>
+			<h1>External module &quot;functions/partial&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +73,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter"><a href="_sequences_rightoflast_.html#rightoflast" class="tsd-kind-icon">right<wbr>OfLast</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_functions_partial_.html#partial" class="tsd-kind-icon">partial</a></li>
 							</ul>
 						</section>
 					</div>
@@ -81,50 +81,38 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-					<a name="rightoflast" class="tsd-anchor"></a>
-					<h3>right<wbr>OfLast</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">right<wbr>OfLast&lt;T&gt;<span class="tsd-signature-symbol">(</span>sequence<span class="tsd-signature-symbol">: </span><a href="_types_.html#sequence" class="tsd-signature-type">Sequence</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, <span class="tsd-signature-symbol">...</span>subs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_types_.html#sequence" class="tsd-signature-type">Sequence</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
+					<a name="partial" class="tsd-anchor"></a>
+					<h3>partial</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
+						<li class="tsd-signature tsd-kind-icon">partial<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span>, partials<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/847b260/src/sequences/rightOfLast.ts#L19">sequences/rightOfLast.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/847b260/src/functions/partial.ts#L16">functions/partial.ts:16</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns the right of a sequence from each last sub(element/string) index.
-										The original sequence is left unmodified.
-										In case the sub is not found, the entire sequence is returned.
-									Arrays are only checked on a sub-element basis (using lastIndexOf).</p>
+									<p>Return a function with negated output of the original function.</p>
 								</div>
 							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>T</h4>
-								</li>
-							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>sequence: <a href="_types_.html#sequence" class="tsd-signature-type">Sequence</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>fn: <span class="tsd-signature-type">Function</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>The sequence.</p>
+										<p>Function to negate.</p>
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>subs: <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">[]</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>One or multiple subs.</p>
-									</div>
+									<h5>partials: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="_types_.html#sequence" class="tsd-signature-type">Sequence</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
-							<p>The sub-sequence right of each last found sub(element/string) index.</p>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span></h4>
+							<p>The negated function.</p>
 						</li>
 					</ul>
 				</section>
@@ -137,14 +125,14 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_sequences_rightoflast_.html">"sequences/right<wbr>OfLast"</a>
+						<a href="_functions_partial_.html">"functions/partial"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_sequences_rightoflast_.html#rightoflast" class="tsd-kind-icon">right<wbr>OfLast</a>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module">
+						<a href="_functions_partial_.html#partial" class="tsd-kind-icon">partial</a>
 					</li>
 				</ul>
 			</nav>

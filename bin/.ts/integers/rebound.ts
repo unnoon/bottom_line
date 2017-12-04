@@ -14,7 +14,9 @@ export default function rebound(index: number, min: number, max: number): number
 
     const range = max - min + 1;
 
-    return (index > max
+    return (
+        index > max
         ? min + (index - min) % range
-        : max + (index - max) % range)|0
+        : max + (index - max) % range
+    )|0
 }
