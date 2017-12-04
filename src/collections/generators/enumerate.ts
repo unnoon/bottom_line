@@ -21,10 +21,10 @@ export default function* enumerate<T>(collection: Collection<T>, from?, to?): It
 {
     const it = KeyedIterator.create(collection);
 
-    let yields = it.next();
+    let yields          = it.next();
     let kvp: [any, any] = yields.value; // key-value-pair
 
-    from = is.undefined(from) && kvp ? kvp[0] : from;
+    from = (is.undefined(from) && kvp) ? kvp[0] : from;
 
     /* tslint:disable-next-line:no-empty */
     for(;!yields.done && kvp[0] !== from; yields = it.next(), kvp = yields.value) {} // fast forward to from
