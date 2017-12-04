@@ -10,8 +10,15 @@ import count from '../../src/collections/count';
 import each from '../../src/collections/each';
 import aliases from '../../src/decorators/aliases';
 import rebound from '../../src/integers/rebound';
-// import KeyPropertyDescriptor from '../../src/classes/KeyPropertyDescriptor';
+import partial from '../../src/functions/partial';
 
-// const r1 = rebound(-3)(-5, 7); // -3
-// const r2 = rebound(-7)(-5, 7); // 6
-const r2 = rebound(-1, 1, 2); // 6
+/* tslint:disable-next-line:only-arrow-functions */
+const fn = function(a, b, c, d, e)
+{
+    return a + b + c + d + e
+};
+
+const partialFn = partial(fn, [1, undefined, 3, undefined, 5]);
+
+console.assert(fn(1, 2, 3, 4, 5) === 15);
+console.assert(partialFn(2, 4) === 15);
