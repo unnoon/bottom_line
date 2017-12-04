@@ -14,6 +14,7 @@
     "no-bitwise": false,
     "object-literal-sort-keys": false,
     "one-line":        [true, "check-whitespace"],
+    "ordered-imports": false,
     "quotemark":       [true, "single", "jsx-single", "avoid-escape"],
     "semicolon":       [false],
     "typedef-whitespace": [true, {"property-declaration": "nospace"}],
