@@ -44,7 +44,7 @@ export default class KeyPropertyDescriptor<T> {
      *
      * @returns This for chaining.
      */
-    onaccess(fn: Function): KeyPropertyDescriptor<T>;
+    onaccess(fn: (v: T) => T): KeyPropertyDescriptor<T>;
     /**
      * Easy onupdate wrapper. Value is piped thru using flow.
      * In case you'll want to use 'this' make sure you don't use a shorthand function.
@@ -64,7 +64,7 @@ export default class KeyPropertyDescriptor<T> {
      *
      * @returns This for chaining.
      */
-    onexecute(fn: Function): KeyPropertyDescriptor<T>;
+    onexecute(fn: T): KeyPropertyDescriptor<T>;
     /**
      * Defines a instance or static property (so no methods).
      *
