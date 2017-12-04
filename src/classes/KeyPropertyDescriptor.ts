@@ -82,7 +82,7 @@ export default class KeyPropertyDescriptor<T>
      * @returns This for chaining.
      */
     // tslint:disable-next-line:ban-types
-    public onaccess(fn: Function): KeyPropertyDescriptor<T> // value is piped thru using flow
+    public onaccess(fn: (v: T) => T): KeyPropertyDescriptor<T> // value is piped thru using flow
     {
         this.get = flow(this.get || this.identityGetter(), fn);
         this.set = this.set || this.identitySetter();
@@ -116,11 +116,11 @@ export default class KeyPropertyDescriptor<T>
      * @returns This for chaining.
      */
     // tslint:disable-next-line:ban-types
-    public onexecute(fn: Function): KeyPropertyDescriptor<T>
+    public onexecute(fn: T): KeyPropertyDescriptor<T>
     {
         // TODO this is super ugly
         // tslint:disable-next-line:ban-types
-        this.value = flow(this.value as any as Function, fn) as any as T; // wrap functions
+        this.value = flow(this.value as any, fn as any) as any as T; // wrap functions
 
         return this;
     }
