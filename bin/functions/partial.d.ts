@@ -1,8 +1,9 @@
 /**
- * Return a function with negated output of the original function.
+ * Return a function with partial default arguments.
  *
- * @param fn - Function to negate.
+ * @param fn       - Function to partialize.
+ * @param partials - Array containing default argument values. Use 'undefined' for blanks.
  *
- * @returns The negated function.
+ * @returns The partial function.
  */
 export default function partial(fn: Function, partials: any[]): Function;

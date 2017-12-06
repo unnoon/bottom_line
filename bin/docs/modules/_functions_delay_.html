@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;lang/not&quot; | bottom_line</title>
+	<title>&quot;functions/delay&quot; | bottom_line</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_lang_not_.html">&quot;lang/not&quot;</a>
+					<a href="_functions_delay_.html">&quot;functions/delay&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;lang/not&quot;</h1>
+			<h1>External module &quot;functions/delay&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -80,7 +80,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_lang_not_.html#not" class="tsd-kind-icon">not</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module"><a href="_functions_delay_.html#delay" class="tsd-kind-icon">delay</a></li>
 							</ul>
 						</section>
 					</div>
@@ -89,34 +89,40 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module">
-					<a name="not" class="tsd-anchor"></a>
-					<h3>not</h3>
+					<a name="delay" class="tsd-anchor"></a>
+					<h3>delay</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module">
-						<li class="tsd-signature tsd-kind-icon">not<span class="tsd-signature-symbol">(</span>predicate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">delay<span class="tsd-signature-symbol">(</span>ms<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/be8cc61/src/lang/not.ts#L12">lang/not.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/be8cc61/src/functions/delay.ts#L14">functions/delay.ts:14</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Negates a given predicate.</p>
+									<p>Delays a function call by a given number of milliseconds.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>predicate: <span class="tsd-signature-type">any</span></h5>
+									<h5>ms: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Predicate to negate.</p>
+										<p>Delay in milliseconds.</p>
+									</div>
+								</li>
+								<li>
+									<h5>fn: <span class="tsd-signature-type">Function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Function to delay.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-							<p>The negated predicate.</p>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>Identifier to be used by cancelDelay</p>
 						</li>
 					</ul>
 				</section>
@@ -129,14 +135,14 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_lang_not_.html">"lang/not"</a>
+						<a href="_functions_delay_.html">"functions/delay"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-function tsd-parent-kind-external-module">
-						<a href="_lang_not_.html#not" class="tsd-kind-icon">not</a>
+						<a href="_functions_delay_.html#delay" class="tsd-kind-icon">delay</a>
 					</li>
 				</ul>
 			</nav>

@@ -91,12 +91,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/c71c64a/src/functions/partial.ts#L16">functions/partial.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/unnoon/bottom_line/blob/be8cc61/src/functions/partial.ts#L17">functions/partial.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Return a function with negated output of the original function.</p>
+									<p>Return a function with partial default arguments.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -104,15 +104,18 @@
 								<li>
 									<h5>fn: <span class="tsd-signature-type">Function</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Function to negate.</p>
+										<p>Function to partialize.</p>
 									</div>
 								</li>
 								<li>
 									<h5>partials: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Array containing default argument values. Use &#39;undefined&#39; for blanks.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span></h4>
-							<p>The negated function.</p>
+							<p>The partial function.</p>
 						</li>
 					</ul>
 				</section>
