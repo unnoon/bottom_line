@@ -5,6 +5,8 @@
 import is    from '../lang/is'
 import count from '../collections/count'
 
+const _ = Symbol('blank');
+
 /**
  * Return a function with partial default arguments.
  *
@@ -16,7 +18,7 @@ import count from '../collections/count'
 /* tslint:disable-next-line:ban-types */
 export default function partial(fn: Function, partials: any[]): Function
 {
-    const blanks     = count(partials, (part) => is.undefined(part));
+    const blanks     = count(partials, (part) => (part === _));
     const n_partials = partials.length;
 
     return function(...args)
@@ -29,9 +31,11 @@ export default function partial(fn: Function, partials: any[]): Function
 
         for(; i < max; i++)
         {
-            filledArgs[i] = (partials[i] !== undefined) ? partials[i] : args[arg++];
+            filledArgs[i] = (partials[i] !== _) ? partials[i] : args[arg++];
         }
 
         return fn.apply(this, filledArgs);
     }
 }
+
+export { partial, _ }
