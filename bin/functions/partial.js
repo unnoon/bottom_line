@@ -1,8 +1,8 @@
 /**
  * Created by Rogier on 13/04/2017.
  */
-import is from '../lang/is';
 import count from '../collections/count';
+const _ = Symbol('blank');
 /**
  * Return a function with partial default arguments.
  *
@@ -13,7 +13,7 @@ import count from '../collections/count';
  */
 /* tslint:disable-next-line:ban-types */
 export default function partial(fn, partials) {
-    const blanks = count(partials, (part) => is.undefined(part));
+    const blanks = count(partials, (part) => (part === _));
     const n_partials = partials.length;
     return function (...args) {
         const max = n_partials + args.length - blanks;
@@ -21,9 +21,10 @@ export default function partial(fn, partials) {
         let i = 0;
         let arg = 0;
         for (; i < max; i++) {
-            filledArgs[i] = (partials[i] !== undefined) ? partials[i] : args[arg++];
+            filledArgs[i] = (partials[i] !== _) ? partials[i] : args[arg++];
         }
         return fn.apply(this, filledArgs);
     };
 }
+export { partial, _ };
 //# sourceMappingURL=partial.js.map

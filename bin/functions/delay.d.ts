@@ -7,6 +7,6 @@
  * @param ms - Delay in milliseconds.
  * @param fn - Function to delay.
  *
- * @returns Identifier to be used by cancelDelay
+ * @returns Identifier to be used by cancelDelay.
  */
 export default function delay(ms: number, fn: Function): number;

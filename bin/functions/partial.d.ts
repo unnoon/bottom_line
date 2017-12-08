@@ -1,3 +1,4 @@
+declare const _: symbol;
 /**
  * Return a function with partial default arguments.
  *
@@ -7,3 +8,4 @@
  * @returns The partial function.
  */
 export default function partial(fn: Function, partials: any[]): Function;
+export { partial, _ };
