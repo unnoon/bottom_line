@@ -10,7 +10,7 @@ import count from '../../src/collections/count';
 import each from '../../src/collections/each';
 import aliases from '../../src/decorators/aliases';
 import rebound from '../../src/integers/rebound';
-import partial from '../../src/functions/partial';
+import { partial, _ } from '../../src/functions/partial';
 
 /* tslint:disable-next-line:only-arrow-functions */
 const fn = function(a, b, c, d, e)
@@ -18,7 +18,7 @@ const fn = function(a, b, c, d, e)
     return a + b + c + d + e
 };
 
-const partialFn = partial(fn, [1, undefined, 3, undefined, 5]);
+const partialFn = partial(fn, [1, _, 3, _, 5]);
 
 console.assert(fn(1, 2, 3, 4, 5) === 15);
 console.assert(partialFn(2, 4) === 15);
