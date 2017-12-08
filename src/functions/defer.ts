@@ -3,12 +3,14 @@
  */
 
 /**
- * Defers a function call to the end of the stack
+ * Defers a function call to the end of the stack.
  *
  * @param fn - Function to defer.
+ *
+ * @returns Identifier to be used by cancelDelay.
  */
 /* tslint:disable-next-line:ban-types */
-export default function defer(fn: Function)
+export default function defer(fn: Function): number
 {
-    setTimeout(fn, 0)
+    return setTimeout(fn, 0)
 }
