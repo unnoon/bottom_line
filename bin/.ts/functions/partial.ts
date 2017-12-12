@@ -18,12 +18,12 @@ const _ = Symbol('blank');
 /* tslint:disable-next-line:ban-types */
 export default function partial(fn: Function, partials: any[]): Function
 {
-    const blanks     = count(partials, (part) => (part === _));
-    const n_partials = partials.length;
+    const blanks  = count(partials, (part) => (part === _));
+    const n_parts = partials.length - blanks;
 
     return function(...args)
     {
-        const max        = n_partials + args.length - blanks;
+        const max        = n_parts + args.length;
         const filledArgs = [];
 
         let i   = 0;
