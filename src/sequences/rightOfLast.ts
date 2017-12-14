@@ -18,11 +18,15 @@ import { Sequence } from '../types';
  */
 export default function rightOfLast<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
+    const lastIndexOf = sequence['lastIndexOf'] || Array.prototype.indexOf;
+    const slice       = sequence['slice']       || Array.prototype.slice;
+
     const output = reduce(subs, (out, sub) =>
     {
-        const index = out.lastIndexOf(sub);
-        return ~index ? out.slice(index + (is.string(sub) ? sub.length : 1)) : out;
+        const index = lastIndexOf.call(out, sub);
+
+        return ~index ? slice.call(out, index + (is.string(sub) ? sub.length : 1)) : out;
     }, sequence);
 
-    return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
+    return output === sequence ? slice.call(sequence) : output // copy in case nothing changed.
 }

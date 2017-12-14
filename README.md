@@ -7,7 +7,7 @@
 
 _- Adds face to your code_
 
-Javascript utility functions that work on any Collection (Iterable(Iterators)|Objects) or Sequence (any[]|string). 
+Javascript utility functions that work on any Collection<T> (Iterable<T>|object) or Sequence<T> (ArrayLike<T>).
 Harnessing the power of generators & decorators and coming in handy per function packages.
 
 ## Installation

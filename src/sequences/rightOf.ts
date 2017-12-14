@@ -18,11 +18,15 @@ import { Sequence } from '../types';
  */
 export default function rightOf<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
+    const indexOf = sequence['indexOf'] || Array.prototype.indexOf;
+    const slice   = sequence['slice']   || Array.prototype.slice;
+
     const output = reduce(subs, (out, sub) =>
     {
-        const index = out.indexOf(sub);
-        return ~index ? out.slice(index + (is.string(sub) ? sub.length : 1)) : out;
+        const index = indexOf.call(out, sub);
+
+        return ~index ? slice.call(out, index + (is.string(sub) ? sub.length : 1)) : out;
     }, sequence);
 
-    return output === sequence ? sequence.slice() : output; // copy
+    return output === sequence ? slice.call(sequence) : output // copy
 }

@@ -42,4 +42,28 @@ describe('sequences/leftOf', () =>
         expect(leftOfArr).to.eql([2, 3]);
         expect(arr).to.eql([2, 3, 5, 3, 6]);
     });
+
+    it('should work on arraylikes', () =>
+    {
+        const arraylike =  {
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        };
+
+        const leftOfArguments = leftOf(arraylike, 5);
+
+        expect(leftOfArguments).to.eql([2, 3]);
+        expect(arraylike).to.eql({
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        });
+    });
 });
