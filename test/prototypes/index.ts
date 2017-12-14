@@ -11,14 +11,19 @@ import each from '../../src/collections/each';
 import aliases from '../../src/decorators/aliases';
 import rebound from '../../src/integers/rebound';
 import { partial, _ } from '../../src/functions/partial';
+import leftOf from '../../src/sequences/leftOf';
+import {expect} from '../unit/test-utils.spec';
+// import {expect} from '../unit/test-utils.spec';
 
-/* tslint:disable-next-line:only-arrow-functions */
-const fn = function(a, b, c, d, e)
-{
-    return a + b + c + d + e
+const arraylike =  {
+    0: 2,
+    1: 3,
+    2: 5,
+    3: 3,
+    4: 6,
+    length: 5,
 };
 
-const partialFn = partial(fn, [1, _, 3, _, 5]);
+const leftOfArguments = leftOf(arraylike, 5);
 
-console.assert(fn(1, 2, 3, 4, 5) === 15);
-console.assert(partialFn(2, 4) === 15);
+console.log(leftOfArguments === [2, 3]);
