@@ -13,6 +13,7 @@ import rebound from '../../src/integers/rebound';
 import { partial, _ } from '../../src/functions/partial';
 import leftOf from '../../src/sequences/leftOf';
 import {expect} from '../unit/test-utils.spec';
+import leftOfLast from '../../src/sequences/leftOfLast';
 // import {expect} from '../unit/test-utils.spec';
 
 const arraylike =  {
@@ -21,9 +22,11 @@ const arraylike =  {
     2: 5,
     3: 3,
     4: 6,
+    5: 5,
+    6: 1,
     length: 5,
 };
 
-const leftOfArguments = leftOf(arraylike, 5);
+const leftOfLastArrayLike = leftOfLast(arraylike, 5, 3);
 
-console.log(leftOfArguments === [2, 3]);
+console.log(leftOfLastArrayLike === [2, 3, 5]);
