@@ -1,6 +1,7 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 import rightOfLast from '../../../src/sequences/rightOfLast';
 import { expect } from '../test-utils.spec';
+import leftOfLast from '../../../src/sequences/leftOfLast';
 
 describe('sequences/rightOfLast', () =>
 {
@@ -40,5 +41,29 @@ describe('sequences/rightOfLast', () =>
 
         expect(rightOfLastArr).to.eql([6]);
         expect(arr).to.eql([2, 3, 5, 3, 6]);
+    });
+
+    it('should work on arraylikes', () =>
+    {
+        const arraylike =  {
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        };
+
+        const rightOfLastArrayLike = rightOfLast(arraylike, 3);
+
+        expect(rightOfLastArrayLike).to.eql([6]);
+        expect(arraylike).to.eql({
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        });
     });
 });

@@ -2,6 +2,7 @@
 
 import rightOf from '../../../src/sequences/rightOf';
 import { expect } from '../test-utils.spec';
+import leftOf from '../../../src/sequences/leftOf';
 
 describe('sequences/rightOf', () =>
 {
@@ -41,5 +42,29 @@ describe('sequences/rightOf', () =>
 
         expect(rightOfArr).to.eql([5, 3, 6]);
         expect(arr).to.eql([2, 3, 5, 3, 6]);
+    });
+
+    it('should work on arraylikes', () =>
+    {
+        const arraylike =  {
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        };
+
+        const leftOfArrayLike = rightOf(arraylike, 3);
+
+        expect(leftOfArrayLike).to.eql([5, 3, 6]);
+        expect(arraylike).to.eql({
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            length: 5,
+        });
     });
 });

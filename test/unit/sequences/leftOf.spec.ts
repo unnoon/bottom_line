@@ -54,9 +54,9 @@ describe('sequences/leftOf', () =>
             length: 5,
         };
 
-        const leftOfArguments = leftOf(arraylike, 5);
+        const leftOfArrayLike = leftOf(arraylike, 5);
 
-        expect(leftOfArguments).to.eql([2, 3]);
+        expect(leftOfArrayLike).to.eql([2, 3]);
         expect(arraylike).to.eql({
             0: 2,
             1: 3,

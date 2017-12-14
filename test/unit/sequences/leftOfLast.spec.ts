@@ -2,6 +2,7 @@
 
 import leftOfLast from '../../../src/sequences/leftOfLast';
 import { expect } from '../test-utils.spec';
+import leftOf from '../../../src/sequences/leftOf';
 
 describe('sequences/leftOfLast', () =>
 {
@@ -41,5 +42,33 @@ describe('sequences/leftOfLast', () =>
 
         expect(leftOfLastArr).to.eql([2, 3, 5]);
         expect(arr).to.eql([2, 3, 5, 3, 6, 5, 1]);
+    });
+
+    it('should work on arraylikes', () =>
+    {
+        const arraylike =  {
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            5: 5,
+            6: 1,
+            length: 7,
+        };
+
+        const leftOfLastArrayLike = leftOfLast(arraylike, 5, 3);
+
+        expect(leftOfLastArrayLike).to.eql([2, 3, 5]);
+        expect(arraylike).to.eql({
+            0: 2,
+            1: 3,
+            2: 5,
+            3: 3,
+            4: 6,
+            5: 5,
+            6: 1,
+            length: 7,
+        });
     });
 });
