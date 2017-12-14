@@ -2,7 +2,6 @@
 
 import leftOfLast from '../../../src/sequences/leftOfLast';
 import { expect } from '../test-utils.spec';
-import leftOf from '../../../src/sequences/leftOf';
 
 describe('sequences/leftOfLast', () =>
 {

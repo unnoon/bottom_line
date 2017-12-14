@@ -1,7 +1,6 @@
 /* tslint:disable:no-unused-expression max-classes-per-file no-console no-shadowed-variable*/
 import rightOfLast from '../../../src/sequences/rightOfLast';
 import { expect } from '../test-utils.spec';
-import leftOfLast from '../../../src/sequences/leftOfLast';
 
 describe('sequences/rightOfLast', () =>
 {

@@ -2,7 +2,6 @@
 
 import rightOf from '../../../src/sequences/rightOf';
 import { expect } from '../test-utils.spec';
-import leftOf from '../../../src/sequences/leftOf';
 
 describe('sequences/rightOf', () =>
 {
