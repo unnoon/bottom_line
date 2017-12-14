@@ -17,11 +17,15 @@ import { Sequence } from '../types';
  */
 export default function leftOfLast<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
+    const lastIndexOf = sequence['lastIndexOf'] || Array.prototype.lastIndexOf;
+    const slice       = sequence['slice']       || Array.prototype.slice;
+
     const output = reduce(subs, (out, sub) =>
     {
-        const index: number = out.lastIndexOf(sub);
-        return ~index ? out.slice(0, index) : out;
+        const index: number = lastIndexOf.call(out, sub);
+
+        return ~index ? slice.call(out, 0, index) : out;
     }, sequence);
 
-    return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
+    return output === sequence ? slice.call(sequence) : output // copy in case nothing changed.
 }

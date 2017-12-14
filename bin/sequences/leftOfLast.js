@@ -14,10 +14,12 @@ import reduce from '../collections/reduce';
  * @returns The sub-sequence left of each last found sub(element/string) index.
  */
 export default function leftOfLast(sequence, ...subs) {
+    const lastIndexOf = sequence['lastIndexOf'] || Array.prototype.lastIndexOf;
+    const slice = sequence['slice'] || Array.prototype.slice;
     const output = reduce(subs, (out, sub) => {
-        const index = out.lastIndexOf(sub);
-        return ~index ? out.slice(0, index) : out;
+        const index = lastIndexOf.call(out, sub);
+        return ~index ? slice.call(out, 0, index) : out;
     }, sequence);
-    return output === sequence ? sequence.slice() : output; // copy in case nothing changed.
+    return output === sequence ? slice.call(sequence) : output; // copy in case nothing changed.
 }
 //# sourceMappingURL=leftOfLast.js.map

@@ -1,7 +1,7 @@
 import KeyPropertyDescriptor from './classes/KeyPropertyDescriptor';
 
 export type Collection<T> = Iterable<T>|object;
-export type Sequence<T>   = string|T[];
+export type Sequence<T>   = ArrayLike<T>;
 export type Class<C>      = ({new(): C});
 export type Prototype<C>  = object; // TODO see if we can improve this.... seems to be hard/impossible because type of constructor = Function
 

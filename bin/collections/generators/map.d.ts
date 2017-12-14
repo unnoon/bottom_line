@@ -8,7 +8,7 @@ import { Collection } from '../../types';
  *
  * @generator
  *
- * @param collection - Collection to enumerate.
+ * @param collection - Collection to map.
  * @param iteratee   - Function that maps each value.
  * @param from       - Key to start mapping.
  * @param to         - Key (exclusive) to stop mapping.
