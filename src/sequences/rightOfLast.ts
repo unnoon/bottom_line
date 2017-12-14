@@ -18,7 +18,7 @@ import { Sequence } from '../types';
  */
 export default function rightOfLast<T>(sequence: Sequence<T>, ...subs: T[]): Sequence<T>
 {
-    const lastIndexOf = sequence['lastIndexOf'] || Array.prototype.indexOf;
+    const lastIndexOf = sequence['lastIndexOf'] || Array.prototype.lastIndexOf;
     const slice       = sequence['slice']       || Array.prototype.slice;
 
     const output = reduce(subs, (out, sub) =>
